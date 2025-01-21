@@ -36,17 +36,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             FromSportId = ModalParameters.TryGet<int>("FromSportId");
             FromFixtureStatusId = ModalParameters.TryGet<int>("FromFixtureStatusId");
 
-            var clientResponse = await TradingService.GetClientList();
-
-            if (clientResponse.StatusCode == StatusCode.Success)
+            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
             {
-                clientResponse.Result = _userState.Model.ClientCodes.Any() ? clientResponse.Result.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
-
-                ClientInformations = clientResponse.Result;
-
-                clientResponse.Result = ClientInformations.Where(c => c.ClientCode != FromClientCode).ToList();
-
-                Clients = clientResponse.Result.Select(s => new SelectListItemModel<string>
+                Clients = _userState.Model.TradingClients.Select(s => new SelectListItemModel<string>
                 {
                     Value = s.ClientCode,
                     Name = s.ClientName

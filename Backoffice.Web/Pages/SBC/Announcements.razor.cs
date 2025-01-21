@@ -311,7 +311,7 @@ namespace Backoffice.Web.Pages.SBC
             {
                 item.EditAction = _ => OnEditClickEvent(item);
                 item.DeleteAction = _ => OnDeleteClickEvent(item);
-                item.DisabledClass = isInternalUser == false && !item.Clients.Any(c => _userState.Model.ClientCodes.Contains(c.ClientCode)) ? "disabled-action" : "";
+                item.DisabledClass = isInternalUser == false && !item.Clients.Any(c => _userState.Model.SportsbookClients.Any(sbc => sbc.ClientCode.Equals(c.ClientCode, StringComparison.OrdinalIgnoreCase))) ? "disabled-action" : "";
             }
         }
 

@@ -33,12 +33,9 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
             {
                 TopFixture = ModalParameters.TryGet<ClientTopFixtureModel.OrderedClientTopFixture>("TopFixture") ?? new ClientTopFixtureModel.OrderedClientTopFixture();
 
-                var clients = (await BackofficeService.GetClients()).Result;
-                if (clients != null)
+                if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
                 {
-                    clients.Clients = _userState.Model.ClientCodes.Any() ? clients.Clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != TopFixture.ClientIdRef).ToList() : new List<Client>();
-
-                    ClientIdSelectedModel = clients.Clients.Select(s => new ClientIdSelectedModel
+                    ClientIdSelectedModel = _userState.Model.TradingClients.Select(s => new ClientIdSelectedModel
                     {
                         IsSelected = false,
                         ClientId = s.ClientId.ToString(),

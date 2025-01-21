@@ -33,7 +33,7 @@ namespace Backoffice.Web.Components.Common
         protected override async Task OnInitializedAsync()
         {
             _isPreLoader = true;
-            _userClients = _userState.Model.ClientCodes.Any() ? _userState.Model.ClientCodes : new List<string>();
+            _userClients = _userState.Model.SportsbookClients.Any() ? _userState.Model.SportsbookClients.Select(s => s.ClientCode).ToList() : new List<string>();
             WithAdministrationPagesAccess = false;
             _boostedSettingsActivityLogs = new List<ActivityLogModel>();
 

@@ -174,17 +174,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         }
         private async Task<List<SelectListItemModel<string>>> LoadClients()
         {
-            var response = await _tradingService.GetClientList();
-
-            var clientList = response.Result;
-            if (clientList == null)
-            {
-                return new();
-            }
-
-            clientList = _userState.Model.ClientCodes.Any() ? clientList.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
-
-            var result = clientList?.Select(s => new SelectListItemModel<string>
+            var result = _userState.Model.TradingClients?.Select(s => new SelectListItemModel<string>
             {
                 Name = s.ClientName,
                 Value = s.ClientCode

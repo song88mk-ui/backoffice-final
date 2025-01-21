@@ -34,13 +34,9 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             Clients = new List<SelectListItemModel<string>>();
             TradingService.Region = Region.ToUpper();
 
-            var clientResponse = await TradingService.GetClientList();
-
-            if (clientResponse.StatusCode == StatusCode.Success)
+            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
             {
-                clientResponse.Result = _userState.Model.ClientCodes.Any() ? clientResponse.Result.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
-
-                Clients = clientResponse.Result.Select(s => new SelectListItemModel<string>
+                Clients = _userState.Model.TradingClients.Select(s => new SelectListItemModel<string>
                 {
                     Value = s.ClientCode,
                     Name = s.ClientName,

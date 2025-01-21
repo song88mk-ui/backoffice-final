@@ -38,14 +38,9 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             _clientFilter = new List<SelectListItemWithCheckboxModel<string>>();
             TradingService.Region = _region.ToUpper();
 
-            var clientsResponse = await TradingService.GetClientList();
-            var clients = clientsResponse.Result;
-
-            if (clients != null)
+            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
             {
-                _clientFilter = _userState.Model.ClientCodes.Any() ?
-                    clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper()))
-                        .Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList() : new();
+                _clientFilter = _userState.Model.TradingClients.Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList();
 
                 _clientFilter.Insert(0, new SelectListItemWithCheckboxModel<string>
                 {

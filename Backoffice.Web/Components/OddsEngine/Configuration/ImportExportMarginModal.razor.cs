@@ -62,8 +62,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             Guid = new Guid();
 
-            Clients = await LoadClients();
-
+            Clients = _userState.Model.TradingClients?.Select(x => new SelectListItemModel<string>()
+            {
+                Name = x.ClientName,
+                Value = x.ClientCode
+            }).ToList() ?? new List<SelectListItemModel<string>>();
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -310,22 +313,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #endregion
 
         #region Utilities
-        private async Task<List<SelectListItemModel<string>>> LoadClients()
-        {
-            var clients = new List<ClientInformationModel>();
-            clients = (await TradingService.GetClientList()).Result;
-
-            if (clients != null)
-            {
-                clients = _userState.Model.ClientCodes.Any() ? clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
-            }
-
-            return clients?.Select(x => new SelectListItemModel<string>()
-            {
-                Name = x.ClientName,
-                Value = x.ClientCode
-            }).ToList() ?? new List<SelectListItemModel<string>>();
-        }
 
         private async Task<List<SelectListItemModel<int>>> LoadSports()
         {

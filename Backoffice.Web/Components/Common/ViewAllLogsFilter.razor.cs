@@ -108,20 +108,15 @@ public partial class ViewAllLogsFilter : IDisposable
     #region Utilities
     private async Task<List<KeyValuePair<string, string>>> GetClients()
     {
-        var response = await _tradingService.GetClientList();
-
         List<KeyValuePair<string, string>> Clients = new List<KeyValuePair<string, string>>();
 
-        if (response != null)
+        if (_userState.Model.TradingClients != null)
         {
-            foreach (var client in response.Result)
+            foreach (var client in _userState.Model.TradingClients)
             {
-                if (_userState.Model.ClientCodes.Contains(client.ClientCode, StringComparer.OrdinalIgnoreCase))
-                {
-                    KeyValuePair<string, string> Client = new KeyValuePair<string, string>(client.ClientCode, client.ClientName);
+                KeyValuePair<string, string> Client = new KeyValuePair<string, string>(client.ClientCode, client.ClientName);
 
-                    Clients.Add(Client);
-                }
+                Clients.Add(Client);
             }
         }
 

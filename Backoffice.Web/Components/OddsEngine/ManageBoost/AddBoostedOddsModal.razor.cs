@@ -83,7 +83,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             Model.PriceBoostConfigList = new List<PriceBoostConfigModel>();
 
-            var clients = await GetClients();
+            var clients = _userState.Model.TradingClients;
 
             var priceBoosts = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
             {
@@ -539,19 +539,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             return selections.OrderBy(m => m.Name).ToList();
         }
-
-        private async Task<List<ClientInformationModel>> GetClients()
-        {
-            var clients = (await TradingService.GetClientList()).Result;
-
-            clients = _userState.Model.ClientCodes.Any() ? clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
-
-            if (!string.IsNullOrEmpty(Model.ClientCode))
-                clients = clients.Where(c => c.ClientCode == Model.ClientCode).ToList();
-
-            return clients;
-        }
-
         private string GetMarketName(string marketName, string marketSpecifier)
         {
             if (string.IsNullOrEmpty(marketName))

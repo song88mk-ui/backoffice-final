@@ -277,20 +277,13 @@ namespace Backoffice.Web.Pages.SBC
 
         private async Task LoadClients()
         {
-            var clients = (await BackofficeService.GetClients()).Result;
-            if (clients != null)
+            if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
             {
-                if (_userState.Model.ClientCodes.Any())
-                {
-                    clients.Clients = clients.Clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-                }
-
-                Clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemModel<Client>
+                Clients = _userState.Model.SportsbookClients.OrderBy(x => x.ClientName).Select(s => new SelectListItemModel<Client>
                 {
                     Value = s,
                     Name = s.ClientName
                 }).ToList();
-
             }
 
             if (!Clients.Any())

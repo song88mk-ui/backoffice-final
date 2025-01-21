@@ -35,11 +35,9 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 SearchText = string.Empty
             };
 
-            if (_userState.Model.ClientCodes != null && _userState.Model.ClientCodes.Any())
+            if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
             {
-                var clients = _userState.Model.SportsbookClients;
-                
-                Clients = clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
+                Clients = _userState.Model.SportsbookClients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
                 {
                     IsChecked = true,
                     Value = s.ClientId.ToString(),
@@ -111,7 +109,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
         #region Utilities
         private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (_userState.Model.ClientCodes != null && _userState.Model.ClientCodes.Any())
+            if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
             {
                 var clients = _userState.Model.SportsbookClients;
 

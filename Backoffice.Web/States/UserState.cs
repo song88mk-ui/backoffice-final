@@ -1,12 +1,9 @@
-﻿using Azure.Core;
-using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.Shared;
 using Backoffice.Web.States.Base;
-using System.ComponentModel;
 using System.Data;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
 namespace Backoffice.Web.States
@@ -24,6 +21,7 @@ namespace Backoffice.Web.States
         #region Fields
 
         private bool _isSuperAdmin;
+        private List<string> _clientCodes { get; set; } = new List<string>();
 
         #endregion
 
@@ -54,12 +52,13 @@ namespace Backoffice.Web.States
                     MainUserId = userClaims.Where(x => x.Type.ToUpper() == "MAINUSERID").FirstOrDefault()?.Value ?? "",
                     RoleId = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLEID")?.Value ?? string.Empty,
                     RoleName = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLENAME")?.Value ?? string.Empty,
-                    ClientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>(),
                     Claims = userClaims.Where(x => !otherPermissions.Contains(x.Type.ToUpper())).ToList(),
                     AccessToken = accessToken,
                     IsAuthenticated = !string.IsNullOrEmpty(accessToken),
                     ClaimsPrincipal = claimsPrincipal
                 };
+
+                _clientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>();
 
                 _isSuperAdmin = !string.IsNullOrEmpty(base.Model.RoleName) && base.Model.RoleName.ToUpper().Equals("SUPER ADMIN") ? true : false;
             }
@@ -67,29 +66,22 @@ namespace Backoffice.Web.States
         }
         public void SetTradingClients(List<ClientInformationModel> clients)
         {
+            if (clients.Any() && !_isSuperAdmin)
+            {
+                clients = clients.Where(c => _clientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+            }
+
             base.Model.TradingClients = new List<ClientInformationModel>(clients);
             OnPropertyChanged();
         }
         public void SetSportsbookClients(List<Client> clients)
         {
-            var sbClients = new List<Client>();
-
-            if (base.Model.ClientCodes != null)
+            if (clients.Any() && !_isSuperAdmin)
             {
-                if (clients.Any())
-                {
-                    if (_isSuperAdmin)
-                        base.Model.ClientCodes = clients.Select(c => c.ClientCode).ToList();
-                    else
-                    {
-                        clients = clients.Where(c => base.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-                    }
-                }
-
-                sbClients = new List<Client>(clients);
+                clients = clients.Where(c => _clientCodes.Contains(c.ClientCode.ToUpper())).ToList();
             }
 
-            base.Model.SportsbookClients = sbClients;
+            base.Model.SportsbookClients = new List<Client>(clients);
             OnPropertyChanged();
         }
         #endregion

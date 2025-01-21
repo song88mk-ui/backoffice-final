@@ -1,6 +1,5 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
@@ -23,18 +22,17 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             Clients = new List<ClientInformationModel>();
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback<AlertModel>>("OnCopyClientSettingsCallback");
-
             await Initialize();
         }
 
         public async Task Initialize()
         {
-            Clients = await LoadClients();
+            Clients = _userState.Model.TradingClients;
 
             var selectedFrom = ModalParameters.TryGet<string>("FromClientCode");
             var selectedTo = ModalParameters.TryGet<string>("ToClientCode");
 
-            if(!string.IsNullOrEmpty(selectedFrom) && !string.IsNullOrEmpty(selectedTo))
+            if (!string.IsNullOrEmpty(selectedFrom) && !string.IsNullOrEmpty(selectedTo))
             {
                 var clientFrom = Clients.FirstOrDefault(c => c.ClientCode.ToUpper() == selectedFrom.ToUpper());
                 var clientTo = Clients.FirstOrDefault(c => c.ClientCode.ToUpper() == selectedTo.ToUpper());
@@ -88,18 +86,5 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         }
         #endregion
 
-        #region Utilities
-        private async Task<List<ClientInformationModel>> LoadClients()
-        {
-            var clients = new List<ClientInformationModel>();
-            clients = (await _tradingService.GetClientList()).Result;
-            if (clients != null)
-            {
-                clients = _userState.Model.ClientCodes.Any() ? clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
-            }
-
-            return clients?.ToList() ?? new List<ClientInformationModel>();
-        }
-        #endregion
     }
 }

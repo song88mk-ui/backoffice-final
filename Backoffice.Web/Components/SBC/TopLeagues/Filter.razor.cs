@@ -135,9 +135,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         {
             if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
             {
-                var clients = _userState.Model.ClientCodes.Any() ? _userState.Model.SportsbookClients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
-
-                TopLeaguesFilterModel.Clients = clients
+                TopLeaguesFilterModel.Clients = _userState.Model.SportsbookClients
                     .Select(s => new TopLeaguesFilterModel.Client
                     {
                         ClientId = s.ClientId,

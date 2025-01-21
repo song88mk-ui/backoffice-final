@@ -252,14 +252,11 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
         private async Task LoadClients()
         {
-            var clients = (await BackofficeService.GetClients()).Result;
+            var clients = _userState.Model.SportsbookClients;
 
-            if (clients != null && clients.Clients.Any())
+            if (clients != null && clients.Any())
             {
-                if(_userState.Model.ClientCodes.Any())
-                    clients.Clients = clients.Clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-
-                Clients = clients.Clients.Select(s => new SelectListItemWithCheckboxModel<string>
+                Clients = clients.Select(s => new SelectListItemWithCheckboxModel<string>
                 {
                     IsChecked = true,
                     Value = s.ClientId.ToString(),

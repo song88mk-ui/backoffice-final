@@ -1,11 +1,10 @@
-﻿using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
-using Microsoft.AspNetCore.Components;
 using BlazorDateRangePicker;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Backoffice.Web.Helpers;
+using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -34,7 +33,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigLogsFilterModel = new ConfigLogsFilterModel()
             {
                 FixtureTypeLookUp = GetFixtureTypes(),
-                Clients = await GetClients(),
+                Clients = _userState.Model.TradingClients.Select(c => new SelectListItemModel<Guid>()
+                {
+                    Value = c.ClientId,
+                    Name = c.ClientName
+                }).ToList(),
                 ClientId = Guid.Empty,
                 Sports = await GetSports(),
                 LeagueId = 0,
@@ -43,7 +46,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 Scopes = GetScopes(),
                 Scope = string.Empty,
                 MarketId = string.Empty,
-                FromDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.Add(new TimeSpan(0,0,0)),
+                FromDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.Add(new TimeSpan(0, 0, 0)),
                 ToDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(1).AddTicks(-1),
                 Filter = string.Empty,
             };
@@ -128,7 +131,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public async Task OnDateRangeChangedEvent(DateRange range)
         {
             var clientDateRange = DateTimeHelper.ConvertToClientTimeZone(range, _userState.TimeZoneOffset);
-            ConfigLogsFilterModel.FromDate= clientDateRange.Start.DateTime;
+            ConfigLogsFilterModel.FromDate = clientDateRange.Start.DateTime;
             ConfigLogsFilterModel.ToDate = clientDateRange.End.DateTime;
 
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
@@ -146,12 +149,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 new SelectListItemModel<int> { Value = 0, Name = "Match" },
                 new SelectListItemModel<int> {  Value = 1, Name = "Outrights" }
             };
-
-        private async Task<List<SelectListItemModel<Guid>>> GetClients() => (await TradingService.GetClientList()).Result.Where(x => _userState.Model.ClientCodes.Contains(x.ClientCode)).Select(c => new SelectListItemModel<Guid>()
-        {
-            Value = c.ClientId,
-            Name = c.ClientName
-        }).ToList();
 
         private async Task<List<SelectListItemModel<int>>> GetSports() => (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result.SportLookup.Select(c => new SelectListItemModel<int>()
         {

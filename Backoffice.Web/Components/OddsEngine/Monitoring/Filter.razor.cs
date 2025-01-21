@@ -45,7 +45,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         protected override async Task OnParametersSetAsync()
         {
-            var tempClientReference = string.Join(',', _userState.Model.ClientCodes.OrderBy(c => c).Select(s => s.Trim()).ToList());
+            var tempClientReference = string.Join(',', _userState.Model.TradingClients.OrderBy(c => c).Select(s => s.ClientCode.Trim()).ToList());
 
             if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
             {
@@ -60,9 +60,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                 _clientReference = tempClientReference;
                 if (_clientListReference != null)
                 {
-                    _clientFilter = _userState.Model.ClientCodes.Any()
-                        ? _clientListReference.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList()
-                        : new();
+                    _clientFilter = _userState.Model.TradingClients?.Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList() ?? new List<SelectListItemWithCheckboxModel<string>>();
 
                     if (_clientFilter.Any())
                     {

@@ -59,13 +59,10 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 ClientIdSelectedModel = new List<ClientIdSelectedModel>()
             };
 
-            var clients = (await BackofficeService.GetClients()).Result;
 
-            if (clients != null)
+            if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
             {
-                clients.Clients = _userState.Model.ClientCodes.Any() ? clients.Clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != CopyTopLeaguesModel.CopyFromClientId).ToList() : new List<Client>();
-
-                CopyTopLeaguesModel.ClientIdSelectedModel = clients.Clients.Select(s => new ClientIdSelectedModel
+                CopyTopLeaguesModel.ClientIdSelectedModel = _userState.Model.SportsbookClients.Select(s => new ClientIdSelectedModel
                 {
                     IsSelected = false,
                     ClientId = s.ClientId.ToString(),

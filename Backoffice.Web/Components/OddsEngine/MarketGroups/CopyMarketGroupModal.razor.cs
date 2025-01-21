@@ -49,16 +49,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 try
                 {
                     CopyToClientCode = ModalParameters.TryGet<string>("ClientCode");
-                    if (_userState.Model.ClientCodes.Any())
+                    if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
                     {
-                        ClientInformations = (await _tradingService.GetClientList()).Result;
-
-                        var roleName = _userState.Model.RoleName;
-                        if (roleName != "Super Admin")
-                        {
-                            var clientCodes = _userState.Model.ClientCodes;
-                            ClientInformations = ClientInformations.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
-                        }
+                        ClientInformations =_userState.Model.TradingClients;
                         Clients = ClientInformations.Where(x => x.ClientCode != CopyToClientCode).Select(s => new SelectListItemModel<string>
                         {
                             Value = s.ClientCode,
