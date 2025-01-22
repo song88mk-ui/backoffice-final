@@ -2,12 +2,14 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics;
 
 namespace Backoffice.Web.Components.SBC.TopLeagues
 {
     public partial class Filter : IDisposable
     {
         #region Properties
+
         [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnInitCallback { get; set; }
@@ -25,6 +27,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         //private TopLeaguesFilterModel DefaultFilter { get; set; }
 
         private bool _init = true;
+
         #endregion
 
         #region Methods
@@ -85,7 +88,8 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             {
                 SetClients();
 
-                await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
+                if (TopLeaguesFilterModel.Clients.Any())
+                    await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
             }
 
             _init = false;
