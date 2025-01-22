@@ -31,16 +31,23 @@ namespace Backoffice.API.Controllers.SportsbookClients
         [HttpPost("topfixtures")]
         public async Task<IActionResult> GetClientTopFixtures([FromBody] GetClientTopFixtureRequest request)
         {
-            var regionClients = await _backofficeRepository.GetClientsByRegion(request.ClientIds);
-
-            var result = await _platformRepository.GetClientTopFixtures(regionClients.Result);
-
-            switch (result.StatusCode)
+            using (var activity = _activitySource.StartActivity("topfixtures"))
             {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
+                activity?.SetTag("request", JsonSerializer.Serialize(request));
+
+                var regionClients = await _backofficeRepository.GetClientsByRegion(request.ClientIds);
+
+                activity?.SetTag("regions", JsonSerializer.Serialize(regionClients));
+
+                var result = await _platformRepository.GetClientTopFixtures(regionClients.Result);
+
+                switch (result.StatusCode)
+                {
+                    case BoStatusCode.Success:
+                        return Ok(result);
+                    default:
+                        return BadRequest(result);
+                }
             }
         }
 

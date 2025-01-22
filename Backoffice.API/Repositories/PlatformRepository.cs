@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Backoffice.API.Telemetry;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Extensions;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -25,11 +27,14 @@ namespace Backoffice.API.Repositories
         private readonly IConfiguration _configuration;
         private readonly IBackofficeActivityLogRepository _activityLogRepository;
         private readonly IRabbitMqRepository _rabbitMqRepository;
-        public PlatformRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IRabbitMqRepository rabbitMqRepository)
+        private readonly ActivitySource _activitySource;
+
+        public PlatformRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IRabbitMqRepository rabbitMqRepository, Instrumentation instrumentation)
         {
             _configuration = configuration;
             _activityLogRepository = activityLogRepository;
             _rabbitMqRepository = rabbitMqRepository;
+            _activitySource = instrumentation.ActivitySource;
         }
 
         #region Client
@@ -418,6 +423,8 @@ namespace Backoffice.API.Repositories
         #region TOP FIXTURE
         public async Task<BaseResponse<ClientTopFixtureResponse>> GetClientTopFixtures(IDictionary<string, string> regionclientIds)
         {
+            using var activity = _activitySource.StartActivity("top.fixture");
+
             try
             {
                 var topFixture = new List<OrderedClientTopFixture>();
@@ -433,7 +440,11 @@ namespace Backoffice.API.Repositories
 
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        var newresult = JsonConvert.DeserializeObject<BaseResponse<ClientTopFixtureResponse>>(response.Content.ReadAsStringAsync().Result).Result.TopFixtures;
+                        var responseString = response.Content.ReadAsStringAsync().Result;
+
+                        activity?.SetTag("response", responseString);
+
+                        var newresult = JsonConvert.DeserializeObject<BaseResponse<ClientTopFixtureResponse>>(responseString).Result.TopFixtures;
                         if (newresult.Any())
                         {
                             topFixture.AddRange(newresult);
@@ -442,9 +453,17 @@ namespace Backoffice.API.Repositories
                     else
                     {
                         if (response.StatusCode == HttpStatusCode.BadRequest)
-                            return JsonConvert.DeserializeObject<BaseResponse<ClientTopFixtureResponse>>(await response.Content.ReadAsStringAsync());
+                        {
+                            var responseString = await response.Content.ReadAsStringAsync();
+
+                            activity?.SetTag("response.bad.request", responseString);
+
+                            return JsonConvert.DeserializeObject<BaseResponse<ClientTopFixtureResponse>>(responseString);
+                        }
                         else
                         {
+                            activity?.SetTag("response.error", response.ReasonPhrase);
+
                             return new BaseResponse<ClientTopFixtureResponse>
                             {
                                 StatusCode = StatusCode.Error,
@@ -466,6 +485,9 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
+                activity?.SetTag("response.ex", ex.Message);
+                activity?.SetTag("response.ex", ex.StackTrace);
+
                 return new BaseResponse<ClientTopFixtureResponse>
                 {
                     StatusCode = StatusCode.Error,
