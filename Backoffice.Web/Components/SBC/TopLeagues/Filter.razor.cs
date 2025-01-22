@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Backoffice.Web.Components.SBC.TopLeagues
@@ -9,8 +10,6 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
     public partial class Filter : IDisposable
     {
         #region Properties
-
-        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnFilterCallback { get; set; }
@@ -36,7 +35,6 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         {
             Sports = new List<SelectListItemModel<string>>();
             TopLeaguesFilterModel = new TopLeaguesFilterModel();
-            //DefaultFilter = new TopLeaguesFilterModel();
 
             SearchForm = new SearchFormModel()
             {
@@ -44,56 +42,19 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 IsReset = false
             };
 
-            SetClients();
-
-            var sports = (await BackofficeService.GetSportsAsync()).Result;
-
-            if (sports != null && sports.SportLookup.Any())
+            if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
             {
-                Sports = sports.SportLookup.Select(s => new SelectListItemModel<string>
-                {
-                    Value = s.SportId.ToString(),
-                    Name = s.SportName
-                }).ToList();
-
-                var sport = Sports.FirstOrDefault(c => c.Value == "1"); // soccer as initial value
-
-                SelectedSportId = sport.Value;
-
-                TopLeaguesFilterModel.SportId = SelectedSportId;
-                TopLeaguesFilterModel.SportName = sport.Name;
-            }
-            else
-            {
-                Sports.Add(new SelectListItemModel<string>
-                {
-                    Value = "0",
-                    Name = "No Sports Available"
-                });
-
-                var sport = Sports.FirstOrDefault();
-
-                SelectedSportId = sport.Value;
-
-                TopLeaguesFilterModel.SportId = SelectedSportId;
-                TopLeaguesFilterModel.SportName = sport.Name;
+                await Initialize();
             }
 
-            await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
+            _userState.PropertyChanged += UserStatePropertyChanged;
         }
 
-        protected override async Task OnParametersSetAsync()
+        private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!_init && !TopLeaguesFilterModel.Clients.Any())
-            {
-                SetClients();
-
-                if (TopLeaguesFilterModel.Clients.Any())
-                    await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
-            }
-
-            _init = false;
+            await Initialize();
         }
+
         public async void OnSportsChangedEvent(ChangeEventArgs e)
         {
             SelectedSportId = e.Value.ToString();
@@ -135,6 +96,46 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         #endregion
 
         #region Utilities
+        private async Task Initialize()
+        {
+            SetClients();
+
+            var sportResponse = await _backofficeService.GetSportsAsync();
+            var sports = sportResponse.Result;
+
+            if (sports != null && sports.SportLookup.Any())
+            {
+                Sports = sports.SportLookup.Select(s => new SelectListItemModel<string>
+                {
+                    Value = s.SportId.ToString(),
+                    Name = s.SportName
+                }).ToList();
+
+                var sport = Sports.FirstOrDefault(c => c.Value == "1");
+
+                SelectedSportId = sport.Value;
+
+                TopLeaguesFilterModel.SportId = SelectedSportId;
+                TopLeaguesFilterModel.SportName = sport.Name;
+            }
+            else
+            {
+                Sports.Add(new SelectListItemModel<string>
+                {
+                    Value = "0",
+                    Name = "No Sports Available"
+                });
+
+                var sport = Sports.FirstOrDefault();
+
+                SelectedSportId = sport.Value;
+
+                TopLeaguesFilterModel.SportId = SelectedSportId;
+                TopLeaguesFilterModel.SportName = sport.Name;
+            }
+
+            await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
+        }
         private void SetClients()
         {
             if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
