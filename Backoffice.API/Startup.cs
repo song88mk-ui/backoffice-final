@@ -90,6 +90,7 @@ namespace Backoffice.API
                       .AddMeter(Instrumentation.MeterName)
                       .AddRuntimeInstrumentation()
                       .AddHttpClientInstrumentation()
+                      .AddProcessInstrumentation()
                       .AddAspNetCoreInstrumentation();
 
                       metrics.AddOtlpExporter(exporterOpts =>
