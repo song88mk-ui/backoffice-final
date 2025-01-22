@@ -211,6 +211,7 @@ namespace Backoffice.Web.Shared
                     var regions = new List<string>() { "HK", "SA" };
                     PageState.Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToUpper() : string.Empty;
                 }
+
                 await InvokeAsync(StateHasChanged);
             }
             catch (Exception ex)

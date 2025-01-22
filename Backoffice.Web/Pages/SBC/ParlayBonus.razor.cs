@@ -13,14 +13,9 @@ namespace Backoffice.Web.Pages.SBC
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public IJSRuntime JSRuntime { get; set; }
-
         public MetaData MetaData { get; set; }
-        public ClientParlayBonusModel ClientParlayBonusModel { get; set; }
+        public ClientParlayBonusModel ClientParlayBonusModel { get; set; } = new ClientParlayBonusModel() { ParlayBonusMinOdds = 1.20m };
         public List<ParlayBonusConfig> TempConfig { get; set; }
-        public List<SelectListItemModel<Client>> Clients { get; set; }
 
         public long ClientId { get; set; }
         public bool IsEdit { get; set; }
@@ -51,8 +46,6 @@ namespace Backoffice.Web.Pages.SBC
                 Title = "Parlay Bonus",
                 IconClass = "ico ico-parlay-bonus"
             };
-            ClientParlayBonusModel = new ClientParlayBonusModel() { ParlayBonusMinOdds = 1.20m };
-            Clients = new List<SelectListItemModel<Client>>();
 
             TempConfig = new List<ParlayBonusConfig>();
 
@@ -67,8 +60,6 @@ namespace Backoffice.Web.Pages.SBC
             OnDisableSaveActionAsync = DisableSaveButton;
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
-
-            await LoadClients();
         }
 
         public async Task OnClientChangedEvent(long clientId)
@@ -84,7 +75,7 @@ namespace Backoffice.Web.Pages.SBC
             await LoadClientParlayBonus(clientId);
         }
 
-        public async Task OnDeleteConfig(Models.ParlayBonusConfig parlayBonusConfig)
+        public async Task OnDeleteConfig(ParlayBonusConfig parlayBonusConfig)
         {
             var parameters = new ModalParameters();
 
@@ -92,12 +83,12 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("ParlayBonusConfig", parlayBonusConfig);
 
-            var ClientName = Clients.FirstOrDefault(x => x.Value.ClientId == ClientId).Name;
+            var ClientName = _userState.Model.SportsbookClients.FirstOrDefault(c => c.ClientId == ClientId);
 
-            parameters.Add("ClientName", ClientName);
+            parameters.Add("ClientName", ClientName?.ClientName ?? string.Empty);
 
             var options = new ModalOptions();
-            ModalService.Open<DeleteModal>("Delete Parlay Bonus", parameters, options);
+            _modalService.Open<DeleteModal>("Delete Parlay Bonus", parameters, options);
         }
 
         public async Task OnViewConfigLog(Models.ParlayBonusConfig parlayBonusConfig)
@@ -110,7 +101,7 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("ModalIcon", "<i class=\"fa fa-list-alt m-2\"></i>");
 
             var options = new ModalOptions();
-            ModalService.Open<ViewLogModal>("Logs", parameters, options);
+            _modalService.Open<ViewLogModal>("Logs", parameters, options);
         }
 
         public async Task SelectPage(int page)
@@ -169,7 +160,7 @@ namespace Backoffice.Web.Pages.SBC
             _isSaving = true;
             IsPreloading = true;
 
-            var result = (await BackofficeService.AddOrUpdateParlayBonus(new ParlayBonusRequest()
+            var result = (await _backofficeService.AddOrUpdateParlayBonus(new ParlayBonusRequest()
             {
                 ClientIdRef = ClientId,
                 ParlayBonusConfig = ClientParlayBonusModel.ParlayBonusConfig.Select(s => new ParlayBonusConfigRequest()
@@ -261,7 +252,6 @@ namespace Backoffice.Web.Pages.SBC
         {
             ClientParlayBonusModel = null;
             TempConfig = null;
-            Clients = null;
 
             GC.SuppressFinalize(this);
         }
@@ -272,30 +262,7 @@ namespace Backoffice.Web.Pages.SBC
 
         private async Task ShowToast()
         {
-            await JSRuntime.InvokeVoidAsync("showToast");
-        }
-
-        private async Task LoadClients()
-        {
-            if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
-            {
-                Clients = _userState.Model.SportsbookClients.OrderBy(x => x.ClientName).Select(s => new SelectListItemModel<Client>
-                {
-                    Value = s,
-                    Name = s.ClientName
-                }).ToList();
-            }
-
-            if (!Clients.Any())
-                Clients.Add(new SelectListItemModel<Client>
-                {
-                    Value = new Client(),
-                    Name = _translationState.GetValue("No Clients Available")
-                });
-            else
-                Clients.Insert(0, new SelectListItemModel<Client> { Value = new Client(), Name = "Choose client" });
-
-            //var selectedClients = Clients.Where(c => !string.IsNullOrEmpty(c.Value.ClientCode)).Select(s => s.Value).ToList();            
+            await _jsRuntime.InvokeVoidAsync("showToast");
         }
 
         private async Task LoadClientParlayBonus(long clientId, bool isSkip = true)
@@ -303,49 +270,58 @@ namespace Backoffice.Web.Pages.SBC
             IsPreloading = true;
             IsEmpty = true;
 
-            var result = (await BackofficeService.GetClientParlayBonus(new GetParlayBonusRequest()
+            if(ClientParlayBonusModel == null)
+                ClientParlayBonusModel = new ClientParlayBonusModel() { ParlayBonusMinOdds = 1.20m };
+
+            ClientParlayBonusModel.ParlayBonusConfig = new List<ParlayBonusConfig>();
+
+            if (clientId > 0)
             {
-                ClientIdRef = clientId,
-                Page = MetaData.CurrentPage,
-                PageSize = MetaData.PageSize
-            })).Result;
-
-            if (result != null)
-            {
-                MetaData = new MetaData()
+                var result = (await _backofficeService.GetClientParlayBonus(new GetParlayBonusRequest()
                 {
-                    CurrentPage = result.Page,
-                    PageSize = result.PageSize,
-                    TotalCount = result.Total,
-                    TotalPages = result.TotalPage
-                };
+                    ClientIdRef = clientId,
+                    Page = MetaData.CurrentPage,
+                    PageSize = MetaData.PageSize
+                })).Result;
 
-                foreach (var config in result.ParlayBonusConfig)
+                if (result != null)
                 {
-                    config.ParlayBonus = Convert.ToDecimal((config.ParlayBonus * 100).ToString("#.00"));
+                    MetaData = new MetaData()
+                    {
+                        CurrentPage = result.Page,
+                        PageSize = result.PageSize,
+                        TotalCount = result.Total,
+                        TotalPages = result.TotalPage
+                    };
+
+                    foreach (var config in result.ParlayBonusConfig)
+                    {
+                        config.ParlayBonus = Convert.ToDecimal((config.ParlayBonus * 100).ToString("#.00"));
+                    }
+
+                    ClientParlayBonusModel.ParlayBonusConfig.RemoveAll(x => TempConfig.Contains(x));
+
+                    TempConfig = new List<Models.ParlayBonusConfig>();
+
+                    if (!IsAdding)
+                    {
+                        IsEdit = false;
+                    }
+
+                    ClientParlayBonusModel = result;
+
+                    IsEmpty = ClientParlayBonusModel.ParlayBonusConfig.Count > 0 ? false : true;
+
+                    TotalCount = ClientParlayBonusModel.ParlayBonusConfig.Count;
+
+                    if (ClientParlayBonusModel.ParlayBonusMinOdds == 0)
+                    {
+                        ClientParlayBonusModel.ParlayBonusMinOdds = 1.20m;
+                    }
                 }
+            }
 
-                ClientParlayBonusModel.ParlayBonusConfig.RemoveAll(x => TempConfig.Contains(x));
-
-                TempConfig = new List<Models.ParlayBonusConfig>();
-
-                if (!IsAdding)
-                {
-                    IsEdit = false;
-                }
-
-                ClientParlayBonusModel = result;
-                IsPreloading = false;
-
-                IsEmpty = ClientParlayBonusModel.ParlayBonusConfig.Count > 0 ? false : true;
-
-                TotalCount = ClientParlayBonusModel.ParlayBonusConfig.Count;
-
-                if (ClientParlayBonusModel.ParlayBonusMinOdds == 0)
-                {
-                    ClientParlayBonusModel.ParlayBonusMinOdds = 1.20m;
-                }
-            } 
+            IsPreloading = false;
         }
 
         private async Task DisableSaveButton(decimal inputValue, string id)
@@ -355,11 +331,11 @@ namespace Backoffice.Web.Pages.SBC
             if (ClientParlayBonusModel.ParlayBonusConfig.Where(c => c.SelectionCount != selectionCount).Any(c => c.ParlayBonus < 0.01m
             || c.ParlayBonus > 5000m) || inputValue < 0.01m || inputValue > 5000m)
             {
-                await JSRuntime.InvokeVoidAsync("disableSaveButton", true);
+                await _jsRuntime.InvokeVoidAsync("disableSaveButton", true);
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("disableSaveButton", false);
+                await _jsRuntime.InvokeVoidAsync("disableSaveButton", false);
             }
         }
 

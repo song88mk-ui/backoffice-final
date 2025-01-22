@@ -2,15 +2,13 @@
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.ComponentModel;
 
 namespace Backoffice.Web.Components.SBC.ParlayBonus
 {
     public partial class Filter : IDisposable
     {
         #region Properties
-
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-        [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [Parameter] public ClientParlayBonusModel ClientParlayBonusResponse { get; set; }
         [Parameter] public EventCallback<bool> OnUpdateClickCallback { get; set; }
@@ -19,12 +17,12 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
         [Parameter] public EventCallback<bool> IsEditChanged { get; set; }
-        [Parameter] public List<SelectListItemModel<Client>> Clients { get; set; }
         [Parameter] public bool IsEdit { get; set; }
         [Parameter] public bool IsDisableAction { get; set; }
 
         public ElementReference ParlayBonusMinOddsElementReference { get; set; }
         public ElementReference FilterAddButtonElementReference { get; set; }
+        private List<SelectListItemModel<Client>> _clients { get; set; }
 
         public string ClientId { get; set; }
         public decimal OriginalMinOdds { get; set; }
@@ -39,6 +37,13 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
         protected override async Task OnInitializedAsync()
         {
             ClientId = "0";
+
+            if(_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
+            {
+                await LoadClients();
+            }
+
+            _userState.PropertyChanged += UserStatePropertyChanged;
         } 
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
@@ -86,7 +91,7 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
 
         public async Task ValidateParlayBonusMinOdds(ChangeEventArgs e)
         {
-            await JSRuntime.InvokeVoidAsync("ValidateParlayBonusMinOdds", ParlayBonusMinOddsElementReference);
+            await _jsRuntime.InvokeVoidAsync("ValidateParlayBonusMinOdds", ParlayBonusMinOddsElementReference);
         }
 
         [JSInvokable("DisableSaveButton")]
@@ -100,6 +105,37 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
 
         }
 
+        #endregion
+
+        #region Utilities
+        private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            await LoadClients();
+        }
+        private async Task LoadClients()
+        {
+            if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
+            {
+                _clients = _userState.Model.SportsbookClients.OrderBy(x => x.ClientName).Select(s => new SelectListItemModel<Client>
+                {
+                    Value = s,
+                    Name = s.ClientName
+                }).ToList();
+            }
+
+            if (!_clients.Any())
+                _clients.Add(new SelectListItemModel<Client>
+                {
+                    Value = new Client(),
+                    Name = _translationState.GetValue("No Clients Available")
+                });
+            else
+                _clients.Insert(0, new SelectListItemModel<Client> { Value = new Client(), Name = "Choose client" });
+
+            var clientId = _clients.FirstOrDefault()?.Value.ClientId ?? 0;
+
+            await OnClientChangedCallback.InvokeAsync(clientId);
+        }
         #endregion
     }
 }

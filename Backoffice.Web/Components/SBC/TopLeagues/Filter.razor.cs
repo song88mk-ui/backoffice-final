@@ -50,11 +50,6 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             _userState.PropertyChanged += UserStatePropertyChanged;
         }
 
-        private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            await Initialize();
-        }
-
         public async void OnSportsChangedEvent(ChangeEventArgs e)
         {
             SelectedSportId = e.Value.ToString();
@@ -135,6 +130,10 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             }
 
             await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
+        }
+        private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            await Initialize();
         }
         private void SetClients()
         {
