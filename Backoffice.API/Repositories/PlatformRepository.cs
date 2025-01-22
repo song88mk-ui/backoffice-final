@@ -485,8 +485,8 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                activity?.SetTag("response.ex", ex.Message);
-                activity?.SetTag("response.ex", ex.StackTrace);
+                activity?.SetTag("response.ex.message", ex.Message);
+                activity?.SetTag("response.ex.stacktrace", ex.StackTrace);
 
                 return new BaseResponse<ClientTopFixtureResponse>
                 {
