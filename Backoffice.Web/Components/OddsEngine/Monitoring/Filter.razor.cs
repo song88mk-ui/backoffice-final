@@ -2,7 +2,6 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Components.OddsEngine.Monitoring
@@ -45,7 +44,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         protected override async Task OnParametersSetAsync()
         {
-            var tempClientReference = string.Join(',', _userState.Model.TradingClients.OrderBy(c => c).Select(s => s.ClientCode.Trim()).ToList());
+            var tempClientReference = string.Join(',', _userState.Model.TradingClients.OrderBy(c => c.ClientCode).Select(s => s.ClientCode.Trim()).ToList());
 
             if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
             {
