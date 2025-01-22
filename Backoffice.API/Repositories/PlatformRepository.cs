@@ -201,63 +201,71 @@ namespace Backoffice.API.Repositories
         }
         public async Task<BaseResponse<GetTopLeaguesResponse>> GetTopLeagues(GetTopLeaguesRequest request, IDictionary<string, string> regionclientIds)
         {
-            try
+            using (var activity = _activitySource.StartActivity("top.leagues"))
             {
-                var topLeagues = new List<OrderedClientTopLeagues>();
-                foreach (var region in regionclientIds)
+                try
                 {
-                    var payload = JsonConvert.SerializeObject(new
+                    var topLeagues = new List<OrderedClientTopLeagues>();
+                    foreach (var region in regionclientIds)
                     {
-                        ClientIdRefs = region.Value,
-                        LanguageCode = request.LanguageCode,
-                        LeagueId = request.LeagueId,
-                        SegmentId = request.SegmentId,
-                        SportId = request.SportId
-                    });
-
-                    var response = await GetHttpClient(region.Key).PostAsync($"v1/client/topleagues/list", new StringContent(
-                        payload, Encoding.UTF8, "application/json"));
-
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        var newresult = JsonConvert.DeserializeObject<BaseResponse<GetTopLeaguesResponse>>(response.Content.ReadAsStringAsync().Result).Result.ClientTopLeagues;
-                        if (newresult.Any())
+                        var payload = JsonConvert.SerializeObject(new
                         {
-                            topLeagues.AddRange(newresult);
+                            ClientIdRefs = region.Value,
+                            LanguageCode = request.LanguageCode,
+                            LeagueId = request.LeagueId,
+                            SegmentId = request.SegmentId,
+                            SportId = request.SportId
+                        });
+
+                        var response = await GetHttpClient(region.Key).PostAsync($"v1/client/topleagues/list", new StringContent(
+                            payload, Encoding.UTF8, "application/json"));
+
+                        activity?.SetTag("client.list.status.code", response.StatusCode);
+
+                        if (response.StatusCode == HttpStatusCode.OK)
+                        {
+                            var newresult = JsonConvert.DeserializeObject<BaseResponse<GetTopLeaguesResponse>>(response.Content.ReadAsStringAsync().Result).Result.ClientTopLeagues;
+                            if (newresult.Any())
+                            {
+                                topLeagues.AddRange(newresult);
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (response.StatusCode == HttpStatusCode.BadRequest)
-                            return JsonConvert.DeserializeObject<BaseResponse<GetTopLeaguesResponse>>(await response.Content.ReadAsStringAsync());
                         else
                         {
-                            return new BaseResponse<GetTopLeaguesResponse>
+                            if (response.StatusCode == HttpStatusCode.BadRequest)
+                                return JsonConvert.DeserializeObject<BaseResponse<GetTopLeaguesResponse>>(await response.Content.ReadAsStringAsync());
+                            else
                             {
-                                StatusCode = StatusCode.Error,
-                                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                            };
+                                return new BaseResponse<GetTopLeaguesResponse>
+                                {
+                                    StatusCode = StatusCode.Error,
+                                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                                };
+                            }
                         }
-                    }
 
-                }
-                return new BaseResponse<GetTopLeaguesResponse>()
-                {
-                    StatusCode = StatusCode.Success,
-                    Message = StatusCode.Success.ToString(),
-                    Result = new GetTopLeaguesResponse
-                    {
-                        ClientTopLeagues = topLeagues
                     }
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<GetTopLeaguesResponse>()
+                    activity?.SetStatus(ActivityStatusCode.Ok);
+                    return new BaseResponse<GetTopLeaguesResponse>()
+                    {
+                        StatusCode = StatusCode.Success,
+                        Message = StatusCode.Success.ToString(),
+                        Result = new GetTopLeaguesResponse
+                        {
+                            ClientTopLeagues = topLeagues
+                        }
+                    };
+                }
+                catch (Exception ex)
                 {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
+                    activity?.SetTag("error.stack.trace", ex.StackTrace);
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    return new BaseResponse<GetTopLeaguesResponse>()
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                    };
+                }
             }
         }
         public async Task<BaseResponse<PlatformMessageResponse>> PostTopLeagues(PostTopLeaguesRequest request, string region)
