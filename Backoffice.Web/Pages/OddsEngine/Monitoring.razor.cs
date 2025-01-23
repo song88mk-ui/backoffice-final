@@ -105,10 +105,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                     ShowLanguageDropDown = false
                 };
 
-                if (!_init && isReloadFixtureMarkets && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
-                {
-                    await OnInitializeEvent(_monitoringCallbackModel);
-                }
+                //if (!_init && isReloadFixtureMarkets && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
+                //{
+                //    await OnInitializeEvent(_monitoringCallbackModel);
+                //}
             }
 
             _init = false;

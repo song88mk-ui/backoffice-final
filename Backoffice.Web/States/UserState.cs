@@ -66,7 +66,7 @@ namespace Backoffice.Web.States
         }
         public void SetTradingClients(List<ClientInformationModel> clients)
         {
-            if (clients.Any() && !_isSuperAdmin)
+            if (clients != null && clients.Any() && !_isSuperAdmin)
             {
                 clients = clients.Where(c => _clientCodes.Contains(c.ClientCode.ToUpper())).ToList();
             }
@@ -76,7 +76,7 @@ namespace Backoffice.Web.States
         }
         public void SetSportsbookClients(List<Client> clients)
         {
-            if (clients.Any() && !_isSuperAdmin)
+            if (clients != null && clients.Any() && !_isSuperAdmin)
             {
                 clients = clients.Where(c => _clientCodes.Contains(c.ClientCode.ToUpper())).ToList();
             }
