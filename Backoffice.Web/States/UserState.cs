@@ -69,9 +69,11 @@ namespace Backoffice.Web.States
             if (clients != null && clients.Any() && !_isSuperAdmin)
             {
                 clients = clients.Where(c => _clientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                base.Model.TradingClients = new List<ClientInformationModel>(clients);
             }
+            else
+                base.Model.SportsbookClients = new List<Client>();
 
-            base.Model.TradingClients = new List<ClientInformationModel>(clients);
             OnPropertyChanged();
         }
         public void SetSportsbookClients(List<Client> clients)
@@ -79,9 +81,12 @@ namespace Backoffice.Web.States
             if (clients != null && clients.Any() && !_isSuperAdmin)
             {
                 clients = clients.Where(c => _clientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-            }
 
-            base.Model.SportsbookClients = new List<Client>(clients);
+                base.Model.SportsbookClients = new List<Client>(clients);
+            }
+            else
+                base.Model.SportsbookClients = new List<Client>();
+
             OnPropertyChanged();
         }
         #endregion
