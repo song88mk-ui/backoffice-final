@@ -33,9 +33,9 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
             {
                 TopFixture = ModalParameters.TryGet<ClientTopFixtureModel.OrderedClientTopFixture>("TopFixture") ?? new ClientTopFixtureModel.OrderedClientTopFixture();
 
-                if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
+                if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
                 {
-                    ClientIdSelectedModel = _userState.Model.TradingClients.Select(s => new ClientIdSelectedModel
+                    ClientIdSelectedModel = _userState.Model.SportsbookClients.Select(s => new ClientIdSelectedModel
                     {
                         IsSelected = false, 
                         ClientId = s.ClientId.ToString(),

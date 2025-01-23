@@ -3,10 +3,9 @@ using Backoffice.Shared.Models;
 using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
+using Backoffice.Web.Utilities;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using System.Security.Claims;
 
 namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 {
@@ -293,54 +292,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
                 Name = s.SportName
             }).ToList();
 
-            //temporarily add virtual sports since it is not handled in API
-            List<SelectListItemWithCheckboxModel<string>> virtualSports = new List<SelectListItemWithCheckboxModel<string>>()
-            {
-                new SelectListItemWithCheckboxModel<string>
-                {
-                    IsChecked = true,
-                    Value = 1001.ToString(),
-                    Name = "Virtual Soccer"
-                },
-                new SelectListItemWithCheckboxModel<string>
-                {
-                    IsChecked = true,
-                    Value = 1002.ToString(),
-                    Name = "Virtual Basketball"
-                },
-                new SelectListItemWithCheckboxModel<string>
-                {
-                    IsChecked = true,
-                    Value = 1003.ToString(),
-                    Name = "Virtual Baseball"
-                },
-                new SelectListItemWithCheckboxModel<string>
-                {
-                    IsChecked = true,
-                    Value = 1005.ToString(),
-                    Name = "Virtual Tennis"
-                },
-                new SelectListItemWithCheckboxModel<string>
-                {
-                    IsChecked = true,
-                    Value = 1021.ToString(),
-                    Name = "Virtual Cricket"
-                },
-                new SelectListItemWithCheckboxModel<string>
-                {
-                    IsChecked = true,
-                    Value = 1055.ToString(),
-                    Name = "Virtual Horse Racing"
-                },
-                new SelectListItemWithCheckboxModel<string>
-                {
-                    IsChecked = true,
-                    Value = 1058.ToString(),
-                    Name = "Virtual Dog Racing"
-                }
-            };
-
-            Sports.AddRange(virtualSports);
+            Sports.AddRange(Utility.VirtualSports);
 
             Sports.Insert(0, new SelectListItemWithCheckboxModel<string>
             {

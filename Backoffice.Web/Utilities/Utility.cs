@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Models;
 
 namespace Backoffice.Web.Utilities
 {
@@ -130,5 +131,52 @@ namespace Backoffice.Web.Utilities
 
             return string.Empty;
         }
+
+        //temporarily add virtual sports since it is not handled in API
+        public static List<SelectListItemWithCheckboxModel<string>> VirtualSports = new List<SelectListItemWithCheckboxModel<string>>()
+            {
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1001.ToString(),
+                    Name = "Virtual Soccer"
+                },
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1002.ToString(),
+                    Name = "Virtual Basketball"
+                },
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1003.ToString(),
+                    Name = "Virtual Baseball"
+                },
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1005.ToString(),
+                    Name = "Virtual Tennis"
+                },
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1021.ToString(),
+                    Name = "Virtual Cricket"
+                },
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1055.ToString(),
+                    Name = "Virtual Horse Racing"
+                },
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1058.ToString(),
+                    Name = "Virtual Dog Racing"
+                }
+            };
     }
 }

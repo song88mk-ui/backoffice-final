@@ -286,7 +286,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _modalService.Open<CopyModal>($"Copy Sports Settings", parameters, options);
         }
-        public async Task HdleViewLogsClick()
+        public async Task HandleViewLogsClick()
         {
             var parameters = new ModalParameters();
 
