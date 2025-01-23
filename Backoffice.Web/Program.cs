@@ -58,14 +58,14 @@ if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
           )
           .AddAspNetCoreInstrumentation((opts) => opts.Filter = httpContext =>
           {
-            var path = httpContext.Request.Path.ToString();
-            var toExclude = path.EndsWith(".js") ||
-                            path.EndsWith(".css") ||
-                            path.StartsWith("/_blazor") ||
-                            path.StartsWith("/_content") ||
-                            path.StartsWith("/bohub") ||
-                            path.StartsWith("/healthz");
-            return !toExclude;
+              var path = httpContext.Request.Path.ToString();
+              var toExclude = path.EndsWith(".js") ||
+                              path.EndsWith(".css") ||
+                              path.StartsWith("/_blazor") ||
+                              path.StartsWith("/_content") ||
+                              path.StartsWith("/bohub") ||
+                              path.StartsWith("/healthz");
+              return !toExclude;
           })
           .AddSqlClientInstrumentation();
 
@@ -99,10 +99,8 @@ if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
 // Add services to the container.
 builder.Services.AddHealthChecks();
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor().AddCircuitOptions(o =>
-{
-    o.DetailedErrors = true;
-});
+builder.Services.AddServerSideBlazor()
+    .AddCircuitOptions(o => o.DetailedErrors = true);
 
 if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CONTAINER_APP_ENV_DNS_SUFFIX")))
 {

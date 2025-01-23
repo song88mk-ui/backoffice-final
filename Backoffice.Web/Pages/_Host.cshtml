@@ -88,25 +88,38 @@
 
     <script src="~/js/oddin.js"></script>
 
-    <script>
-        let currentReconnectionProcess = null;
-        var signalRUrl = '@GetCustomDomain()';
+    <script src="~/js/boot.js"></script>
+    @*  <script>
+    let currentReconnectionProcess = null;
+    var signalRUrl = '@GetCustomDomain()';
 
-        Blazor.start({
-            reconnectionHandler: {
-                onConnectionDown: (options, reason) => {
-                    currentReconnectionProcess ??= startReconnectionProcess();
-                    console.warn('Connection lost:', reason);
-                },
-                onConnectionUp: () => {
-                    currentReconnectionProcess?.cancel();
-                    currentReconnectionProcess = null;
-                    console.log('Reconnected!');
-                }
-            },
-            configureSignalR: builder => builder.withUrl(signalRUrl, { skipNegotiation: true, transport: 1 })
-        });
-    </script>
+    Blazor.start({
+    reconnectionHandler: {
+    onConnectionDown: (options, reason) => {
+    // currentReconnectionProcess ??= startReconnectionProcess();
+    // console.warn('Connection lost:', reason);
+
+    if (!currentReconnectionProcess) {
+    currentReconnectionProcess = startReconnectionProcess();
+    }
+    console.log('Blazor is down');
+    console.warn('Connection lost:', reason);
+    },
+    onConnectionUp: () => {
+    if (currentReconnectionProcess) {
+    currentReconnectionProcess.cancel();
+    currentReconnectionProcess = null;
+    }
+    console.log('Blazor is up');
+    console.log('Reconnected!');
+    }
+    },
+    // configureSignalR: builder => builder.withUrl(signalRUrl, { skipNegotiation: true, transport: 1 })
+    configureSignalR: builder => {
+    builder.withUrl(signalRUrl, { skipNegotiation: true, transport: 'WebSockets' });
+    }
+    });
+    </script> *@
     <script>
         // Wait until a reload button appears
         new MutationObserver((mutations, observer) => {
