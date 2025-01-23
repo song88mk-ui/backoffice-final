@@ -1,6 +1,8 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using System.ComponentModel;
 
 namespace Backoffice.Web.Components.OddsEngine.SportSettings
 {
@@ -22,19 +24,18 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         private int _counter;
         private LanguageCode _languageCode;
+        private List<ClientInformationModel> _clientListReference = new List<ClientInformationModel>();
 
         protected override async Task OnInitializedAsync()
         {
             if (PreRenderService.IsPreRendering)
                 return;
 
-            var clientResponse = await _tradingService.GetClientList();
+            //var clientResponse = await _tradingService.GetClientList();
 
-            if (clientResponse.StatusCode == StatusCode.Success)
+            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
             {
-                clientResponse.Result = clientResponse.Result.Where(c => _userState.Model.TradingClients.Any(tc => tc.ClientCode.Equals(c.ClientCode, StringComparison.OrdinalIgnoreCase))).ToList();
-
-                _clients = clientResponse.Result.Select(s => new SelectListItemModel<string>
+                _clients = _userState.Model.TradingClients.Select(s => new SelectListItemModel<string>
                 {
                     Value = s.ClientCode,
                     Name = s.ClientName,
@@ -43,6 +44,22 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 _selectedClientCode = _clients.FirstOrDefault()?.Value;
                 await OnClientChangedCallback.InvokeAsync(_selectedClientCode);
             }
+
+            _userState.PropertyChanged += UserStatePropertyChanged;
+
+            //if (clientResponse.StatusCode == StatusCode.Success)
+            //{
+            //    clientResponse.Result = clientResponse.Result.Where(c => _userState.Model.TradingClients.Any(tc => tc.ClientCode.Equals(c.ClientCode, StringComparison.OrdinalIgnoreCase))).ToList();
+
+            //    _clients = clientResponse.Result.Select(s => new SelectListItemModel<string>
+            //    {
+            //        Value = s.ClientCode,
+            //        Name = s.ClientName,
+            //    }).OrderBy(x => x.Name).ToList();
+
+            //    _selectedClientCode = _clients.FirstOrDefault()?.Value;
+            //    await OnClientChangedCallback.InvokeAsync(_selectedClientCode);
+            //}
         }
 
 
@@ -103,6 +120,24 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 _editSportSettingsPage = EditSportSettingsPage.Main;
                 await OnUpdateClickCallback.InvokeAsync(_editSportSettingsPage);
 
+            }
+        }
+
+
+        private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
+            {
+                _clientListReference = new List<ClientInformationModel>(_userState.Model.TradingClients);
+
+                _clients = _userState.Model.TradingClients.Select(s => new SelectListItemModel<string>
+                {
+                    Value = s.ClientCode,
+                    Name = s.ClientName,
+                }).OrderBy(x => x.Name).ToList();
+
+                _selectedClientCode = _clients?.FirstOrDefault()?.Value ?? string.Empty;
+                await OnClientChangedCallback.InvokeAsync(_selectedClientCode);
             }
         }
     }

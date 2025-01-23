@@ -66,21 +66,24 @@ namespace Backoffice.Web.States
         }
         public void SetTradingClients(List<ClientInformationModel> clients)
         {
-            if (clients != null && clients.Any() && !_isSuperAdmin)
+            if (clients != null && clients.Any())
             {
-                clients = clients.Where(c => _clientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                if (!_isSuperAdmin)
+                    clients = clients.Where(c => _clientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+
                 base.Model.TradingClients = new List<ClientInformationModel>(clients);
             }
             else
-                base.Model.SportsbookClients = new List<Client>();
+                base.Model.TradingClients = new List<ClientInformationModel>();
 
             OnPropertyChanged();
         }
         public void SetSportsbookClients(List<Client> clients)
         {
-            if (clients != null && clients.Any() && !_isSuperAdmin)
+            if (clients != null && clients.Any())
             {
-                clients = clients.Where(c => _clientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                if (!_isSuperAdmin)
+                    clients = clients.Where(c => _clientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
                 base.Model.SportsbookClients = new List<Client>(clients);
             }
