@@ -4,18 +4,18 @@
             <div class="col-2">
                 <label class="my-1 mr-2">@_translationState.GetValue("Clients")</label>
                 <div class="dropdown">
-                    <button class="btn clientBtn dropdown-toggle" type="button" id="clientDropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">@_translationState.GetValue("Clients") (@ClientIdSelectedModel?.Where(x => x.IsSelected).Count())</button>
+                    @if (ClientIdSelectedModel != null && ClientIdSelectedModel.Any())
+                    {
+                        <button class="btn clientBtn dropdown-toggle" type="button" id="clientDropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">@_translationState.GetValue("Clients") (@ClientIdSelectedModel?.Where(x => x.IsSelected).Count())</button>
 
-                    <ul class="dropdown-menu" aria-labelledby="clientDropdown">
-                        <li class="dropdown-item">
-                            <div class="form-check">
-                                <InputCheckbox class="form-check-input" @bind-Value="@IsSelectAll" @onclick="_ => SelectAllToggleCheckbox(!IsSelectAll)" />
-                                <label class="form-check-label" for="ClientAll">@_translationState.GetValue("Select All")</label>
-                            </div>
-                        </li>
+                        <ul class="dropdown-menu" aria-labelledby="clientDropdown">
+                            <li class="dropdown-item">
+                                <div class="form-check">
+                                    <InputCheckbox class="form-check-input" @bind-Value="@IsSelectAll" @onclick="_ => SelectAllToggleCheckbox(!IsSelectAll)" />
+                                    <label class="form-check-label" for="ClientAll">@_translationState.GetValue("Select All")</label>
+                                </div>
+                            </li>
 
-                        @if (ClientIdSelectedModel != null && ClientIdSelectedModel.Any())
-                        {
                             @foreach (var item in ClientIdSelectedModel)
                             {
                                 <li class="dropdown-item">
@@ -25,16 +25,21 @@
                                     </div>
                                 </li>
                             }
-                        }
-                    </ul>
+                        </ul>
+                    }
+                    else
+                    {
+
+                        <button class="btn clientBtn dropdown-toggle" type="button" id="clientDropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">@_translationState.GetValue("Clients") (@ClientIdSelectedModel?.Where(x => x.IsSelected).Count())</button>
+                    }
                 </div>
             </div>
 
-            <div class="col-10 mt-2 pt-3">
-                <div class="d-flex flex-wrap border border-2 rounded p-2">
-                    @if (ClientIdSelectedModel != null)
-                    {
-                        foreach (var item in ClientIdSelectedModel.Where(x => x.IsSelected))
+            @if (ClientIdSelectedModel != null && ClientIdSelectedModel.Any())
+            {
+                <div class="col-10 mt-2 pt-3">
+                    <div class="d-flex flex-wrap border border-2 rounded p-2">
+                        @foreach (var item in ClientIdSelectedModel.Where(x => x.IsSelected))
                         {
                             <div class="mx-2 mb-2 p-2 clientBorder">
                                 @item.ClientName
@@ -43,23 +48,23 @@
                                 </span>
                             </div>
                         }
-                    }
+                    </div>
                 </div>
-            </div>
+            }
         </div>
 
         <div class="row">
             <div class="col-12">
                 <label class="my-1 mr-2">@_translationState.GetValue("Top Fixtures")</label>
                 <div class="d-flex flex-wrap p-3 leagueContainer">
-                    @if(TopFixture != null)
+                    @if (TopFixture != null)
                     {
                         foreach (var item in TopFixture.TopFixtures)
                         {
                             <div class="mx-2 mb-2 p-2 clientBorder">
                                 @item.FixtureName
                             </div>
-                        }                        
+                        }
                     }
                 </div>
             </div>
