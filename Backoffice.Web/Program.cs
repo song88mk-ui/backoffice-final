@@ -25,6 +25,9 @@ Action<ResourceBuilder> configureResource = r => r.AddService(
     serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "latest",
     serviceInstanceId: Environment.MachineName);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddSimpleConsole(opts => { opts.SingleLine = true; });
+
 builder.Services.AddSingleton<Instrumentation>();
 
 var logger = new LoggerConfiguration()
