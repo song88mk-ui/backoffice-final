@@ -118,6 +118,7 @@ namespace Backoffice.Web.Shared
                                     league.IsSelected = true;
                                     _selectedSport.LeagueId = league.Id;
                                     _selectedSport.LeagueName = league.Name;
+                                    _selectedSport.UnixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                                 }
                             }
                         }
@@ -143,8 +144,7 @@ namespace Backoffice.Web.Shared
                             SegmentId = _selectedSport.SegmentId,
                             SegmentName = segment?.Name ?? "-",
                             LeagueId = _selectedSport.LeagueId,
-                            LeagueName = league?.Name ?? "-",
-
+                            LeagueName = league?.Name ?? "-"
                         };
 
                         await OnSportClickCallback.InvokeAsync(_selectedSport);

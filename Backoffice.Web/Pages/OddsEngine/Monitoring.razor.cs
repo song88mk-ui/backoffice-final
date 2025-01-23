@@ -5,13 +5,12 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.OddsEngine.Monitoring;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Monitoring;
-using Backoffice.Web.Services;
 using Backoffice.Web.States;
 using Backoffice.Web.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Collections.Concurrent;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
+using System.Diagnostics;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -76,6 +75,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = ValidateParameters();
             if (_shouldRender)
             {
+                var isSportChange = ValidateSportChange();
+
                 if (_userId != _userState.Model.Id)
                 {
                     _userId = _userState.Model.Id;
@@ -94,6 +95,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     _sportId = SelectedSport.SportId;
                     _segmentId = SelectedSport.SegmentId;
                     _leagueId = SelectedSport.LeagueId;
+                    _selectedSportsUnix = SelectedSport.UnixTime;
                 }
 
                 _languageCode = _translationState.ActiveLanguageCode;
@@ -105,13 +107,14 @@ namespace Backoffice.Web.Pages.OddsEngine
                     ShowLanguageDropDown = false
                 };
 
-                //if (!_init && isReloadFixtureMarkets && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
-                //{
-                //    await OnInitializeEvent(_monitoringCallbackModel);
-                //}
-            }
+                if (!_init && isSportChange && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
+                {
+                    Debug.WriteLine(" - Param Init ");
+                    await OnInitializeEvent(_monitoringCallbackModel);
+                }
 
-            _init = false;
+                _init = false;
+            }
         }
         protected override async Task OnAfterRenderAsync(bool firstRender) => _shouldRender = false;
         protected override bool ShouldRender() => _shouldRender;
@@ -127,10 +130,13 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _modalService.Open<CloseMatchModal>("Close Match", parameters, options);
         }
-        private bool ValidateParameters() => _init || ((SelectedSport?.LeagueId ?? _leagueId) != _leagueId || (LeagueId != 0 && LeagueId != _leagueId)) || _languageCode != _translationState.ActiveLanguageCode || _selectedSportsUnix != SelectedSport?.UnixTime || _userId != _userState.Model.Id;
+        private bool ValidateParameters() => _init || ValidateSportChange() || _userId != _userState.Model.Id || _selectedSportsUnix != SelectedSport?.UnixTime;
+
+        private bool ValidateSportChange() => (SelectedSport?.LeagueId ?? _leagueId) != _leagueId || (LeagueId != 0 && LeagueId != _leagueId) || _languageCode != _translationState.ActiveLanguageCode;
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
         {
+            Debug.WriteLine(" - Init ");
             _isPreloader = true;
             _shouldRender = true;
             _fixtureMarkets = new List<MonitoringFixtureModel>();
@@ -151,7 +157,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = true;
         }
 
-        private async Task MonitoringCallback(MonitoringCallbackModel model) => await OnInitializeEvent(_monitoringCallbackModel = model);
+        private async Task MonitoringCallback(MonitoringCallbackModel model)
+        {
+            if (_monitoringCallbackModel.SearchText == model.SearchText && _monitoringCallbackModel.SelectedMarketTemplateId == model.SelectedMarketTemplateId)
+                return;
+
+            Debug.WriteLine(" - Callback Init ");
+            await OnInitializeEvent(_monitoringCallbackModel = model);
+        }
 
         private Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
         {
