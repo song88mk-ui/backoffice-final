@@ -643,7 +643,7 @@ namespace Backoffice.Web.Services
 
             if (obj.GetType().Name == typeof(List<ClientMarketTemplateGroupDTO>).Name)
             {
-                var another = string.IsNullOrEmpty(data2) ? new List<ClientMarketTemplateGroupDTO>() : JsonSerializer.Deserialize(data2, type);
+                var another = string.IsNullOrEmpty(data2) || data2 == "-" ? new List<ClientMarketTemplateGroupDTO>() : JsonSerializer.Deserialize(data2, type);
 
                 var another2 = (List<ClientMarketTemplateGroupDTO>)another;
                 var ctr = 0;
@@ -782,7 +782,7 @@ namespace Backoffice.Web.Services
             {
                 var another = string.IsNullOrEmpty(data2) ? new object() : JsonSerializer.Deserialize(data2, type);
 
-                if (string.IsNullOrEmpty(data2))
+                if (!string.IsNullOrEmpty(data2) || data2 == "")
                     result = result + GetProperties(obj, another) + "|";
                 else
                     result = result + GetProperties(obj, new object()) + "|";
