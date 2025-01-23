@@ -179,6 +179,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _clientListReference = new List<ClientInformationModel>(_userState.Model.TradingClients);
 
                 await GetContent();
+                StateHasChanged();
             }
         }
         private void OpacityChanged(decimal opacity)
