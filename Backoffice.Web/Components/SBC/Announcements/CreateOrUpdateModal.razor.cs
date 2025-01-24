@@ -65,8 +65,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
         {
             _isPreload = false;
 
-            _startDate = DateTimeHelper.Now(_userState.TimeZoneOffset).AddDays(-1);
-            _endDate = DateTimeHelper.Now(_userState.TimeZoneOffset).AddDays(1).AddTicks(-1);
+            _startDate = DateTime.UtcNow.AddDays(-1);
+            _endDate = DateTime.UtcNow.AddDays(1).AddTicks(-1);
 
             _alerts = new List<AnnouncementsAlertModel>();
             _announcement = ModalParameters.TryGet<Models.Announcements>("Announcement");

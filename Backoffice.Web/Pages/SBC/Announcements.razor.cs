@@ -104,8 +104,8 @@ namespace Backoffice.Web.Pages.SBC
                 parameters.Add("ModalDialogClass", "modal-l");
                 parameters.Add("Announcement", new Models.Announcements
                 {
-                    StartDate = DateTimeHelper.Now(_userState.TimeZoneOffset),
-                    EndDate = DateTimeHelper.Now(_userState.TimeZoneOffset),
+                    StartDate = DateTime.UtcNow,
+                    EndDate = DateTime.UtcNow,
                     LanguageCode = LanguageCode.EN,
                     IsActive = true
                 });
