@@ -655,15 +655,18 @@ namespace Backoffice.Web.Services
                     }
                     else if (activity == Activity.Update.ToString())
                     {
-                        var dataResult = GetProperties(item, another2[ctr]);
-                        if (!string.IsNullOrEmpty(dataResult))
-                            dataResult = GetProperties(item, new ClientMarketTemplateGroupDTO());
+                        if (another2 != null && another2.Count > ctr)
+                        {
+                            var dataResult = GetProperties(item, another2[ctr]);
+                            if (!string.IsNullOrEmpty(dataResult))
+                                dataResult = GetProperties(item, new ClientMarketTemplateGroupDTO());
 
-                        result = string.IsNullOrEmpty(dataResult) ? result : result + dataResult + "||";
+                            result = string.IsNullOrEmpty(dataResult) ? result : result + dataResult + "||";
+                        }
                     }
                     else
                     {
-                        if (ctr + 1 > another2.Count)
+                        if (ctr + 1 > (another2?.Count ?? 0))
                         {
                             result = result + GetProperties(item, new ClientMarketTemplateGroupDTO()) + "|";
                             continue;
@@ -673,8 +676,11 @@ namespace Backoffice.Web.Services
                             result = result + "<b>NEW*<b/><br>" + GetProperties(item, new ClientMarketTemplateGroupDTO()) + "|";
                         else
                         {
-                            var dataResult = GetProperties(item, another2[ctr]);
-                            result = string.IsNullOrEmpty(dataResult) ? result : result + dataResult + "|";
+                            if (another2 != null && another2.Count > ctr)
+                            {
+                                var dataResult = GetProperties(item, another2[ctr]);
+                                result = string.IsNullOrEmpty(dataResult) ? result : result + dataResult + "|";
+                            }
                         }
                     }
 
@@ -795,6 +801,9 @@ namespace Backoffice.Web.Services
         private static string GetProperties(object obj, object another)
         {
             var result = string.Empty;
+
+            if (another == null)
+                return result;
 
             //Get all properties of obj
             //And compare each other
