@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.ActionFilter;
+using Backoffice.Web.States;
 using Backoffice.Web.Telemetry;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
@@ -144,7 +145,7 @@ namespace Backoffice.Web.Services
                 ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(userName);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
-                _memCache.AddOrUpdateCache(key, result, DateTimeOffset.UtcNow.AddMinutes(1));
+                _memCache.AddOrUpdateCache(key, result, DateTimeOffset.UtcNow.AddSeconds(30));
 
                 return result;
             }
@@ -162,6 +163,7 @@ namespace Backoffice.Web.Services
             var auth = _httpClient.GetAsync("api/authentication/logout").Result;
 
             _httpContextAccessor.HttpContext?.Session.Remove("UserToken");
+           
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
             _httpClient.DefaultRequestHeaders.Authorization = null;
 
