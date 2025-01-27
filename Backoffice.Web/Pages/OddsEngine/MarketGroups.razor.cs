@@ -264,7 +264,35 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var oldMarketGroupSerialize = JsonSerializer.Serialize(MarketGroupModel.OldMarketTemplateGroups);
                 var newMarketGroupSerialize = JsonSerializer.Serialize(marketTemplateGroups);
 
-                if (oldMarketGroupSerialize == newMarketGroupSerialize)
+                var hasChange = false;
+
+                if (MarketGroupModel.OldMarketTemplateGroups.Count != marketTemplateGroups.Count)
+                    hasChange = true;
+                else
+                {
+                    foreach (var oldModel in MarketGroupModel.OldMarketTemplateGroups)
+                    {
+                        var newModel = marketTemplateGroups.FirstOrDefault(c => c.MarketTemplateGroupId == oldModel.MarketTemplateGroupId);
+
+                        if (newModel == null)
+                        {
+                            hasChange = true;
+                            break;
+                        }
+
+                        if (!newModel.Name.Equals(oldModel.Name, StringComparison.OrdinalIgnoreCase) ||
+                            !newModel.MarketTemplateIds.Equals(oldModel.MarketTemplateIds, StringComparison.OrdinalIgnoreCase) ||
+                            newModel.IsActive != oldModel.IsActive ||
+                            newModel.SortOrder != oldModel.SortOrder)
+                        {
+                            hasChange = true;
+                            break;
+                        }
+                    }
+                }
+
+                //if (oldMarketGroupSerialize == newMarketGroupSerialize)
+                if (!hasChange)
                 {
                     await OnInit();
                     return;

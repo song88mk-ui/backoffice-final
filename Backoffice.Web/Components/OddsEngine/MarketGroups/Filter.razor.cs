@@ -29,6 +29,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         public int SelectedSportId { get; set; }
         public List<SelectListItemModel<int>> FixtureStatuses { get; set; }
         public int SelectedFixtureStatusId { get; set; }
+        private string _clientReference;
 
         #endregion
 
@@ -36,8 +37,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         protected override async Task OnInitializedAsync()
         {
-            _userState.PropertyChanged += UserStatePropertyChanged;
-
             Clients = new List<SelectListItemModel<string>>();
             Sports = new List<SelectListItemModel<int>>();
             FixtureStatuses = new List<SelectListItemModel<int>>();
@@ -55,6 +54,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                         Value = s.ClientCode,
                         Name = s.ClientName
                     }).ToList();
+
                 }
                 else
                 {
@@ -64,6 +64,10 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                         Name = _translationState.GetValue("No Clients Available")
                     });
                 }
+
+                _clientReference = string.Join(',', Clients.Where(c => c.Value != "").Select(c => c.Value.Trim()).OrderBy(c => c).ToList());
+
+                _userState.PropertyChanged += UserStatePropertyChanged;
 
                 SelectedClientCode = Clients.FirstOrDefault().Value;
 
@@ -176,8 +180,12 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         #region Utilities
 
-        private void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
+        private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            var tempClientReference = string.Join(',', _userState.Model.TradingClients.Select(c => c.ClientCode.Trim()).OrderBy(c => c).ToList());
+            if (_clientReference == tempClientReference)
+                return;
+
             Clients = new List<SelectListItemModel<string>>();
 
             if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
@@ -197,7 +205,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 });
             }
 
+            _clientReference = string.Join(',', Clients.Where(c => c.Value != "").Select(c => c.Value.Trim()).OrderBy(c => c).ToList());
             SelectedClientCode = Clients.FirstOrDefault().Value;
+            await PrepareMarketGroupModel();
         }
         private async Task PrepareMarketGroupModel()
         {
