@@ -166,7 +166,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("MarketGroupModel", MarketGroupModel);
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
+            //parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();

@@ -1,8 +1,8 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using ActivityLogModel = Backoffice.Shared.Models.ActivityLogModel;
 
@@ -70,7 +70,8 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             {
                 Page = SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", "."),
                 Payload = $"{MarketGroupModel.ClientCode}.{MarketGroupModel.SportId}.{MarketGroupModel.FixtureStatusId}",
-                MetaData = MetaData
+                MetaData = MetaData,
+                DateFrom = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddYears(-1)
             })).Result;
 
             if (response != null)
