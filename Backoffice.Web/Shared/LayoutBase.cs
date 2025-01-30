@@ -82,9 +82,12 @@ namespace Backoffice.Web.Shared
 
                 if (ctsToken.IsCancellationRequested || clientResult.StatusCode != StatusCode.Success)
                 {
-                    ToasterService.AddToast(Toast.NewToast
-                            ("Get Clients",
-                            $"{clientResult.Message}"));
+                    if (clientResult.StatusCode == StatusCode.Unauthorized)
+                        NavigationManager.NavigateTo("login", true);
+                    else
+                        ToasterService.AddToast(Toast.NewToast
+                                ("Get Clients",
+                                $"{clientResult.Message}"));
 
                     return;
                 }

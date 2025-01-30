@@ -440,6 +440,14 @@ namespace Backoffice.Web.Services
                     return JsonSerializer.Deserialize<BaseResponse<ClientModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else
                 {
+                    if(response.StatusCode == HttpStatusCode.Unauthorized)
+                        return new BaseResponse<ClientModel>
+                        {
+                            StatusCode = StatusCode.Unauthorized,
+                            Message = $"{StatusCode.Unauthorized.ToString().Replace('_', ' ')} ({response.ReasonPhrase})",
+                            Result = new ClientModel()
+                        };
+
                     return new BaseResponse<ClientModel>
                     {
                         StatusCode = StatusCode.Error,
