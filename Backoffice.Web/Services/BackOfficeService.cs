@@ -18,8 +18,6 @@ namespace Backoffice.Web.Services
     public class BackofficeService : BaseService, IBackofficeService
     {
         #region Fields
-        public string Page { get; set; } = string.Empty;
-        public LanguageCode LanguageCode { get; set; } = LanguageCode.EN;
         private HttpClient _client;
         private HttpClient _httpClient
         {
@@ -41,20 +39,18 @@ namespace Backoffice.Web.Services
         private readonly IAuthenticationService _authenticationService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IJSRuntime _jsRuntime;
-        private readonly UserState _userState;
         #endregion
 
         #region Ctor
 
-        public BackofficeService(IHttpClientFactory clientFactory, IConfiguration configuration, IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor, IJSRuntime jsRuntime, UserState userState) : base(clientFactory.CreateClient("backoffice-api"))
+        public BackofficeService(IHttpClientFactory clientFactory, IConfiguration configuration, IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor, IJSRuntime jsRuntime, UserState userState) : base(clientFactory.CreateClient("backoffice-api"), userState)
         {
             _configuration = configuration;
             _authenticationService = authenticationService;
             _httpContextAccessor = httpContextAccessor;
             _jsRuntime = jsRuntime;
-            _userState = userState;
 
-            _httpClient = clientFactory.CreateClient("backoffice-api");
+            _client = clientFactory.CreateClient("backoffice-api");
         }
 
         #endregion

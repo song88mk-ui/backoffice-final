@@ -4,7 +4,9 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.Events;
+using Backoffice.Web.States;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading;
 
@@ -12,13 +14,35 @@ namespace Backoffice.Web.Services
 {
     public class BaseService
     {
+        public string Page { get; set; } = string.Empty;
+        public LanguageCode LanguageCode { get; set; } = LanguageCode.EN;
         public event EventHandler<UnauthorizedEventArgs> Unauthorized;
 
-        private readonly HttpClient _httpClient;
-        public BaseService(HttpClient httpClient)
+        private HttpClient _client;
+        private HttpClient _httpClient
         {
-            _httpClient = httpClient;
+            get
+            {
+                if (_client == null)
+                {
+                    _client = new HttpClient();
+                }
+
+                ConfigureHttpClientHeaders();
+
+                return _client;
+            }
+            set => _client = value;
         }
+        protected readonly UserState _userState;
+
+
+        public BaseService(HttpClient httpClient, UserState userState)
+        {
+            _userState = userState;
+            _client = httpClient;
+        }
+
 
         protected async Task<BaseResponse<T1>?> PostAsJsonAsync<T1, T2>(
             string requestUri,
@@ -112,6 +136,27 @@ namespace Backoffice.Web.Services
         protected virtual void OnUnauthorized(UnauthorizedEventArgs e)
         {
             Unauthorized?.Invoke(this, e);
+        }
+        private void ConfigureHttpClientHeaders()
+        {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.Model.AccessToken);
+
+            RemoveHeader("x-page");
+            RemoveHeader("x-language-code");
+
+            if (!string.IsNullOrEmpty(Page))
+            {
+                _client.DefaultRequestHeaders.Add("x-page", Page);
+            }
+
+            _client.DefaultRequestHeaders.Add("x-language-code", LanguageCode.ToString());
+        }
+        private void RemoveHeader(string headerName)
+        {
+            if (_client.DefaultRequestHeaders.Contains(headerName))
+            {
+                _client.DefaultRequestHeaders.Remove(headerName);
+            }
         }
     }
 }
