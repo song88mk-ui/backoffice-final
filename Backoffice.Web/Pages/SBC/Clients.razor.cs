@@ -17,9 +17,9 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
-        
 
-        
+
+
         public MetaData MetaData { get; set; }
         public ClientListResponse ClientListModel { get; set; }
         public ClientListCallbackModel ClientListCallbackModel { get; set; }
@@ -38,7 +38,7 @@ namespace Backoffice.Web.Pages.SBC
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {//
+        {
             PageState.Page = this;
 
             _pageHeaderModel = new()

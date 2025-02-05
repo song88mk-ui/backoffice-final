@@ -3,6 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
+using Backoffice.Web.Models.Events;
 
 namespace Backoffice.Web.Services
 {
@@ -10,6 +11,8 @@ namespace Backoffice.Web.Services
     {
         string Page { get; set; }
         LanguageCode LanguageCode { get; set; }
+        event EventHandler<UnauthorizedEventArgs> Unauthorized;
+
         Task<BaseResponse<MaintenanceResponse>> GetMaintenanceV2();
         Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);

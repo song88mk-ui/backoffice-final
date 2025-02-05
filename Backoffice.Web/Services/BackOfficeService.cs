@@ -15,7 +15,7 @@ using System.Text.Json;
 
 namespace Backoffice.Web.Services
 {
-    public class BackofficeService : IBackofficeService
+    public class BackofficeService : BaseService, IBackofficeService
     {
         #region Fields
         public string Page { get; set; } = string.Empty;
@@ -46,7 +46,7 @@ namespace Backoffice.Web.Services
 
         #region Ctor
 
-        public BackofficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor, IJSRuntime jsRuntime, UserState userState)
+        public BackofficeService(IHttpClientFactory clientFactory, IConfiguration configuration, IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor, IJSRuntime jsRuntime, UserState userState) : base(clientFactory.CreateClient("backoffice-api"))
         {
             _configuration = configuration;
             _authenticationService = authenticationService;
@@ -54,7 +54,7 @@ namespace Backoffice.Web.Services
             _jsRuntime = jsRuntime;
             _userState = userState;
 
-            _httpClient = httpClient;
+            _httpClient = clientFactory.CreateClient("backoffice-api");
         }
 
         #endregion
@@ -434,27 +434,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync($"sportsbook/client/list", cancellationToken);
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if(response.StatusCode == HttpStatusCode.Unauthorized)
-                        return new BaseResponse<ClientModel>
-                        {
-                            StatusCode = StatusCode.Unauthorized,
-                            Message = $"{StatusCode.Unauthorized.ToString().Replace('_', ' ')} ({response.ReasonPhrase})",
-                            Result = new ClientModel()
-                        };
-
-                    return new BaseResponse<ClientModel>
-                    {
-                        StatusCode = StatusCode.Error,
-                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})",
-                        Result = new ClientModel()
-                    };
-                }
+                return await GetAsync<ClientModel>($"sportsbook/client/list", cancellationToken) ?? new BaseResponse<ClientModel>();
             }
             catch (Exception ex)
             {
@@ -474,26 +454,25 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var Model = await _httpClient.PostAsync($"sportsbook/client/information/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"sportsbook/client/information/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
-                if (Model.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientListResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ClientListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
                         ?? new BaseResponse<ClientListResponse>();
                 else
                 {
-                    if (Model.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientListResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ClientListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
                             ?? new BaseResponse<ClientListResponse>();
                     else
                     {
                         return new BaseResponse<ClientListResponse>
                         {
                             StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
                         };
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -513,25 +492,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var Model = await _httpClient.PostAsync($"sportsbook/client/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
-
-                if (Model.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<bool>();
-                else
-                {
-                    if (Model.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                            ?? new BaseResponse<bool>();
-                    else
-                    {
-                        return new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
-                        };
-                    }
-                }
+                return await PostAsJsonAsync<bool, ClientListResponse.Client>($"sportsbook/client/post", request) ?? new BaseResponse<bool>();
             }
             catch (Exception ex)
             {
@@ -551,26 +512,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var Model = await _httpClient.PostAsync($"sportsbook/client/bet/setting", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
-
-                if (Model.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<BetSettingResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<BetSettingResponse>();
-                else
-                {
-                    if (Model.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<BetSettingResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                            ?? new BaseResponse<BetSettingResponse>();
-                    else
-                    {
-                        return new BaseResponse<BetSettingResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
-                        };
-                    }
-                }
-
+                return await PostAsJsonAsync<BetSettingResponse, BetSettingRequest>($"sportsbook/client/bet/setting", request) ?? new BaseResponse<BetSettingResponse>();
             }
             catch (Exception ex)
             {
@@ -619,25 +561,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.PostAsync($"sportsbook/settings/topfixtures", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<ClientTopFixtureModel>();
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                            ?? new BaseResponse<ClientTopFixtureModel>();
-                    else
-                    {
-                        return new BaseResponse<ClientTopFixtureModel>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
+                return await PostAsJsonAsync<ClientTopFixtureModel, GetClientTopFixtureRequest>($"sportsbook/settings/topfixtures", request);
             }
             catch (Exception ex)
             {
@@ -657,25 +581,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var Model = await _httpClient.PostAsync($"sportsbook/settings/topfixtures/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
-
-                if (Model.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<PlatformMessageModel>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<PlatformMessageModel>();
-                else
-                {
-                    if (Model.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<PlatformMessageModel>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                            ?? new BaseResponse<PlatformMessageModel>();
-                    else
-                    {
-                        return new BaseResponse<PlatformMessageModel>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
-                        };
-                    }
-                }
+                return await PostAsJsonAsync<PlatformMessageModel, PostClientTopFixtureRequest>($"sportsbook/settings/topfixtures/post", request);
             }
             catch (Exception ex)
             {
@@ -2045,6 +1951,5 @@ namespace Backoffice.Web.Services
 
             ////Console.WriteLine("- {0} was disposed!", this.GetType().Name);
         }
-
     }
 }

@@ -521,7 +521,7 @@ namespace Backoffice.Web.Components.SBC.Clients
             if (IsPreload)
                 return;
 
-            foreach(var betSetting in Client.BetSettings)
+            foreach (var betSetting in Client.BetSettings)
             {
                 var suggestedMinBet = await GetBaseSettings(betSetting.CurrencyCode);
 

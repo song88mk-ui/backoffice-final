@@ -96,6 +96,8 @@ namespace Backoffice.Web.Extensions
             builder.Services.AddScoped<AlertToastService>();
             builder.Services.AddScoped<HubService>();
 
+            builder.Services.AddScoped<IBackofficeService, BackofficeService>();
+
             return builder;
         }
 
@@ -113,12 +115,19 @@ namespace Backoffice.Web.Extensions
                 client.DefaultRequestHeaders.Add("x-api-key", builder?.Configuration["API:Backoffice:Security:APIKey"]);
                 client.DefaultRequestHeaders.Add("x-region", builder?.Configuration["API:Region"]);
             });
-            builder.Services.AddHttpClient<IBackofficeService, BackofficeService>(client =>
+
+            builder.Services.AddHttpClient("backoffice-api", client =>
             {
                 client.BaseAddress = new Uri(builder?.Configuration["API:Backoffice:Uri"] ?? string.Empty);
                 client.DefaultRequestHeaders.Add("x-api-key", builder?.Configuration["API:Backoffice:Security:APIKey"]);
                 client.DefaultRequestHeaders.Add("x-region", builder?.Configuration["API:Region"]);
             });
+            //builder.Services.AddHttpClient<IBackofficeService, BackofficeService>(client =>
+            //{
+            //    client.BaseAddress = new Uri(builder?.Configuration["API:Backoffice:Uri"] ?? string.Empty);
+            //    client.DefaultRequestHeaders.Add("x-api-key", builder?.Configuration["API:Backoffice:Security:APIKey"]);
+            //    client.DefaultRequestHeaders.Add("x-region", builder?.Configuration["API:Region"]);
+            //});
             return builder;
         }
 

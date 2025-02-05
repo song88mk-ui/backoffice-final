@@ -3,6 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
+using Backoffice.Web.Models.Events;
 using Backoffice.Web.Models.Shared;
 using Backoffice.Web.Services;
 using Backoffice.Web.States;
@@ -66,6 +67,7 @@ namespace Backoffice.Web.Shared
                 _cts = new CancellationTokenSource();
 
                 TranslationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
+                BackofficeService.Unauthorized += async (s, e) => NavigationManager.NavigateTo("login", true);
 
                 if (!UserState.Model.IsAuthenticated)
                 {
@@ -82,12 +84,9 @@ namespace Backoffice.Web.Shared
 
                 if (ctsToken.IsCancellationRequested || clientResult.StatusCode != StatusCode.Success)
                 {
-                    if (clientResult.StatusCode == StatusCode.Unauthorized)
-                        NavigationManager.NavigateTo("login", true);
-                    else
-                        ToasterService.AddToast(Toast.NewToast
-                                ("Get Clients",
-                                $"{clientResult.Message}"));
+                    ToasterService.AddToast(Toast.NewToast
+                            ("Get Clients",
+                            $"{clientResult.Message}"));
 
                     return;
                 }
@@ -253,7 +252,6 @@ namespace Backoffice.Web.Shared
                 Permissions = permissions,
             };
         }
-
         #endregion
     }
 }
