@@ -3,7 +3,6 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
-using Backoffice.Web.Models.Events;
 using Backoffice.Web.Models.Shared;
 using Backoffice.Web.Services;
 using Backoffice.Web.States;
