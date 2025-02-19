@@ -13,11 +13,13 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         [Parameter] public EventCallback<MonitoringCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<List<SelectListItemWithCheckboxModel<string>>> OnFilterClientCallback { get; set; }
         [Parameter] public int SportId { get; set; }
+        [Parameter] public long LeagueId { get; set; }
         #endregion
 
         #region Fields
         private string _region = "hk";
         private int _sportId;
+        private long _leagueId;
         private SearchFormModel _searchForm;
         private List<MainMarketTemplateResponse> _topMarketTemplates;
         private List<SelectListItemWithCheckboxModel<string>>? _clientFilter;
@@ -79,10 +81,12 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
             }
 
 
-            if (_sportId != SportId || _languageCode != _translationState.ActiveLanguageCode)
+            if (_sportId != SportId || _leagueId != LeagueId || _languageCode != _translationState.ActiveLanguageCode)
             {
                 _sportId = SportId;
+                _leagueId = LeagueId;
                 _languageCode = _translationState.ActiveLanguageCode;
+                _searchForm.SearchText = string.Empty;
 
                 var topMarketsResponse = await _backofficeService.GetTopMarkets(_sportId, _languageCode);
                 _topMarketTemplates = topMarketsResponse.Result;

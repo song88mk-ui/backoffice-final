@@ -18,7 +18,7 @@
             <OEPageHeader PageHeaderModel="@_pageHeaderModel" />
         </div>
         <div class="col-md-12">
-            <Filter SportId="_sportId" OnInitCallback="MonitoringCallback" OnFilterClientCallback="FilterClientCallback" />
+            <Filter SportId="_sportId" LeagueId="_leagueId" OnInitCallback="MonitoringCallback" OnFilterClientCallback="FilterClientCallback" />
         </div>
 
         @if (!string.IsNullOrEmpty(_alertModel.Message))
