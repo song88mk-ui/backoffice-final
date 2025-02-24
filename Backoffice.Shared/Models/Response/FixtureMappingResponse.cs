@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Backoffice.Shared.Models.Response
 {
@@ -13,11 +14,13 @@ namespace Backoffice.Shared.Models.Response
 
     public class FixtureMappingModel
     {
-        public long FiId { get; set; }
+        public string FiId { get; set; }
         public string FiNa { get; set; }
+        public DateTime? FiStDa { get; set; }
         public int SpId { get; set; }
         public int SegId { get; set; }
         public int LeId { get; set; }
+        public DateTime Ti { get; set; }
         public ProviderModel<long> Info { get; set; }
         public int ChTyId { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Backoffice.Shared.Models.Response
 {
@@ -15,6 +16,7 @@ namespace Backoffice.Shared.Models.Response
     {
         public string MaTeId { get; set; }
         public string MaTeNa { get; set; }
+        public DateTime Ti { get; set; }
         public ProviderModel<List<string>> Info { get; set; }
     }
 }
