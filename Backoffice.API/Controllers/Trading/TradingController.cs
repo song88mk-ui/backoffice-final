@@ -14,8 +14,9 @@ using System.Threading.Tasks;
 
 namespace Backoffice.API.Controllers.Trading
 {
+    [Authorize]
     [Route("api/[controller]")]
-    [ApiController, EnableCors("AllowAllOrigins")]
+    [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class TradingController : ControllerBase
     {
         private ITradingRepository _tradingRepository { get; set; }
