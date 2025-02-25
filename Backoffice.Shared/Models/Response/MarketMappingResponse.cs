@@ -10,6 +10,8 @@ namespace Backoffice.Shared.Models.Response
             MarketMapping = new List<MarketMappingModel>();
         }
         public List<MarketMappingModel> MarketMapping { get; set; }
+        public int TotalCount { get; set; }
+        public int TotalPage { get; set; }
     }
 
     public class MarketMappingModel

@@ -2047,11 +2047,11 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedSports(string region, MappingRequest request)
+        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedSports(string region)
         {
             try
             {
-                var response = await GetHttpClientV2(region).PostAsync($"unmapped/sports", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var response = await GetHttpClientV2(region).GetAsync($"unmapped/sports");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<UnmappedResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -2079,11 +2079,11 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedSegment(string region, MappingRequest request)
+        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedSegment(string region)
         {
             try
             {
-                var response = await GetHttpClientV2(region).PostAsync($"unmapped/segments", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var response = await GetHttpClientV2(region).GetAsync($"unmapped/segments");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<UnmappedResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -2111,11 +2111,11 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedLeague(string region, MappingRequest request)
+        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedLeague(string region)
         {
             try
             {
-                var response = await GetHttpClientV2(region).PostAsync($"unmapped/leagues", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var response = await GetHttpClientV2(region).GetAsync($"unmapped/leagues");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<UnmappedResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -2143,11 +2143,11 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedFixture(string region, MappingRequest request)
+        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedFixture(string region)
         {
             try
             {
-                var response = await GetHttpClientV2(region).PostAsync($"unmapped/fixtures", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var response = await GetHttpClientV2(region).GetAsync($"unmapped/fixtures");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<UnmappedResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -2175,11 +2175,11 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedMarket(string region, MappingRequest request)
+        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedMarket(string region)
         {
             try
             {
-                var response = await GetHttpClientV2(region).PostAsync($"unmapped/markets", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var response = await GetHttpClientV2(region).GetAsync($"unmapped/markets");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<UnmappedResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -2207,11 +2207,11 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedSelection(string region, MappingRequest request)
+        public async Task<BaseResponse<UnmappedResponse>> GetUnmappedSelection(string region)
         {
             try
             {
-                var response = await GetHttpClientV2(region).PostAsync($"unmapped/selections", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var response = await GetHttpClientV2(region).GetAsync($"unmapped/selections");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<UnmappedResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

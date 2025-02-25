@@ -110,12 +110,12 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<FixtureMappingResponse>> GetFixtureMapping(string region, MappingRequest request);
         Task<BaseResponse<MarketMappingResponse>> GetMarketMapping(string region, MappingRequest request);
         Task<BaseResponse<SelectionMappingResponse>> GetSelectionMapping(string region, MappingRequest request);
-        Task<BaseResponse<UnmappedResponse>> GetUnmappedSports(string region, MappingRequest request);
-        Task<BaseResponse<UnmappedResponse>> GetUnmappedSegment(string region, MappingRequest request);
-        Task<BaseResponse<UnmappedResponse>> GetUnmappedLeague(string region, MappingRequest request);
-        Task<BaseResponse<UnmappedResponse>> GetUnmappedFixture(string region, MappingRequest request);
-        Task<BaseResponse<UnmappedResponse>> GetUnmappedMarket(string region, MappingRequest request);
-        Task<BaseResponse<UnmappedResponse>> GetUnmappedSelection(string region, MappingRequest request);
+        Task<BaseResponse<UnmappedResponse>> GetUnmappedSports(string region);
+        Task<BaseResponse<UnmappedResponse>> GetUnmappedSegment(string region);
+        Task<BaseResponse<UnmappedResponse>> GetUnmappedLeague(string region);
+        Task<BaseResponse<UnmappedResponse>> GetUnmappedFixture(string region);
+        Task<BaseResponse<UnmappedResponse>> GetUnmappedMarket(string region);
+        Task<BaseResponse<UnmappedResponse>> GetUnmappedSelection(string region);
         Task<BaseResponse<bool>> AddOrUpdateProviderMapping(string region, string category, ProviderMappingRequest request);
 
         #endregion

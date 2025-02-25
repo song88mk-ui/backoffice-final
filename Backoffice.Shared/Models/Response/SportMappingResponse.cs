@@ -10,6 +10,8 @@ namespace Backoffice.Shared.Models.Response
             SportMapping = new List<SportMappingModel>();
         }
         public List<SportMappingModel> SportMapping { get; set; }
+        public int TotalCount { get; set; }
+        public int TotalPage { get; set; }
     }
 
     public class SportMappingModel

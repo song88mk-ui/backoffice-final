@@ -1021,12 +1021,12 @@ namespace Backoffice.API.Controllers.Trading
             }
         }
 
-        [HttpPost("unmapped/sports")]
-        public async Task<IActionResult> GetUnMappedSports([FromBody] MappingRequest request)
+        [HttpGet("unmapped/sports")]
+        public async Task<IActionResult> GetUnMappedSports()
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetUnmappedSports(region, request);
+            var result = await _tradingRepository.GetUnmappedSports(region);
 
             switch (result.StatusCode)
             {
@@ -1037,12 +1037,12 @@ namespace Backoffice.API.Controllers.Trading
             }
         }
 
-        [HttpPost("unmapped/segments")]
-        public async Task<IActionResult> GetUnmappedSegments([FromBody] MappingRequest request)
+        [HttpGet("unmapped/segments")]
+        public async Task<IActionResult> GetUnmappedSegments()
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetUnmappedSegment(region, request);
+            var result = await _tradingRepository.GetUnmappedSegment(region);
 
             switch (result.StatusCode)
             {
@@ -1053,12 +1053,12 @@ namespace Backoffice.API.Controllers.Trading
             }
         }
 
-        [HttpPost("unmapped/leagues")]
-        public async Task<IActionResult> GetUnmappedLeagues([FromBody] MappingRequest request)
+        [HttpGet("unmapped/leagues")]
+        public async Task<IActionResult> GetUnmappedLeagues()
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetUnmappedLeague(region, request);
+            var result = await _tradingRepository.GetUnmappedLeague(region);
 
             switch (result.StatusCode)
             {
@@ -1069,12 +1069,12 @@ namespace Backoffice.API.Controllers.Trading
             }
         }
 
-        [HttpPost("unmapped/fixtures")]
-        public async Task<IActionResult> GetUnmappedFixtures([FromBody] MappingRequest request)
+        [HttpGet("unmapped/fixtures")]
+        public async Task<IActionResult> GetUnmappedFixtures()
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetUnmappedFixture(region, request);
+            var result = await _tradingRepository.GetUnmappedFixture(region);
 
             switch (result.StatusCode)
             {
@@ -1085,12 +1085,12 @@ namespace Backoffice.API.Controllers.Trading
             }
         }
 
-        [HttpPost("unmapped/markets")]
-        public async Task<IActionResult> GetUnmappedMarkets([FromBody] MappingRequest request)
+        [HttpGet("unmapped/markets")]
+        public async Task<IActionResult> GetUnmappedMarkets()
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetUnmappedMarket(region, request);
+            var result = await _tradingRepository.GetUnmappedMarket(region);
 
             switch (result.StatusCode)
             {
@@ -1101,12 +1101,12 @@ namespace Backoffice.API.Controllers.Trading
             }
         }
 
-        [HttpPost("unmapped/selections")]
-        public async Task<IActionResult> GetUnmappedSelections([FromBody] MappingRequest request)
+        [HttpGet("unmapped/selections")]
+        public async Task<IActionResult> GetUnmappedSelections()
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetUnmappedSelection(region, request);
+            var result = await _tradingRepository.GetUnmappedSelection(region);
 
             switch (result.StatusCode)
             {

@@ -10,6 +10,8 @@ namespace Backoffice.Shared.Models.Response
             SegmentMapping = new List<SegmentMappingModel>();
         }
         public List<SegmentMappingModel> SegmentMapping { get; set; }
+        public int TotalCount { get; set; }
+        public int TotalPage { get; set; }
     }
 
     public class SegmentMappingModel

@@ -10,6 +10,8 @@ namespace Backoffice.Shared.Models.Response
             LeagueMapping = new List<LeagueMappingModel>();
         }
         public List<LeagueMappingModel> LeagueMapping { get; set; }
+        public int TotalCount { get; set; }
+        public int TotalPage { get; set; }
     }
 
     public class LeagueMappingModel
