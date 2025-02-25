@@ -104,6 +104,12 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<bool>> DeactivateFixtureMarkets(DeactivateFixtureMarketRequest request, string region);
 
         #region Mapping
+        Task<BaseResponse<SportMappingModel>> GetSportMappingById(string region, string sportId);
+        Task<BaseResponse<SegmentMappingModel>> GetSegmentMappingById(string region, string segmentId);
+        Task<BaseResponse<LeagueMappingModel>> GetLeagueMappingById(string region, string leagueId);
+        Task<BaseResponse<FixtureMappingModel>> GetFixtureMappingById(string region, string fixtureId);
+        Task<BaseResponse<MarketMappingModel>> GetMarketMappingById(string region, string marketId);
+        Task<BaseResponse<SelectionMappingModel>> GetSelectionMappingById(string region, string selectionId);
         Task<BaseResponse<SportMappingResponse>> GetSportMapping(string region, MappingRequest request);
         Task<BaseResponse<SegmentMappingResponse>> GetSegmentMapping(string region, MappingRequest request);
         Task<BaseResponse<LeagueMappingResponse>> GetLeagueMapping(string region, MappingRequest request);

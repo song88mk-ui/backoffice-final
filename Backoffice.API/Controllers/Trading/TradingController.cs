@@ -14,9 +14,8 @@ using System.Threading.Tasks;
 
 namespace Backoffice.API.Controllers.Trading
 {
-    [Authorize]
     [Route("api/[controller]")]
-    [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
+    [ApiController, EnableCors("AllowAllOrigins")]
     public class TradingController : ControllerBase
     {
         private ITradingRepository _tradingRepository { get; set; }
@@ -924,6 +923,102 @@ namespace Backoffice.API.Controllers.Trading
         }
 
         #region Provider Mapping
+
+        [HttpGet("mapping/sports/{sportId}")]
+        public async Task<IActionResult> GetSportMappingById([FromRoute] string sportId)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _tradingRepository.GetSportMappingById(region, sportId);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("mapping/segments/{segmentId}")]
+        public async Task<IActionResult> GetSegmentMapping([FromRoute] string segmentId)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _tradingRepository.GetSegmentMappingById(region, segmentId);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("mapping/leagues/{leagueId}")]
+        public async Task<IActionResult> GetLeagueMapping([FromRoute] string leagueId)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _tradingRepository.GetLeagueMappingById(region, leagueId);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("mapping/fixtures/{fixtureId}")]
+        public async Task<IActionResult> GetFixtureMapping([FromRoute] string fixtureId)
+        {// 
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _tradingRepository.GetFixtureMappingById(region, fixtureId);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("mapping/markets/{marketId}")]
+        public async Task<IActionResult> GetMarketMapping([FromRoute] string marketId)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _tradingRepository.GetMarketMappingById(region, marketId);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("mapping/selections/{selectionId}")]
+        public async Task<IActionResult> GetSelectionMapping([FromRoute] string selectionId)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _tradingRepository.GetSelectionMappingById(region, selectionId);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
 
         [HttpPost("mapping/sports")]
         public async Task<IActionResult> GetSportMapping([FromBody] MappingRequest request)
