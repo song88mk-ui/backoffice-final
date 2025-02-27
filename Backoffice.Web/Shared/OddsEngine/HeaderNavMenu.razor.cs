@@ -130,6 +130,10 @@ namespace Backoffice.Web.Shared.OddsEngine
                     case "MARKET-GROUPS":
                         _menu = OeNavMenu.MarketSettings;
                         break;
+                    case "MAPPING":
+                    case "MAPPING-FIXTURE":
+                        _menu = OeNavMenu.Mapping;
+                        break;
                     default:
                         _menu = OeNavMenu.Monitoring;
                         break;
@@ -157,6 +161,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         {
             _showPriceBoostMenu = false;
             _showMarketSettingsMenu = false;
+            _showMappingMenu = false;
         }
 
         private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
