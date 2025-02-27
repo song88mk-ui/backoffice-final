@@ -16,3 +16,15 @@ hr {
     margin: 1.5rem 0;
     border-top: 1.5px solid #9E9A99;
 }
+
+.mapping-fixture {
+    margin-left: 0px !important;
+}
+
+.mapping-fixture hr {
+    display: none;
+}
+
+.mapping-fixture .ico {
+    display: none;
+}

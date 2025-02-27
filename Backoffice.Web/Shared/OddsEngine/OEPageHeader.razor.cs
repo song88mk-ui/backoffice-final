@@ -6,6 +6,7 @@ namespace Backoffice.Web.Shared.OddsEngine
     public partial class OEPageHeader : IDisposable
     {
         [Parameter] public PageHeaderModel PageHeaderModel { get; set; }
+        [Parameter] public string PageHeaderClassName { get; set; }
 
         private string _title = "";
         private string _iconClass = "";
