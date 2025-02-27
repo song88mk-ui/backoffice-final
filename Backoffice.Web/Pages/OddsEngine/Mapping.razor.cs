@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class MappingFixture
+    public partial class Mapping
     {
         private List<BreadcrumbModel> _breadcrumbs;
         private PageHeaderModel _pageHeaderModel;
