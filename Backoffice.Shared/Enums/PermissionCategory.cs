@@ -65,6 +65,7 @@ namespace Backoffice.Shared.Enums
         SBC_OE_MarketSetting_SortOrder,
         SBC_OE_MarketSetting_Group,
         SBC_OE_PriceBoost_Manage,
-        SBC_OE_PriceBoost_Settings
+        SBC_OE_PriceBoost_Settings,
+        SBC_OE_Mapping
     }
 }

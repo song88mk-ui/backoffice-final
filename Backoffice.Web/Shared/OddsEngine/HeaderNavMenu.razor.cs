@@ -15,6 +15,7 @@ namespace Backoffice.Web.Shared.OddsEngine
 
         private bool _showPriceBoostMenu;
         private bool _showMarketSettingsMenu;
+        private bool _showMappingMenu;
         private bool _init = true;
         private bool _shouldRender;
         private List<Claim> _userClaims = new();
@@ -79,6 +80,20 @@ namespace Backoffice.Web.Shared.OddsEngine
             }
             else
                 _showMarketSettingsMenu = false;
+
+            _shouldRender = true;
+        }
+
+        public async Task HandleMappingClick()
+        {
+            if (!_showMappingMenu)
+            {
+                HideAllMenu();
+
+                _showMappingMenu = true;
+            }
+            else
+                _showMappingMenu = false;
 
             _shouldRender = true;
         }
