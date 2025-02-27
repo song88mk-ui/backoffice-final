@@ -1,8 +1,8 @@
 ﻿<div class="modal-header">
     <div class="title">Edit Mapping</div>
     <div>
-        <button class="btn-cancel">Cancel</button>
-        <button class="btn-save">Save changes</button>
+        <button data-bs-dismiss="modal" @onclick="OnCloseClickEvent" class="btn-cancel">Cancel</button>
+        <button data-bs-dismiss="modal" @onclick="OnSaveClickEvent" class="btn-save">Save changes</button>
     </div>
 </div>
 <div class="modal-body">

@@ -1,10 +1,17 @@
 ﻿using Backoffice.Web.Models;
 using System.Drawing;
+using Microsoft.AspNetCore.Components;
+using Backoffice.Web.Components.Common;
+using Backoffice.Web.Components.OddsEngine.Mapping;
+using Backoffice.Web.Services;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class Mapping
     {
+        [Inject] public IModalService ModalService { get; set; }
+        [CascadingParameter] public CustomModal Modal { get; set; }
+        
         private List<BreadcrumbModel> _breadcrumbs;
         private PageHeaderModel _pageHeaderModel;
 
@@ -55,6 +62,19 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             _activeTab = tab;
             _shouldRender = true;
+        }
+
+        public async Task OnEditMappingClickEvent()
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("ModalDialogClass", "modal-lg");
+            var options = new ModalOptions();
+
+            ModalService.Open<EditMappingModal>("Edit Mapping Modal", parameters, options);
+        }
+
+        public async Task OnSaveClickEvent()
+        {
         }
     }
 }

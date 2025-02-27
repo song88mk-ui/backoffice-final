@@ -31,7 +31,10 @@
 
         @if (_activeTab == MappingTab.Mapped)
         {
-            <div>Mapped mockup here</div>
+            <div>Mapped mockup here <button @onclick="OnEditMappingClickEvent">Open Edit Modal</button></div>
         }
+        <div>
+            <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
+        </div>
     </Authorized>
 </AuthorizeView>
