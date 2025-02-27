@@ -57,6 +57,11 @@
     align-items: center;
 }
 
+.fa-download {
+    display: block;
+    width: 15px;
+}
+
 .mapping-setup-content-container {
     border: 1px dashed #DED8D8;
     padding: 12px 10px;
@@ -159,19 +164,33 @@
 .btn-save {
     background-color: #1151F3;
     color: #FFF;
-    padding: 10px;
+    padding: 7px 10px;
     min-width: 62px;
     border-radius: 5px;
     border: 0px;
     outline: 0px;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 /*Search*/
 
+.search-container {
+    position: relative;
+    width: 100%;
+}
+
 .input-search {
-    padding: 7px 10px;
+    width: 100%;
+    padding: 7px 30px 7px 10px;
     font-size: 12px;
     font-weight: 500;
+}
+
+.fa-search {
+    position: absolute;
+    right: 10px;
+    top: 10px;
 }
 
 /*Providers*/

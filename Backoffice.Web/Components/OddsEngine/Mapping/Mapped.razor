@@ -21,7 +21,7 @@
         <div class="mapping-setup-container">
             <div class="mapping-setup-header">
                 <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
-                <span>icon</span>
+                <img class="download-icon" src="icons/svg/download.svg" />
             </div>
             <div class="mapping-setup-content-container">
                 <div class="text-input">
@@ -44,7 +44,7 @@
                 <div class="header-cluster">
                     <span class="remove-all-label">@_translationState.GetValue("Remove All")</span>
                     <button class="btn-save">@_translationState.GetValue("Save")</button>
-                    <span>icon</span>
+                    <img class="download-icon" src="icons/svg/upload.svg" />
                 </div>
             </div>
             <div class="item-list-container">
@@ -53,7 +53,10 @@
         </div>
     </div>
     <div class="right">
-        <input class="input-search" placeholder="@_translationState.GetValue("Search")" />
+        <div class="search-container">
+            <input class="input-search" placeholder="@_translationState.GetValue("Search")" />
+            <i class="fa fa-search" />
+        </div>
         <div class="providers-container">
             <div class="provider">
                 <span class="provider-label header-label">Bet Genius</span>
