@@ -1,5 +1,6 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.Mapping
 
+
 @inherits BasePage
 @layout OEMonitoringLayout
 
@@ -31,10 +32,7 @@
 
         @if (_activeTab == MappingTab.Mapped)
         {
-            <div>Mapped mockup here <button @onclick="OnEditMappingClickEvent">Open Edit Modal</button></div>
+            <MappedTab/>
         }
-        <div>
-            <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
-        </div>
     </Authorized>
 </AuthorizeView>
