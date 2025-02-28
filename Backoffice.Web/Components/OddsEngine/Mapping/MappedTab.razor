@@ -1,3 +1,5 @@
+@using Backoffice.Web.Components.OddsEngine.Mapping
+
 <div>
 
     <div class="d-flex flex-row justify-content-between">
@@ -50,11 +52,11 @@
                 <td>256</td>
                 <td>2024-02-13 02:15 PM</td>
                 <td class="action-row">
-                    <img src="icons/svg/icon-update.svg" />
+                    <button class="btn-icon" @onclick="OnEditMappingClickEvent">
+                        <img src="icons/svg/icon-update.svg" />
+                    </button>
                     <img src="icons/svg/icon-trash.svg" />
-
                 </td>
-
             </tr>
             <tr>
                 <td>Cleveland Cavaliers vs. Golden State Warrior</td>
@@ -64,19 +66,19 @@
                         <div class="source-item inactive">SR</div>
                         <div class="source-item inactive">BG</div>
                     </div>
-
                 </td>
                 <td>256</td>
                 <td>2024-02-03 12:15 AM</td>
                 <td class="action-row">
-                    <img src="icons/svg/icon-update.svg" />
+                    <button class="btn-icon" @onclick="OnEditMappingClickEvent">
+                        <img src="icons/svg/icon-update.svg" />
+                    </button>
                     <img src="icons/svg/icon-trash.svg" />
-
                 </td>
             </tr>
         </tbody>
     </table>
-
-
-
+    <div>
+        <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
+    </div>
 </div>

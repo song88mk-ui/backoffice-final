@@ -1,0 +1,89 @@
+﻿<div class="modal-header">
+    <div class="title">Edit Mapping</div>
+    <div>
+        <button data-bs-dismiss="modal" @onclick="OnCloseClickEvent" class="btn-cancel">Cancel</button>
+        <button data-bs-dismiss="modal" @onclick="OnSaveClickEvent" class="btn-save">Save changes</button>
+    </div>
+</div>
+<div class="modal-body">
+    <div class="information-container mb-3">
+        <div class="mb-2">
+            <label class="form-label">New Mapped ID</label>
+            <input type="text" class="form-control" placeholder="Cleveland Cavaliers vs. Golden State Warriors" />
+        </div>
+        <div class="mb-2">
+            <label class="form-label">New Fixture Name</label>
+            <input type="text" class="form-control" placeholder="222" />
+        </div>
+        <ul class="suggestion">
+            <li>
+                <div>Ankara Keciorengucu vs. Sivasspor (ID# 01) </div>
+                <div class="badge rounded-pill bg-blue">BG</div>
+            </li>
+            <li>
+                <div>Ankara Keciorengucu vs. Sivasspor (ID# 21) </div>
+                <div class="badge rounded-pill bg-red">SR</div>
+            </li>
+        </ul>
+    </div>
+    <div class="information-container">
+        <div class="search">
+            <input type="text" placeholder="Search" />
+            <i class="fa fa-search"></i>
+        </div>
+        <div class="fixtures-group">
+            <div class="fixtures">
+                <div class="fixtures-title mb-3">Bet Genius</div>
+                <ul>
+                    <li>
+                        <div class="drag-icon">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                        </div>
+                        <div class="text-ellipse">Cleveland Cavaliers vs. Golden State Warrior (ID# :31)</div>
+                    </li>
+                    <li>
+                        <div class="drag-icon">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                        </div>
+                        <div class="text-ellipse">Wellington Blaze vs. Central Hinds (ID# :11)</div>
+                    </li>
+                    <li>
+                        <div class="drag-icon">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                        </div>
+                        <div class="text-ellipse">Sydney Kings vs. Melbourne United (ID#121)</div>
+                    </li>
+                    <li>
+                        <div class="drag-icon">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                        </div>
+                        <div class="text-ellipse">Goyang Skyrunner vs. KCC Egis (ID# 234)</div>
+                    </li>
+                </ul>
+            </div>
+            <div class="fixtures">
+                <div class="fixtures-title mb-3">Sports Radar</div>
+                <ul>
+                    <li>
+                        <div class="drag-icon">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                        </div>
+                        <div class="text-ellipse">Cleveland Cavaliers vs. Golden State Warrior (ID# :251)</div>
+                    </li>
+                    <li>
+                        <div class="drag-icon">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                        </div>
+                        <div class="text-ellipse">Sydney Kings vs. Melbourne United (ID# :22) </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,177 @@
+﻿.modal-header {
+    border-bottom: none;
+}
+
+.title {
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 27px;
+}
+
+.btn-save,
+.btn-cancel {
+    height:44px;
+    padding: 10px 18px;
+    border-radius: 8px;
+}
+
+.btn-cancel {
+    border: 1px solid #E0E1E4;
+    background: #FFF;
+    color: #344054;
+    min-width: 94px;
+}
+
+.btn-save {
+    background: #000;
+    color: #FFF;
+    min-width: 134px;
+}
+
+.information-container {
+    padding: 10px 12px;
+    border-radius: 4px;
+    border: 1px dashed #DED8D8;
+    background: #F6F6F6;
+}
+
+label {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 15px;
+}
+
+.form-control {
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.form-control::placeholder {
+    font-style:italic;
+}
+
+.suggestion {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px dashed #CDCBCB;
+    background: #FFF;
+    list-style: none;
+}
+
+.suggestion {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.suggestion li {
+    display: flex;
+    padding: 12px;
+    cursor: pointer;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    border: 1px solid #DCDCDC;
+    border-radius: 5px;
+}
+
+.suggestion li:hover {
+    background: #F6F6F6;
+}
+
+.badge {
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.bg-blue {
+    background: #1151F3;
+}
+
+.bg-red {
+    background: #EC2024;
+}
+
+.search {
+    display: flex;
+    align-items: center;
+    border: 1px solid #DCDCDC;
+    border-radius: 5px;
+}
+
+.search:focus-within {
+    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
+}
+
+.search input {
+    padding: 10px;
+    border: none;
+    flex: 1;
+    outline: none;
+    border-radius: 5px 0 0 5px;
+}
+
+.search .fa-search {
+    padding: 10px;
+    background: #FFF;
+}
+
+.fixtures-group {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.fixtures {
+    min-width: 0;
+    flex-basis: 50%;
+    padding: 10px 8px;
+}
+
+.fixtures .fixtures-title {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.fixtures ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+}
+
+.fixtures ul li {
+    display: flex;
+    border: 1px solid #DCDCDC;
+    border-radius: 5px;
+    background: #FFF;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.fixtures ul li:hover {
+    background: #F6F6F6;
+}
+
+.fixtures ul li div {
+    padding: 10px;
+}
+
+.fixtures ul li .drag-icon {
+    border-radius: 5px 0 0 5px;
+    background: #E8F5FF;
+    align-items: center;
+}
+
+.drag-icon {
+    display: flex;
+    gap: 2px;
+    color: #BDDEF8;
+}
+
+.text-ellipse {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

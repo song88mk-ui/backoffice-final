@@ -71,3 +71,9 @@ table{
     border-right: none;
 
 }
+
+.btn-icon {
+    border: none;
+    background: none;
+    padding: 0;
+}
