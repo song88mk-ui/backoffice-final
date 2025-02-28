@@ -1,5 +1,6 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.Mapping
 
+
 @inherits BasePage
 @layout OEMonitoringLayout
 
@@ -31,7 +32,7 @@
 
         @if (_activeTab == MappingTab.Mapped)
         {
-            <div>Mapped mockup here</div>
+            <MappedTab/>
         }
     </Authorized>
 </AuthorizeView>
