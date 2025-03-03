@@ -17,7 +17,7 @@
 
 .tab-container {
     width: 100%;
-    margin-top: 20px;
+    margin: 20px 0px;
     border-bottom: 1px solid #E5E4E4;
     display: flex;
     flex-direction: row;
