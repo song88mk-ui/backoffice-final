@@ -1,4 +1,6 @@
-﻿namespace Backoffice.Shared.Models.Requests
+﻿using System.Collections.Generic;
+
+namespace Backoffice.Shared.Models.Requests
 {
     public class ProviderMappingRequest
     {
@@ -9,5 +11,10 @@
         public int? SegId { get; set; } = null;
         public int? LeId { get; set; } = null;
         public int ChTyId { get; set; }
+    }
+
+    public class ProviderMappingBulkRequest
+    {
+        public List<ProviderMappingRequest> Mapping { get; set; }
     }
 }

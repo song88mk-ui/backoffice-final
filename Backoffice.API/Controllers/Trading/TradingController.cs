@@ -1229,6 +1229,22 @@ namespace Backoffice.API.Controllers.Trading
             }
         }
 
+        [HttpPost("mapping/{category}/bulk")]
+        public async Task<IActionResult> AddOrUpdateProviderMappingBulk([FromRoute] string category, [FromBody] ProviderMappingBulkRequest request)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _tradingRepository.AddOrUpdateProviderMapping(region, category, request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         #endregion
     }
 }
