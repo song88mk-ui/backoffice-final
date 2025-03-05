@@ -1,0 +1,6 @@
+﻿namespace Backoffice.Web.Components.OddsEngine.Mapping
+{
+    public partial class UnMapped
+    {
+    }
+}

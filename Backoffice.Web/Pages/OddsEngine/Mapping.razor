@@ -4,7 +4,6 @@
 @inherits BasePage
 @layout OEMonitoringLayout
 
-@page "/hk/odds-engine/mapping-sports"
 @page "/hk/odds-engine/mapping-segments"
 @page "/hk/odds-engine/mapping-leagues"
 @page "/hk/odds-engine/mapping-fixture"
@@ -27,12 +26,12 @@
         
         @if (_activeTab == MappingTab.Unmapped)
         {
-            <Mapped />
+            <UnMapped />
         }
 
         @if (_activeTab == MappingTab.Mapped)
         {
-            <MappedTab/>
+            <Mapped />
         }
     </Authorized>
 </AuthorizeView>
