@@ -7,14 +7,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     public partial class MappingProvider
     {
         [Parameter] public EventCallback<ProviderItemModel> OnDragCallback { get; set; }
-        [Parameter] public List<ProviderItemModel> ProviderItems { get; set; } = new List<ProviderItemModel>
-        {
-            new ProviderItemModel { Id = 1, Name = "Test Fixture (ID#: 01)", Provider = ProviderType.SportsRadar },
-            new ProviderItemModel { Id = 2, Name = "Test Fixture (ID#: 02)", Provider = ProviderType.BetGenius },
-            new ProviderItemModel { Id = 3, Name = "Test Fixture (ID#: 03)", Provider = ProviderType.BetGenius },
-        };
+        [Parameter] public List<ProviderItemModel> ProviderItems { get; set; } = new List<ProviderItemModel>();
         private string _searchQuery { get; set; } = string.Empty;
-
         private List<ProviderItemModel> _filteredProviderItems { get; set; } = new List<ProviderItemModel>();
         private Dictionary<ProviderType, List<ProviderItemModel>> _groupProviderItems { get; set; } = new Dictionary<ProviderType, List<ProviderItemModel>>();
 
@@ -52,4 +46,4 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             };
         }
     }
-}
+}     
