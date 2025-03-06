@@ -17,6 +17,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class Monitoring : IDisposable
     {
         #region Properties
+        
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
 
         [Parameter] public int SportId { get; set; }
@@ -642,6 +643,16 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _shouldRender = true;
                 await InvokeAsync(StateHasChanged);
             }
+        }
+
+        public async Task OnConfirmSelectionClickEvent()
+        {
+            ModalParameters parameters = new ModalParameters();
+            parameters.Add("ModalDialogClass", "modal-dialog-centered");
+
+            ModalOptions options = new ModalOptions();
+
+            _modalService.Open<ConfirmSelectionModal>("", parameters, options);
         }
 
         private async Task GetMostEvenLine()

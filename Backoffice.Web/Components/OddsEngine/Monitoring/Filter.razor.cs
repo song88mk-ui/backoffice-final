@@ -145,7 +145,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         public async Task OnSwitchAllClickEvent()
         {
             var parameters = new ModalParameters();
-            parameters.Add("ModalDialogClass", "modal-sm");
+            parameters.Add("ModalDialogClass", "modal-dialog-centered modal-sm");
             var options = new ModalOptions();
 
             ModalService.Open<SwitchAllFixturesModal>("SWITCH ALL FIXTURES", parameters, options);

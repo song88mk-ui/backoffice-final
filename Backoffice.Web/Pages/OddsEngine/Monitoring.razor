@@ -110,10 +110,10 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <div class="provider-icon sr">SR</div>
+                                                        <div role="presentation" @onclick="OnConfirmSelectionClickEvent" class="provider-icon sr">SR</div>
                                                     </td>
                                                     <td>
-                                                        <div class="provider-icon disabled-icon">BG</div>
+                                                        <div role="presentation" @onclick="OnConfirmSelectionClickEvent"  class="provider-icon disabled-icon">BG</div>
                                                     </td>
                                                     <AuthorizeView Policy="sbc-monitoring-match-canedit">
                                                         <Authorized Context="authorizedContext">
