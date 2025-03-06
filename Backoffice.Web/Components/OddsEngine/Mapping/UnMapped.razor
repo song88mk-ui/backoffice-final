@@ -1,4 +1,6 @@
-﻿<div class="dropdowns-container">
+﻿@using Backoffice.Web.Components.OddsEngine.Mapping
+
+<div class="dropdowns-container">
     <select class="dropdown">
         <option value="" disabled selected hidden>@_translationState.GetValue("Select Sports")</option>
         <option value="Sports 1">Sports 1</option>
@@ -32,7 +34,7 @@
                     <span>@_translationState.GetValue("New Fixture Name")</span>
                     <input type="text" placeholder="Enter Fixture Name" />
                 </div>
-                <div class="item-list-container">
+                <div class="item-list-container" dropzone="move" @ondrop="HandleDropProviderItem" ondragover="event.preventDefault();">
                     <span class="empty-message italic">@_translationState.GetValue("Drag and drop the item you want to map.")</span>
                 </div>
                 <button class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
@@ -53,49 +55,6 @@
         </div>
     </div>
     <div class="right">
-        <div class="search-container">
-            <input class="input-search" placeholder="@_translationState.GetValue("Search")" />
-            <i class="fa fa-search" />
-        </div>
-        <div class="providers-container">
-            <div class="provider">
-                <span class="provider-label header-label">Bet Genius</span>
-                <div class="provider-items-container">
-                    <div class="provider-item">
-                        <div class="provider-item-name-container">
-                            <img class="drag-icon" src="icons/svg/draggable.svg" />
-                            <span class="provider-item-name">Test Fixture (ID#: 01)</span>
-                        </div>
-                        <img class="linked-icon" src="icons/svg/linked.svg" />
-                    </div>
-                    <div class="provider-item">
-                        <div class="provider-item-name-container">
-                            <img class="drag-icon" src="icons/svg/draggable.svg" />
-                            <span class="provider-item-name">Test Fixture (ID#: 01)</span>
-                        </div>
-                        <img class="linked-icon" src="icons/svg/linked.svg" />
-                    </div>
-                </div>
-            </div>
-            <div class="provider">
-                <span class="provider-label header-label">Sport Radar</span>
-                <div class="provider-items-container">
-                    <div class="provider-item">
-                        <div class="provider-item-name-container">
-                            <img class="drag-icon" src="icons/svg/draggable.svg" />
-                            <span class="provider-item-name">Test Fixture (ID#: 01)</span>
-                        </div>
-                        <img class="linked-icon" src="icons/svg/linked.svg" />
-                    </div>
-                    <div class="provider-item">
-                        <div class="provider-item-name-container">
-                            <img class="drag-icon" src="icons/svg/draggable.svg" />
-                            <span class="provider-item-name">Test Fixture (ID#: 01)</span>
-                        </div>
-                        <img class="linked-icon" src="icons/svg/linked.svg" />
-                    </div>
-                </div>
-            </div>
-        </div>
+        <MappingProvider OnDragCallback="HandleDragProviderItem" />
     </div>
 </div>
