@@ -3,12 +3,15 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using Backoffice.Web.Services;
+
 
 namespace Backoffice.Web.Components.OddsEngine.Monitoring
 {
     public partial class Filter : IDisposable
     {
         #region Properties
+        [Inject] public IModalService ModalService { get; set; }
 
         [Parameter] public EventCallback<MonitoringCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<List<SelectListItemWithCheckboxModel<string>>> OnFilterClientCallback { get; set; }
@@ -137,6 +140,15 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                 _selectedClientName = items.FirstOrDefault().Value;
 
             await OnFilterClientCallback.InvokeAsync(_clientFilter);
+        }
+
+        public async Task OnSwitchAllClickEvent()
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("ModalDialogClass", "modal-dialog-centered modal-sm");
+            var options = new ModalOptions();
+
+            ModalService.Open<SwitchAllFixturesModal>("SWITCH ALL FIXTURES", parameters, options);
         }
 
         public void Dispose()

@@ -1,0 +1,32 @@
+.btn-container{
+    height: 60px;
+    text-align: center;
+    justify-self: center;
+    display: flex;
+    flex-direction: row;
+}
+
+.input-container{
+    margin:20px;
+    span{
+        margin-left: 10px;
+        font-size: 14px;
+        font-weight: 400;
+    }
+}
+
+button{
+    height: 44px;
+    width: 125px;
+    border-radius: 8px;
+    font-size: 16px;
+    margin:4px;
+    background-color: white;
+    border-color: #D0D5DD;
+
+}
+
+.confirm{
+    background-color: black;
+    color:white;
+}
