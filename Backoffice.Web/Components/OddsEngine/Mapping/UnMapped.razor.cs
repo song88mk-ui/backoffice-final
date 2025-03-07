@@ -17,10 +17,5 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             _draggedProviderItem = providerItem;
         }
-
-        private void HandleDropProviderItem()
-        {
-            Console.WriteLine($"Dropped Provider Item: {_draggedProviderItem.Name}");
-        }
     }
 }

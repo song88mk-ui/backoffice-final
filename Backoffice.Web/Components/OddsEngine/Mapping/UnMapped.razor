@@ -20,26 +20,7 @@
 
 <div class="main-content-grid">
     <div class="left">
-        <div class="mapping-setup-container">
-            <div class="mapping-setup-header">
-                <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
-                <img class="download-icon" src="icons/svg/download.svg" />
-            </div>
-            <div class="mapping-setup-content-container">
-                <div class="text-input">
-                    <span>@_translationState.GetValue("Mapped ID")</span>
-                    <input type="text" placeholder="255" />
-                </div>
-                <div class="text-input">
-                    <span>@_translationState.GetValue("New Fixture Name")</span>
-                    <input type="text" placeholder="Enter Fixture Name" />
-                </div>
-                <div class="item-list-container" dropzone="move" @ondrop="HandleDropProviderItem" ondragover="event.preventDefault();">
-                    <span class="empty-message italic">@_translationState.GetValue("Drag and drop the item you want to map.")</span>
-                </div>
-                <button class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
-            </div>
-        </div>
+        <MappingSetup DraggedProviderItem="_draggedProviderItem" />
         <div class="mapped-items-container">
             <div class="mapped-items-header">
                 <span class="header-label">@_translationState.GetValue("Mapped Items")</span>

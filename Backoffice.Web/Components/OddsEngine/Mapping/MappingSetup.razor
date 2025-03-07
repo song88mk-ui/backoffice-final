@@ -1,0 +1,32 @@
+<div class="mapping-setup-container">
+    <div class="mapping-setup-header">
+        <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
+        <img class="download-icon" src="icons/svg/download.svg" />
+    </div>
+    <div class="mapping-setup-content-container">
+        <div class="text-input">
+            <span>@_translationState.GetValue("Mapped ID")</span>
+            <input type="text" placeholder="255" />
+        </div>
+        <div class="text-input">
+            <span>@_translationState.GetValue("New Fixture Name")</span>
+            <input type="text" placeholder="Enter Fixture Name" />
+        </div>
+        <div class="item-list-container" dropzone="move" @ondrop="HandleDropProviderItem" ondragover="event.preventDefault();">
+            @if (_droppedProviderItems.Any())
+            {
+                <ul class="item-list">
+                    @foreach (var item in _droppedProviderItems)
+                    {
+                        <li class="item" @onclick="() => HandleRemoveProviderItem(item.Value)"><div>@item.Value.Name</div><span class="badge @GetProviderCss(item.Value.Provider)">@GetProviderAcronym(item.Value.Provider)</span></li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div class="empty-message italic">@_translationState.GetValue("Drag and drop the item you want to map.")</div>
+            }
+        </div>
+        <button class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
+    </div>
+</div>
