@@ -21,21 +21,23 @@
         <div class="mapping-setup-container">
             <div class="mapping-setup-header">
                 <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
-                <img class="download-icon" src="icons/svg/download.svg" />
+                <img class="download-icon" src="icons/svg/download.svg"/>
             </div>
             <div class="mapping-setup-content-container">
                 <div class="text-input">
                     <span>@_translationState.GetValue("Mapped ID")</span>
-                    <input type="text" placeholder="255" />
+                    <input type="text" placeholder="255"/>
                 </div>
                 <div class="text-input">
                     <span>@_translationState.GetValue("New Fixture Name")</span>
-                    <input type="text" placeholder="Enter Fixture Name" />
+                    <input type="text" placeholder="Enter Fixture Name"/>
                 </div>
                 <div class="item-list-container">
-                    <span class="empty-message italic">@_translationState.GetValue("Drag and drop the item you want to map.")</span>
+                    <span
+                        class="empty-message italic">@_translationState.GetValue("Drag and drop the item you want to map.")</span>
                 </div>
-                <button class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
+                <button
+                    class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
             </div>
         </div>
         <div class="mapped-items-container">
@@ -44,7 +46,7 @@
                 <div class="header-cluster">
                     <span class="remove-all-label">@_translationState.GetValue("Remove All")</span>
                     <button class="btn-save">@_translationState.GetValue("Save")</button>
-                    <img class="download-icon" src="icons/svg/upload.svg" />
+                    <img class="download-icon" src="icons/svg/upload.svg"/>
                 </div>
             </div>
             <div class="item-list-container">
@@ -54,48 +56,28 @@
     </div>
     <div class="right">
         <div class="search-container">
-            <input class="input-search" placeholder="@_translationState.GetValue("Search")" />
-            <i class="fa fa-search" />
+            <input class="input-search" placeholder="@_translationState.GetValue("Search")"/>
+            <i class="fa fa-search"/>
         </div>
         <div class="providers-container">
-            <div class="provider">
-                <span class="provider-label header-label">Bet Genius</span>
-                <div class="provider-items-container">
-                    <div class="provider-item">
-                        <div class="provider-item-name-container">
-                            <img class="drag-icon" src="icons/svg/draggable.svg" />
-                            <span class="provider-item-name">Test Fixture (ID#: 01)</span>
-                        </div>
-                        <img class="linked-icon" src="icons/svg/linked.svg" />
-                    </div>
-                    <div class="provider-item">
-                        <div class="provider-item-name-container">
-                            <img class="drag-icon" src="icons/svg/draggable.svg" />
-                            <span class="provider-item-name">Test Fixture (ID#: 01)</span>
-                        </div>
-                        <img class="linked-icon" src="icons/svg/linked.svg" />
-                    </div>
-                </div>
-            </div>
-            <div class="provider">
-                <span class="provider-label header-label">Sport Radar</span>
-                <div class="provider-items-container">
-                    <div class="provider-item">
-                        <div class="provider-item-name-container">
-                            <img class="drag-icon" src="icons/svg/draggable.svg" />
-                            <span class="provider-item-name">Test Fixture (ID#: 01)</span>
-                        </div>
-                        <img class="linked-icon" src="icons/svg/linked.svg" />
-                    </div>
-                    <div class="provider-item">
-                        <div class="provider-item-name-container">
-                            <img class="drag-icon" src="icons/svg/draggable.svg" />
-                            <span class="provider-item-name">Test Fixture (ID#: 01)</span>
-                        </div>
-                        <img class="linked-icon" src="icons/svg/linked.svg" />
+            @foreach (var provider in _sportsGroupedByProvider)
+            {
+                <div class="provider">
+                    <span class="provider-label header-label">@providerIdToName[provider.Key]</span>
+                    <div class="provider-items-container">
+                        @foreach (var sport in provider)
+                        {
+                            <div class="provider-item">
+                                <div class="provider-item-name-container">
+                                    <img class="drag-icon" src="icons/svg/draggable.svg"/>
+                                    <span class="provider-item-name">@sport.Na</span>
+                                </div>
+                                <img class="linked-icon" src="icons/svg/linked.svg"/>
+                            </div>
+                        }
                     </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>
