@@ -1,6 +1,3 @@
-using Backoffice.Shared.Models;
-using Microsoft.AspNetCore.Components.Web;
-
 namespace Backoffice.Web.Models.OddsEngine.Mapping
 {
     public enum ProviderType

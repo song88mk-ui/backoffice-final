@@ -20,7 +20,7 @@
 
 <div class="main-content-grid">
     <div class="left">
-        <MappingSetup DraggedProviderItem="_draggedProviderItem" />
+        <MappingSetup DraggedProviderItem="_draggedProviderItem" OnSubmitCallback="HandleSubmitMappingSetup" />
         <div class="mapped-items-container">
             <div class="mapped-items-header">
                 <span class="header-label">@_translationState.GetValue("Mapped Items")</span>

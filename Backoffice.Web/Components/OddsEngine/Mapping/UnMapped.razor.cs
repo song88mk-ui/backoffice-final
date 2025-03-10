@@ -17,5 +17,10 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             _draggedProviderItem = providerItem;
         }
+
+        private void HandleSubmitMappingSetup(MappingSetupModel mappingSetup)
+        {
+            Console.WriteLine($"Mapping setup submitted. {mappingSetup.NewFixtureName}");
+        }
     }
 }
