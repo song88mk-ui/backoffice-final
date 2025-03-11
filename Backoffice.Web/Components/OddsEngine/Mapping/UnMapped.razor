@@ -26,18 +26,20 @@
             <div class="mapping-setup-content-container">
                 <div class="text-input">
                     <span>@_translationState.GetValue("Mapped ID")</span>
-                    <input type="text" placeholder="255"/>
+                    <input type="text" @bind-value="_currentMappingItem.Id" placeholder="255"/>
                 </div>
                 <div class="text-input">
                     <span>@_translationState.GetValue("New Fixture Name")</span>
-                    <input type="text" placeholder="Enter Fixture Name"/>
+                    <input type="text" @bind-value="_currentMappingItem.Na" placeholder ="Enter Fixture Name" />
                 </div>
                 <div class="item-list-container">
                     <span
                         class="empty-message italic">@_translationState.GetValue("Drag and drop the item you want to map.")</span>
                 </div>
                 <button
-                    class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
+                    class="btn-create-mapping @(false ? "inactive" : "active")"
+                    @onclick=HandleCreateMappingClick
+                >@_translationState.GetValue("Create Mapping")</button>
             </div>
         </div>
         <div class="mapped-items-container">
@@ -45,7 +47,7 @@
                 <span class="header-label">@_translationState.GetValue("Mapped Items")</span>
                 <div class="header-cluster">
                     <span class="remove-all-label">@_translationState.GetValue("Remove All")</span>
-                    <button class="btn-save">@_translationState.GetValue("Save")</button>
+                    <button class="btn-save" @onclick=HandleSaveMappingClick>@_translationState.GetValue("Save")</button>
                     <img class="download-icon" src="icons/svg/upload.svg"/>
                 </div>
             </div>
