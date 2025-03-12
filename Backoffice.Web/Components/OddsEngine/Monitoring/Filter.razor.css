@@ -26,3 +26,17 @@ button:focus:not(:focus-visible) {
 .dropdown-toggle::after {
     content: unset;
 }
+
+.switch-all-btn{
+    width: 150px;
+    height: 38px;
+    background-color: #E95D3E;
+    border-radius: 5px;
+    color:#FFFBFB;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 20px;
+    align-content: center;
+    cursor: pointer;
+}

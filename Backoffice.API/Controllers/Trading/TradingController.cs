@@ -1234,7 +1234,7 @@ namespace Backoffice.API.Controllers.Trading
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.AddOrUpdateProviderMapping(region, category, request);
+            var result = await _tradingRepository.AddOrUpdateProviderMappingBulk(region, category, request);
 
             switch (result.StatusCode)
             {

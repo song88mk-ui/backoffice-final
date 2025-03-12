@@ -24,7 +24,7 @@
                         <ul class="item-list">
                             @foreach (var item in _droppedProviderItems)
                             {
-                                <li class="item" @onclick="() => HandleRemoveProviderItem(item.Value)"><div>@item.Value.Name</div><span class="badge @GetProviderCss(item.Value.Provider)">@GetProviderAcronym(item.Value.Provider)</span></li>
+                                <li class="item" @onclick="() => HandleRemoveProviderItem(item.Value)"><div>@item.Value.Na</div><span class="badge @providerCss[item.Value.ChTyId]">@providerAcronym[item.Value.ChTyId]</span></li>
                             }
                         </ul>
                     }

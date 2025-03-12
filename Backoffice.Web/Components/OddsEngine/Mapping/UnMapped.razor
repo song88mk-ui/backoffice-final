@@ -27,7 +27,7 @@
                 <div class="header-cluster">
                     <span class="remove-all-label">@_translationState.GetValue("Remove All")</span>
                     <button class="btn-save">@_translationState.GetValue("Save")</button>
-                    <img class="download-icon" src="icons/svg/upload.svg" />
+                    <img class="download-icon" src="icons/svg/upload.svg"/>
                 </div>
             </div>
             <div class="item-list-container">
@@ -36,6 +36,6 @@
         </div>
     </div>
     <div class="right">
-        <MappingProvider ProviderItems="_providerItems" OnDragCallback="HandleDragProviderItem" />
+        <MappingProvider ProviderItems="_unMappedSports" OnDragCallback="HandleDragProviderItem" />
     </div>
 </div>

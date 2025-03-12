@@ -1,16 +1,36 @@
 using Backoffice.Web.Models.OddsEngine.Mapping;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Backoffice.Shared.Models.Response;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class MappingSetup
     {
-        [Parameter] public ProviderItemModel DraggedProviderItem { get; set; } = new ProviderItemModel();
+        [Parameter] public UnmappedModel DraggedProviderItem { get; set; } = new UnmappedModel();
         [Parameter] public EventCallback<MappingSetupModel> OnSubmitCallback { get; set; }
         private MappingSetupModel _mappingSetup = new MappingSetupModel();
-        private Dictionary<ProviderType, ProviderItemModel> _droppedProviderItems = new Dictionary<ProviderType, ProviderItemModel>();
+        private Dictionary<int, UnmappedModel> _droppedProviderItems = new Dictionary<int, UnmappedModel>();
         private EditContext _editContext;
+        private Dictionary<int, string> providerAcronym = new Dictionary<int, string>
+        {
+            {
+                1, "BG"
+            },
+            {
+                2, "SR"
+            }
+        };
+
+        private Dictionary<int, string> providerCss = new Dictionary<int, string>
+        {
+            {
+                1, "bg-primary"
+            },
+            {
+                2, "bg-danger"
+            }
+        };
 
         protected override void OnInitialized()
         {
@@ -25,37 +45,17 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             if (DraggedProviderItem != null)
             {
-                _droppedProviderItems[DraggedProviderItem.Provider] = DraggedProviderItem;
+                _droppedProviderItems[DraggedProviderItem.ChTyId] = DraggedProviderItem;
                 _mappingSetup.Providers = _droppedProviderItems.Values.ToList();
                 _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetup.Providers));
             }
         }
 
-        private void HandleRemoveProviderItem(ProviderItemModel providerItem)
+        private void HandleRemoveProviderItem(UnmappedModel providerItem)
         {
-            _droppedProviderItems.Remove(providerItem.Provider);
+            _droppedProviderItems.Remove(providerItem.ChTyId);
             _mappingSetup.Providers = _droppedProviderItems.Values.ToList();
             _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetup.Providers));
-        }
-
-        private string GetProviderAcronym(ProviderType providerType)
-        {
-            return providerType switch
-            {
-                ProviderType.SportsRadar => "SR",
-                ProviderType.BetGenius => "BG",
-                _ => "Unknown"
-            };
-        }
-
-        private string GetProviderCss(ProviderType providerType)
-        {
-            return providerType switch
-            {
-                ProviderType.SportsRadar => "bg-danger",
-                ProviderType.BetGenius => "bg-primary",
-                _ => "Unknown"
-            };
         }
     }
 }

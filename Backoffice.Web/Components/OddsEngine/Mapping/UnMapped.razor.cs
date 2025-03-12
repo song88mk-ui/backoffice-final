@@ -1,23 +1,22 @@
-﻿using Backoffice.Web.Models.OddsEngine.Mapping;
+﻿using System.Collections;
+using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Models.OddsEngine.Mapping;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class UnMapped
     {
-        private ProviderItemModel _draggedProviderItem;
-
-        public List<ProviderItemModel> _providerItems { get; set; } = new List<ProviderItemModel>
+        private UnmappedModel _draggedProviderItem;
+        private List<UnmappedModel> _unMappedSports = new();
+        protected override async Task OnInitializedAsync()
         {
-            new ProviderItemModel { Id = 1, Name = "Test Fixture (ID#: 01)", Provider = ProviderType.SportsRadar },
-            new ProviderItemModel { Id = 2, Name = "Test Fixture (ID#: 02)", Provider = ProviderType.BetGenius },
-            new ProviderItemModel { Id = 3, Name = "Test Fixture (ID#: 03)", Provider = ProviderType.BetGenius },
-        };
-
-        private void HandleDragProviderItem(ProviderItemModel providerItem)
+            var response = await _providerMappingService.GetUnmappedSports();
+            _unMappedSports = response.Result.Unmapped;
+        }
+        private void HandleDragProviderItem(UnmappedModel providerItem)
         {
             _draggedProviderItem = providerItem;
         }
-
         private void HandleSubmitMappingSetup(MappingSetupModel mappingSetup)
         {
             Console.WriteLine($"Mapping setup submitted. {mappingSetup.NewFixtureName}");
