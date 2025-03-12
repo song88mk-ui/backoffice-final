@@ -78,3 +78,27 @@ table thead th {
 .close-match-btn {
     white-space: nowrap;
 }
+
+
+.provider-icon{
+    width: 23px;
+    height: 17px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 600;
+    color:white;
+    cursor: pointer;
+}
+
+.sr{
+    background-color: #EC2024;
+}
+.bg{
+    background-color: #1151F3;
+}
+
+.disabled-icon{
+    background-color: #707070;
+}

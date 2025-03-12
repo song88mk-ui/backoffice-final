@@ -23,21 +23,22 @@
         <div class="mapping-setup-container">
             <div class="mapping-setup-header">
                 <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
-                <img class="download-icon" src="icons/svg/download.svg" />
+                <img class="download-icon" src="icons/svg/download.svg"/>
             </div>
             <div class="mapping-setup-content-container">
                 <div class="text-input">
                     <span>@_translationState.GetValue("Mapped ID")</span>
-                    <input type="text" placeholder="255" />
+                    <input type="text" placeholder="255"/>
                 </div>
                 <div class="text-input">
                     <span>@_translationState.GetValue("New Fixture Name")</span>
-                    <input type="text" placeholder="Enter Fixture Name" />
+                    <input type="text" placeholder="Enter Fixture Name"/>
                 </div>
                 <div class="item-list-container" dropzone="move" @ondrop="HandleDropProviderItem" ondragover="event.preventDefault();">
                     <span class="empty-message italic">@_translationState.GetValue("Drag and drop the item you want to map.")</span>
                 </div>
-                <button class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
+                <button
+                    class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
             </div>
         </div>
         <div class="mapped-items-container">
@@ -46,7 +47,7 @@
                 <div class="header-cluster">
                     <span class="remove-all-label">@_translationState.GetValue("Remove All")</span>
                     <button class="btn-save">@_translationState.GetValue("Save")</button>
-                    <img class="download-icon" src="icons/svg/upload.svg" />
+                    <img class="download-icon" src="icons/svg/upload.svg"/>
                 </div>
             </div>
             <div class="item-list-container">
@@ -55,6 +56,6 @@
         </div>
     </div>
     <div class="right">
-        <MappingProvider ProviderItems="_providerItems" OnDragCallback="HandleDragProviderItem" />
+        <MappingProvider ProviderItems="_unMappedSports" OnDragCallback="HandleDragProviderItem" />
     </div>
 </div>

@@ -7,14 +7,14 @@
         @foreach (var group in _groupProviderItems)
         {
             <div class="provider">
-                <span class="provider-label header-label">@GetProviderName(group.Key)</span>
+                <span class="provider-label header-label">@providerIdToName[group.Key]</span>
                 <div class="provider-items-container">
                     @foreach (var item in group.Value)
                     {
                         <div class="provider-item" draggable="true" @ondragstart="() => HandleDragStart(item)">
                             <div class="provider-item-name-container">
                                 <img class="drag-icon" src="icons/svg/draggable.svg" />
-                                <span class="provider-item-name">@item.Name</span>
+                                <span class="provider-item-name">@item.Na</span>
                             </div>
                             <img class="linked-icon" src="icons/svg/linked.svg" />
                         </div>

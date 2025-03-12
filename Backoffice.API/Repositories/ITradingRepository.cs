@@ -123,6 +123,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<UnmappedResponse>> GetUnmappedMarket(string region);
         Task<BaseResponse<UnmappedResponse>> GetUnmappedSelection(string region);
         Task<BaseResponse<bool>> AddOrUpdateProviderMapping(string region, string category, ProviderMappingRequest request);
+        Task<BaseResponse<bool>> AddOrUpdateProviderMappingBulk(string region, string category, ProviderMappingBulkRequest request);
 
         #endregion
     }
