@@ -1,31 +1,25 @@
 ﻿using System.Collections;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Models.OddsEngine.Mapping;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class UnMapped
     {
-        private Dictionary<int, string> providerIdToName = new Dictionary<int, string>
-        {
-            {
-                1, "Bet Genius"
-            },
-            {
-                2, "Sports Radar"
-            }
-        };
-
+        private UnmappedModel _draggedProviderItem;
         private List<UnmappedModel> _unMappedSports = new();
-
-
-        private IEnumerable<IGrouping<int, UnmappedModel>> _sportsGroupedByProvider =
-            new List<IGrouping<int, UnmappedModel>>();
-
         protected override async Task OnInitializedAsync()
         {
             var response = await _providerMappingService.GetUnmappedSports();
-            _sportsGroupedByProvider = response.Result.Unmapped
-                .GroupBy(x => x.ChTyId);
+            _unMappedSports = response.Result.Unmapped;
+        }
+        private void HandleDragProviderItem(UnmappedModel providerItem)
+        {
+            _draggedProviderItem = providerItem;
+        }
+        private void HandleSubmitMappingSetup(MappingSetupModel mappingSetup)
+        {
+            Console.WriteLine($"Mapping setup submitted. {mappingSetup.NewFixtureName}");
         }
     }
 }
