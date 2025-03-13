@@ -10,10 +10,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     public partial class Unmapped
     {
         private UnmappedModel _draggedProviderItem;
-        //private ProviderMappingItem _currentMappingItem;
 
         private List<UnmappedModel> _unmappedSports;
-        private List<MappingSetupItemModel> _currentMappedItems;
+        private List<MappingSetupItemModel> _currentMappedItems = new List<MappingSetupItemModel>();
 
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
         {
@@ -46,23 +45,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private void ResetMappedItemsList()
         {
-            //if (resetSingle)
-            //{
-            //    _currentMappingItem = new ProviderMappingItem
-            //    {
-            //        Id = "",
-            //        Na = "",
-            //        Info = new ProviderModel<string>
-            //        {
-            //            SrId = "0",
-            //            BgId = "0"
-            //        },
-            //        SpId = null,
-            //        SegId = null,
-            //        LeId = null
-            //    };
-            //}
-
             _currentMappedItems = new List<MappingSetupItemModel>();
 
             _shouldRender = true;
@@ -72,21 +54,28 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             var request = new ProviderMappingBulkRequest();
 
-            //foreach (var item in items)
-            //{
-            //    request.Mapping.Add(
-            //        new ProviderMappingRequest()
-            //        {
-            //            Id = item.Id,
-            //            Na = item.Na,
-            //            Info = JsonSerializer.Serialize(item.Info),
-            //            SpId = item.SpId,
-            //            SegId = item.SegId,
-            //            LeId = item.LeId,
-            //            ChTyId = 0 // Will be changed to null since initial mappings must have no channel type id
-            //        }
-            //    );
-            //}
+            foreach (var item in items)
+            {
+                var info = new ProviderModel<string>()
+                {
+                    SrId = item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id ?? "0",
+                    BgId = item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.Id ?? "0",
+                };
+
+                // todo: map SpId, SegId, LeId for requests that need it, BE will also update request such that ChTyId is nullable
+                request.Mapping.Add(
+                    new ProviderMappingRequest()
+                    {
+                        Id = item.Id,
+                        Na = item.Name,
+                        Info = JsonSerializer.Serialize(info),
+                        //SpId = item.SpId,
+                        //SegId = item.SegId,
+                        //LeId = item.LeId,
+                        ChTyId = 0
+                    }
+                );
+            }
 
             return request;
         }
@@ -101,7 +90,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private async Task HandleSaveMappingClick()
         {
             // todo: create if/switch case for different categories based on selected mapping category
-            await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.Sport], BuildRequestPayload(_currentMappedItems));
+            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.Sport], BuildRequestPayload(_currentMappedItems));
 
             ResetMappedItemsList();
 

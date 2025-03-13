@@ -31,7 +31,16 @@
                 </div>
             </div>
             <div class="item-list-container">
-                <span class="empty-message">@_translationState.GetValue("No fixture mappings have been created.")</span>
+                @if (_currentMappedItems.Any())
+                {
+                    @foreach(var item in _currentMappedItems)
+                    {
+                        <span>@item.Name</span>
+                    }
+                } else
+                {
+                    <span class="empty-message">@_translationState.GetValue("No fixture mappings have been created.")</span>
+                }
             </div>
         </div>
     </div>
