@@ -20,7 +20,13 @@
 
 <div class="main-content-grid">
     <div class="left">
-        <MappingSetup DraggedProviderItem="_draggedProviderItem" OnSubmitCallback="HandleCreateMappingClick" />
+        <div class="mapping-setup-container">
+            <div class="mapping-setup-header">
+                <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
+                <img class="download-icon" src="icons/svg/download.svg" />
+            </div>
+            <MappingSetup DraggedProviderItem="_draggedProviderItem" OnSubmitCallback="HandleCreateMappingClick" />
+        </div>
         <div class="mapped-items-container">
             <div class="mapped-items-header">
                 <span class="header-label">@_translationState.GetValue("Mapped Items")</span>
