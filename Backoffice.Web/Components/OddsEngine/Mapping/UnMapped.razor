@@ -1,4 +1,6 @@
-﻿<div class="dropdowns-container">
+﻿@using Backoffice.Web.Components.OddsEngine.Mapping
+
+<div class="dropdowns-container">
     <select class="dropdown">
         <option value="" disabled selected hidden>@_translationState.GetValue("Select Sports")</option>
         <option value="Sports 1">Sports 1</option>
@@ -18,30 +20,8 @@
 
 <div class="main-content-grid">
     <div class="left">
-        <div class="mapping-setup-container">
-            <div class="mapping-setup-header">
-                <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
-                <img class="download-icon" src="icons/svg/download.svg"/>
-            </div>
-            <div class="mapping-setup-content-container">
-                <div class="text-input">
-                    <span>@_translationState.GetValue("Mapped ID")</span>
-                    <input type="text" @bind-value="_currentMappingItem.Id" placeholder="255"/>
-                </div>
-                <div class="text-input">
-                    <span>@_translationState.GetValue("New Fixture Name")</span>
-                    <input type="text" @bind-value="_currentMappingItem.Na" placeholder ="Enter Fixture Name" />
-                </div>
-                <div class="item-list-container">
-                    <span
-                        class="empty-message italic">@_translationState.GetValue("Drag and drop the item you want to map.")</span>
-                </div>
-                <button
-                    class="btn-create-mapping @(false ? "inactive" : "active")"
-                    @onclick=HandleCreateMappingClick
-                >@_translationState.GetValue("Create Mapping")</button>
-            </div>
-        </div>
+        <MappingSetup DraggedProviderItem="_draggedProviderItem" OnSubmitCallback="HandleSubmitMappingSetup" />
+
         <div class="mapped-items-container">
             <div class="mapped-items-header">
                 <span class="header-label">@_translationState.GetValue("Mapped Items")</span>
@@ -57,29 +37,6 @@
         </div>
     </div>
     <div class="right">
-        <div class="search-container">
-            <input class="input-search" placeholder="@_translationState.GetValue("Search")"/>
-            <i class="fa fa-search"/>
-        </div>
-        <div class="providers-container">
-            @foreach (var provider in _sportsGroupedByProvider)
-            {
-                <div class="provider">
-                    <span class="provider-label header-label">@providerIdToName[provider.Key]</span>
-                    <div class="provider-items-container">
-                        @foreach (var sport in provider)
-                        {
-                            <div class="provider-item">
-                                <div class="provider-item-name-container">
-                                    <img class="drag-icon" src="icons/svg/draggable.svg"/>
-                                    <span class="provider-item-name">@sport.Na</span>
-                                </div>
-                                <img class="linked-icon" src="icons/svg/linked.svg"/>
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
+        <MappingProvider ProviderItems="_unMappedSports" OnDragCallback="HandleDragProviderItem" />
     </div>
 </div>

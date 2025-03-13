@@ -1,0 +1,116 @@
+/*Mapping Setup*/
+
+.mapping-setup-container {
+  background-color: #F4F4F4;
+  padding: 10px;
+}
+
+.mapping-setup-header {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fa-download {
+  display: block;
+  width: 15px;
+}
+
+.mapping-setup-content-container {
+  border: 1px dashed #DED8D8;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 4px;
+}
+
+.mapping-setup-content-container .text-input span {
+  color: #000;
+  margin-bottom: 4px;
+  display: block;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 15px;
+}
+
+.mapping-setup-content-container .text-input input {
+  background-color: #FFFFFF;
+  color: #000;
+  border: 1px solid #E5E5E5;
+  width: 100%;
+  border-radius: 4px;
+  padding: 10px;
+  font-weight: 500;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.item-list-container {
+  border: 1px dashed #CDCBCB;
+  padding: 12px 10px;
+  background-color: #FFF;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.item-list-container .empty-message {
+  color: #606060;
+  font-weight: 500;
+  line-height: 15px;
+  padding: 7px 0;
+  text-align: center;
+}
+
+.item-list-container .empty-message.italic {
+  font-style: italic;
+}
+
+.btn-create-mapping {
+  color: #FFF;
+  width: 100%;
+  padding: 10px;
+  outline: 0px;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.btn-create-mapping.active {
+  background-color: #1151F3;
+}
+
+.btn-create-mapping.inactive {
+  background-color: #83A3F4;
+}
+
+.item-list {
+  padding: 0;
+  margin-bottom: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item-list .item {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #CDCBCB;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.item-list .item:hover {
+  background: #F4F4F4;
+}
+
+.item-list .item .badge {
+  border-radius: 8px;
+  padding: 5px 6px;
+}

@@ -1,45 +1,34 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Models.OddsEngine.Mapping;
 using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class UnMapped
     {
+        private UnmappedModel _draggedProviderItem;
+        private List<UnmappedModel> _unMappedSports;
         private ProviderMappingItem _currentMappingItem;
         private List<ProviderMappingItem> _currentMappedItems;
-        private IEnumerable<IGrouping<int, UnmappedModel>> _sportsGroupedByProvider =
-            new List<IGrouping<int, UnmappedModel>>();
 
         private bool _shouldRender;
-
-        private Dictionary<int, string> providerIdToName = new Dictionary<int, string>
-        {
-            {
-                1, "Bet Genius"
-            },
-            {
-                2, "Sports Radar"
-            }
-        };
-
         protected override async Task OnInitializedAsync()
         {
-            ResetMappingFields(true, true);
-
-            await FetchUnmappedSports();
-
-            _shouldRender = true;
+            var response = await _providerMappingService.GetUnmappedSports();
+            _unMappedSports = response.Result.Unmapped;
         }
 
         protected override bool ShouldRender() => _shouldRender;
 
-        private async Task FetchUnmappedSports()
+        private void HandleDragProviderItem(UnmappedModel providerItem)
         {
-            var response = await _providerMappingService.GetUnmappedSports();
-            _sportsGroupedByProvider = response.Result.Unmapped
-                .GroupBy(x => x.ChTyId);
+            _draggedProviderItem = providerItem;
+        }
+        private void HandleSubmitMappingSetup(MappingSetupModel mappingSetup)
+        {
+            Console.WriteLine($"Mapping setup submitted. {mappingSetup.NewFixtureName}");
         }
 
         private void ResetMappingFields(bool resetSingle, bool resetList)
