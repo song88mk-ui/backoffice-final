@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
-    public partial class Unmapped
+    public partial class Unmap
     {
         private UnmappedModel _draggedProviderItem;
 
