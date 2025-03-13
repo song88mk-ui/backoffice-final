@@ -11,6 +11,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private List<UnmappedModel> _filteredProviderItems { get; set; } = new List<UnmappedModel>();
         private List<UnmappedModel> _previousProviderItems = new List<UnmappedModel>();
+
         private Dictionary<int, List<UnmappedModel>> _groupProviderItems { get; set; } = new Dictionary<int, List<UnmappedModel>>();
         private Dictionary<int, string> providerIdToName = new Dictionary<int, string>
         {

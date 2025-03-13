@@ -10,9 +10,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     public partial class UnMapped
     {
         private UnmappedModel _draggedProviderItem;
-        private List<UnmappedModel> _unMappedSports;
         private ProviderMappingItem _currentMappingItem;
+
+        private List<UnmappedModel> _unMappedSports;
         private List<ProviderMappingItem> _currentMappedItems;
+
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
         {
             { MappingCategory.Sport, "sport" },
@@ -92,9 +94,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             return request;
         }
 
-        private void HandleCreateMappingClick()
+        private void HandleCreateMappingClick(ProviderMappingItem item)
         {
-            _currentMappedItems.Add(_currentMappingItem);
+            _currentMappedItems.Add(item);
 
             ResetMappingFields(true, false);
 
