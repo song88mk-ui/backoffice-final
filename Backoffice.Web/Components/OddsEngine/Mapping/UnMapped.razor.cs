@@ -17,6 +17,20 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             _draggedProviderItem = providerItem;
         }
+
+        private void HandleDropMappingProvider()
+        {
+            if (_draggedProviderItem != null)
+            {
+                _unMappedSports.Remove(_draggedProviderItem);
+            }
+        }
+
+        private void HandleRemoveProviderItem(UnmappedModel providerItem)
+        {
+            _unMappedSports.Add(providerItem);
+        }
+        
         private void HandleSubmitMappingSetup(MappingSetupModel mappingSetup)
         {
             Console.WriteLine($"Mapping setup submitted. {mappingSetup.NewFixtureName}");

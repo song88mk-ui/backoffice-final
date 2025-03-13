@@ -9,6 +9,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     {
         [Parameter] public UnmappedModel DraggedProviderItem { get; set; } = new UnmappedModel();
         [Parameter] public EventCallback<MappingSetupModel> OnSubmitCallback { get; set; }
+        [Parameter] public EventCallback<EventArgs> OnDropProviderItemCallback { get; set; }
+        [Parameter] public EventCallback<UnmappedModel> OnRemoveProviderItem { get; set; }
         private MappingSetupModel _mappingSetup = new MappingSetupModel();
         private Dictionary<int, UnmappedModel> _droppedProviderItems = new Dictionary<int, UnmappedModel>();
         private EditContext _editContext;
@@ -45,9 +47,13 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             if (DraggedProviderItem != null)
             {
+                if (_droppedProviderItems.ContainsKey(DraggedProviderItem.ChTyId)) {
+                    HandleRemoveProviderItem(_droppedProviderItems[DraggedProviderItem.ChTyId]);
+                }
                 _droppedProviderItems[DraggedProviderItem.ChTyId] = DraggedProviderItem;
                 _mappingSetup.Providers = _droppedProviderItems.Values.ToList();
                 _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetup.Providers));
+                OnDropProviderItemCallback.InvokeAsync(EventArgs.Empty);
             }
         }
 
@@ -56,6 +62,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _droppedProviderItems.Remove(providerItem.ChTyId);
             _mappingSetup.Providers = _droppedProviderItems.Values.ToList();
             _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetup.Providers));
+            OnRemoveProviderItem.InvokeAsync(providerItem);
         }
     }
 }
