@@ -14,6 +14,7 @@ namespace Backoffice.Web.Components.Common
         private ModalParameters ModalParameters { get; set; }
         private string ToolTip { get; set; }
         private bool HideCloseButton { get; set; }
+        private bool HideHeader { get; set; }
         private bool HasHeaderBackButton { get; set; }
         private object CallBackObject { get; set; }
         #endregion
@@ -63,6 +64,7 @@ namespace Backoffice.Web.Components.Common
             _titleClass = !string.IsNullOrEmpty(modalTitleClass) ? modalTitleClass : "";
 
             ToolTip = options.Tooltip;
+            HideHeader = options.HideHeader == null ? false : (bool)options.HideHeader;
             HideCloseButton = options.HideCloseButton == null ? false : (bool)options.HideCloseButton;
             HasHeaderBackButton = options.HasHeaderBackButton == null ? false : (bool)options.HasHeaderBackButton;
             CallBackObject = options.CallbackObject;

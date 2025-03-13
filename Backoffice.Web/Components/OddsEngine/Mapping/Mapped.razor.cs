@@ -16,9 +16,12 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalDialogClass", "modal-lg");
-            var options = new ModalOptions();
+            var options = new ModalOptions
+            {
+                HideHeader = true
+            };
 
-            ModalService.Open<EditMappingModal>("Edit Mapping Modal", parameters, options);
+            ModalService.Open<EditMappingModal>("Edit Mapping", parameters, options);
         }
 
         public async Task OnSaveClickEvent()

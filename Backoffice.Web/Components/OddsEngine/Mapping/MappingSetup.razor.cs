@@ -9,7 +9,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     {
         [Parameter] public UnmappedModel DraggedProviderItem { get; set; } = new UnmappedModel();
         [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
-
+        [Parameter] public string FormId { get; set; } = "mappingSetupFormId";
+        [Parameter] public bool HasSubmitButton { get; set; } = true;
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
 

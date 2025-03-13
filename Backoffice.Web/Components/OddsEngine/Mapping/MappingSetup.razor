@@ -1,4 +1,4 @@
-<EditForm EditContext="_editContext" OnValidSubmit="HandleSubmit">
+<EditForm id="@FormId" EditContext="_editContext" OnValidSubmit="HandleSubmit">
     <DataAnnotationsValidator />
 
     <div class="mapping-setup-content-container">
@@ -30,6 +30,9 @@
             </div>
             <ValidationMessage For="() => _mappingSetupItem.Providers" />
         </div>
-        <button type="submit" class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
+        @if(HasSubmitButton)
+        {
+            <button type="submit" class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
+        }
     </div>
 </EditForm>
