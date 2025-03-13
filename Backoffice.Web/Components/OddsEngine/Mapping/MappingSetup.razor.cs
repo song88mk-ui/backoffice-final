@@ -8,8 +8,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     public partial class MappingSetup
     {
         [Parameter] public UnmappedModel DraggedProviderItem { get; set; } = new UnmappedModel();
-        [Parameter] public EventCallback<MappingSetupModel> OnSubmitCallback { get; set; }
-        private MappingSetupModel _mappingSetup = new MappingSetupModel();
+        [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
+        private MappingSetupItemModel _mappingSetupItem = new MappingSetupItemModel();
         private Dictionary<int, UnmappedModel> _droppedProviderItems = new Dictionary<int, UnmappedModel>();
         private EditContext _editContext;
         private Dictionary<int, string> providerAcronym = new Dictionary<int, string>
@@ -34,28 +34,40 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         protected override void OnInitialized()
         {
-            _editContext = new EditContext(_mappingSetup);
+            _editContext = new EditContext(_mappingSetupItem);
         }
     
         private void HandleSubmit()
         {
-            OnSubmitCallback.InvokeAsync(_mappingSetup);
+            OnSubmitCallback.InvokeAsync(_mappingSetupItem);
+            ResetValues();
         }
+
         private void HandleDropProviderItem()
         {
             if (DraggedProviderItem != null)
             {
                 _droppedProviderItems[DraggedProviderItem.ChTyId] = DraggedProviderItem;
-                _mappingSetup.Providers = _droppedProviderItems.Values.ToList();
-                _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetup.Providers));
+                _mappingSetupItem.Providers = _droppedProviderItems.Values.ToList();
+                _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
             }
         }
 
         private void HandleRemoveProviderItem(UnmappedModel providerItem)
         {
             _droppedProviderItems.Remove(providerItem.ChTyId);
-            _mappingSetup.Providers = _droppedProviderItems.Values.ToList();
-            _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetup.Providers));
+            _mappingSetupItem.Providers = _droppedProviderItems.Values.ToList();
+            _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
+        }
+
+        private void ResetValues()
+        {
+            _mappingSetupItem = new MappingSetupItemModel
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = string.Empty,
+                Providers = new List<UnmappedModel>()
+            };
         }
     }
 }
