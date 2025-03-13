@@ -9,9 +9,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     {
         [Parameter] public UnmappedModel DraggedProviderItem { get; set; } = new UnmappedModel();
         [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
-        private MappingSetupItemModel _mappingSetupItem = new MappingSetupItemModel();
-        private Dictionary<int, UnmappedModel> _droppedProviderItems = new Dictionary<int, UnmappedModel>();
+
+        private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
+
+        private Dictionary<int, UnmappedModel> _droppedProviderItems = new Dictionary<int, UnmappedModel>();
         private Dictionary<int, string> providerAcronym = new Dictionary<int, string>
         {
             {
@@ -21,7 +23,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 2, "SR"
             }
         };
-
         private Dictionary<int, string> providerCss = new Dictionary<int, string>
         {
             {
@@ -32,8 +33,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             }
         };
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
+            ResetValues();
             _editContext = new EditContext(_mappingSetupItem);
         }
     

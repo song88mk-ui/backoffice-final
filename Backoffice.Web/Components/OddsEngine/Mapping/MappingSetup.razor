@@ -19,12 +19,12 @@
             </div>
             <div>
                 <div class="item-list-container" dropzone="move" @ondrop="HandleDropProviderItem" ondragover="event.preventDefault();">
-                    @if (_droppedProviderItems.Any())
+                    @if (_mappingSetupItem.Providers.Any())
                     {
                         <ul class="item-list">
-                            @foreach (var item in _droppedProviderItems)
+                            @foreach (var item in _mappingSetupItem.Providers)
                             {
-                                <li class="item" @onclick="() => HandleRemoveProviderItem(item.Value)"><div>@item.Value.Na</div><span class="badge @providerCss[item.Value.ChTyId]">@providerAcronym[item.Value.ChTyId]</span></li>
+                                <li class="item" @onclick="() => HandleRemoveProviderItem(item)"><div>@item.Na</div><span class="badge @providerCss[item.ChTyId]">@providerAcronym[item.ChTyId]</span></li>
                             }
                         </ul>
                     }
