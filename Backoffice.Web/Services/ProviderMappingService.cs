@@ -65,4 +65,37 @@ public class ProviderMappingService : IProviderMappingService
             };
         }
     }
+
+    public async Task<BaseResponse<SportMappingResponse>> GetSportMapping()
+    {
+        try
+        {
+            var response = await GetHttpClient().PostAsync("/api/trading/mapping/sports", new StringContent(""));
+
+            if (response.IsSuccessStatusCode)
+            {
+                return JsonSerializer.Deserialize<BaseResponse<SportMappingResponse>>
+                (
+                    await response.Content.ReadAsStringAsync(),
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                ) ?? new BaseResponse<SportMappingResponse>();
+            }
+            else
+            {
+                return new BaseResponse<SportMappingResponse>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            if (ex.StackTrace != null)
+                Log.Error(ex.StackTrace.ToString());
+
+            return new BaseResponse<SportMappingResponse>
+            {
+                StatusCode = StatusCode.Error,
+                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+            };
+        }
+    }
 }
