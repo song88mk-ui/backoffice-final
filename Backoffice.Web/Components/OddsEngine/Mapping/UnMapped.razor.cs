@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models.OddsEngine.Mapping;
@@ -12,23 +13,33 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private List<UnmappedModel> _unMappedSports;
         private ProviderMappingItem _currentMappingItem;
         private List<ProviderMappingItem> _currentMappedItems;
+        private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
+        {
+            { MappingCategory.Sport, "sport" },
+            { MappingCategory.Segment, "segment" },
+            { MappingCategory.League, "league" },
+            { MappingCategory.Fixture, "fixture" },
+            { MappingCategory.Market, "market" },
+            { MappingCategory.Selection, "selection" }
+        };
 
         private bool _shouldRender;
+
+        protected override bool ShouldRender() => _shouldRender;
+
         protected override async Task OnInitializedAsync()
         {
             var response = await _providerMappingService.GetUnmappedSports();
             _unMappedSports = response.Result.Unmapped;
-        }
 
-        protected override bool ShouldRender() => _shouldRender;
+            _shouldRender = true;
+        }
 
         private void HandleDragProviderItem(UnmappedModel providerItem)
         {
             _draggedProviderItem = providerItem;
-        }
-        private void HandleSubmitMappingSetup(MappingSetupModel mappingSetup)
-        {
-            Console.WriteLine($"Mapping setup submitted. {mappingSetup.NewFixtureName}");
+
+            _shouldRender = true;
         }
 
         private void ResetMappingFields(bool resetSingle, bool resetList)
@@ -92,7 +103,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private async Task HandleSaveMappingClick()
         {
-            await _providerMappingService.AddOrUpdateProviderMappingBulk("sport", BuildRequestPayload(_currentMappedItems));
+            // todo: create if/switch case for different categories based on selected mapping category
+            await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.Sport], BuildRequestPayload(_currentMappedItems));
 
             ResetMappingFields(true, true);
 
