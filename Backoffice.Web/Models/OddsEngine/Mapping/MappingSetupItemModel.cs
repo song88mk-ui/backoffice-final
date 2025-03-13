@@ -5,18 +5,18 @@ using Backoffice.Shared.Models.Response;
 
 namespace Backoffice.Web.Models.OddsEngine.Mapping
 {
-    public class MappingSetupModel
+    public class MappingSetupItemModel
     {
-        public MappingSetupModel()
+        public MappingSetupItemModel()
         {
-            MappedId = Guid.NewGuid().ToString();
+            Id = Guid.NewGuid().ToString();
         }
 
-        [Required(ErrorMessage = "Mapped ID is required.")]
-        public string MappedId { get; set; }
+        [Required(ErrorMessage = "ID is required.")]
+        public string Id { get; set; }
 
-        [Required(ErrorMessage = "New Fixture Name is required.")]
-        public string NewFixtureName { get; set; }
+        [Required(ErrorMessage = "Name is required.")]
+        public string Name { get; set; }
 
         [MustHaveOneElement(ErrorMessage = "At least one provider is required.")]
         public List<UnmappedModel> Providers { get; set; }
