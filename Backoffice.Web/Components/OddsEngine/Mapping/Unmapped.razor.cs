@@ -53,14 +53,27 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private ProviderMappingBulkRequest BuildRequestPayload(List<MappingSetupItemModel> items)
         {
             var request = new ProviderMappingBulkRequest();
+            int SrId = 0;
+            int BgId = 0;
 
             foreach (var item in items)
             {
-                var info = new ProviderModel<string>()
+                // info varies per mapping category
+                var info = new ProviderModel<int>()
                 {
-                    SrId = item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id ?? "0",
-                    BgId = item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.Id ?? "0",
+                    SrId = 0,
+                    BgId = 0,   
                 };
+
+                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id, out SrId))
+                {
+                    info.SrId = SrId;
+                }
+
+                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.Id, out BgId))
+                {
+                    info.BgId = BgId;
+                }
 
                 // todo: map SpId, SegId, LeId for requests that need it, BE will also update request such that ChTyId is nullable
                 request.Mapping.Add(
