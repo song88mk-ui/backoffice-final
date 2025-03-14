@@ -17,20 +17,20 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private Dictionary<int, string> providerAcronym = new Dictionary<int, string>
         {
             {
-                1, "BG"
+                0, "SR"
             },
             {
-                2, "SR"
-            }
+                1, "BG"
+            },
         };
         private Dictionary<int, string> providerCss = new Dictionary<int, string>
         {
             {
-                1, "bg-primary"
+                0, "bg-danger"
             },
             {
-                2, "bg-danger"
-            }
+                1, "bg-primary"
+            },
         };
 
         protected override async Task OnInitializedAsync()

@@ -12,6 +12,13 @@
   align-items: center;
 }
 
+    .mapping-setup-header .header-label {
+        color: #000;
+        font-weight: 700;
+        font-size: 15px;
+        line-height: 22px;
+    }
+
 .fa-download {
   display: block;
   width: 15px;

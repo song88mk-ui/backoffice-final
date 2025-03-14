@@ -16,11 +16,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private Dictionary<int, string> providerIdToName = new Dictionary<int, string>
         {
             {
-                1, "Bet Genius"
+                0, "Sports Radar"
             },
             {
-                2, "Sports Radar"
-            }
+                1, "Bet Genius"
+            },
         };
 
         private string _searchQuery { get; set; } = string.Empty;
