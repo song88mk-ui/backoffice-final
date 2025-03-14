@@ -2470,26 +2470,42 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var response = await GetHttpClientV2(region).PostAsync($"mapping/{category}/bulk", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
-
-                BaseResponse<bool> result;
-                if (response.IsSuccessStatusCode)
-                    result = JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
+                await Publish(new MessageRequest
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        result = JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        result = new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
+                    Payload = JsonSerializer.Serialize(request),
+                    CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                    MessageType = "OnBulkUpdate",
+                    RoutingKey = $"r.bo.mapping.onbulkupdate"
+                }, "HK");
 
-                return result;
+                return new BaseResponse<bool>
+                {
+                    Result = true,
+                };
+
+                //var response = await GetHttpClientV2(region).PostAsync($"mapping/{category}/bulk", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+                //BaseResponse<bool> result;
+                //if (response.IsSuccessStatusCode)
+                //{
+
+                //    result = JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                //}
+                //else
+                //{
+                //    if (response.StatusCode == HttpStatusCode.BadRequest)
+                //        result = JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                //    else
+                //    {
+                //        result = new BaseResponse<bool>
+                //        {
+                //            StatusCode = StatusCode.Error,
+                //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                //        };
+                //    }
+                //}
+
+                //return result;
             }
             catch (Exception ex)
             {

@@ -8,10 +8,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     {
         [Parameter] public EventCallback<UnmappedModel> OnDragCallback { get; set; }
         [Parameter] public List<UnmappedModel> ProviderItems { get; set; } = new List<UnmappedModel>();
-        private string _searchQuery { get; set; } = string.Empty;
+
         private List<UnmappedModel> _filteredProviderItems { get; set; } = new List<UnmappedModel>();
-        private Dictionary<int, List<UnmappedModel>> _groupProviderItems { get; set; } = new Dictionary<int, List<UnmappedModel>>();
         private List<UnmappedModel> _previousProviderItems = new List<UnmappedModel>();
+
+        private Dictionary<int, List<UnmappedModel>> _groupProviderItems { get; set; } = new Dictionary<int, List<UnmappedModel>>();
         private Dictionary<int, string> providerIdToName = new Dictionary<int, string>
         {
             {
@@ -22,20 +23,26 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             }
         };
 
-        private Dictionary<int, List<UnmappedModel>> GetGroupedProviderItems()
-        {
-            return _filteredProviderItems.GroupBy(m => m.ChTyId).ToDictionary(g => g.Key, g => g.ToList());
-        }
+        private string _searchQuery { get; set; } = string.Empty;
+        private bool _shouldRender;
+
+        protected override bool ShouldRender() => _shouldRender;
 
         protected override void OnParametersSet()
         {
-            var _shouldRender = !ProviderItems.SequenceEqual(_previousProviderItems);
+            _shouldRender = ValidateRender();
+
             if (_shouldRender)
             {
                 _filteredProviderItems = ProviderItems;
                 _groupProviderItems = GetGroupedProviderItems();
                 _previousProviderItems = new List<UnmappedModel>(ProviderItems);
             }
+        }
+
+        private Dictionary<int, List<UnmappedModel>> GetGroupedProviderItems()
+        {
+            return _filteredProviderItems.GroupBy(m => m.ChTyId).ToDictionary(g => g.Key, g => g.ToList());
         }
 
         public void FilterProviderItems(ChangeEventArgs e)
@@ -48,6 +55,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private void HandleDragStart(UnmappedModel selectedItem)
         {
             OnDragCallback.InvokeAsync(selectedItem);
+        }
+
+        private bool ValidateRender()
+        {
+            return !ProviderItems.SequenceEqual(_previousProviderItems);
         }
     }
 }     

@@ -1,7 +1,9 @@
 ﻿using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.States;
@@ -68,23 +70,23 @@ public class ProviderMappingService : IProviderMappingService
         }
     }
 
-    public async Task<BaseResponse<SportMappingResponse>> GetSportMapping(MappingRequest request)
+    public async Task<BaseResponse<bool>> AddOrUpdateProviderMapping(string category, ProviderMappingRequest request)
     {
         try
         {
-            var response = await GetHttpClient().PostAsync("/api/trading/mapping/sports", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+            var response = await GetHttpClient().PostAsync($"/api/trading/mapping/{category}", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<BaseResponse<SportMappingResponse>>
+                return JsonSerializer.Deserialize<BaseResponse<bool>>
                 (
                     await response.Content.ReadAsStringAsync(),
                     new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                ) ?? new BaseResponse<SportMappingResponse>();
+                ) ?? new BaseResponse<bool>();
             }
             else
             {
-                return new BaseResponse<SportMappingResponse>();
+                return new BaseResponse<bool>();
             }
         }
         catch (Exception ex)
@@ -93,7 +95,40 @@ public class ProviderMappingService : IProviderMappingService
             if (ex.StackTrace != null)
                 Log.Error(ex.StackTrace.ToString());
 
-            return new BaseResponse<SportMappingResponse>
+            return new BaseResponse<bool>
+            {
+                StatusCode = StatusCode.Error,
+                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+            };
+        }
+    }
+
+    public async Task<BaseResponse<bool>> AddOrUpdateProviderMappingBulk(string category, ProviderMappingBulkRequest request)
+    {
+        try
+        {
+            var response = await GetHttpClient().PostAsync($"/api/trading/mapping/{category}/bulk", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+            if (response.IsSuccessStatusCode)
+            {
+                return JsonSerializer.Deserialize<BaseResponse<bool>>
+                (
+                    await response.Content.ReadAsStringAsync(),
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                ) ?? new BaseResponse<bool>();
+            }
+            else
+            {
+                return new BaseResponse<bool>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            if (ex.StackTrace != null)
+                Log.Error(ex.StackTrace.ToString());
+
+            return new BaseResponse<bool>
             {
                 StatusCode = StatusCode.Error,
                 Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
