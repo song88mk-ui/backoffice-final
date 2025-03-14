@@ -2,6 +2,7 @@ using Backoffice.Web.Models;
 using System.Drawing;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.OddsEngine.Mapping;
 using Backoffice.Web.Services;
@@ -15,10 +16,16 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private List<SportMappingModel> _sportMapping = new();
         protected override async Task OnInitializedAsync()
         {
-            var response = await _providerMappingService.GetSportMapping();
-            _sportMapping = response.Result?.SportMapping ?? new List<SportMappingModel>();
+            var request = new MappingRequest
+            {
+                Page = 1,
+                PageSize = 100
+            };
+
+            var response = await _providerMappingService.GetSportMapping(request);
+            _sportMapping = response.Result.SportMapping;
         }
-        public async Task OnEditMappingClickEvent()
+        public async Task HandleEditMappingClickEvent(SportMappingModel mappingItem)
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalDialogClass", "modal-lg");

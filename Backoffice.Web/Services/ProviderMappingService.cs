@@ -3,8 +3,10 @@ using System.Text.Json;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.States;
 using Serilog;
+using System.Text;
 
 namespace Backoffice.Web.Services;
 
@@ -66,11 +68,11 @@ public class ProviderMappingService : IProviderMappingService
         }
     }
 
-    public async Task<BaseResponse<SportMappingResponse>> GetSportMapping()
+    public async Task<BaseResponse<SportMappingResponse>> GetSportMapping(MappingRequest request)
     {
         try
         {
-            var response = await GetHttpClient().PostAsync("/api/trading/mapping/sports", new StringContent(""));
+            var response = await GetHttpClient().PostAsync("/api/trading/mapping/sports", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
             if (response.IsSuccessStatusCode)
             {
