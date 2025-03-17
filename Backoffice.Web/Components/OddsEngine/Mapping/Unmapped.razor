@@ -47,7 +47,7 @@
     <div class="right">
         @if (_unmappedSports != null && _unmappedSports.Count() > 0)
         {
-            <MappingProvider ProviderItems="_unmappedSports" OnDragCallback="HandleDragProviderItem" />
+            <MappingProvider ProviderItems="_unmappedSports" OnDragItemCallback="HandleDragProviderItem" />
         }
     </div>
 </div>

@@ -6,7 +6,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class MappingProvider
     {
-        [Parameter] public EventCallback<UnmappedModel> OnDragCallback { get; set; }
+        [Parameter] public EventCallback<List<UnmappedModel>> OnDragItemCallback { get; set; }
         [Parameter] public List<UnmappedModel> ProviderItems { get; set; } = new List<UnmappedModel>();
 
         private List<UnmappedModel> _filteredProviderItems { get; set; } = new List<UnmappedModel>();
@@ -54,7 +54,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private void HandleDragStart(UnmappedModel selectedItem)
         {
-            OnDragCallback.InvokeAsync(selectedItem);
+            var linkedItems = ProviderItems.Where(item => item.Na.ToLower() == selectedItem.Na.ToLower()).ToList();
+
+            OnDragItemCallback.InvokeAsync(linkedItems);
         }
 
         private bool ValidateRender()

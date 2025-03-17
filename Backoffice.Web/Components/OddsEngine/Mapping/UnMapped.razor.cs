@@ -9,7 +9,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class Unmapped
     {
-        private UnmappedModel _draggedProviderItem;
+        private List<UnmappedModel> _draggedProviderItems;
 
         private List<UnmappedModel> _unmappedSports;
         private List<MappingSetupItemModel> _currentMappedItems = new List<MappingSetupItemModel>();
@@ -36,9 +36,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
-        private void HandleDragProviderItem(UnmappedModel providerItem)
+        private void HandleDragProviderItem(List<UnmappedModel> providerItems)
         {
-            _draggedProviderItem = providerItem;
+            _draggedProviderItems = providerItems;
 
             _shouldRender = true;
         }
