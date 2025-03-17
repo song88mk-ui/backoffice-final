@@ -11,7 +11,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private List<UnmappedModel> _filteredProviderItems { get; set; } = new List<UnmappedModel>();
         private List<UnmappedModel> _previousProviderItems = new List<UnmappedModel>();
-
         private Dictionary<int, List<UnmappedModel>> _groupProviderItems { get; set; } = new Dictionary<int, List<UnmappedModel>>();
         private Dictionary<int, string> providerIdToName = new Dictionary<int, string>
         {
@@ -22,6 +21,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 1, "Bet Genius"
             },
         };
+
+        private UnmappedModel _currentHoveredItem;
 
         private string _searchQuery { get; set; } = string.Empty;
         private bool _shouldRender;
@@ -57,6 +58,23 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             var linkedItems = ProviderItems.Where(item => item.Na.ToLower() == selectedItem.Na.ToLower()).ToList();
 
             OnDragItemCallback.InvokeAsync(linkedItems);
+        }
+
+        private void HandleMouseOver(UnmappedModel item)
+        {
+            _currentHoveredItem = item;
+        }
+
+        private void HandleMouseOut()
+        {
+            _currentHoveredItem = new UnmappedModel();
+        }
+
+        private string GetLinkedItemCss(UnmappedModel item)
+        {
+            var linkedItems = ProviderItems.Where(x => x.Na.ToLower() == item.Na.ToLower()).ToList();
+
+            return _currentHoveredItem?.Na == item.Na && linkedItems.Count() > 1 ? "highlight" : "";
         }
 
         private bool ValidateRender()
