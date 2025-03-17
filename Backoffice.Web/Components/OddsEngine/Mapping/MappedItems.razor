@@ -16,7 +16,7 @@
                     <div class="mapped-item">
                         <div class="mapped-item-cta-header">
                             <img src="icons/svg/icon-update.svg" />
-                            <img src="icons/svg/icon-trash.svg" />
+                            <img src="icons/svg/icon-trash.svg" @onclick="_ => HandleRemoveItemClick(item)" />
                         </div>
                         <span class="mapped-item-name">@item.Name</span>
                         <span class="mapped-item-id">Mapped ID: #@(item.Id)</span>

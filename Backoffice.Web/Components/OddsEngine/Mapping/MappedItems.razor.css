@@ -102,6 +102,7 @@
 .mapped-item-cta-header img {
     width: 14px;
     height: auto;
+    cursor: pointer;
 }
 
 .mapped-item-name {

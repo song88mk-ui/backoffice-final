@@ -10,7 +10,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         [Parameter]
         public EventCallback OnSaveMappingCallback { get; set; }
         [Parameter]
-        public EventCallback OnRemoveAllCallback { get; set; }
+        public EventCallback<MappingSetupItemModel?> OnRemoveCallback { get; set; }
 
         private void HandleSaveMappingClick()
         {
@@ -19,7 +19,12 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private void HandleRemoveAllClick()
         {
-            OnRemoveAllCallback.InvokeAsync();
+            OnRemoveCallback.InvokeAsync();
+        }
+
+        private void HandleRemoveItemClick(MappingSetupItemModel item)
+        {
+            OnRemoveCallback.InvokeAsync(item);
         }
     }
 }

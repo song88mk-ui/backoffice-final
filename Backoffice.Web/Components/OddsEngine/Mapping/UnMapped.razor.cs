@@ -110,9 +110,16 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
-        private void HandleRemoveAllClick()
+        private void HandleRemoveMappedItem(MappingSetupItemModel singleItem = null)
         {
-            ResetMappedItemsList();
+            if (singleItem == null)
+            {
+                ResetMappedItemsList();
+            }
+            else
+            {
+                _currentMappedItems = _currentMappedItems.Where(x => x.Id != singleItem.Id && x.Name != singleItem.Name).ToList();
+            }
 
             _shouldRender = true;
         }
