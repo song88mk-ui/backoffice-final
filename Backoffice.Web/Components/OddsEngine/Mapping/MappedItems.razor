@@ -1,0 +1,41 @@
+﻿<div class="mapped-items-container">
+    <div class="mapped-items-header">
+        <span class="header-label">@_translationState.GetValue("Mapped Items")</span>
+        <div class="header-cluster">
+            <span class="remove-all-label">@_translationState.GetValue("Remove All")</span>
+            <button class="btn-save" @onclick="HandleSaveMappingClick">@_translationState.GetValue("Save")</button>
+            <img class="download-icon" src="icons/svg/upload.svg" />
+        </div>
+    </div>
+    <div class="item-list-container">
+        <div class="item-list">
+            @if (CurrentMappedItems.Any())
+            {
+                @foreach (var item in CurrentMappedItems)
+                {
+                    <div class="mapped-item">
+                        <div class="mapped-item-cta-header">
+                            <img src="icons/svg/icon-update.svg" />
+                            <img src="icons/svg/icon-trash.svg" />
+                        </div>
+                        <span class="mapped-item-name">@item.Name</span>
+                        <span class="mapped-item-id">Mapped ID: #@(item.Id)</span>
+                        <div class="mapped-item-provider">
+                            <span>Provider: </span>
+                            <div class="mapped-item-provider-icons-container">
+                                @foreach(var provider in item.Providers)
+                                {
+                                    <ProviderIcon ChannelTypeId="provider.ChTyId" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <span class="empty-message">@_translationState.GetValue("No fixture mappings have been created.")</span>
+            }
+        </div>
+    </div>
+</div>

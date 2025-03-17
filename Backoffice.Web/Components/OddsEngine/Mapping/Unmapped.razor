@@ -20,29 +20,8 @@
 
 <div class="main-content-grid">
     <div class="left">
-        <MappingSetup DraggedProviderItem="_draggedProviderItem" OnSubmitCallback="HandleCreateMappingClick" />
-        <div class="mapped-items-container">
-            <div class="mapped-items-header">
-                <span class="header-label">@_translationState.GetValue("Mapped Items")</span>
-                <div class="header-cluster">
-                    <span class="remove-all-label">@_translationState.GetValue("Remove All")</span>
-                    <button class="btn-save" @onclick=HandleSaveMappingClick>@_translationState.GetValue("Save")</button>
-                    <img class="download-icon" src="icons/svg/upload.svg"/>
-                </div>
-            </div>
-            <div class="item-list-container">
-                @if (_currentMappedItems.Any())
-                {
-                    @foreach(var item in _currentMappedItems)
-                    {
-                        <span>@item.Name</span>
-                    }
-                } else
-                {
-                    <span class="empty-message">@_translationState.GetValue("No fixture mappings have been created.")</span>
-                }
-            </div>
-        </div>
+        <MappingSetup DraggedProviderItems="_draggedProviderItems" OnSubmitCallback="HandleCreateMappingClick" />
+        <MappedItems CurrentMappedItems="_currentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" />
     </div>
     <div class="right">
         @if (_unmappedSports != null && _unmappedSports.Count() > 0)
