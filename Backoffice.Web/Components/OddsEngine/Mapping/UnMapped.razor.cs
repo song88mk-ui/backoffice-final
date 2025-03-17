@@ -109,5 +109,12 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
             _shouldRender = true;
         }
+
+        private void HandleRemoveAllClick()
+        {
+            ResetMappedItemsList();
+
+            _shouldRender = true;
+        }
     }
 }

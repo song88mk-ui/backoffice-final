@@ -9,10 +9,17 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         public List<MappingSetupItemModel> CurrentMappedItems { get; set; }
         [Parameter]
         public EventCallback OnSaveMappingCallback { get; set; }
+        [Parameter]
+        public EventCallback OnRemoveAllCallback { get; set; }
 
         private void HandleSaveMappingClick()
         {
             OnSaveMappingCallback.InvokeAsync();
+        }
+
+        private void HandleRemoveAllClick()
+        {
+            OnRemoveAllCallback.InvokeAsync();
         }
     }
 }

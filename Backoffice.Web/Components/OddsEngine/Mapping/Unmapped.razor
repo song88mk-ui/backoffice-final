@@ -21,7 +21,7 @@
 <div class="main-content-grid">
     <div class="left">
         <MappingSetup DraggedProviderItems="_draggedProviderItems" OnSubmitCallback="HandleCreateMappingClick" />
-        <MappedItems CurrentMappedItems="_currentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" />
+        <MappedItems CurrentMappedItems="_currentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" OnRemoveAllCallback="HandleRemoveAllClick"/>
     </div>
     <div class="right">
         @if (_unmappedSports != null && _unmappedSports.Count() > 0)
