@@ -7,20 +7,58 @@ using Backoffice.Web.Models.OddsEngine.Mapping;
 using Backoffice.Web.Services;
 using Backoffice.Web.Components.Common;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class EditMappingModal: IDisposable
     {
         [Inject] public IModalService ModalService { get; set; }
+        [CascadingParameter] public ModalParameters ModalParameters { get; set; }
+        [CascadingParameter] private CustomModal Modal { get; set; }
         private UnmappedModel _draggedProviderItem;
         private List<UnmappedModel> _unmappedSports;
         private string _formId = "editMappingFormId";
-        
+        private MappingSetupItemModel _mappingSetupItem = new MappingSetupItemModel();
+        private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
+        {
+            { MappingCategory.Sport, "sport" },
+            { MappingCategory.Segment, "segment" },
+            { MappingCategory.League, "league" },
+            { MappingCategory.Fixture, "fixture" },
+            { MappingCategory.Market, "market" },
+            { MappingCategory.Selection, "selection" }
+        };
+
         protected override async Task OnInitializedAsync()
         {
             var response = await _providerMappingService.GetUnmappedSports();
             _unmappedSports = response.Result.Unmapped;
+
+            var mappedResponse = await _providerMappingService.GetSportMappingBySpId(ModalParameters.TryGet<int>("SpId"));
+            var sportMapping = mappedResponse.Result;
+
+            _mappingSetupItem = new MappingSetupItemModel
+            {
+                Id = sportMapping.SpId.ToString(),
+                Name = sportMapping.SpNa,
+                Providers = GetUnmappedProviderByInfo(sportMapping.Info)
+            };
+        }
+
+        private List<UnmappedModel> GetUnmappedProviderByInfo(ProviderModel<int> info)
+        {
+            var providers = new List<UnmappedModel>();
+
+            foreach (var provider in _unmappedSports)
+            {
+                if ((provider.Id == info.SrId.ToString() || provider.Id == info.BgId.ToString()) && provider.Id != "0")
+                {
+                    providers.Add(provider);
+                }
+            }
+
+            return providers;
         }
 
         private void HandleDragProviderItem(UnmappedModel providerItem)
@@ -28,17 +66,40 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _draggedProviderItem = providerItem;
         }
 
-        private void HandleUpdateMappingClick(MappingSetupItemModel item)
+        private async Task HandleUpdateMappingClick(MappingSetupItemModel item)
         {
-            
+            var info = new ProviderModel<int>()
+            {
+                SrId = 0,
+                BgId = 0,   
+            };
+
+            if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id, out int SrId))
+            {
+                info.SrId = SrId;
+            }
+
+            if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.Id, out int BgId))
+            {
+                info.BgId = BgId;
+            }
+
+            var request = new ProviderMappingRequest()
+            {
+                Id = item.Id,
+                Na = item.Name,
+                Info = JsonSerializer.Serialize(info),
+                ChTyId = 0
+            };
+
+            await _providerMappingService.AddOrUpdateProviderMapping(_mappingCategories[MappingCategory.Sport], request);
+
+            ModalService.Cancel();
+
+            await Modal.OnSaveClickCallback.InvokeAsync();
         }
 
         public void OnCloseClickEvent()
-        {
-            ModalService.Cancel();
-        }
-
-        public void OnSaveClickEvent()
         {
             ModalService.Cancel();
         }

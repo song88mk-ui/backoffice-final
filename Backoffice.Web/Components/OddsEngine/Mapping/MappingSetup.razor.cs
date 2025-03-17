@@ -11,9 +11,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
         [Parameter] public string FormId { get; set; } = "mappingSetupFormId";
         [Parameter] public bool HasSubmitButton { get; set; } = true;
+        [Parameter] public MappingSetupItemModel MappingSetupItem { get; set; } = new MappingSetupItemModel();
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
-
         private Dictionary<int, UnmappedModel> _droppedProviderItems = new Dictionary<int, UnmappedModel>();
         private Dictionary<int, string> providerAcronym = new Dictionary<int, string>
         {
@@ -21,7 +21,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 1, "BG"
             },
             {
-                2, "SR"
+                0, "SR"
             }
         };
         private Dictionary<int, string> providerCss = new Dictionary<int, string>
@@ -30,7 +30,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 1, "bg-primary"
             },
             {
-                2, "bg-danger"
+                0, "bg-danger"
             }
         };
 
@@ -38,6 +38,16 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             ResetValues();
             _editContext = new EditContext(_mappingSetupItem);
+        }
+
+        protected override void OnParametersSet()
+        {
+            if (!string.IsNullOrEmpty(MappingSetupItem?.Id))
+            {
+                _mappingSetupItem = MappingSetupItem;
+                _droppedProviderItems = _mappingSetupItem.Providers.ToDictionary(p => p.ChTyId);
+                _editContext = new EditContext(_mappingSetupItem);
+            }
         }
     
         private void HandleSubmit()

@@ -7,7 +7,7 @@
 </div>
 <div class="modal-body pt-0">
     <div class="information-container mb-3">
-        <MappingSetup HasSubmitButton=false FormId="@_formId" DraggedProviderItem="_draggedProviderItem" OnSubmitCallback="HandleUpdateMappingClick" />
+        <MappingSetup MappingSetupItem="_mappingSetupItem" HasSubmitButton=false FormId="@_formId" DraggedProviderItem="_draggedProviderItem" OnSubmitCallback="HandleUpdateMappingClick" />
     </div>
     <div class="information-container p-3">
         @if (_unmappedSports != null && _unmappedSports.Count() > 0)

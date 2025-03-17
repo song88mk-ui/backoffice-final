@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Enums;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
@@ -19,7 +20,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 1, "Bet Genius"
             },
             {
-                2, "Sports Radar"
+                0, "Sports Radar"
             }
         };
 
