@@ -65,6 +65,7 @@
 }
 
 .drag-icon {
+  pointer-events: none;
   background-color: #E8F5FF;
   color: #BDDEF8;
   padding: 0px 13px;

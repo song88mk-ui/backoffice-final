@@ -1,4 +1,4 @@
-﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;

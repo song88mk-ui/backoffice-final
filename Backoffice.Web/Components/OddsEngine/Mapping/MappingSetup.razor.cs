@@ -50,6 +50,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             if (DraggedProviderItem != null)
             {
+                if (_droppedProviderItems.ContainsKey(DraggedProviderItem.ChTyId)) {
+                    HandleRemoveProviderItem(_droppedProviderItems[DraggedProviderItem.ChTyId]);
+                }
                 _droppedProviderItems[DraggedProviderItem.ChTyId] = DraggedProviderItem;
                 _mappingSetupItem.Providers = _droppedProviderItems.Values.ToList();
                 _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));

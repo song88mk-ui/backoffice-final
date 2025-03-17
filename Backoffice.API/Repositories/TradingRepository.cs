@@ -2470,26 +2470,28 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var response = await GetHttpClientV2(region).PostAsync($"mapping/{category}/bulk", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
-
-                BaseResponse<bool> result;
-                if (response.IsSuccessStatusCode)
-                    result = JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
+                var messageType = category switch
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        result = JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        result = new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
+                    "sport" => "OnSportBulkUpdate",
+                    "segment" => "OnSegmentBulkUpdate",
+                    "league" => "OnLeagueBulkUpdate",
+                    "fixture" => "OnFixtureBulkUpdate",
+                    _ => "default"
+                };
 
-                return result;
+                await Publish(new MessageRequest
+                {
+                    Payload = JsonSerializer.Serialize(request),
+                    CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                    MessageType = messageType,
+                    RoutingKey = $"r.bo.mapping.onbulkupdate"
+                }, "HK");
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = true,
+                };
             }
             catch (Exception ex)
             {
