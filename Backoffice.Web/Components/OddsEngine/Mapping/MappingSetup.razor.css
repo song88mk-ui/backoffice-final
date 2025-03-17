@@ -116,8 +116,3 @@
 .item-list .item:hover {
   background: #F4F4F4;
 }
-
-.item-list .item .badge {
-  border-radius: 8px;
-  padding: 5px 6px;
-}
