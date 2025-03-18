@@ -29,11 +29,25 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private void HandleDropProviderItem()
         {
-            if (DraggedProviderItems.Any())
+            if (DraggedProviderItems == null) return;
+
+            if (DraggedProviderItems.Count() > 1)
             {
                 _mappingSetupItem.Providers = new List<UnmappedModel>(DraggedProviderItems);
-                _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
+            } else
+            {
+                int sameProviderIndex = _mappingSetupItem.Providers.FindIndex(x => x.ChTyId == DraggedProviderItems[0].ChTyId);
+                bool hasItemOfSameProvider = sameProviderIndex != -1;
+
+                if (hasItemOfSameProvider) { 
+                    _mappingSetupItem.Providers[sameProviderIndex] = DraggedProviderItems[0];
+                } else
+                {
+                    _mappingSetupItem.Providers.Add(DraggedProviderItems[0]);
+                }
             }
+
+            _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
         }
 
         private void HandleRemoveProviderItem(UnmappedModel providerItem)
