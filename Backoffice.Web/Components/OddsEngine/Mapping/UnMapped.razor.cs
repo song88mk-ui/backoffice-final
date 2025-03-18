@@ -9,7 +9,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class Unmapped
     {
-        private UnmappedModel _draggedProviderItem;
+        private List<UnmappedModel> _draggedProviderItems;
 
         private List<UnmappedModel> _unmappedSports;
         private List<MappingSetupItemModel> _currentMappedItems = new List<MappingSetupItemModel>();
@@ -36,9 +36,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
-        private void HandleDragProviderItem(UnmappedModel providerItem)
+        private void HandleDragProviderItem(List<UnmappedModel> providerItems)
         {
-            _draggedProviderItem = providerItem;
+            _draggedProviderItems = providerItems;
 
             _shouldRender = true;
         }
@@ -53,14 +53,27 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private ProviderMappingBulkRequest BuildRequestPayload(List<MappingSetupItemModel> items)
         {
             var request = new ProviderMappingBulkRequest();
+            int SrId = 0;
+            int BgId = 0;
 
             foreach (var item in items)
             {
-                var info = new ProviderModel<string>()
+                // info varies per mapping category
+                var info = new ProviderModel<int>()
                 {
-                    SrId = item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id ?? "0",
-                    BgId = item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.Id ?? "0",
+                    SrId = 0,
+                    BgId = 0,   
                 };
+
+                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id, out SrId))
+                {
+                    info.SrId = SrId;
+                }
+
+                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.Id, out BgId))
+                {
+                    info.BgId = BgId;
+                }
 
                 // todo: map SpId, SegId, LeId for requests that need it, BE will also update request such that ChTyId is nullable
                 request.Mapping.Add(
@@ -93,6 +106,20 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.Sport], BuildRequestPayload(_currentMappedItems));
 
             ResetMappedItemsList();
+
+            _shouldRender = true;
+        }
+
+        private void HandleRemoveMappedItem(MappingSetupItemModel singleItem = null)
+        {
+            if (singleItem == null)
+            {
+                ResetMappedItemsList();
+            }
+            else
+            {
+                _currentMappedItems = _currentMappedItems.Where(x => x.Id != singleItem.Id && x.Name != singleItem.Name).ToList();
+            }
 
             _shouldRender = true;
         }

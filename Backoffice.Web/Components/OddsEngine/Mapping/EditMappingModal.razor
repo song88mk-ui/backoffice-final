@@ -1,18 +1,27 @@
-﻿<div class="modal-header">
-    <div class="title">Edit Mapping</div>
-    <div>
-        <button data-bs-dismiss="modal" @onclick="OnCloseClickEvent" class="btn-cancel">Cancel</button>
-        <button data-bs-dismiss="modal" type="submit" form="@_formId" class="btn-save">Save changes</button>
+﻿@if (_isPreLoader)
+{
+    <div class="p-3">
+        <Preloader />
     </div>
-</div>
-<div class="modal-body pt-0">
-    <div class="information-container mb-3">
-        <MappingSetup MappingSetupItem="_mappingSetupItem" HasSubmitButton=false FormId="@_formId" DraggedProviderItem="_draggedProviderItem" OnSubmitCallback="HandleUpdateMappingClick" />
+}
+else
+{
+    <div class="modal-header border-bottom-0">
+        <div class="title">Edit Mapping</div>
+        <div>
+            <button data-bs-dismiss="modal" @onclick="OnCloseClickEvent" class="btn-cancel">@_translationState.GetValue("Cancel")</button>
+            <button data-bs-dismiss="modal" type="submit" form="@_formId" class="btn-save" disabled="@_isLoading">@_translationState.GetValue("Save changes")</button>
+        </div>
     </div>
-    <div class="information-container p-3">
-        @if (_unmappedSports != null && _unmappedSports.Count() > 0)
-        {
-            <MappingProvider ProviderItems="_unmappedSports" OnDragCallback="HandleDragProviderItem" />
-        }
+    <div class="modal-body pt-0">
+        <div class="information-container mb-3">
+            <MappingSetup MappingSetupItem="_mappingSetupItem" HasSubmitButton=false FormId="@_formId" DraggedProviderItems="_draggedProviderItems" OnSubmitCallback="HandleUpdateMappingClick" />
+        </div>
+        <div class="information-container p-3">
+            @if (_unmappedSports != null && _unmappedSports.Count() > 0)
+            {
+                <MappingProvider ProviderItems="_unmappedSports" OnDragItemCallback="HandleDragProviderItem" />
+            }
+        </div>
     </div>
-</div>
+}

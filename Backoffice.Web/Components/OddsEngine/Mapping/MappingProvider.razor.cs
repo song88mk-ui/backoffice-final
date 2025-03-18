@@ -7,22 +7,23 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class MappingProvider
     {
-        [Parameter] public EventCallback<UnmappedModel> OnDragCallback { get; set; }
+        [Parameter] public EventCallback<List<UnmappedModel>> OnDragItemCallback { get; set; }
         [Parameter] public List<UnmappedModel> ProviderItems { get; set; } = new List<UnmappedModel>();
 
         private List<UnmappedModel> _filteredProviderItems { get; set; } = new List<UnmappedModel>();
         private List<UnmappedModel> _previousProviderItems = new List<UnmappedModel>();
-
         private Dictionary<int, List<UnmappedModel>> _groupProviderItems { get; set; } = new Dictionary<int, List<UnmappedModel>>();
         private Dictionary<int, string> providerIdToName = new Dictionary<int, string>
         {
             {
-                1, "Bet Genius"
+                0, "Sports Radar"
             },
             {
-                0, "Sports Radar"
-            }
+                1, "Bet Genius"
+            },
         };
+
+        private UnmappedModel _currentHoveredItem;
 
         private string _searchQuery { get; set; } = string.Empty;
         private bool _shouldRender;
@@ -55,7 +56,26 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private void HandleDragStart(UnmappedModel selectedItem)
         {
-            OnDragCallback.InvokeAsync(selectedItem);
+            var linkedItems = ProviderItems.Where(item => item.Na.ToLower() == selectedItem.Na.ToLower()).ToList();
+
+            OnDragItemCallback.InvokeAsync(linkedItems);
+        }
+
+        private void HandleMouseOver(UnmappedModel item)
+        {
+            _currentHoveredItem = item;
+        }
+
+        private void HandleMouseOut()
+        {
+            _currentHoveredItem = new UnmappedModel();
+        }
+
+        private string GetLinkedItemCss(UnmappedModel item)
+        {
+            var linkedItems = ProviderItems.Where(x => x.Na.ToLower() == item.Na.ToLower()).ToList();
+
+            return _currentHoveredItem?.Na == item.Na && linkedItems.Count() > 1 ? "highlight" : "";
         }
 
         private bool ValidateRender()

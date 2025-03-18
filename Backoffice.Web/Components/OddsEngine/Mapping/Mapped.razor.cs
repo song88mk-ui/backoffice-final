@@ -24,11 +24,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             var request = new MappingRequest
             {
                 Page = 1,
-                PageSize = 200
+                PageSize = 1000
             };
 
             var response = await _providerMappingService.GetSportMapping(request);
-            _sportMapping = response.Result.SportMapping;
+            _sportMapping = response.Result.SportMapping.OrderBy(sm => sm.SpNa).ToList();
         }
         public async Task HandleEditMappingClickEvent(SportMappingModel mappingItem)
         {

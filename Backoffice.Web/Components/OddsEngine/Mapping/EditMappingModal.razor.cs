@@ -16,9 +16,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter] private CustomModal Modal { get; set; }
-        private UnmappedModel _draggedProviderItem;
+        private List<UnmappedModel> _draggedProviderItems;
         private List<UnmappedModel> _unmappedSports;
         private string _formId = "editMappingFormId";
+        private bool _isPreLoader = true;
+        private bool _isLoading = false;
         private MappingSetupItemModel _mappingSetupItem = new MappingSetupItemModel();
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
         {
@@ -44,6 +46,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 Name = sportMapping.SpNa,
                 Providers = GetUnmappedProviderByInfo(sportMapping.Info)
             };
+
+            _isPreLoader = false;
         }
 
         private List<UnmappedModel> GetUnmappedProviderByInfo(ProviderModel<int> info)
@@ -61,13 +65,15 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             return providers;
         }
 
-        private void HandleDragProviderItem(UnmappedModel providerItem)
+        private void HandleDragProviderItem(List<UnmappedModel> providerItems)
         {
-            _draggedProviderItem = providerItem;
+            _draggedProviderItems = providerItems;
         }
 
         private async Task HandleUpdateMappingClick(MappingSetupItemModel item)
         {
+            _isLoading = true;
+
             var info = new ProviderModel<int>()
             {
                 SrId = 0,
@@ -94,6 +100,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
             await _providerMappingService.AddOrUpdateProviderMapping(_mappingCategories[MappingCategory.Sport], request);
 
+            _isLoading = false;
+            
             ModalService.Cancel();
 
             await Modal.OnSaveClickCallback.InvokeAsync();

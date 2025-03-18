@@ -1,0 +1,139 @@
+﻿.mapped-items-container {
+    background-color: #F4F4F4;
+    border: 1px solid #DADADA;
+    padding: 10px;
+}
+
+.mapped-items-header {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-cluster {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.remove-all-label {
+    color: #A6A6A6;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 15px;
+    cursor: pointer;
+}
+
+.btn-save {
+    background-color: #1151F3;
+    color: #FFF;
+    padding: 7px 10px;
+    min-width: 62px;
+    border-radius: 5px;
+    border: 0px;
+    outline: 0px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.header-label {
+    color: #000;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 22px;
+}
+
+.item-list-container {
+    border: 1px dashed #CDCBCB;
+    padding: 12px 10px;
+    background-color: #FFF;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+    .item-list-container .empty-message {
+        color: #606060;
+        font-weight: 500;
+        line-height: 15px;
+        padding: 7px 0;
+        text-align: center;
+    }
+
+.item-list {
+    padding: 0;
+    margin-bottom: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+    .item-list .item {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #CDCBCB;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+    }
+
+        .item-list .item:hover {
+            background: #F4F4F4;
+        }
+
+.mapped-item {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+    border: 1px solid #EAEAEA;
+}
+
+.mapped-item-cta-header {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    gap: 8px;
+}
+
+.mapped-item-cta-header img {
+    width: 14px;
+    height: auto;
+    cursor: pointer;
+}
+
+.mapped-item-name {
+    color: #666;
+    margin-bottom: 6px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.mapped-item-id {
+    color: #666;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.mapped-item-provider {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+    .mapped-item-provider span {
+        color: #666;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .mapped-item-provider-icons-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+

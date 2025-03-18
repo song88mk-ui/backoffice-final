@@ -93,3 +93,8 @@
   font-size: 15px;
   line-height: 22px;
 }
+
+.provider-item.highlight {
+    background-color: #E6FFE5;
+    border: 1px solid #6CEB67;
+}
