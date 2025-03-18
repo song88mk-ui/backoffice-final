@@ -19,7 +19,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         protected override async Task OnInitializedAsync()
         {
             ResetValues();
-            _editContext = new EditContext(_mappingSetupItem);
         }
     
         private void HandleSubmit()
@@ -70,6 +69,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 Name = string.Empty,
                 Providers = new List<UnmappedModel>()
             };
+
+            _editContext = new EditContext(_mappingSetupItem);
         }
     }
 }

@@ -12,10 +12,10 @@ namespace Backoffice.Web.Models.OddsEngine.Mapping
             Id = Guid.NewGuid().ToString();
         }
 
-        [Required(ErrorMessage = "ID is required.")]
+        [MinLength(1, ErrorMessage = "ID is required.")]
         public string Id { get; set; }
 
-        [Required(ErrorMessage = "Name is required.")]
+        [MinLength(1, ErrorMessage = "Name is required.")]
         public string Name { get; set; }
 
         [MustHaveOneElement(ErrorMessage = "At least one provider is required.")]
