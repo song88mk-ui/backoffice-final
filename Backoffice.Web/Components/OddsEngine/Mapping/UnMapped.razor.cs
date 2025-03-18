@@ -10,8 +10,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     public partial class Unmapped
     {
         private List<UnmappedModel> _draggedProviderItems;
-
         private List<UnmappedModel> _unmappedSports;
+        private List<UnmappedModel> _tempFilteredUnmappedSports;
+        private List<UnmappedModel> _currentMappingSetupProviderItems = new List<UnmappedModel>();
         private List<MappingSetupItemModel> _currentMappedItems = new List<MappingSetupItemModel>();
 
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
@@ -32,6 +33,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             var response = await _providerMappingService.GetUnmappedSports();
             _unmappedSports = response.Result.Unmapped;
+            _tempFilteredUnmappedSports = _unmappedSports;
 
             _shouldRender = true;
         }
@@ -43,9 +45,17 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
-        private void ResetMappedItemsList()
+        private void ResetMappingItems(bool resetMappingSetupProviderItems = true, bool resetMappedItems = true)
         {
-            _currentMappedItems = new List<MappingSetupItemModel>();
+            if (resetMappingSetupProviderItems)
+            {
+                _currentMappingSetupProviderItems = new List<UnmappedModel>();
+            }
+
+            if (resetMappedItems)
+            {
+                _currentMappedItems = new List<MappingSetupItemModel>();
+            }
 
             _shouldRender = true;
         }
@@ -97,6 +107,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             _currentMappedItems.Add(item);
 
+            ResetMappingItems(true, false);
+
             _shouldRender = true;
         }
 
@@ -105,7 +117,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             // todo: create if/switch case for different categories based on selected mapping category
             var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.Sport], BuildRequestPayload(_currentMappedItems));
 
-            ResetMappedItemsList();
+            _unmappedSports = _tempFilteredUnmappedSports;
+
+            ResetMappingItems();
 
             _shouldRender = true;
         }
@@ -114,11 +128,52 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             if (singleItem == null)
             {
-                ResetMappedItemsList();
+                ResetMappingItems(false, true);
             }
             else
             {
                 _currentMappedItems = _currentMappedItems.Where(x => x.Id != singleItem.Id && x.Name != singleItem.Name).ToList();
+            }
+
+            FilterProviderItems();
+
+            _shouldRender = true;
+        }
+
+        private void OnItemDropCallback(List<UnmappedModel> itemsToFilter)
+        {
+            if (itemsToFilter == null) return;
+
+            _currentMappingSetupProviderItems = itemsToFilter;
+
+            FilterProviderItems();
+
+            _shouldRender = true;
+        }
+
+        private List<UnmappedModel> GetAllItemsToBeFiltered()
+        {
+            List<UnmappedModel> allItemsToBeFiltered = new List<UnmappedModel>();
+
+            allItemsToBeFiltered.AddRange(_currentMappingSetupProviderItems);
+
+            foreach(var mappedItem in _currentMappedItems)
+            {
+                allItemsToBeFiltered.AddRange(mappedItem.Providers);
+            }
+
+            return allItemsToBeFiltered;
+        }
+
+        private void FilterProviderItems()
+        {
+            _tempFilteredUnmappedSports = _unmappedSports;
+
+            var allItemsToBeFiltered = GetAllItemsToBeFiltered();
+
+            foreach (var providerItem in allItemsToBeFiltered)
+            {
+                _tempFilteredUnmappedSports = _tempFilteredUnmappedSports.Where(x => JsonSerializer.Serialize(x) != JsonSerializer.Serialize(providerItem)).ToList();
             }
 
             _shouldRender = true;

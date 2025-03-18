@@ -20,13 +20,13 @@
 
 <div class="main-content-grid">
     <div class="left">
-        <MappingSetup DraggedProviderItems="_draggedProviderItems" OnSubmitCallback="HandleCreateMappingClick" />
+        <MappingSetup DraggedProviderItems="_draggedProviderItems" OnSubmitCallback="HandleCreateMappingClick" OnItemDropCallback="OnItemDropCallback" />
         <MappedItems CurrentMappedItems="_currentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" OnRemoveCallback="HandleRemoveMappedItem" />
     </div>
     <div class="right">
-        @if (_unmappedSports != null && _unmappedSports.Count() > 0)
+        @if (_tempFilteredUnmappedSports != null && _tempFilteredUnmappedSports.Count() > 0)
         {
-            <MappingProvider ProviderItems="_unmappedSports" OnDragItemCallback="HandleDragProviderItem" />
+            <MappingProvider ProviderItems="_tempFilteredUnmappedSports" OnDragItemCallback="HandleDragProviderItem" />
         }
     </div>
 </div>

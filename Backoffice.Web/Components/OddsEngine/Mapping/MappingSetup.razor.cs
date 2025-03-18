@@ -9,6 +9,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     {
         [Parameter] public List<UnmappedModel> DraggedProviderItems { get; set; } = new List<UnmappedModel>();
         [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
+        [Parameter] public EventCallback<List<UnmappedModel>> OnItemDropCallback { get; set; }
 
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
@@ -48,12 +49,17 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             }
 
             _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
+
+            OnItemDropCallback.InvokeAsync(_mappingSetupItem.Providers);
         }
 
         private void HandleRemoveProviderItem(UnmappedModel providerItem)
         {
             _mappingSetupItem.Providers = _mappingSetupItem.Providers.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
+            
             _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
+
+            OnItemDropCallback.InvokeAsync(_mappingSetupItem.Providers);
         }
 
         private void ResetValues()
