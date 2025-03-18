@@ -15,6 +15,10 @@ namespace Backoffice.Shared.Models.Requests
 
     public class ProviderMappingBulkRequest
     {
+        public ProviderMappingBulkRequest()
+        {
+            Mapping = new List<ProviderMappingRequest>();
+        }
         public List<ProviderMappingRequest> Mapping { get; set; }
     }
 }

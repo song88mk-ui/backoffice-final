@@ -1,35 +1,43 @@
 <EditForm EditContext="_editContext" OnValidSubmit="HandleSubmit">
     <DataAnnotationsValidator />
-
-    <div class="mapping-setup-content-container">
-        <div class="text-input">
-            <span>@_translationState.GetValue("ID")</span>
-            <InputText class="form-control" type="text" placeholder="Enter Id" @bind-Value="_mappingSetupItem.Id" />
-            <ValidationMessage For="() => _mappingSetupItem.Id" />
+    <div class="mapping-setup-container">
+        <div class="mapping-setup-header">
+            <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
+            <img class="download-icon" src="icons/svg/download.svg" />
         </div>
-        <div class="text-input">
-            <span>@_translationState.GetValue("Name")</span>
-            <InputText class="form-control" type="text" placeholder="Enter Name" @bind-Value="_mappingSetupItem.Name" />
-            <ValidationMessage For="() => _mappingSetupItem.Name" />
-        </div>
-        <div>
-            <div class="item-list-container" dropzone="move" @ondrop="HandleDropProviderItem" ondragover="event.preventDefault();">
-                @if (_mappingSetupItem.Providers.Any())
-                {
-                    <ul class="item-list">
-                        @foreach (var item in _mappingSetupItem.Providers)
-                        {
-                            <li class="item" @onclick="() => HandleRemoveProviderItem(item)"><div>@item.Na</div><span class="badge @providerCss[item.ChTyId]">@providerAcronym[item.ChTyId]</span></li>
-                        }
-                    </ul>
-                }
-                else
-                {
-                    <div class="empty-message italic">@_translationState.GetValue("Drag and drop the item you want to map.")</div>
-                }
+        <div class="mapping-setup-content-container">
+            <div class="text-input">
+                <span>@_translationState.GetValue("ID")</span>
+                <InputText class="form-control" type="text" placeholder="Enter Id" @bind-Value="_mappingSetupItem.Id" />
+                <ValidationMessage For="() => _mappingSetupItem.Id" />
             </div>
-            <ValidationMessage For="() => _mappingSetupItem.Providers" />
+            <div class="text-input">
+                <span>@_translationState.GetValue("Name")</span>
+                <InputText class="form-control" type="text" placeholder="Enter Name" @bind-Value="_mappingSetupItem.Name" />
+                <ValidationMessage For="() => _mappingSetupItem.Name" />
+            </div>
+            <div>
+                <div class="item-list-container" dropzone="move" @ondrop="HandleDropProviderItem" ondragover="event.preventDefault();">
+                    @if (_mappingSetupItem.Providers.Any())
+                    {
+                        <ul class="item-list">
+                            @foreach (var item in _mappingSetupItem.Providers)
+                            {
+                                <li class="item" @onclick="() => HandleRemoveProviderItem(item)">
+                                    <div>@item.Na</div>
+                                    <ProviderIcon ChannelTypeId="item.ChTyId" />
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="empty-message italic">@_translationState.GetValue("Drag and drop the item you want to map.")</div>
+                    }
+                </div>
+                <ValidationMessage For="() => _mappingSetupItem.Providers" />
+            </div>
+            <button type="submit" class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
         </div>
-        <button type="submit" class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
     </div>
 </EditForm>

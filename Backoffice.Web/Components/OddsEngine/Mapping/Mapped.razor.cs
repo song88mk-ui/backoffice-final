@@ -19,7 +19,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             var request = new MappingRequest
             {
                 Page = 1,
-                PageSize = 100
+                PageSize = 200
             };
 
             var response = await _providerMappingService.GetSportMapping(request);

@@ -7,31 +7,13 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class MappingSetup
     {
-        [Parameter] public UnmappedModel DraggedProviderItem { get; set; } = new UnmappedModel();
+        [Parameter] public List<UnmappedModel> DraggedProviderItems { get; set; } = new List<UnmappedModel>();
         [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
 
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
 
         private Dictionary<int, UnmappedModel> _droppedProviderItems = new Dictionary<int, UnmappedModel>();
-        private Dictionary<int, string> providerAcronym = new Dictionary<int, string>
-        {
-            {
-                1, "BG"
-            },
-            {
-                2, "SR"
-            }
-        };
-        private Dictionary<int, string> providerCss = new Dictionary<int, string>
-        {
-            {
-                1, "bg-primary"
-            },
-            {
-                2, "bg-danger"
-            }
-        };
 
         protected override async Task OnInitializedAsync()
         {
@@ -47,21 +29,24 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private void HandleDropProviderItem()
         {
-            if (DraggedProviderItem != null)
+            if (DraggedProviderItems.Any())
             {
-                if (_droppedProviderItems.ContainsKey(DraggedProviderItem.ChTyId)) {
-                    HandleRemoveProviderItem(_droppedProviderItems[DraggedProviderItem.ChTyId]);
-                }
-                _droppedProviderItems[DraggedProviderItem.ChTyId] = DraggedProviderItem;
-                _mappingSetupItem.Providers = _droppedProviderItems.Values.ToList();
+                //if (_droppedProviderItems.ContainsKey(DraggedProviderItem.ChTyId)) {
+                //    HandleRemoveProviderItem(_droppedProviderItems[DraggedProviderItem.ChTyId]);
+                //}
+                //_droppedProviderItems[DraggedProviderItem.ChTyId] = DraggedProviderItem;
+
+                _mappingSetupItem.Providers = new List<UnmappedModel>(DraggedProviderItems);
                 _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
             }
         }
 
         private void HandleRemoveProviderItem(UnmappedModel providerItem)
         {
-            _droppedProviderItems.Remove(providerItem.ChTyId);
-            _mappingSetupItem.Providers = _droppedProviderItems.Values.ToList();
+            //_droppedProviderItems.Remove(providerItem.ChTyId);
+            //_mappingSetupItem.Providers = _droppedProviderItems.Values.ToList();
+
+            _mappingSetupItem.Providers = _mappingSetupItem.Providers.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
             _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
         }
 

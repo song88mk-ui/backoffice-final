@@ -12,6 +12,13 @@
   align-items: center;
 }
 
+    .mapping-setup-header .header-label {
+        color: #000;
+        font-weight: 700;
+        font-size: 15px;
+        line-height: 22px;
+    }
+
 .fa-download {
   display: block;
   width: 15px;
@@ -108,9 +115,4 @@
 
 .item-list .item:hover {
   background: #F4F4F4;
-}
-
-.item-list .item .badge {
-  border-radius: 8px;
-  padding: 5px 6px;
 }
