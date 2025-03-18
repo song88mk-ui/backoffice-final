@@ -31,11 +31,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             if (DraggedProviderItems.Any())
             {
-                //if (_droppedProviderItems.ContainsKey(DraggedProviderItem.ChTyId)) {
-                //    HandleRemoveProviderItem(_droppedProviderItems[DraggedProviderItem.ChTyId]);
-                //}
-                //_droppedProviderItems[DraggedProviderItem.ChTyId] = DraggedProviderItem;
-
                 _mappingSetupItem.Providers = new List<UnmappedModel>(DraggedProviderItems);
                 _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
             }
@@ -43,9 +38,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private void HandleRemoveProviderItem(UnmappedModel providerItem)
         {
-            //_droppedProviderItems.Remove(providerItem.ChTyId);
-            //_mappingSetupItem.Providers = _droppedProviderItems.Values.ToList();
-
             _mappingSetupItem.Providers = _mappingSetupItem.Providers.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
             _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
         }

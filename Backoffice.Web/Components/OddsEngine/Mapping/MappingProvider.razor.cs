@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Backoffice.Shared.Models.Response;
+using System.Diagnostics;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
@@ -73,6 +74,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private string GetLinkedItemCss(UnmappedModel item)
         {
             var linkedItems = ProviderItems.Where(x => x.Na.ToLower() == item.Na.ToLower()).ToList();
+
+            _shouldRender = true;
 
             return _currentHoveredItem?.Na == item.Na && linkedItems.Count() > 1 ? "highlight" : "";
         }
