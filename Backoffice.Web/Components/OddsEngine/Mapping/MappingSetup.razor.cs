@@ -9,6 +9,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     {
         [Parameter] public List<UnmappedModel> DraggedProviderItems { get; set; } = new List<UnmappedModel>();
         [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
+        [Parameter] public EventCallback<List<UnmappedModel>> OnItemDropCallback { get; set; }
 
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
@@ -18,7 +19,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         protected override async Task OnInitializedAsync()
         {
             ResetValues();
-            _editContext = new EditContext(_mappingSetupItem);
         }
     
         private void HandleSubmit()
@@ -29,25 +29,36 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private void HandleDropProviderItem()
         {
-            if (DraggedProviderItems.Any())
-            {
-                //if (_droppedProviderItems.ContainsKey(DraggedProviderItem.ChTyId)) {
-                //    HandleRemoveProviderItem(_droppedProviderItems[DraggedProviderItem.ChTyId]);
-                //}
-                //_droppedProviderItems[DraggedProviderItem.ChTyId] = DraggedProviderItem;
+            if (DraggedProviderItems == null) return;
 
+            if (DraggedProviderItems.Count() > 1)
+            {
                 _mappingSetupItem.Providers = new List<UnmappedModel>(DraggedProviderItems);
-                _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
+            } else
+            {
+                int sameProviderIndex = _mappingSetupItem.Providers.FindIndex(x => x.ChTyId == DraggedProviderItems[0].ChTyId);
+                bool hasItemOfSameProvider = sameProviderIndex != -1;
+
+                if (hasItemOfSameProvider) { 
+                    _mappingSetupItem.Providers[sameProviderIndex] = DraggedProviderItems[0];
+                } else
+                {
+                    _mappingSetupItem.Providers.Add(DraggedProviderItems[0]);
+                }
             }
+
+            _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
+
+            OnItemDropCallback.InvokeAsync(_mappingSetupItem.Providers);
         }
 
         private void HandleRemoveProviderItem(UnmappedModel providerItem)
         {
-            //_droppedProviderItems.Remove(providerItem.ChTyId);
-            //_mappingSetupItem.Providers = _droppedProviderItems.Values.ToList();
-
             _mappingSetupItem.Providers = _mappingSetupItem.Providers.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
+            
             _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
+
+            OnItemDropCallback.InvokeAsync(_mappingSetupItem.Providers);
         }
 
         private void ResetValues()
@@ -58,6 +69,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 Name = string.Empty,
                 Providers = new List<UnmappedModel>()
             };
+
+            _editContext = new EditContext(_mappingSetupItem);
         }
     }
 }

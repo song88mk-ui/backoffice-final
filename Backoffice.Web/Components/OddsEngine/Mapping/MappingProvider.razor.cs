@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Backoffice.Shared.Models.Response;
+using System.Diagnostics;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
@@ -31,7 +32,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         protected override void OnParametersSet()
         {
-            _shouldRender = ValidateRender();
+            _shouldRender = ValidateParameterRender();
 
             if (_shouldRender)
             {
@@ -53,9 +54,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _groupProviderItems = GetGroupedProviderItems();
         }
 
-        private void HandleDragStart(UnmappedModel selectedItem)
+        private void HandleDragStart(UnmappedModel item)
         {
-            var linkedItems = ProviderItems.Where(item => item.Na.ToLower() == selectedItem.Na.ToLower()).ToList();
+            var linkedItems = GetLinkedItems(item);
 
             OnDragItemCallback.InvokeAsync(linkedItems);
         }
@@ -72,12 +73,19 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private string GetLinkedItemCss(UnmappedModel item)
         {
-            var linkedItems = ProviderItems.Where(x => x.Na.ToLower() == item.Na.ToLower()).ToList();
+            var linkedItems = GetLinkedItems(item);
 
-            return _currentHoveredItem?.Na == item.Na && linkedItems.Count() > 1 ? "highlight" : "";
+            _shouldRender = true;
+
+            return _currentHoveredItem?.Na == item.Na ? "highlight" : "";
         }
 
-        private bool ValidateRender()
+        private List<UnmappedModel> GetLinkedItems(UnmappedModel item)
+        {
+            return ProviderItems.Where(x => x.Na.ToLower() == item.Na.ToLower()).DistinctBy(y => y.ChTyId).ToList();
+        }
+
+        private bool ValidateParameterRender()
         {
             return !ProviderItems.SequenceEqual(_previousProviderItems);
         }
