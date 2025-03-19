@@ -13,8 +13,13 @@ namespace Backoffice.Shared.Models.Response
 
     public class UnmappedModel
     {
+        public UnmappedModel()
+        {
+            OtPrLi = new ProviderModel<List<int>>();
+        }
         public string Id { get; set; }
         public string Na { get; set; }
         public int ChTyId { get; set; }
+        public ProviderModel<List<int>> OtPrLi { get; set; }
     }
 }
