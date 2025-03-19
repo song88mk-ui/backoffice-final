@@ -72,39 +72,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private async Task HandleUpdateMappingClick(MappingSetupItemModel item)
         {
-            _isLoading = true;
-
-            var info = new ProviderModel<int>()
-            {
-                SrId = 0,
-                BgId = 0,   
-            };
-
-            if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id, out int SrId))
-            {
-                info.SrId = SrId;
-            }
-
-            if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.Id, out int BgId))
-            {
-                info.BgId = BgId;
-            }
-
-            var request = new ProviderMappingRequest()
-            {
-                Id = item.Id,
-                Na = item.Name,
-                Info = JsonSerializer.Serialize(info),
-                ChTyId = 0
-            };
-
-            await _providerMappingService.AddOrUpdateProviderMapping(_mappingCategories[MappingCategory.Sport], request);
-
-            _isLoading = false;
-            
-            ModalService.Cancel();
-
-            await Modal.OnSaveClickCallback.InvokeAsync();
         }
 
         public void OnCloseClickEvent()
