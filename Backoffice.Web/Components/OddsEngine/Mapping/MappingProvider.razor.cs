@@ -77,7 +77,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
             _shouldRender = true;
 
-            return _currentHoveredItem?.Na == item.Na && linkedItems.Count() > 1 ? "highlight" : "";
+            return _currentHoveredItem?.Na == item.Na ? "highlight" : "";
         }
 
         private List<UnmappedModel> GetLinkedItems(UnmappedModel item)
