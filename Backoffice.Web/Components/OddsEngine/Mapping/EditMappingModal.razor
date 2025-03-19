@@ -10,7 +10,7 @@ else
         <div class="title">Edit Mapping</div>
         <div>
             <button data-bs-dismiss="modal" @onclick="OnCloseClickEvent" class="btn-cancel">@_translationState.GetValue("Cancel")</button>
-            <button data-bs-dismiss="modal" type="submit" form="@_formId" class="btn-save" disabled="@_isLoading">@_translationState.GetValue("Save changes")</button>
+            <button data-bs-dismiss="modal" type="submit" form="@_formId" class="btn-save">@_translationState.GetValue("Save changes")</button>
         </div>
     </div>
     <div class="modal-body pt-0">

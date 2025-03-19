@@ -20,7 +20,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private List<UnmappedModel> _unmappedSports;
         private string _formId = "editMappingFormId";
         private bool _isPreLoader = true;
-        private bool _isLoading = false;
         private MappingSetupItemModel _mappingSetupItem = new MappingSetupItemModel();
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
         {
