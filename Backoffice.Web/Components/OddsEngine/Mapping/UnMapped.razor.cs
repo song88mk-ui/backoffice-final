@@ -9,9 +9,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class Unmapped
     {
-        private List<UnmappedModel> _unmappedSports;
-        private List<UnmappedModel> _tempFilteredUnmappedSports;
-        private List<UnmappedModel> _currentMappingSetupProviderItems = new List<UnmappedModel>();
+        private List<MappingProviderItemModel> _unmappedSports;
+        private List<MappingProviderItemModel> _tempFilteredUnmappedSports;
+        private List<MappingProviderItemModel> _currentMappingSetupProviderItems = new List<MappingProviderItemModel>();
         private List<MappingSetupItemModel> _currentMappedItems = new List<MappingSetupItemModel>();
 
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
@@ -31,13 +31,13 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         protected override async Task OnInitializedAsync()
         {
             var response = await _providerMappingService.GetUnmappedSports();
-            _unmappedSports = response.Result.Unmapped;
+            _unmappedSports = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
             _tempFilteredUnmappedSports = _unmappedSports;
 
             _shouldRender = true;
         }
 
-        private void HandleProviderItemClick(UnmappedModel providerItem)
+        private void HandleProviderItemClick(MappingProviderItemModel providerItem)
         {
             if (providerItem == null) return;
 
@@ -55,6 +55,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
             FilterProviderItems();
 
+            SetLinkedItems();
+
             _shouldRender = true;
         }
 
@@ -62,7 +64,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             if (resetMappingSetupProviderItems)
             {
-                _currentMappingSetupProviderItems = new List<UnmappedModel>();
+                _currentMappingSetupProviderItems = new List<MappingProviderItemModel>();
+
+                SetLinkedItems();
             }
 
             if (resetMappedItems)
@@ -137,13 +141,15 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
-        private void HandleRemoveMappingSetupProviderItem(UnmappedModel providerItem)
+        private void HandleRemoveMappingSetupProviderItem(MappingProviderItemModel providerItem)
         {
             if (providerItem == null) return;
 
             _currentMappingSetupProviderItems = _currentMappingSetupProviderItems.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
 
             FilterProviderItems();
+
+            SetLinkedItems();
 
             _shouldRender = true;
         }
@@ -164,9 +170,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
-        private List<UnmappedModel> GetAllItemsToBeFiltered()
+        private List<MappingProviderItemModel> GetAllItemsToBeFiltered()
         {
-            List<UnmappedModel> allItemsToBeFiltered = new List<UnmappedModel>();
+            List<MappingProviderItemModel> allItemsToBeFiltered = new List<MappingProviderItemModel>();
 
             allItemsToBeFiltered.AddRange(_currentMappingSetupProviderItems);
 
@@ -187,6 +193,34 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             foreach (var providerItem in allItemsToBeFiltered)
             {
                 _tempFilteredUnmappedSports = _tempFilteredUnmappedSports.Where(x => JsonSerializer.Serialize(x) != JsonSerializer.Serialize(providerItem)).ToList();
+            }
+
+            _shouldRender = true;
+        }
+
+        private void SetLinkedItems()
+        {
+            int itemIndex = -1;
+
+            List<string> srIds = new List<string>();
+            List<string> bgIds = new List<string>();
+
+            foreach (var currentMappingItem in _currentMappingSetupProviderItems)
+            {
+                srIds.AddRange(currentMappingItem.OtPrLi.SrId.Select(s => s.ToString()));
+                bgIds.AddRange(currentMappingItem.OtPrLi.BgId.Select(s => s.ToString()));
+            }
+
+            foreach (var item in _tempFilteredUnmappedSports)
+            {
+                if ((srIds.Contains(item.Id) && item.ChTyId == (int)ChannelType.SR) || 
+                    (bgIds.Contains(item.Id) && item.ChTyId == (int)ChannelType.BG))
+                {
+                    item.IsCurrentLinkedItem = true;
+                    continue;
+                }
+
+                item.IsCurrentLinkedItem = false;
             }
 
             _shouldRender = true;
