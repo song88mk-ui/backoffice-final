@@ -7,9 +7,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class MappingSetup
     {
-        [Parameter] public List<UnmappedModel> MappingSetupProviderItems { get; set; }
+        [Parameter] public List<MappingProviderItemModel> MappingSetupProviderItems { get; set; }
         [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
-        [Parameter] public EventCallback<UnmappedModel> OnRemoveProviderItemCallback { get; set; }
+        [Parameter] public EventCallback<MappingProviderItemModel> OnRemoveProviderItemCallback { get; set; }
 
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
@@ -28,7 +28,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = ValidateParameterRender();
 
             if (_shouldRender) {
-                _mappingSetupItem.Providers = new List<UnmappedModel>(MappingSetupProviderItems);
+                _mappingSetupItem.Providers = new List<MappingProviderItemModel>(MappingSetupProviderItems);
 
                 _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
             }
@@ -40,7 +40,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             ResetValues();
         }
 
-        private void HandleRemoveProviderItemClick(UnmappedModel providerItem)
+        private void HandleRemoveProviderItemClick(MappingProviderItemModel providerItem)
         {
             OnRemoveProviderItemCallback.InvokeAsync(providerItem);
 
@@ -53,7 +53,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = string.Empty,
-                Providers = new List<UnmappedModel>()
+                Providers = new List<MappingProviderItemModel>()
             };
 
             _editContext = new EditContext(_mappingSetupItem);

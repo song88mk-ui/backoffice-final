@@ -16,7 +16,10 @@
                                 <img class="drag-icon" src="icons/svg/draggable.svg" />
                                 <span class="provider-item-name">@item.Na</span>
                             </div>
-                            <img class="linked-icon" src="icons/svg/linked.svg" />
+                            @if (item.HasLinkedItem)
+                            {
+                                <img class="linked-icon" src="icons/svg/linked.svg" />
+                            }
                         </div>
                     }
                 </div>
