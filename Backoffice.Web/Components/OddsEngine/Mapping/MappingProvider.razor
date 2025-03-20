@@ -11,12 +11,7 @@
                 <div class="provider-items-container">
                     @foreach (var item in group.Value)
                     {
-                        <div class="provider-item @GetLinkedItemCss(item)" 
-                            draggable="true" 
-                            @ondragstart="_ => HandleDragStart(item)" 
-                             @onmouseover="_ => HandleMouseOver(item)" 
-                             @onmouseout="HandleMouseOut"
-                        >
+                        <div class="provider-item @GetLinkedItemCss(item)" @onclick="_ => HandleItemClick(item)">
                             <div class="provider-item-name-container">
                                 <img class="drag-icon" src="icons/svg/draggable.svg" />
                                 <span class="provider-item-name">@item.Na</span>

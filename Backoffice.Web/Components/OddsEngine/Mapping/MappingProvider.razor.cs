@@ -7,11 +7,14 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class MappingProvider
     {
-        [Parameter] public EventCallback<List<UnmappedModel>> OnDragItemCallback { get; set; }
-        [Parameter] public List<UnmappedModel> ProviderItems { get; set; } = new List<UnmappedModel>();
+        [Parameter] public EventCallback<UnmappedModel> OnClickItemCallback { get; set; }
+        [Parameter] public List<UnmappedModel> ProviderItems { get; set; }
+        [Parameter] public List<UnmappedModel> MappingSetupProviderItems { get; set; }
 
         private List<UnmappedModel> _filteredProviderItems { get; set; } = new List<UnmappedModel>();
         private List<UnmappedModel> _previousProviderItems = new List<UnmappedModel>();
+        private List<UnmappedModel> _mappingSetupProviderItems = new List<UnmappedModel>();
+
         private Dictionary<int, List<UnmappedModel>> _groupProviderItems { get; set; } = new Dictionary<int, List<UnmappedModel>>();
         private Dictionary<int, string> providerIdToName = new Dictionary<int, string>
         {
@@ -22,8 +25,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 1, "Bet Genius"
             },
         };
-
-        private UnmappedModel _currentHoveredItem;
 
         private string _searchQuery { get; set; } = string.Empty;
         private bool _shouldRender;
@@ -36,6 +37,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
             if (_shouldRender)
             {
+                _mappingSetupProviderItems = MappingSetupProviderItems;
                 _filteredProviderItems = ProviderItems;
                 _groupProviderItems = GetGroupedProviderItems();
                 _previousProviderItems = new List<UnmappedModel>(ProviderItems);
@@ -54,30 +56,20 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _groupProviderItems = GetGroupedProviderItems();
         }
 
-        private void HandleDragStart(UnmappedModel item)
+        public void HandleItemClick(UnmappedModel item)
         {
-            var linkedItems = GetLinkedItems(item);
-
-            OnDragItemCallback.InvokeAsync(linkedItems);
-        }
-
-        private void HandleMouseOver(UnmappedModel item)
-        {
-            _currentHoveredItem = item;
-        }
-
-        private void HandleMouseOut()
-        {
-            _currentHoveredItem = new UnmappedModel();
+            OnClickItemCallback.InvokeAsync(item);
         }
 
         private string GetLinkedItemCss(UnmappedModel item)
         {
-            var linkedItems = GetLinkedItems(item);
+            //var linkedItems = GetLinkedItems(item);
 
-            _shouldRender = true;
+            //_shouldRender = true;
 
-            return _currentHoveredItem?.Na == item.Na ? "highlight" : "";
+            //return _currentHoveredItem?.Na == item.Na ? "highlight" : "";
+
+            return "";
         }
 
         private List<UnmappedModel> GetLinkedItems(UnmappedModel item)
@@ -87,7 +79,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private bool ValidateParameterRender()
         {
-            return !ProviderItems.SequenceEqual(_previousProviderItems);
+            return !ProviderItems.SequenceEqual(_previousProviderItems) || !MappingSetupProviderItems.SequenceEqual(_mappingSetupProviderItems);
         }
     }
 }     

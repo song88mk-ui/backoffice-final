@@ -9,7 +9,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class Unmapped
     {
-        private List<UnmappedModel> _draggedProviderItems;
         private List<UnmappedModel> _unmappedSports;
         private List<UnmappedModel> _tempFilteredUnmappedSports;
         private List<UnmappedModel> _currentMappingSetupProviderItems = new List<UnmappedModel>();
@@ -38,9 +37,23 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
-        private void HandleDragProviderItem(List<UnmappedModel> providerItems)
+        private void HandleProviderItemClick(UnmappedModel providerItem)
         {
-            _draggedProviderItems = providerItems;
+            if (providerItem == null) return;
+
+            int sameProviderIndex = _currentMappingSetupProviderItems.FindIndex(x => x.ChTyId == providerItem.ChTyId);
+            bool hasItemOfSameProvider = sameProviderIndex != -1;
+
+            if (hasItemOfSameProvider)
+            {
+                _currentMappingSetupProviderItems[sameProviderIndex] = providerItem;
+            }
+            else
+            {
+                _currentMappingSetupProviderItems.Add(providerItem);
+            }
+
+            FilterProviderItems();
 
             _shouldRender = true;
         }
@@ -124,6 +137,17 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
+        private void HandleRemoveMappingSetupProviderItem(UnmappedModel providerItem)
+        {
+            if (providerItem == null) return;
+
+            _currentMappingSetupProviderItems = _currentMappingSetupProviderItems.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
+
+            FilterProviderItems();
+
+            _shouldRender = true;
+        }
+
         private void HandleRemoveMappedItem(MappingSetupItemModel singleItem = null)
         {
             if (singleItem == null)
@@ -134,17 +158,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             {
                 _currentMappedItems = _currentMappedItems.Where(x => x.Id != singleItem.Id && x.Name != singleItem.Name).ToList();
             }
-
-            FilterProviderItems();
-
-            _shouldRender = true;
-        }
-
-        private void OnItemDropCallback(List<UnmappedModel> itemsToFilter)
-        {
-            if (itemsToFilter == null) return;
-
-            _currentMappingSetupProviderItems = itemsToFilter;
 
             FilterProviderItems();
 
