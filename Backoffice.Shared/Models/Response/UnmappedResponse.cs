@@ -16,6 +16,8 @@ namespace Backoffice.Shared.Models.Response
         public UnmappedModel()
         {
             OtPrLi = new ProviderModel<List<int>>();
+            OtPrLi.SrId = new List<int>();
+            OtPrLi.BgId = new List<int>();
         }
         public string Id { get; set; }
         public string Na { get; set; }
