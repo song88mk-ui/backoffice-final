@@ -19,6 +19,6 @@ namespace Backoffice.Web.Models.OddsEngine.Mapping
         public string Name { get; set; }
 
         [MustHaveOneElement(ErrorMessage = "At least one provider is required.")]
-        public List<UnmappedModel> Providers { get; set; }
+        public List<MappingProviderItemModel> Providers { get; set; }
     }
 }
