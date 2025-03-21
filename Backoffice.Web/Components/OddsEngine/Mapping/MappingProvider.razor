@@ -8,7 +8,7 @@
         {
             <div class="provider">
                 <span class="provider-label header-label">@providerIdToName[group.Key]</span>
-                <div class="provider-items-container">
+                <div class="provider-items-container provider-@(group.Key)-items-container">
                     @foreach (var item in group.Value)
                     {
                         <div class="provider-item @GetLinkedItemCss(item)" @onclick="_ => HandleItemClick(item)">

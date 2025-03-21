@@ -3,12 +3,16 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models.OddsEngine.Mapping;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class Unmapped
     {
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+
         private List<MappingProviderItemModel> _unmappedSports;
         private List<MappingProviderItemModel> _tempFilteredUnmappedSports;
         private List<MappingProviderItemModel> _currentMappingSetupProviderItems = new List<MappingProviderItemModel>();
@@ -37,7 +41,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
-        private void HandleProviderItemClick(MappingProviderItemModel providerItem)
+        private async Task HandleProviderItemClick(MappingProviderItemModel providerItem)
         {
             if (providerItem == null) return;
 
@@ -56,6 +60,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             FilterProviderItems();
 
             SetLinkedItems();
+
+            await ScrollItemListsToTop();
 
             _shouldRender = true;
         }
@@ -224,6 +230,19 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             }
 
             _shouldRender = true;
+        }
+
+        private async Task ScrollItemListsToTop()
+        {
+            var _groupedItems = _tempFilteredUnmappedSports.GroupBy(m => m.ChTyId).ToDictionary(g => g.Key, g => g.OrderBy(x => x.IsCurrentLinkedItem ? 0 : 1).ToList());
+
+            foreach (var key in _groupedItems.Keys)
+            {
+                if (_groupedItems[key].First().IsCurrentLinkedItem == true)
+                {
+                    await JSRuntime.InvokeVoidAsync("scrollToTopOfElement", $".provider-{key}-items-container", "fast");
+                }
+            }
         }
     }
 }
