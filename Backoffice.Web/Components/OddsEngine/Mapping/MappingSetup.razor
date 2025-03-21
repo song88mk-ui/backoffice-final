@@ -17,13 +17,13 @@
                 <ValidationMessage For="() => _mappingSetupItem.Name" />
             </div>
             <div>
-                <div class="item-list-container" dropzone="move" @ondrop="HandleDropProviderItem" ondragover="event.preventDefault();">
+                <div class="item-list-container">
                     @if (_mappingSetupItem.Providers.Any())
                     {
                         <ul class="item-list">
                             @foreach (var item in _mappingSetupItem.Providers)
                             {
-                                <li class="item" @onclick="() => HandleRemoveProviderItem(item)">
+                                <li class="item" @onclick="() => HandleRemoveProviderItemClick(item)">
                                     <div>@item.Na</div>
                                     <ProviderIcon ChannelTypeId="item.ChTyId" />
                                 </li>

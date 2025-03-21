@@ -3,16 +3,19 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models.OddsEngine.Mapping;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class Unmapped
     {
-        private List<UnmappedModel> _draggedProviderItems;
-        private List<UnmappedModel> _unmappedSports;
-        private List<UnmappedModel> _tempFilteredUnmappedSports;
-        private List<UnmappedModel> _currentMappingSetupProviderItems = new List<UnmappedModel>();
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+
+        private List<MappingProviderItemModel> _unmappedSports;
+        private List<MappingProviderItemModel> _tempFilteredUnmappedSports;
+        private List<MappingProviderItemModel> _currentMappingSetupProviderItems = new List<MappingProviderItemModel>();
         private List<MappingSetupItemModel> _currentMappedItems = new List<MappingSetupItemModel>();
 
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
@@ -32,15 +35,33 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         protected override async Task OnInitializedAsync()
         {
             var response = await _providerMappingService.GetUnmappedSports();
-            _unmappedSports = response.Result.Unmapped;
+            _unmappedSports = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
             _tempFilteredUnmappedSports = _unmappedSports;
 
             _shouldRender = true;
         }
 
-        private void HandleDragProviderItem(List<UnmappedModel> providerItems)
+        private async Task HandleProviderItemClick(MappingProviderItemModel providerItem)
         {
-            _draggedProviderItems = providerItems;
+            if (providerItem == null) return;
+
+            int sameProviderIndex = _currentMappingSetupProviderItems.FindIndex(x => x.ChTyId == providerItem.ChTyId);
+            bool hasItemOfSameProvider = sameProviderIndex != -1;
+
+            if (hasItemOfSameProvider)
+            {
+                _currentMappingSetupProviderItems[sameProviderIndex] = providerItem;
+            }
+            else
+            {
+                _currentMappingSetupProviderItems.Add(providerItem);
+            }
+
+            FilterProviderItems();
+
+            SetLinkedItems();
+
+            await ScrollItemListsToTop();
 
             _shouldRender = true;
         }
@@ -49,7 +70,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             if (resetMappingSetupProviderItems)
             {
-                _currentMappingSetupProviderItems = new List<UnmappedModel>();
+                _currentMappingSetupProviderItems = new List<MappingProviderItemModel>();
+
+                SetLinkedItems();
             }
 
             if (resetMappedItems)
@@ -124,6 +147,19 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
+        private void HandleRemoveMappingSetupProviderItem(MappingProviderItemModel providerItem)
+        {
+            if (providerItem == null) return;
+
+            _currentMappingSetupProviderItems = _currentMappingSetupProviderItems.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
+
+            FilterProviderItems();
+
+            SetLinkedItems();
+
+            _shouldRender = true;
+        }
+
         private void HandleRemoveMappedItem(MappingSetupItemModel singleItem = null)
         {
             if (singleItem == null)
@@ -140,20 +176,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
-        private void OnItemDropCallback(List<UnmappedModel> itemsToFilter)
+        private List<MappingProviderItemModel> GetAllItemsToBeFiltered()
         {
-            if (itemsToFilter == null) return;
-
-            _currentMappingSetupProviderItems = itemsToFilter;
-
-            FilterProviderItems();
-
-            _shouldRender = true;
-        }
-
-        private List<UnmappedModel> GetAllItemsToBeFiltered()
-        {
-            List<UnmappedModel> allItemsToBeFiltered = new List<UnmappedModel>();
+            List<MappingProviderItemModel> allItemsToBeFiltered = new List<MappingProviderItemModel>();
 
             allItemsToBeFiltered.AddRange(_currentMappingSetupProviderItems);
 
@@ -177,6 +202,47 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             }
 
             _shouldRender = true;
+        }
+
+        private void SetLinkedItems()
+        {
+            int itemIndex = -1;
+
+            List<string> srIds = new List<string>();
+            List<string> bgIds = new List<string>();
+
+            foreach (var currentMappingItem in _currentMappingSetupProviderItems)
+            {
+                srIds.AddRange(currentMappingItem.OtPrLi.SrId.Select(s => s.ToString()));
+                bgIds.AddRange(currentMappingItem.OtPrLi.BgId.Select(s => s.ToString()));
+            }
+
+            foreach (var item in _tempFilteredUnmappedSports)
+            {
+                if ((srIds.Contains(item.Id) && item.ChTyId == (int)ChannelType.SR) || 
+                    (bgIds.Contains(item.Id) && item.ChTyId == (int)ChannelType.BG))
+                {
+                    item.IsCurrentLinkedItem = true;
+                    continue;
+                }
+
+                item.IsCurrentLinkedItem = false;
+            }
+
+            _shouldRender = true;
+        }
+
+        private async Task ScrollItemListsToTop()
+        {
+            var _groupedItems = _tempFilteredUnmappedSports.GroupBy(m => m.ChTyId).ToDictionary(g => g.Key, g => g.OrderBy(x => x.IsCurrentLinkedItem ? 0 : 1).ToList());
+
+            foreach (var key in _groupedItems.Keys)
+            {
+                if (_groupedItems[key].First().IsCurrentLinkedItem == true)
+                {
+                    await JSRuntime.InvokeVoidAsync("scrollToTopOfElement", $".provider-{key}-items-container", "fast");
+                }
+            }
         }
     }
 }
