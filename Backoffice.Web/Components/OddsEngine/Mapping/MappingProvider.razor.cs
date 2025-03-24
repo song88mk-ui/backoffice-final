@@ -1,17 +1,19 @@
+using Backoffice.Web.Models.OddsEngine.Mapping;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Backoffice.Shared.Models.Response;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class MappingProvider
     {
-        [Parameter] public EventCallback<List<UnmappedModel>> OnDragItemCallback { get; set; }
-        [Parameter] public List<UnmappedModel> ProviderItems { get; set; } = new List<UnmappedModel>();
+        [Parameter] public EventCallback<MappingProviderItemModel> OnClickItemCallback { get; set; }
+        [Parameter] public List<MappingProviderItemModel> ProviderItems { get; set; }
+        [Parameter] public List<MappingProviderItemModel> MappingSetupProviderItems { get; set; }
 
-        private List<UnmappedModel> _filteredProviderItems { get; set; } = new List<UnmappedModel>();
-        private List<UnmappedModel> _previousProviderItems = new List<UnmappedModel>();
-        private Dictionary<int, List<UnmappedModel>> _groupProviderItems { get; set; } = new Dictionary<int, List<UnmappedModel>>();
+        private List<MappingProviderItemModel> _filteredProviderItems { get; set; } = new List<MappingProviderItemModel>();
+        private List<MappingProviderItemModel> _previousProviderItems = new List<MappingProviderItemModel>();
+        private List<MappingProviderItemModel> _mappingSetupProviderItems = new List<MappingProviderItemModel>();
+
+        private Dictionary<int, List<MappingProviderItemModel>> _groupProviderItems { get; set; } = new Dictionary<int, List<MappingProviderItemModel>>();
         private Dictionary<int, string> providerIdToName = new Dictionary<int, string>
         {
             {
@@ -22,8 +24,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             },
         };
 
-        private UnmappedModel _currentHoveredItem;
-
         private string _searchQuery { get; set; } = string.Empty;
         private bool _shouldRender;
 
@@ -31,55 +31,42 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         protected override void OnParametersSet()
         {
-            _shouldRender = ValidateRender();
+            _shouldRender = ValidateParameterRender();
 
             if (_shouldRender)
             {
+                _mappingSetupProviderItems = MappingSetupProviderItems;
                 _filteredProviderItems = ProviderItems;
                 _groupProviderItems = GetGroupedProviderItems();
-                _previousProviderItems = new List<UnmappedModel>(ProviderItems);
+                _previousProviderItems = new List<MappingProviderItemModel>(_filteredProviderItems);
             }
         }
 
-        private Dictionary<int, List<UnmappedModel>> GetGroupedProviderItems()
+        private Dictionary<int, List<MappingProviderItemModel>> GetGroupedProviderItems()
         {
-            return _filteredProviderItems.GroupBy(m => m.ChTyId).ToDictionary(g => g.Key, g => g.ToList());
+            return _filteredProviderItems.GroupBy(m => m.ChTyId).ToDictionary(g => g.Key, g => g.OrderBy(x => x.IsCurrentLinkedItem ? 0 : 1).ToList());
         }
 
         public void FilterProviderItems(ChangeEventArgs e)
         {
             _searchQuery = e.Value.ToString();
-            _filteredProviderItems = ProviderItems.Where(m => m.Na.ToLower().Contains(_searchQuery.ToLower())).ToList();
+            _filteredProviderItems = _filteredProviderItems.Where(m => m.Na.ToLower().Contains(_searchQuery.ToLower())).ToList();
             _groupProviderItems = GetGroupedProviderItems();
         }
 
-        private void HandleDragStart(UnmappedModel selectedItem)
+        public void HandleItemClick(MappingProviderItemModel item)
         {
-            var linkedItems = ProviderItems.Where(item => item.Na.ToLower() == selectedItem.Na.ToLower()).ToList();
-
-            OnDragItemCallback.InvokeAsync(linkedItems);
+            OnClickItemCallback.InvokeAsync(item);
         }
 
-        private void HandleMouseOver(UnmappedModel item)
+        private string GetLinkedItemCss(MappingProviderItemModel item)
         {
-            _currentHoveredItem = item;
+            return item.IsCurrentLinkedItem ? "highlight" : "";
         }
 
-        private void HandleMouseOut()
+        private bool ValidateParameterRender()
         {
-            _currentHoveredItem = new UnmappedModel();
-        }
-
-        private string GetLinkedItemCss(UnmappedModel item)
-        {
-            var linkedItems = ProviderItems.Where(x => x.Na.ToLower() == item.Na.ToLower()).ToList();
-
-            return _currentHoveredItem?.Na == item.Na && linkedItems.Count() > 1 ? "highlight" : "";
-        }
-
-        private bool ValidateRender()
-        {
-            return !ProviderItems.SequenceEqual(_previousProviderItems);
+            return !ProviderItems.SequenceEqual(_previousProviderItems) || !MappingSetupProviderItems.SequenceEqual(_mappingSetupProviderItems);
         }
     }
 }     

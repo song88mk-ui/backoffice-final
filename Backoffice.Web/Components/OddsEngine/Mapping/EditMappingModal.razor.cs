@@ -17,7 +17,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter] private CustomModal Modal { get; set; }
         private List<UnmappedModel> _draggedProviderItems;
-        private List<UnmappedModel> _unmappedSports;
+        private List<MappingProviderItemModel> _unmappedSports;
         private string _formId = "editMappingFormId";
         private bool _isPreLoader = true;
         private MappingSetupItemModel _mappingSetupItem = new MappingSetupItemModel();
@@ -34,7 +34,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         protected override async Task OnInitializedAsync()
         {
             var response = await _providerMappingService.GetUnmappedSports();
-            _unmappedSports = response.Result.Unmapped;
+            _unmappedSports = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
 
             var mappedResponse = await _providerMappingService.GetSportMappingBySpId(ModalParameters.TryGet<int>("SpId"));
             var sportMapping = mappedResponse.Result;
@@ -49,9 +49,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _isPreLoader = false;
         }
 
-        private List<UnmappedModel> GetUnmappedProviderByInfo(ProviderModel<int> info)
+        private List<MappingProviderItemModel> GetUnmappedProviderByInfo(ProviderModel<int> info)
         {
-            var providers = new List<UnmappedModel>();
+            var providers = new List<MappingProviderItemModel>();
 
             foreach (var provider in _unmappedSports)
             {
@@ -64,8 +64,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             return providers;
         }
 
-        private async Task HandleUpdateMappingClick(MappingSetupItemModel item)
+        public void OnCloseClickEvent()
         {
+            ModalService.Cancel();
         }
 
         public void OnSaveClickEvent()

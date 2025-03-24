@@ -38,17 +38,19 @@
 }
 
 .provider-items-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    max-height: 60svh;
 }
 
 .provider-item {
   background-color: #FFF;
   border: 1px solid #DCDCDC;
   width: 100%;
-  height: 50px;
+  min-height: 50px;
   padding-right: 16px;
   display: flex;
   justify-content: space-between;

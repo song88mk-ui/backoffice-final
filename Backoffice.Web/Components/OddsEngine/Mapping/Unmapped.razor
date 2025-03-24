@@ -20,19 +20,13 @@
 
 <div class="main-content-grid">
     <div class="left">
-        <div class="mapping-setup-container">
-            <div class="mapping-setup-header">
-                <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
-                <img class="download-icon" src="icons/svg/download.svg" />
-            </div>
-            <MappingSetup DraggedProviderItems="_draggedProviderItems" OnSubmitCallback="HandleCreateMappingClick" />
-        </div>
+        <MappingSetup MappingSetupProviderItems="_currentMappingSetupProviderItems" OnSubmitCallback="HandleCreateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
         <MappedItems CurrentMappedItems="_currentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" OnRemoveCallback="HandleRemoveMappedItem" />
     </div>
     <div class="right">
-        @if (_unmappedSports != null && _unmappedSports.Count() > 0)
+        @if (_tempFilteredUnmappedSports != null && _tempFilteredUnmappedSports.Count() > 0)
         {
-            <MappingProvider ProviderItems="_unmappedSports" OnDragItemCallback="HandleDragProviderItem" />
+            <MappingProvider MappingSetupProviderItems="_currentMappingSetupProviderItems" ProviderItems="_tempFilteredUnmappedSports" OnClickItemCallback="HandleProviderItemClick" />
         }
     </div>
 </div>
