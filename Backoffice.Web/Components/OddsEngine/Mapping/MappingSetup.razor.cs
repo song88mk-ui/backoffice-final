@@ -10,6 +10,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         [Parameter] public List<MappingProviderItemModel> MappingSetupProviderItems { get; set; }
         [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
         [Parameter] public EventCallback<MappingProviderItemModel> OnRemoveProviderItemCallback { get; set; }
+        [Parameter] public MappingSetupItemModel MappingSetupItem { get; set; } = new MappingSetupItemModel();
 
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
@@ -28,6 +29,10 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = ValidateParameterRender();
 
             if (_shouldRender) {
+                _mappingSetupItem = MappingSetupItem;
+                
+                _editContext = new EditContext(_mappingSetupItem);
+                
                 _mappingSetupItem.Providers = new List<MappingProviderItemModel>(MappingSetupProviderItems);
 
                 _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
@@ -63,7 +68,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private bool ValidateParameterRender()
         {
-            return !MappingSetupProviderItems.SequenceEqual(_mappingSetupItem.Providers);
+            return !MappingSetupProviderItems.SequenceEqual(_mappingSetupItem.Providers) || !string.IsNullOrEmpty(MappingSetupItem?.Id);
         }
     }
 }
