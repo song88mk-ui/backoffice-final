@@ -34,8 +34,11 @@
                 <th>Source</th>
                 <th>ID</th>
                 <th>Date Mapped</th>
-                <th>Action</th>
-
+                <AuthorizeView Policy="sbc-mapping-canedit">
+                    <Authorized>
+                        <th>Action</th>
+                    </Authorized>
+                </AuthorizeView>
             </tr>
         </thead>
         <tbody>
@@ -52,12 +55,16 @@
                 </td>
                 <td>@mappingItem.SpId</td>
                 <td>@mappingItem.Ti</td>
-                <td class="action-row">
-                    <button class="btn-icon" @onclick="() => HandleEditMappingClickEvent(mappingItem)">
-                        <img src="icons/svg/icon-update.svg" />
-                    </button>
-                    <img src="icons/svg/icon-trash.svg" />
-                </td>
+                <AuthorizeView Policy="sbc-mapping-canedit">
+                    <Authorized>
+                        <td class="action-row">
+                            <button class="btn-icon" @onclick="() => HandleEditMappingClickEvent(mappingItem)">
+                                <img src="icons/svg/icon-update.svg" />
+                            </button>
+                            <img src="icons/svg/icon-trash.svg" />
+                        </td>
+                    </Authorized>
+                </AuthorizeView>
             </tr>
             }
         </tbody>
