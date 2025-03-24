@@ -51,7 +51,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             _mappingSetupItem = new MappingSetupItemModel
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = "0",
                 Name = string.Empty,
                 Providers = new List<MappingProviderItemModel>()
             };

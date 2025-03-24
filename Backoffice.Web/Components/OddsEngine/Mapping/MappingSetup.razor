@@ -8,7 +8,7 @@
         <div class="mapping-setup-content-container">
             <div class="text-input">
                 <span>@_translationState.GetValue("ID")</span>
-                <InputText class="form-control" type="text" placeholder="Enter Id" @bind-Value="_mappingSetupItem.Id" />
+                <InputText class="form-control" type="number" placeholder="Enter Id" @bind-Value="_mappingSetupItem.Id" />
                 <ValidationMessage For="() => _mappingSetupItem.Id" />
             </div>
             <div class="text-input">

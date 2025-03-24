@@ -118,7 +118,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                         //SpId = item.SpId,
                         //SegId = item.SegId,
                         //LeId = item.LeId,
-                        ChTyId = 0
+                        //ChTyId = 0
                     }
                 );
             }

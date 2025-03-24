@@ -9,7 +9,7 @@ namespace Backoffice.Web.Models.OddsEngine.Mapping
     {
         public MappingSetupItemModel()
         {
-            Id = Guid.NewGuid().ToString();
+            Id = "0";
         }
 
         [MinLength(1, ErrorMessage = "ID is required.")]
