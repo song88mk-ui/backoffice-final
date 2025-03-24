@@ -16,36 +16,27 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private List<SportMappingModel> _sportMapping = new();
         protected override async Task OnInitializedAsync()
         {
-            await FetchSportMapping();
-        }
-        
-        private async Task FetchSportMapping()
-        {
             var request = new MappingRequest
             {
                 Page = 1,
-                PageSize = 1000
+                PageSize = 200
             };
 
             var response = await _providerMappingService.GetSportMapping(request);
-            _sportMapping = response.Result.SportMapping.OrderBy(sm => sm.SpNa).ToList();
+            _sportMapping = response.Result.SportMapping;
         }
         public async Task HandleEditMappingClickEvent(SportMappingModel mappingItem)
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("SpId", mappingItem.SpId);
-            var options = new ModalOptions
-            {
-                HideHeader = true
-            };
+            
+            var options = new ModalOptions();
 
-            ModalService.Open<EditMappingModal>("Edit Mapping", parameters, options);
+            ModalService.Open<EditMappingModal>("Edit Mapping Modal", parameters, options);
         }
 
         public async Task OnSaveClickEvent()
         {
-            await FetchSportMapping();
         }
     }
 }

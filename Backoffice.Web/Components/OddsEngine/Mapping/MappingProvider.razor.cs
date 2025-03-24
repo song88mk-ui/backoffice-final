@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.Enums;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {

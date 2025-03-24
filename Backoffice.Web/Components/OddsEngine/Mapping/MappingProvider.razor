@@ -3,27 +3,27 @@
     <i class="fa fa-search" />
 </div>
 <div class="providers-container">
-    @foreach (var group in _groupProviderItems)
-    {
-        <div class="provider">
-            <span class="provider-label header-label">@providerIdToName[group.Key]</span>
-            <div class="provider-items-container">
-                @foreach (var item in group.Value)
-                {
-                    <div class="provider-item @GetLinkedItemCss(item)" 
-                        draggable="true" 
-                        @ondragstart="_ => HandleDragStart(item)" 
-                        @onmouseover="_ => HandleMouseOver(item)" 
-                        @onmouseout="HandleMouseOut"
-                    >
-                        <div class="provider-item-name-container">
-                            <img class="drag-icon" src="icons/svg/draggable.svg" />
-                            <span class="provider-item-name">@item.Na</span>
+    <div class="providers-container">
+        @foreach (var group in _groupProviderItems)
+        {
+            <div class="provider">
+                <span class="provider-label header-label">@providerIdToName[group.Key]</span>
+                <div class="provider-items-container provider-@(group.Key)-items-container">
+                    @foreach (var item in group.Value)
+                    {
+                        <div class="provider-item @GetLinkedItemCss(item)" @onclick="_ => HandleItemClick(item)">
+                            <div class="provider-item-name-container">
+                                <img class="drag-icon" src="icons/svg/draggable.svg" />
+                                <span class="provider-item-name">@item.Na</span>
+                            </div>
+                            @if (item.HasLinkedItem)
+                            {
+                                <img class="linked-icon" src="icons/svg/linked.svg" />
+                            }
                         </div>
-                        <img class="linked-icon" src="icons/svg/linked.svg" />
-                    </div>
-                }
+                    }
+                </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 </div>

@@ -64,16 +64,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             return providers;
         }
 
-        private void HandleDragProviderItem(List<UnmappedModel> providerItems)
-        {
-            _draggedProviderItems = providerItems;
-        }
-
         private async Task HandleUpdateMappingClick(MappingSetupItemModel item)
         {
         }
 
-        public void OnCloseClickEvent()
+        public void OnSaveClickEvent()
         {
             ModalService.Cancel();
         }

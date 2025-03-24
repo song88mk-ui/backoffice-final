@@ -7,28 +7,30 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
     public partial class MappingSetup
     {
-        [Parameter] public List<UnmappedModel> DraggedProviderItems { get; set; } = new List<UnmappedModel>();
+        [Parameter] public List<MappingProviderItemModel> MappingSetupProviderItems { get; set; }
         [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
-        [Parameter] public string FormId { get; set; } = "mappingSetupFormId";
-        [Parameter] public bool HasSubmitButton { get; set; } = true;
-        [Parameter] public MappingSetupItemModel MappingSetupItem { get; set; } = new MappingSetupItemModel();
+        [Parameter] public EventCallback<MappingProviderItemModel> OnRemoveProviderItemCallback { get; set; }
+
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
-        private Dictionary<int, UnmappedModel> _droppedProviderItems = new Dictionary<int, UnmappedModel>();
+
+        private bool _shouldRender;
+
+        protected override bool ShouldRender() => _shouldRender;
 
         protected override async Task OnInitializedAsync()
         {
             ResetValues();
-            _editContext = new EditContext(_mappingSetupItem);
         }
 
-        protected override void OnParametersSet()
+        protected override async Task OnParametersSetAsync()
         {
-            if (!string.IsNullOrEmpty(MappingSetupItem?.Id))
-            {
-                _mappingSetupItem = MappingSetupItem;
-                _droppedProviderItems = _mappingSetupItem.Providers.ToDictionary(p => p.ChTyId);
-                _editContext = new EditContext(_mappingSetupItem);
+            _shouldRender = ValidateParameterRender();
+
+            if (_shouldRender) {
+                _mappingSetupItem.Providers = new List<MappingProviderItemModel>(MappingSetupProviderItems);
+
+                _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
             }
         }
     
@@ -38,27 +40,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             ResetValues();
         }
 
-        private void HandleDropProviderItem()
+        private void HandleRemoveProviderItemClick(MappingProviderItemModel providerItem)
         {
-            if (DraggedProviderItems.Any())
-            {
-                //if (_droppedProviderItems.ContainsKey(DraggedProviderItem.ChTyId)) {
-                //    HandleRemoveProviderItem(_droppedProviderItems[DraggedProviderItem.ChTyId]);
-                //}
-                //_droppedProviderItems[DraggedProviderItem.ChTyId] = DraggedProviderItem;
+            OnRemoveProviderItemCallback.InvokeAsync(providerItem);
 
-                _mappingSetupItem.Providers = new List<UnmappedModel>(DraggedProviderItems);
-                _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
-            }
-        }
-
-        private void HandleRemoveProviderItem(UnmappedModel providerItem)
-        {
-            //_droppedProviderItems.Remove(providerItem.ChTyId);
-            //_mappingSetupItem.Providers = _droppedProviderItems.Values.ToList();
-
-            _mappingSetupItem.Providers = _mappingSetupItem.Providers.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
-            _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
+            _shouldRender = true;
         }
 
         private void ResetValues()
@@ -67,8 +53,17 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = string.Empty,
-                Providers = new List<UnmappedModel>()
+                Providers = new List<MappingProviderItemModel>()
             };
+
+            _editContext = new EditContext(_mappingSetupItem);
+
+            _shouldRender = true;
+        }
+
+        private bool ValidateParameterRender()
+        {
+            return !MappingSetupProviderItems.SequenceEqual(_mappingSetupItem.Providers);
         }
     }
 }
