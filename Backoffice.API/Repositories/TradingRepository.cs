@@ -2479,6 +2479,14 @@ namespace Backoffice.API.Repositories
                     _ => "default"
                 };
 
+                var validate = ValidateMappingRequest(category, request);
+                if (!string.IsNullOrEmpty(validate))
+                    return new BaseResponse<bool>()
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({validate})"
+                    };
+
                 await Publish(new MessageRequest
                 {
                     Payload = JsonSerializer.Serialize(request),
@@ -2555,6 +2563,60 @@ namespace Backoffice.API.Repositories
                 return _configuration[$"API:TradingAPI:SA:APIKey"];
             else
                 return _configuration[$"API:TradingAPI:HK:APIKey"];
+        }
+
+        private string ValidateMappingRequest(string category, ProviderMappingBulkRequest request)
+        {
+            var result = string.Empty;
+
+            switch(category)
+            {
+                case "sport":
+                    foreach(var mapping in request.Mapping)
+                    {
+                        if (!int.TryParse(mapping.Id, out int id))
+                        {
+                            result = "Invalid Sport ID";
+                            break;
+                        }
+                    }
+                    break;
+                case "segment":
+                    foreach (var mapping in request.Mapping)
+                    {
+                        if (!int.TryParse(mapping.Id, out int id))
+                        {
+                            result = "Invalid Segment ID";
+                            break;
+                        }
+                    }
+                    break;
+                case "league":
+                    foreach (var mapping in request.Mapping)
+                    {
+                        if (!int.TryParse(mapping.Id, out int id))
+                        {
+                            result = "Invalid League ID";
+                            break;
+                        }
+                    }
+                    break;
+                case "fixture":
+                    foreach (var mapping in request.Mapping)
+                    {
+                        if (!int.TryParse(mapping.Id, out int id))
+                        {
+                            result = "Invalid Fixture ID";
+                            break;
+                        }
+                    }
+                    break;
+                default:
+                    result = "Invalid category";
+                    break;
+            }
+
+            return result;
         }
         #endregion
     }
