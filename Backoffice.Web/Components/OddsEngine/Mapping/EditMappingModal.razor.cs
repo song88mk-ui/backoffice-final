@@ -23,6 +23,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         private List<MappingProviderItemModel> _currentMappingSetupProviderItems = new List<MappingProviderItemModel>();
         private List<MappingSetupItemModel> _currentMappedItems = new List<MappingSetupItemModel>();
         private MappingSetupItemModel _mappingSetupItem = new MappingSetupItemModel();
+        private string _formId = "editMappingFormId";
         private bool _isPreLoader = true;
         private bool _shouldRender;
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
@@ -51,9 +52,12 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 Name = sportMapping.SpNa,
                 Providers = GetUnmappedProviderByInfo(sportMapping.Info)
             };
-
             _currentMappingSetupProviderItems = _mappingSetupItem.Providers;
-            
+
+            FilterProviderItems();
+
+            SetLinkedItems();
+
             _isPreLoader = false;
 
             _shouldRender = true;
@@ -214,11 +218,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         }
 
         public void OnCloseClickEvent()
-        {
-            ModalService.Cancel();
-        }
-
-        public void OnSaveClickEvent()
         {
             ModalService.Cancel();
         }

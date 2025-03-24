@@ -11,6 +11,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
         [Parameter] public EventCallback<MappingProviderItemModel> OnRemoveProviderItemCallback { get; set; }
         [Parameter] public MappingSetupItemModel MappingSetupItem { get; set; } = new MappingSetupItemModel();
+        [Parameter] public string FormId { get; set; } = "mappingSetupFormId";
+        [Parameter] public bool HasSubmitButton { get; set; } = true;
 
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
