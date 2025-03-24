@@ -1,53 +1,51 @@
 ﻿<div class="modal @_modalClass modal-z-index" tabindex="-1" role="dialog" style="display:@_modalDisplay;">
     <div class="modal-dialog @_modalDialogClass" role="document" style="@_modalDialogStyle">
         <div class="modal-content">
-            @if (!HideHeader)
-            {
-                <div class="modal-header py-4 mx-4 @_modalHeaderClass">
-                    @if (string.IsNullOrEmpty(ToolTip))
+            <div class="modal-header py-4 mx-4 @_modalHeaderClass">
+                @if (string.IsNullOrEmpty(ToolTip))
+                {
+                    @if (!string.IsNullOrEmpty(_modalIcon))
                     {
+                        @((MarkupString)_modalIcon)
+                    }
+                    <h5 class="modal-title fw-bold @_titleClass">
+                        @if (HasHeaderBackButton)
+                        {
+                            <button type="button" class="back-button" @onclick="_ => OnBack()"><i class="fa fa-2x fa-angle-left p-r-10"></i></button> <span style="top: -5px; position: relative">@_translationState.GetValue(_modalTitle)</span>
+                        }
+                        else
+                        {
+                            @_translationState.GetValue(_modalTitle)
+                        }
+                    </h5>
+                }
+                else
+                {
+                    <Tooltip Text="@ToolTip">
                         @if (!string.IsNullOrEmpty(_modalIcon))
                         {
                             @((MarkupString)_modalIcon)
                         }
-                        <h5 class="modal-title fw-bold @_titleClass">
+                        <h5 class="modal-title">
                             @if (HasHeaderBackButton)
                             {
-                                <button type="button" class="back-button" @onclick="_ => OnBack()"><i class="fa fa-2x fa-angle-left p-r-10"></i></button> <span style="top: -5px; position: relative">@_translationState.GetValue(_modalTitle)</span>
+                                <button type="button" class="btn-close" @onclick="_ => Close()"></button> <span style="top: -5px; position: relative">@_translationState.GetValue(_modalTitle)</span>
                             }
                             else
                             {
                                 @_translationState.GetValue(_modalTitle)
                             }
                         </h5>
-                    }
-                    else
-                    {
-                        <Tooltip Text="@ToolTip">
-                            @if (!string.IsNullOrEmpty(_modalIcon))
-                            {
-                                @((MarkupString)_modalIcon)
-                            }
-                            <h5 class="modal-title">
-                                @if (HasHeaderBackButton)
-                                {
-                                    <button type="button" class="btn-close" @onclick="_ => Close()"></button> <span style="top: -5px; position: relative">@_translationState.GetValue(_modalTitle)</span>
-                                }
-                                else
-                                {
-                                    @_translationState.GetValue(_modalTitle)
-                                }
-                            </h5>
-                        </Tooltip>
-                    }
+                    </Tooltip>
+                }
 
-                    @if (!HideCloseButton)
-                    {
-                        <button type="button" class="btn-close" @onclick="_ => Close()">
-                        </button>
-                    }
-                </div>
-            }
+                @if (!HideCloseButton)
+                {
+                    <button type="button" class="btn-close" @onclick="_ => Close()">
+                    </button>
+                }
+
+            </div>
             <CascadingValue Value="this">
                 <CascadingValue Value="@ModalParameters">
                     @ModalContent
