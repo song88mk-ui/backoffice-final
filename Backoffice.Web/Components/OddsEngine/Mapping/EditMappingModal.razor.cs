@@ -16,20 +16,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter] private CustomModal Modal { get; set; }
-        private List<UnmappedModel> _draggedProviderItems;
         private List<MappingProviderItemModel> _unmappedSports;
-        private string _formId = "editMappingFormId";
-        private bool _isPreLoader = true;
         private MappingSetupItemModel _mappingSetupItem = new MappingSetupItemModel();
-        private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
-        {
-            { MappingCategory.Sport, "sport" },
-            { MappingCategory.Segment, "segment" },
-            { MappingCategory.League, "league" },
-            { MappingCategory.Fixture, "fixture" },
-            { MappingCategory.Market, "market" },
-            { MappingCategory.Selection, "selection" }
-        };
 
         protected override async Task OnInitializedAsync()
         {
@@ -45,8 +33,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 Name = sportMapping.SpNa,
                 Providers = GetUnmappedProviderByInfo(sportMapping.Info)
             };
-
-            _isPreLoader = false;
         }
 
         private List<MappingProviderItemModel> GetUnmappedProviderByInfo(ProviderModel<int> info)
