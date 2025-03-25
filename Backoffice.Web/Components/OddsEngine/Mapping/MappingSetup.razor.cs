@@ -2,6 +2,7 @@ using Backoffice.Web.Models.OddsEngine.Mapping;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Models;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping
 {
@@ -31,11 +32,31 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = ValidateParameterRender();
 
             if (_shouldRender) {
-                _mappingSetupItem = MappingSetupItem;
-                
-                _editContext = new EditContext(_mappingSetupItem);
+                if (MappingSetupItem?.Id != null && MappingSetupItem?.Name != null && MappingSetupItem?.Providers != null) {
+                    _mappingSetupItem = new MappingSetupItemModel
+                    {
+                        Id = MappingSetupItem.Id,
+                        Name = MappingSetupItem.Name,
+                        Providers = MappingSetupItem.Providers.Select(s =>
+                            new MappingProviderItemModel
+                            {
+                                Id = s.Id,
+                                Na = s.Na,
+                                ChTyId = s.ChTyId,
+                                OtPrLi = new ProviderModel<List<int>>
+                                {
+                                    SrId = s.OtPrLi.SrId,
+                                    BgId = s.OtPrLi.BgId
+                                },
+                                IsCurrentLinkedItem = s.IsCurrentLinkedItem,
+                                HasLinkedItem = s.HasLinkedItem,
+                            }).ToList()
+                    };
+                }
                 
                 _mappingSetupItem.Providers = new List<MappingProviderItemModel>(MappingSetupProviderItems);
+
+                _editContext = new EditContext(_mappingSetupItem);
 
                 _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
             }
@@ -58,7 +79,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             _mappingSetupItem = new MappingSetupItemModel
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = "0",
                 Name = string.Empty,
                 Providers = new List<MappingProviderItemModel>()
             };

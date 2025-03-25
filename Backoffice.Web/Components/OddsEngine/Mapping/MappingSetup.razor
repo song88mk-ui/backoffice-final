@@ -3,7 +3,7 @@
     <div class="mapping-setup-content-container">
         <div class="text-input">
             <span>@_translationState.GetValue("ID")</span>
-            <InputText class="form-control" type="text" placeholder="Enter Id" @bind-Value="_mappingSetupItem.Id" />
+            <InputText class="form-control" type="number" placeholder="Enter Id" @bind-Value="_mappingSetupItem.Id" />
             <ValidationMessage For="() => _mappingSetupItem.Id" />
         </div>
         <div class="text-input">
@@ -27,7 +27,7 @@
                 }
                 else
                 {
-                    <div class="empty-message italic">@_translationState.GetValue("Drag and drop the item you want to map.")</div>
+                    <div class="empty-message italic">@_translationState.GetValue("Click on the items you want to map.")</div>
                 }
             </div>
             <ValidationMessage For="() => _mappingSetupItem.Providers" />

@@ -7,11 +7,6 @@ namespace Backoffice.Web.Models.OddsEngine.Mapping
 {
     public class MappingSetupItemModel
     {
-        public MappingSetupItemModel()
-        {
-            Id = Guid.NewGuid().ToString();
-        }
-
         [MinLength(1, ErrorMessage = "ID is required.")]
         public string Id { get; set; }
 

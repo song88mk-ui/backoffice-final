@@ -5,6 +5,7 @@ namespace Backoffice.Web.Models.OddsEngine.Mapping
 {
     public class MappingProviderItemModel
     {
+        public MappingProviderItemModel() { }
         public MappingProviderItemModel(UnmappedModel model)
         {
             Id = model.Id;
