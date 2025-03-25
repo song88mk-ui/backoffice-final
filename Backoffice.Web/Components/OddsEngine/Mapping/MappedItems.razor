@@ -3,7 +3,10 @@
         <span class="header-label">@_translationState.GetValue("Mapped Items")</span>
         <div class="header-cluster">
             <span class="remove-all-label" @onclick="HandleRemoveAllClick">@_translationState.GetValue("Remove All")</span>
-            <button class="btn-save" @onclick="HandleSaveMappingClick">@_translationState.GetValue("Save")</button>
+            <button class="btn-save @(GetDisabledSaveButtonCss())"
+                @onclick="HandleSaveMappingClick" 
+                disabled="@(IsDisabledSaveBtn())"
+            >@_translationState.GetValue("Save")</button>
             <img class="download-icon" src="icons/svg/upload.svg" />
         </div>
     </div>

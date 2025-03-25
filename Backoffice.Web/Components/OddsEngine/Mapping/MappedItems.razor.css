@@ -37,6 +37,10 @@
     font-weight: 600;
 }
 
+    .btn-save.disabled {
+        background-color: #83A3F4;
+    }
+
 .header-label {
     color: #000;
     font-weight: 700;

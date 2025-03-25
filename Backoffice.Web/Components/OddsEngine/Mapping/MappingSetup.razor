@@ -34,7 +34,7 @@
         </div>
         @if(HasSubmitButton)
         {
-            <button type="submit" class="btn-create-mapping @(false ? "inactive" : "active")">@_translationState.GetValue("Create Mapping")</button>
+            <button type="submit" class="btn-create-mapping @(GetDisabledCreateBtnCss())" disabled="@(IsDisabledCreateBtn())">@_translationState.GetValue("Create Mapping")</button>
         }
     </div>
 </EditForm>

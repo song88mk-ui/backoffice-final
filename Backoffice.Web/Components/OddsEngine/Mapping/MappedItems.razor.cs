@@ -26,6 +26,16 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             OnRemoveCallback.InvokeAsync(item);
         }
+
+        private bool IsDisabledSaveBtn()
+        {
+            return !CurrentMappedItems.Any();
+        }
+
+        private string GetDisabledSaveButtonCss()
+        {
+            return IsDisabledSaveBtn() ? "disabled" : "";
+        }
     }
 }
     
