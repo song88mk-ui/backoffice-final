@@ -9,6 +9,7 @@ public interface IProviderMappingService
 {
     Task<BaseResponse<UnmappedResponse>> GetUnmappedSports();
     Task<BaseResponse<SportMappingResponse>> GetSportMapping(MappingRequest request);
+    Task<BaseResponse<SportMappingModel>> GetSportMappingBySpId(int spId);
     Task<BaseResponse<bool>> AddOrUpdateProviderMapping(string category, ProviderMappingRequest request);
     Task<BaseResponse<bool>> AddOrUpdateProviderMappingBulk(string category, ProviderMappingBulkRequest request);
 }
