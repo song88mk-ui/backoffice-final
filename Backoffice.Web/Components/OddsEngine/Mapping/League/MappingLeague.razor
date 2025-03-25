@@ -1,0 +1,47 @@
+@using Backoffice.Web.Components.OddsEngine.Mapping.League
+
+<div>
+    <span class="title">League Mapping</span>
+    <div class="d-flex flex-row justify-content-between">
+
+        <div class="dropdowns-container">
+            <select class="dropdown">
+                <option value="" disabled selected hidden>@_translationState.GetValue("Date Created")</option>
+                <option value="Sports 1">Sports 1</option>
+                <option value="Sports 2">Sports 2</option>
+            </select>
+            <select class="dropdown">
+                <option value="" disabled selected hidden>@_translationState.GetValue("Source")</option>
+                <option value="Segment 1">Segment 1</option>
+                <option value="Segment 2">Segment 2</option>
+            </select>
+        </div>
+
+        <div class="input-search input-group mb-3">
+            <input type="text"class="form-control no-left-border" placeholder="Search">
+            <span class="input-group-text">
+                <img src="icons/svg/icon-search.svg" alt="Search Icon">
+            </span>
+        </div>
+
+    </div>
+
+    <table class="table">
+        <thead class="table-head text-white">
+            <tr>
+                <th>Fixture Name</th>
+                <th>Fixture Data/Time-in-Play</th>
+                <th>Source</th>
+                <th>ID</th>
+                <th>Date Mapped</th>
+                <th>Action</th>
+
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div>
+        @* <CustomModal OnSaveClickCallback="OnSaveClickEvent" /> *@
+    </div>
+</div>
