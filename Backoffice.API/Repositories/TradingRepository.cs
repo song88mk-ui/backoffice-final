@@ -2569,7 +2569,10 @@ namespace Backoffice.API.Repositories
         {
             var result = string.Empty;
 
-            switch(category)
+            if (request.Mapping.Any())
+                return $"No {category} mapping to be updated";
+
+            switch (category)
             {
                 case "sport":
                     //validate if ID already mapped to another
