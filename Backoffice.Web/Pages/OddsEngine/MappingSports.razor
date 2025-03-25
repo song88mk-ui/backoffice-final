@@ -8,10 +8,7 @@
 
 <AuthorizeView Policy="sbc-mapping">
     <Authorized>
-        @if (_showSuccessAlert)
-        {
-            <AlertMessage AlertModel="_alertModel" />
-        }
+        <AlertMessage AlertModel="_alertModel" />
 
         <div class="col-md-12">
             <Breadcrumb Breadcrumbs="_breadcrumbs" />

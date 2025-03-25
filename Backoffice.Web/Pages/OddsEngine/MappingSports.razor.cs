@@ -10,14 +10,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         private List<BreadcrumbModel> _breadcrumbs;
         private PageHeaderModel _pageHeaderModel;
 
-        private AlertModel _alertModel = new AlertModel()
-        {
-            Status = AlertStatus.Success,
-            Message = "Mapping saved successfully!",
-            Opacity = 1.0m,
-        };
+        private AlertModel _alertModel;
 
-        private bool _showSuccessAlert;
         private bool _shouldRender;
 
         private MappingTab _activeTab;
@@ -71,11 +65,16 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             _shouldRender = true;
 
-            _showSuccessAlert = true;
+            _alertModel = new AlertModel()
+            {
+                Status = AlertStatus.Success,
+                Message = "Mapping saved successfully!",
+                Opacity = 1.0m,
+            };
 
             await Task.Delay(1500);
 
-            _showSuccessAlert = false;
+            _alertModel = null;
         }
     }
 }
