@@ -2,7 +2,13 @@
 
 <div class="main-content-grid">
     <div class="left">
-        <MappingSetup MappingSetupProviderItems="_currentMappingSetupProviderItems" OnSubmitCallback="HandleCreateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
+        <div class="mapping-setup-container">
+            <div class="mapping-setup-header">
+                <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
+                <img class="download-icon" src="icons/svg/download.svg" />
+            </div>
+            <MappingSetup MappingSetupProviderItems="_currentMappingSetupProviderItems" OnSubmitCallback="HandleCreateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
+        </div>
         <MappedItems CurrentMappedItems="_currentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" OnRemoveCallback="HandleRemoveMappedItem" />
     </div>
     <div class="right">
