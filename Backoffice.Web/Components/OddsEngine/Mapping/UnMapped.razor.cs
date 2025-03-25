@@ -2,6 +2,7 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Mapping;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -12,6 +13,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     public partial class Unmapped
     {
         [Inject] public IJSRuntime JSRuntime { get; set; }
+
+        [Parameter] public EventCallback OnSuccessSaveCallback { get; set; }
 
         private List<MappingProviderItemModel> _unmappedSports;
         private List<MappingProviderItemModel> _tempFilteredUnmappedSports;
@@ -140,9 +143,14 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             // todo: create if/switch case for different categories based on selected mapping category
             var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.Sport], BuildRequestPayload(_currentMappedItems));
 
-            _unmappedSports = _tempFilteredUnmappedSports;
+            if (response != null && response.StatusCode == StatusCode.Success)
+            {
+                _unmappedSports = _tempFilteredUnmappedSports;
 
-            ResetMappingItems();
+                ResetMappingItems();
+
+                await OnSuccessSaveCallback.InvokeAsync();
+            }
 
             _shouldRender = true;
         }
