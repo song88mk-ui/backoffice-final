@@ -10,7 +10,7 @@ namespace Backoffice.Shared.Models.Requests
         public int? SpId { get; set; } = null;
         public int? SegId { get; set; } = null;
         public int? LeId { get; set; } = null;
-        public int ChTyId { get; set; }
+        public int? ChTyId { get; set; }
     }
 
     public class ProviderMappingBulkRequest

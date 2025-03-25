@@ -20,6 +20,6 @@ namespace Backoffice.Shared.Models.Response
         public string SegNa { get; set; }
         public DateTime Ti { get; set; }
         public ProviderModel<List<int>> Info { get; set; }
-        public int ChTyId { get; set; }
+        public int? ChTyId { get; set; }
     }
 }

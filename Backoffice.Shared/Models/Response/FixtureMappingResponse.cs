@@ -24,6 +24,6 @@ namespace Backoffice.Shared.Models.Response
         public int LeId { get; set; }
         public DateTime Ti { get; set; }
         public ProviderModel<long> Info { get; set; }
-        public int ChTyId { get; set; }
+        public int? ChTyId { get; set; }
     }
 }

@@ -1071,7 +1071,7 @@ namespace Backoffice.API.Controllers.Trading
 
         [HttpPost("mapping/fixtures")]
         public async Task<IActionResult> GetFixtureMapping([FromBody] MappingRequest request)
-        {// 
+        {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetFixtureMapping(region, request);
