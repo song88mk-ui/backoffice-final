@@ -1,29 +1,5 @@
 /*Mapping Setup*/
 
-.mapping-setup-container {
-  background-color: #F4F4F4;
-  padding: 10px;
-}
-
-.mapping-setup-header {
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-    .mapping-setup-header .header-label {
-        color: #000;
-        font-weight: 700;
-        font-size: 15px;
-        line-height: 22px;
-    }
-
-.fa-download {
-  display: block;
-  width: 15px;
-}
-
 .mapping-setup-content-container {
   border: 1px dashed #DED8D8;
   padding: 12px 10px;

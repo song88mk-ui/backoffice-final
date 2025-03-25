@@ -45,6 +45,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         public async Task OnSaveClickEvent()
         {
+            await FetchSportMapping();
         }
     }
 }
