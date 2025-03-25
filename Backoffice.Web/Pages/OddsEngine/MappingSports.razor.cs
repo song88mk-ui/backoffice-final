@@ -9,13 +9,9 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         private List<BreadcrumbModel> _breadcrumbs;
         private PageHeaderModel _pageHeaderModel;
-
         private AlertModel _alertModel;
-
         private bool _shouldRender;
-
         private MappingTab _activeTab;
-
         private enum MappingTab
         {
             Unmapped,
@@ -71,10 +67,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Message = "Mapping saved successfully!",
                 Opacity = 1.0m,
             };
-
-            await Task.Delay(1500);
-
-            _alertModel = null;
         }
     }
 }

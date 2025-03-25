@@ -13,6 +13,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
     {
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
+        [Parameter] public EventCallback<bool> OnSuccessSaveCallback { get; set; }
         private List<SportMappingModel> _sportMapping = new();
         protected override async Task OnInitializedAsync()
         {
@@ -45,6 +46,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         public async Task OnSaveClickEvent()
         {
+            OnSuccessSaveCallback.InvokeAsync(true);
             await FetchSportMapping();
         }
     }

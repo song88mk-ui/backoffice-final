@@ -14,6 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         [Parameter] public MappingSetupItemModel MappingSetupItem { get; set; } = new MappingSetupItemModel();
         [Parameter] public string FormId { get; set; } = "mappingSetupFormId";
         [Parameter] public bool HasSubmitButton { get; set; } = true;
+        [Parameter] public bool IsEdit { get; set; } = false;
 
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
