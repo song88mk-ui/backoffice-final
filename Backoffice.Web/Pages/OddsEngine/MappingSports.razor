@@ -8,6 +8,7 @@
 
 <AuthorizeView Policy="sbc-mapping">
     <Authorized>
+        <AlertMessage AlertClass="mt-3" AlertModel="@_alertModel" />
         <div class="col-md-12">
             <Breadcrumb Breadcrumbs="_breadcrumbs" />
         </div>
@@ -29,7 +30,7 @@
 
         @if (_activeTab == MappingTab.Mapped)
         {
-            <Mapped />
+            <Mapped OnSaveMapping="HandleSaveMapping" />
         }
     </Authorized>
 </AuthorizeView>
