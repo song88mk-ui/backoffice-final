@@ -103,11 +103,15 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                 Info = JsonSerializer.Serialize(info),
                 ChTyId = 0
             };
-            await _providerMappingService.AddOrUpdateProviderMapping(_mappingCategories[MappingCategory.Sport], request);
-            
-            ModalService.Cancel();
 
-            await Modal.OnSaveClickCallback.InvokeAsync();
+            var response = await _providerMappingService.AddOrUpdateProviderMapping(_mappingCategories[MappingCategory.Sport], request);
+            
+            if (response != null && response.StatusCode == StatusCode.Success)
+            {
+                ModalService.Cancel();
+
+                await Modal.OnSaveClickCallback.InvokeAsync();
+            }
         }
 
         private void HandleRemoveMappingSetupProviderItem(MappingProviderItemModel providerItem)
