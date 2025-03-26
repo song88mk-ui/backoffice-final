@@ -1855,21 +1855,21 @@ namespace Backoffice.API.Repositories
 
         #region Mapping
 
-        public async Task<BaseResponse<SportMappingModel>> GetSportMappingById(string region, string sportId)
-        {
+        public async Task<BaseResponse<SportMappingItemModel>> GetSportMappingById(string region, string sportId)
+        {//
             try
             {
                 var response = await GetHttpClientV2(region).GetAsync($"mapping/sports/{sportId}");
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<SportMappingModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<SportMappingItemModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<SportMappingModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<SportMappingItemModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
                     {
-                        return new BaseResponse<SportMappingModel>
+                        return new BaseResponse<SportMappingItemModel>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -1879,7 +1879,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                return new BaseResponse<SportMappingModel>
+                return new BaseResponse<SportMappingItemModel>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

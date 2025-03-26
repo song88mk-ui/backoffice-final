@@ -5,4 +5,15 @@
         public T SrId { get; set; }
         public T BgId { get; set; }
     }
+    public class ProviderItemModel<T>
+    {
+        public Item<T> SrId { get; set; }
+        public Item<T> BgId { get; set; }
+    }
+
+    public class Item<T>
+    {
+        public T Id { get; set; }
+        public string Name { get; set; }
+    }
 }
