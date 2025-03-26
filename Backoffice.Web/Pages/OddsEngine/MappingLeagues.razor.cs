@@ -2,7 +2,7 @@ using Backoffice.Web.Models;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class MappedLeague
+    public partial class MappingLeagues
     {
         private List<BreadcrumbModel> _breadcrumbs;
         private PageHeaderModel _pageHeaderModel;

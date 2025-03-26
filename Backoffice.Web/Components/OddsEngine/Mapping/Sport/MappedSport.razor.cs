@@ -1,15 +1,14 @@
-using Backoffice.Web.Models;
-using System.Drawing;
-using Microsoft.AspNetCore.Components;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
-using Backoffice.Web.Components.OddsEngine.Mapping;
+using Backoffice.Web.Components.OddsEngine.Mapping.Common;
+using Backoffice.Web.Models;
 using Backoffice.Web.Services;
+using Microsoft.AspNetCore.Components;
 
-namespace Backoffice.Web.Components.OddsEngine.Mapping
+namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 {
-    public partial class Mapped
+    public partial class MappedSport
     {
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
@@ -19,7 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
         {
             await FetchSportMapping();
         }
-        
+
         private async Task FetchSportMapping()
         {
             var request = new MappingRequest

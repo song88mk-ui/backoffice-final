@@ -1,4 +1,4 @@
-﻿@using Backoffice.Web.Components.OddsEngine.Mapping
+﻿@using Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
 @inherits BasePage
 @layout OEMonitoringLayout
@@ -24,12 +24,12 @@
         
         @if (_activeTab == MappingTab.Unmapped)
         {
-            <Unmapped />
+            <UnmappedSport />
         }
 
         @if (_activeTab == MappingTab.Mapped)
         {
-            <Mapped />
+            <MappedSport />
         }
     </Authorized>
 </AuthorizeView>

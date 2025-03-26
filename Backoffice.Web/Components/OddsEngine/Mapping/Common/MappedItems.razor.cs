@@ -1,7 +1,7 @@
 ﻿using Backoffice.Web.Models.OddsEngine.Mapping;
 using Microsoft.AspNetCore.Components;
 
-namespace Backoffice.Web.Components.OddsEngine.Mapping
+namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 {
     public partial class MappedItems
     {

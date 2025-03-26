@@ -1,16 +1,14 @@
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Mapping;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Text.Json;
 
-namespace Backoffice.Web.Components.OddsEngine.Mapping
+namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 {
-    public partial class Unmapped
+    public partial class UnmappedSport
     {
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
