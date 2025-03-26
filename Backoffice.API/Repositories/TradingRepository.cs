@@ -2579,13 +2579,34 @@ namespace Backoffice.API.Repositories
             switch (category)
             {
                 case "sport":
-                    //validate if ID already mapped to another
+                    foreach (var mapping in request.Mapping)
+                    {
+                        if (!string.IsNullOrEmpty(mapping.Id))
+                        {
+                            result = "ID should be empty for Bulk Upload";
+                            break;
+                        }
+                    }
                     break;
                 case "segment":
-                    //validate if ID already mapped to another
+                    foreach (var mapping in request.Mapping)
+                    {
+                        if (!string.IsNullOrEmpty(mapping.Id))
+                        {
+                            result = "ID should be empty for Bulk Upload";
+                            break;
+                        }
+                    }
                     break;
                 case "league":
-                    //validate if ID already mapped to another
+                    foreach (var mapping in request.Mapping)
+                    {
+                        if (!string.IsNullOrEmpty(mapping.Id))
+                        {
+                            result = "ID should be empty for Bulk Upload";
+                            break;
+                        }
+                    }
                     break;
                 case "fixture":
                     foreach (var mapping in request.Mapping)
