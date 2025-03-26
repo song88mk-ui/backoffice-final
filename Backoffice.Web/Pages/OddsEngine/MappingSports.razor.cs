@@ -59,14 +59,14 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async void ShowSuccessSaveMappingAlert()
         {
-            _shouldRender = true;
-
             _alertModel = new AlertModel()
             {
                 Status = AlertStatus.Success,
                 Message = "Mapping saved successfully!",
                 Opacity = 1.0m,
             };
+
+            _shouldRender = true;
         }
     }
 }

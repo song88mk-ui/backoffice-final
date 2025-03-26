@@ -90,6 +90,16 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
             _shouldRender = true;
         }
 
+        private bool IsDisabledCreateBtn()
+        {
+            return string.IsNullOrWhiteSpace(_mappingSetupItem.Name) || string.IsNullOrWhiteSpace(_mappingSetupItem.Id) || !_mappingSetupItem.Providers.Any();
+        }
+
+        private string GetDisabledCreateBtnCss()
+        {
+            return IsDisabledCreateBtn() ? "disabled" : "";
+        }
+
         private bool ValidateParameterRender()
         {
             return !MappingSetupProviderItems.SequenceEqual(_mappingSetupItem.Providers) || !string.IsNullOrEmpty(MappingSetupItem?.Id);
