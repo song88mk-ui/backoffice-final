@@ -115,17 +115,15 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
                     info.BgId = BgId;
                 }
 
-                // todo: map SpId, SegId, LeId for requests that need it, BE will also update request such that ChTyId is nullable
+                // todo: map SpId, SegId, LeId for requests that need it
                 request.Mapping.Add(
-                    new ProviderMappingRequest()
+                    new ProviderMappingModel()
                     {
-                        Id = item.Id,
                         Na = item.Name,
                         Info = JsonSerializer.Serialize(info),
                         //SpId = item.SpId,
                         //SegId = item.SegId,
                         //LeId = item.LeId,
-                        //ChTyId = 0
                     }
                 );
             }
