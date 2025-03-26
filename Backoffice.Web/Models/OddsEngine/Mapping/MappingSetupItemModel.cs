@@ -1,13 +1,10 @@
-using System;
-using System.ComponentModel.DataAnnotations;
 using Backoffice.Web.Models.Validation;
-using Backoffice.Shared.Models.Response;
+using System.ComponentModel.DataAnnotations;
 
 namespace Backoffice.Web.Models.OddsEngine.Mapping
 {
     public class MappingSetupItemModel
     {
-        [MinLength(1, ErrorMessage = "ID is required.")]
         public string Id { get; set; }
 
         [MinLength(1, ErrorMessage = "Name is required.")]
