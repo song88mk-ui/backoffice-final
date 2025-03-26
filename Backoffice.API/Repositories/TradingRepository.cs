@@ -2435,6 +2435,14 @@ namespace Backoffice.API.Repositories
         {
             try
             {
+                var validate = ValidateMappingRequest(category, request);
+                if (!string.IsNullOrEmpty(validate))
+                    return new BaseResponse<bool>()
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({validate})"
+                    };
+
                 var response = await GetHttpClientV2(region).PostAsync($"mapping/{category}", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 BaseResponse<bool> result;
@@ -2479,7 +2487,7 @@ namespace Backoffice.API.Repositories
                     _ => "default"
                 };
 
-                var validate = ValidateMappingRequest(category, request);
+                var validate = ValidateMappingRequestBulk(category, request);
                 if (!string.IsNullOrEmpty(validate))
                     return new BaseResponse<bool>()
                     {
@@ -2565,7 +2573,35 @@ namespace Backoffice.API.Repositories
                 return _configuration[$"API:TradingAPI:HK:APIKey"];
         }
 
-        private string ValidateMappingRequest(string category, ProviderMappingBulkRequest request)
+        private string ValidateMappingRequest(string category, ProviderMappingRequest request)
+        {
+            var result = string.Empty;
+
+            if (string.IsNullOrEmpty(request.UserId) || !Guid.TryParse(request.UserId, out var userId))
+                return $"Invalid User ID";
+
+            if (!int.TryParse(request.Mapping.Id, out int id))
+                return $"Invalid {category} ID";
+
+            switch (category)
+            {
+                case "sport":
+                    break;
+                case "segment":
+                    break;
+                case "league":
+                    break;
+                case "fixture":
+                    break;
+                default:
+                    result = "Invalid category";
+                    break;
+            }
+
+            return result;
+        }
+
+        private string ValidateMappingRequestBulk(string category, ProviderMappingBulkRequest request)
         {
             var result = string.Empty;
 
