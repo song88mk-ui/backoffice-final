@@ -2569,7 +2569,7 @@ namespace Backoffice.API.Repositories
         {
             var result = string.Empty;
 
-            if (request.Mapping.Any())
+            if (!request.Mapping.Any())
                 return $"No {category} mapping to be updated";
 
             switch (category)
