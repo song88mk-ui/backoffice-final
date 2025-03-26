@@ -88,7 +88,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
         private ProviderMappingBulkRequest BuildRequestPayload(List<MappingSetupItemModel> items)
         {
-            var request = new ProviderMappingBulkRequest();
+            var request = new ProviderMappingBulkRequest
+            {
+                UserId = _userState.Model.Id
+            };
+
             int SrId = 0;
             int BgId = 0;
 
