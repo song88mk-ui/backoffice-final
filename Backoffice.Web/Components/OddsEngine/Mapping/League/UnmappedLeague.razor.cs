@@ -34,7 +34,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
         protected override async Task OnInitializedAsync()
         {
-            var response = await _providerMappingService.GetUnmappedSports();
+            var response = await _providerMappingService.GetUnmappedLeagues();
             _unmappedSports = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
             _tempFilteredUnmappedSports = _unmappedSports;
 

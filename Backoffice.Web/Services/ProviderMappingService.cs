@@ -136,6 +136,71 @@ public class ProviderMappingService : IProviderMappingService
         }
     }
 
+    public async Task<BaseResponse<UnmappedResponse>> GetUnmappedLeagues()
+    {
+        try
+        {
+            var response = await GetHttpClient().GetAsync($"/api/trading/unmapped/leagues");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return JsonSerializer.Deserialize<BaseResponse<UnmappedResponse>>
+                (
+                    await response.Content.ReadAsStringAsync(),
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                ) ?? new BaseResponse<UnmappedResponse>();
+            }
+            else
+            {
+                return new BaseResponse<UnmappedResponse>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            if (ex.StackTrace != null)
+                Log.Error(ex.StackTrace.ToString());
+
+            return new BaseResponse<UnmappedResponse>
+            {
+                StatusCode = StatusCode.Error,
+                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+            };
+        }
+    }
+
+    public async Task<BaseResponse<LeagueMappingResponse>> GetLeaguesMapping(MappingRequest request)
+    {
+        try
+        {
+            var response = await GetHttpClient().PostAsync("/api/trading/mapping/leagues", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+            if (response.IsSuccessStatusCode)
+            {
+                return JsonSerializer.Deserialize<BaseResponse<LeagueMappingResponse>>
+                (
+                    await response.Content.ReadAsStringAsync(),
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                ) ?? new BaseResponse<LeagueMappingResponse>();
+            }
+            else
+            {
+                return new BaseResponse<LeagueMappingResponse>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            if (ex.StackTrace != null)
+                Log.Error(ex.StackTrace.ToString());
+
+            return new BaseResponse<LeagueMappingResponse>
+            {
+                StatusCode = StatusCode.Error,
+                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+            };
+        }
+    }
+
     public async Task<BaseResponse<SportMappingResponse>> GetSportMapping(MappingRequest request)
     {
         try
