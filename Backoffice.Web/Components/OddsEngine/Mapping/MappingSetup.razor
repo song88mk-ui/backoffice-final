@@ -1,11 +1,14 @@
 <EditForm id="@FormId" EditContext="_editContext" OnValidSubmit="HandleSubmit">
     <DataAnnotationsValidator />
     <div class="mapping-setup-content-container">
-        <div class="text-input">
-            <span>@_translationState.GetValue("ID")</span>
-            <InputText class="form-control" type="text" placeholder="Enter Id" readonly="@IsEdit" @bind-Value="_mappingSetupItem.Id" />
-            <ValidationMessage For="() => _mappingSetupItem.Id" />
-        </div>
+        @if (IsEdit)
+        {
+            <div class="text-input">
+                <span>@_translationState.GetValue("ID")</span>
+                <InputText class="form-control" type="text" readonly="true" @bind-Value="_mappingSetupItem.Id" />
+                <ValidationMessage For="() => _mappingSetupItem.Id" />
+            </div>
+        }
         <div class="text-input">
             <span>@_translationState.GetValue("Name")</span>
             <InputText class="form-control" type="text" placeholder="Enter Name" @bind-Value="_mappingSetupItem.Name" />
