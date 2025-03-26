@@ -2434,7 +2434,7 @@ namespace Backoffice.API.Repositories
         public async Task<BaseResponse<bool>> AddOrUpdateProviderMapping(string region, string category, ProviderMappingRequest request)
         {
             try
-            {
+            {//
                 var response = await GetHttpClientV2(region).PostAsync($"mapping/{category}", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 BaseResponse<bool> result;
