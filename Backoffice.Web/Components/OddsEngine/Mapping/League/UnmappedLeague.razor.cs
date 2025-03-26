@@ -9,7 +9,7 @@ using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 {
-    public partial class UnMappingLeague
+    public partial class UnmappedLeague
     {
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
@@ -110,9 +110,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
                 // todo: map SpId, SegId, LeId for requests that need it, BE will also update request such that ChTyId is nullable
                 request.Mapping.Add(
-                    new ProviderMappingRequest()
+                    new ProviderMappingModel
                     {
-                        Id = item.Id,
                         Na = item.Name,
                         Info = JsonSerializer.Serialize(info),
                         //SpId = item.SpId,

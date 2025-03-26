@@ -1,4 +1,4 @@
-﻿@using Backoffice.Web.Components.OddsEngine.Mapping
+﻿@using Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
 
 @inherits BasePage
@@ -26,12 +26,12 @@
         
         @if (_activeTab == MappingTab.Unmapped)
         {
-            <Unmapped OnSuccessSaveCallback="ShowSuccessSaveMappingAlert"/>
+            <UnmappedSport OnSuccessSaveCallback="ShowSuccessSaveMappingAlert"/>
         }
 
         @if (_activeTab == MappingTab.Mapped)
         {
-            <Mapped OnSuccessSaveCallback="ShowSuccessSaveMappingAlert" />
+            <MappedSport OnSuccessSaveCallback="ShowSuccessSaveMappingAlert" />
         }
     </Authorized>
 </AuthorizeView>

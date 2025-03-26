@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Text.Json;
 
-namespace Backoffice.Web.Components.OddsEngine.Mapping
+namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 {
     public partial class EditMappingModal: IDisposable
     {

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Models;
 
-namespace Backoffice.Web.Components.OddsEngine.Mapping
+namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 {
     public partial class MappingSetup
     {
