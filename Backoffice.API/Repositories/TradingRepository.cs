@@ -2569,37 +2569,19 @@ namespace Backoffice.API.Repositories
         {
             var result = string.Empty;
 
-            switch(category)
+            if (request.Mapping.Any())
+                return $"No {category} mapping to be updated";
+
+            switch (category)
             {
                 case "sport":
-                    foreach(var mapping in request.Mapping)
-                    {
-                        if (!int.TryParse(mapping.Id, out int id))
-                        {
-                            result = "Invalid Sport ID";
-                            break;
-                        }
-                    }
+                    //validate if ID already mapped to another
                     break;
                 case "segment":
-                    foreach (var mapping in request.Mapping)
-                    {
-                        if (!int.TryParse(mapping.Id, out int id))
-                        {
-                            result = "Invalid Segment ID";
-                            break;
-                        }
-                    }
+                    //validate if ID already mapped to another
                     break;
                 case "league":
-                    foreach (var mapping in request.Mapping)
-                    {
-                        if (!int.TryParse(mapping.Id, out int id))
-                        {
-                            result = "Invalid League ID";
-                            break;
-                        }
-                    }
+                    //validate if ID already mapped to another
                     break;
                 case "fixture":
                     foreach (var mapping in request.Mapping)

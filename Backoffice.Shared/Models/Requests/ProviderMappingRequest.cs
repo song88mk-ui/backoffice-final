@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Backoffice.Shared.Models.Requests
 {
@@ -15,6 +16,7 @@ namespace Backoffice.Shared.Models.Requests
 
     public class ProviderMappingBulkRequest
     {
+        public Guid UserId { get; set; }
         public ProviderMappingBulkRequest()
         {
             Mapping = new List<ProviderMappingRequest>();
