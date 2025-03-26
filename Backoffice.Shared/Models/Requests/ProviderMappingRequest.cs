@@ -5,6 +5,11 @@ namespace Backoffice.Shared.Models.Requests
 {
     public class ProviderMappingRequest
     {
+        public string UserId { get; set; }
+        public ProviderMappingModel mapping { get; set; }
+    }
+    public class ProviderMappingModel
+    {
         public string Id { get; set; }
         public string Na { get; set; }
         public string Info { get; set; }
@@ -19,8 +24,8 @@ namespace Backoffice.Shared.Models.Requests
         public string UserId { get; set; }
         public ProviderMappingBulkRequest()
         {
-            Mapping = new List<ProviderMappingRequest>();
+            Mapping = new List<ProviderMappingModel>();
         }
-        public List<ProviderMappingRequest> Mapping { get; set; }
+        public List<ProviderMappingModel> Mapping { get; set; }
     }
 }
