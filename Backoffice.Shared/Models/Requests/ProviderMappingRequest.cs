@@ -6,7 +6,7 @@ namespace Backoffice.Shared.Models.Requests
     public class ProviderMappingRequest
     {
         public string UserId { get; set; }
-        public ProviderMappingModel mapping { get; set; }
+        public ProviderMappingModel Mapping { get; set; }
     }
     public class ProviderMappingModel
     {

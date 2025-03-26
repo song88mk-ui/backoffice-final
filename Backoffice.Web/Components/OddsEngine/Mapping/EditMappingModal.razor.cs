@@ -98,10 +98,13 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping
 
             var request = new ProviderMappingRequest()
             {
-                Id = item.Id,
-                Na = item.Name,
-                Info = JsonSerializer.Serialize(info),
-                ChTyId = 0
+                UserId = _userState.Model.Id,
+                Mapping = new ProviderMappingModel
+                {
+                    Id = item.Id,
+                    Na = item.Name,
+                    Info = JsonSerializer.Serialize(info)
+                }
             };
 
             var response = await _providerMappingService.AddOrUpdateProviderMapping(_mappingCategories[MappingCategory.Sport], request);
