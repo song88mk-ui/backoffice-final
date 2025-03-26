@@ -2569,6 +2569,10 @@ namespace Backoffice.API.Repositories
         {
             var result = string.Empty;
 
+            if(string.IsNullOrEmpty(request.UserId) || !Guid.TryParse(request.UserId, out var userId))
+                return $"Invalid User ID";
+
+
             if (!request.Mapping.Any())
                 return $"No {category} mapping to be updated";
 
