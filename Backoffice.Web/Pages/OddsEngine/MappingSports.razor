@@ -14,8 +14,8 @@
             <Breadcrumb Breadcrumbs="_breadcrumbs" />
         </div>
         <div class="tab-container">
-            <div class="tab @(_activeTab == MappingTab.Unmapped ? "active-tab" : "inactive-tab")" @onclick="_ => HandleTabClick(MappingTab.Unmapped)">@_translationState.GetValue("Unmapped") (10)</div>
-            <div class="tab @(_activeTab == MappingTab.Mapped ? "active-tab" : "inactive-tab")" @onclick="_ => HandleTabClick(MappingTab.Mapped)">@_translationState.GetValue("Mapped") (10)</div>
+            <div class="tab @(_activeTab == MappingTab.Unmapped ? "active-tab" : "inactive-tab")" @onclick="_ => HandleTabClick(MappingTab.Unmapped)">@_translationState.GetValue("Unmapped") (@_unmappedCount)</div>
+            <div class="tab @(_activeTab == MappingTab.Mapped ? "active-tab" : "inactive-tab")" @onclick="_ => HandleTabClick(MappingTab.Mapped)">@_translationState.GetValue("Mapped") (@_mappedCount)</div>
         </div>
         <div class="header-container">
             <OEPageHeader PageHeaderModel="_pageHeaderModel" PageHeaderClassName="mapping-fixture"/>
@@ -26,7 +26,7 @@
         
         @if (_activeTab == MappingTab.Unmapped)
         {
-            <UnmappedSport OnSuccessSaveCallback="ShowSuccessSaveMappingAlert"/>
+            <UnmappedSport OnItemsCountUpdateCallback="SetMappingTabCount" OnSuccessSaveCallback="ShowSuccessSaveMappingAlert" />
         }
 
         @if (_activeTab == MappingTab.Mapped)

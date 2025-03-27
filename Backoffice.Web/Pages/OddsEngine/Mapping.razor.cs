@@ -1,4 +1,5 @@
-﻿using Backoffice.Web.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Models;
 using System.Drawing;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -11,12 +12,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _shouldRender;
 
         private MappingTab _activeTab;
-
-        private enum MappingTab
-        {
-            Unmapped,
-            Mapped
-        }
 
         protected override async Task OnInitializedAsync()
         {
