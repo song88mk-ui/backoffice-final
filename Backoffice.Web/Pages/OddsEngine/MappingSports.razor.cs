@@ -2,6 +2,7 @@
 using System.Drawing;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Enums;
+using Backoffice.Web.Models.OddsEngine.Mapping;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -69,6 +70,21 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = true;
         }
 
-        private void 
+        private void SetMappingTabCount(UpdateMappingTabCountModel model)
+        {
+            switch(model.Tab)
+            {
+                case MappingTab.Unmapped:
+                    _unmappedCount = model.Count;
+                    break;
+                case MappingTab.Mapped:
+                    _mappedCount = model.Count; 
+                    break;
+                default:
+                    break;
+            }
+
+            _shouldRender = true;
+        }
     }
 }

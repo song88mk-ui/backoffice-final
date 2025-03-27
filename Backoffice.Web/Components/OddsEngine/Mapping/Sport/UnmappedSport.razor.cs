@@ -13,11 +13,17 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [Parameter] public EventCallback OnSuccessSaveCallback { get; set; }
+        [Parameter] public EventCallback<UpdateMappingTabCountModel> OnItemsCountUpdateCallback { get; set; }
 
         private List<MappingProviderItemModel> _unmappedSports;
         private List<MappingProviderItemModel> _tempFilteredUnmappedSports;
         private List<MappingProviderItemModel> _currentMappingSetupProviderItems = new List<MappingProviderItemModel>();
         private List<MappingSetupItemModel> _currentMappedItems = new List<MappingSetupItemModel>();
+        private UpdateMappingTabCountModel _countCallbackModel = new UpdateMappingTabCountModel
+        {
+            Tab = MappingTab.Unmapped,
+            Count = 0
+        };
 
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
         {
@@ -40,6 +46,10 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             if (response != null && response?.Result != null && response?.StatusCode == StatusCode.Success) {
                 _unmappedSports = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
                 _tempFilteredUnmappedSports = _unmappedSports;
+                
+                _countCallbackModel.Count = _unmappedSports.Count();
+
+                await OnItemsCountUpdateCallback.InvokeAsync(_countCallbackModel);
             }
 
             _shouldRender = true;
@@ -150,8 +160,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             {
                 _unmappedSports = _tempFilteredUnmappedSports;
 
+                _countCallbackModel.Count = _unmappedSports.Count();
+
                 ResetMappingItems();
 
+                await OnItemsCountUpdateCallback.InvokeAsync(_countCallbackModel);
                 await OnSuccessSaveCallback.InvokeAsync();
             }
 
