@@ -22,4 +22,13 @@ namespace Backoffice.Shared.Models.Response
         public ProviderModel<List<int>> Info { get; set; }
         public int? ChTyId { get; set; }
     }
+
+    public class SegmentMappingItemModel
+    {
+        public int SegId { get; set; }
+        public string SegNa { get; set; }
+        public DateTime Ti { get; set; }
+        public ProviderItemModel<List<Item<int>>> Info { get; set; }
+        public int? ChTyId { get; set; }
+    }
 }

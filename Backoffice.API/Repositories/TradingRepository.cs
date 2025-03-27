@@ -1887,21 +1887,21 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<SegmentMappingModel>> GetSegmentMappingById(string region, string segmentId)
+        public async Task<BaseResponse<SegmentMappingItemModel>> GetSegmentMappingById(string region, string segmentId)
         {
             try
             {
                 var response = await GetHttpClientV2(region).GetAsync($"mapping/segments/{segmentId}");
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<SegmentMappingModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<SegmentMappingItemModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<SegmentMappingModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<SegmentMappingItemModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
                     {
-                        return new BaseResponse<SegmentMappingModel>
+                        return new BaseResponse<SegmentMappingItemModel>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -1911,7 +1911,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                return new BaseResponse<SegmentMappingModel>
+                return new BaseResponse<SegmentMappingItemModel>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
@@ -1919,21 +1919,21 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<LeagueMappingModel>> GetLeagueMappingById(string region, string leagueId)
+        public async Task<BaseResponse<LeagueMappingItemModel>> GetLeagueMappingById(string region, string leagueId)
         {
             try
             {
                 var response = await GetHttpClientV2(region).GetAsync($"mapping/leagues/{leagueId}");
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<LeagueMappingModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<LeagueMappingItemModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<LeagueMappingModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<LeagueMappingItemModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
                     {
-                        return new BaseResponse<LeagueMappingModel>
+                        return new BaseResponse<LeagueMappingItemModel>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -1943,7 +1943,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                return new BaseResponse<LeagueMappingModel>
+                return new BaseResponse<LeagueMappingItemModel>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
