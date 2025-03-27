@@ -105,8 +105,8 @@ namespace Backoffice.API.Repositories
 
         #region Mapping
         Task<BaseResponse<SportMappingItemModel>> GetSportMappingById(string region, string sportId);
-        Task<BaseResponse<SegmentMappingModel>> GetSegmentMappingById(string region, string segmentId);
-        Task<BaseResponse<LeagueMappingModel>> GetLeagueMappingById(string region, string leagueId);
+        Task<BaseResponse<SegmentMappingItemModel>> GetSegmentMappingById(string region, string segmentId);
+        Task<BaseResponse<LeagueMappingItemModel>> GetLeagueMappingById(string region, string leagueId);
         Task<BaseResponse<FixtureMappingModel>> GetFixtureMappingById(string region, string fixtureId);
         Task<BaseResponse<MarketMappingModel>> GetMarketMappingById(string region, string marketId);
         Task<BaseResponse<SelectionMappingModel>> GetSelectionMappingById(string region, string selectionId);
