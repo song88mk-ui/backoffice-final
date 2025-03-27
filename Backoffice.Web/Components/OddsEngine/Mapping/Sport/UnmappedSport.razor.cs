@@ -36,8 +36,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
         protected override async Task OnInitializedAsync()
         {
             var response = await _providerMappingService.GetUnmappedSports();
-            _unmappedSports = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
-            _tempFilteredUnmappedSports = _unmappedSports;
+
+            if (response != null && response?.Result != null && response?.StatusCode == StatusCode.Success) {
+                _unmappedSports = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
+                _tempFilteredUnmappedSports = _unmappedSports;
+            }
 
             _shouldRender = true;
         }
@@ -176,7 +179,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             }
             else
             {
-                _currentMappedItems = _currentMappedItems.Where(x => x.Id != singleItem.Id && x.Name != singleItem.Name).ToList();
+                _currentMappedItems = _currentMappedItems.Where(x => x.Name != singleItem.Name).ToList();
             }
 
             FilterProviderItems();

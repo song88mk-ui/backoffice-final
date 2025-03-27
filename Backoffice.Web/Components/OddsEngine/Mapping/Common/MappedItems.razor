@@ -22,7 +22,6 @@
                             <img src="icons/svg/icon-trash.svg" @onclick="_ => HandleRemoveItemClick(item)" />
                         </div>
                         <span class="mapped-item-name">@item.Name</span>
-                        <span class="mapped-item-id">Mapped ID: #@(item.Id)</span>
                         <div class="mapped-item-provider">
                             <span>Provider: </span>
                             <div class="mapped-item-provider-icons-container">
@@ -37,7 +36,7 @@
             }
             else
             {
-                <span class="empty-message">@_translationState.GetValue("No fixture mappings have been created.")</span>
+                <span class="empty-message">@_translationState.GetValue("No sport mappings have been created.")</span>
             }
         </div>
     </div>
