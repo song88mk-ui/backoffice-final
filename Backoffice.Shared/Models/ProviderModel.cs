@@ -7,8 +7,8 @@
     }
     public class ProviderItemModel<T>
     {
-        public Item<T> SrId { get; set; }
-        public Item<T> BgId { get; set; }
+        public T SrId { get; set; }
+        public T BgId { get; set; }
     }
 
     public class Item<T>

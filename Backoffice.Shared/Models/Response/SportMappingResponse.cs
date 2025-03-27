@@ -28,7 +28,7 @@ namespace Backoffice.Shared.Models.Response
         public int SpId { get; set; }
         public string SpNa { get; set; }
         public DateTime Ti { get; set; }
-        public ProviderItemModel<int> Info { get; set; }
+        public ProviderItemModel<Item<int>> Info { get; set; }
         public int? ChTyId { get; set; }
     }
 
