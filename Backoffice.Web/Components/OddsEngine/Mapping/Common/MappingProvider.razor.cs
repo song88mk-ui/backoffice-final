@@ -50,7 +50,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         public void FilterProviderItems(ChangeEventArgs e)
         {
             _searchQuery = e.Value.ToString();
-            _filteredProviderItems = _filteredProviderItems.Where(m => m.Na.ToLower().Contains(_searchQuery.ToLower())).ToList();
+            _filteredProviderItems = ProviderItems.Where(m => m.Na.ToLower().Contains(_searchQuery.ToLower())).ToList();
             _groupProviderItems = GetGroupedProviderItems();
         }
 
