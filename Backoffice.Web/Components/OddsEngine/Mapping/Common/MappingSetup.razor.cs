@@ -63,7 +63,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             }
         }
 
-        private void OnNameInput(ChangeEventArgs e)
+        private void OnNameInputChange(ChangeEventArgs e)
         {
             _mappingSetupItem.Name = e.Value.ToString();
 
