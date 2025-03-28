@@ -26,7 +26,7 @@
         
         @if (_activeTab == MappingTab.Unmapped)
         {
-            <UnmappedSport OnItemsCountUpdateCallback="SetMappingTabCount" OnSuccessSaveCallback="ShowSuccessSaveMappingAlert" />
+            <UnmappedSport OnItemsCountUpdateCallback="SetMappingTabCount" />
         }
 
         @if (_activeTab == MappingTab.Mapped)

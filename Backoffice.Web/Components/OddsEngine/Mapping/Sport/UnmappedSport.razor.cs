@@ -12,7 +12,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
     {
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
-        [Parameter] public EventCallback OnSuccessSaveCallback { get; set; }
         [Parameter] public EventCallback<UpdateMappingTabCountModel> OnItemsCountUpdateCallback { get; set; }
 
         private List<MappingProviderItemModel> _unmappedSports;
@@ -165,7 +164,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 ResetMappingItems();
 
                 await OnItemsCountUpdateCallback.InvokeAsync(_countCallbackModel);
-                await OnSuccessSaveCallback.InvokeAsync();
             }
 
             _shouldRender = true;
@@ -192,7 +190,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             }
             else
             {
-                _currentMappedItems = _currentMappedItems.Where(x => x.Name != singleItem.Name).ToList();
+                _currentMappedItems = _currentMappedItems.Where(x => JsonSerializer.Serialize(x) != JsonSerializer.Serialize(singleItem)).ToList();
             }
 
             FilterProviderItems();

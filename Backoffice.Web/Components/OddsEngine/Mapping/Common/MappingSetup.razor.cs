@@ -62,6 +62,13 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
                 _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
             }
         }
+
+        private void OnNameInputChange(ChangeEventArgs e)
+        {
+            _mappingSetupItem.Name = e.Value.ToString();
+
+            _shouldRender = true;
+        }
     
         private void HandleSubmit()
         {

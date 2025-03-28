@@ -11,7 +11,7 @@
         }
         <div class="text-input">
             <span>@_translationState.GetValue("Name")</span>
-            <InputText class="form-control" type="text" placeholder="Enter Name" @bind-Value="_mappingSetupItem.Name" />
+            <input type="text" class="form-control" placeholder="Enter Name" @oninput="OnNameInputChange" />
             <ValidationMessage For="() => _mappingSetupItem.Name" />
         </div>
         <div>
@@ -22,7 +22,7 @@
                         @foreach (var item in _mappingSetupItem.Providers)
                         {
                             <li class="item" @onclick="() => HandleRemoveProviderItemClick(item)">
-                                <div>@item.Na</div>
+                            <div>@($"{item.Na} (ID#{item.Id})")</div>
                                 <ProviderIcon ChannelTypeId="item.ChTyId" />
                             </li>
                         }
