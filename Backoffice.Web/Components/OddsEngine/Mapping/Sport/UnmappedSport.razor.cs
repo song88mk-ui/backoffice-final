@@ -1,3 +1,4 @@
+using Azure.Core;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
@@ -97,23 +98,46 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             _shouldRender = true;
         }
 
-        private ProviderMappingBulkRequest BuildRequestPayload(List<MappingSetupItemModel> items)
+        private ProviderMappingRequest BuildSingleRequestPayload()
+        {
+            var mapping = BuildMappingPayload();
+            var request = new ProviderMappingRequest
+            {
+                UserId = _userState.Model.Id,
+                Mapping = new ProviderMappingModel
+                {
+                    Na = mapping.First().Na,
+                    Info = mapping.First().Info,
+                }
+            };
+
+            return request;
+        }
+
+        private ProviderMappingBulkRequest BuildBulkRequestPayload()
         {
             var request = new ProviderMappingBulkRequest
             {
-                UserId = _userState.Model.Id
+                UserId = _userState.Model.Id,
+                Mapping = BuildMappingPayload()
             };
 
+            return request;
+        }
+
+        private List<ProviderMappingModel> BuildMappingPayload()
+        {
+            var mapping = new List<ProviderMappingModel>();
             int SrId = 0;
             int BgId = 0;
 
-            foreach (var item in items)
+            foreach (var item in _currentMappedItems)
             {
                 // info varies per mapping category
                 var info = new ProviderModel<int>()
                 {
                     SrId = 0,
-                    BgId = 0,   
+                    BgId = 0,
                 };
 
                 if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id, out SrId))
@@ -127,7 +151,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 }
 
                 // todo: map SpId, SegId, LeId for requests that need it
-                request.Mapping.Add(
+                mapping.Add(
                     new ProviderMappingModel()
                     {
                         Na = item.Name,
@@ -139,7 +163,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 );
             }
 
-            return request;
+            return mapping;
         }
 
         private void HandleCreateMappingClick(MappingSetupItemModel item)
@@ -153,8 +177,16 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
         private async Task HandleSaveMappingClick()
         {
+            BaseResponse<bool> response;
+
             // todo: create if/switch case for different categories based on selected mapping category
-            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.Sport], BuildRequestPayload(_currentMappedItems));
+            if (_currentMappedItems.Count() == 1)
+            {
+                response = await _providerMappingService.AddOrUpdateProviderMapping(_mappingCategories[MappingCategory.Sport], BuildSingleRequestPayload());
+            } else
+            {
+                response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.Sport], BuildBulkRequestPayload());
+            }
 
             if (response != null && response.StatusCode == StatusCode.Success)
             {
