@@ -2580,7 +2580,7 @@ namespace Backoffice.API.Repositories
             if (string.IsNullOrEmpty(request.UserId) || !Guid.TryParse(request.UserId, out var userId))
                 return $"Invalid User ID";
 
-            if (!int.TryParse(request.Mapping.Id, out int id))
+            if (!string.IsNullOrEmpty(request.Mapping.Id) && !int.TryParse(request.Mapping.Id, out int id))
                 return $"Invalid {category} ID";
 
             switch (category)
