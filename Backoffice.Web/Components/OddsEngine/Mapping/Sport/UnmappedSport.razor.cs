@@ -1,4 +1,3 @@
-using Azure.Core;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
@@ -13,7 +12,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
     {
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
-        [Parameter] public EventCallback OnSuccessSaveCallback { get; set; }
         [Parameter] public EventCallback<UpdateMappingTabCountModel> OnItemsCountUpdateCallback { get; set; }
 
         private List<MappingProviderItemModel> _unmappedSports;
@@ -98,46 +96,23 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             _shouldRender = true;
         }
 
-        private ProviderMappingRequest BuildSingleRequestPayload()
-        {
-            var mapping = BuildMappingPayload();
-            var request = new ProviderMappingRequest
-            {
-                UserId = _userState.Model.Id,
-                Mapping = new ProviderMappingModel
-                {
-                    Na = mapping.First().Na,
-                    Info = mapping.First().Info,
-                }
-            };
-
-            return request;
-        }
-
-        private ProviderMappingBulkRequest BuildBulkRequestPayload()
+        private ProviderMappingBulkRequest BuildRequestPayload(List<MappingSetupItemModel> items)
         {
             var request = new ProviderMappingBulkRequest
             {
-                UserId = _userState.Model.Id,
-                Mapping = BuildMappingPayload()
+                UserId = _userState.Model.Id
             };
 
-            return request;
-        }
-
-        private List<ProviderMappingModel> BuildMappingPayload()
-        {
-            var mapping = new List<ProviderMappingModel>();
             int SrId = 0;
             int BgId = 0;
 
-            foreach (var item in _currentMappedItems)
+            foreach (var item in items)
             {
                 // info varies per mapping category
                 var info = new ProviderModel<int>()
                 {
                     SrId = 0,
-                    BgId = 0,
+                    BgId = 0,   
                 };
 
                 if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id, out SrId))
@@ -151,7 +126,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 }
 
                 // todo: map SpId, SegId, LeId for requests that need it
-                mapping.Add(
+                request.Mapping.Add(
                     new ProviderMappingModel()
                     {
                         Na = item.Name,
@@ -163,7 +138,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 );
             }
 
-            return mapping;
+            return request;
         }
 
         private void HandleCreateMappingClick(MappingSetupItemModel item)
@@ -177,16 +152,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
         private async Task HandleSaveMappingClick()
         {
-            BaseResponse<bool> response;
-
             // todo: create if/switch case for different categories based on selected mapping category
-            if (_currentMappedItems.Count() == 1)
-            {
-                response = await _providerMappingService.AddOrUpdateProviderMapping(_mappingCategories[MappingCategory.Sport], BuildSingleRequestPayload());
-            } else
-            {
-                response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.Sport], BuildBulkRequestPayload());
-            }
+            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.Sport], BuildRequestPayload(_currentMappedItems));
 
             if (response != null && response.StatusCode == StatusCode.Success)
             {
@@ -197,7 +164,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 ResetMappingItems();
 
                 await OnItemsCountUpdateCallback.InvokeAsync(_countCallbackModel);
-                await OnSuccessSaveCallback.InvokeAsync();
             }
 
             _shouldRender = true;
@@ -224,7 +190,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             }
             else
             {
-                _currentMappedItems = _currentMappedItems.Where(x => x.Name != singleItem.Name).ToList();
+                _currentMappedItems = _currentMappedItems.Where(x => JsonSerializer.Serialize(x) != JsonSerializer.Serialize(singleItem)).ToList();
             }
 
             FilterProviderItems();
