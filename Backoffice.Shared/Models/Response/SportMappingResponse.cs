@@ -31,7 +31,4 @@ namespace Backoffice.Shared.Models.Response
         public ProviderItemModel<Item<int>> Info { get; set; }
         public int? ChTyId { get; set; }
     }
-
-
-
 }
