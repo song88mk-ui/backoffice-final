@@ -44,7 +44,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
         private Dictionary<int, List<MappingProviderItemModel>> GetGroupedProviderItems()
         {
-            return _filteredProviderItems.GroupBy(m => m.ChTyId).ToDictionary(g => g.Key, g => g.OrderBy(x => x.IsCurrentLinkedItem ? 0 : 1).ToList());
+            return _filteredProviderItems.GroupBy(m => m.ChTyId).OrderBy(g => g.Key).ToDictionary(g => g.Key, g => g.OrderBy(x => x.IsCurrentLinkedItem ? 0 : 1).ToList());
         }
 
         public void FilterProviderItems(ChangeEventArgs e)

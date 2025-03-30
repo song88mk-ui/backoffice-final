@@ -33,7 +33,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             _shouldRender = ValidateParameterRender();
 
             if (_shouldRender) {
-                if (MappingSetupItem?.Id != null && MappingSetupItem?.Name != null && MappingSetupItem?.Providers != null) {
+                if (MappingSetupItem?.Id != _mappingSetupItem.Id) {
                     _mappingSetupItem = new MappingSetupItemModel
                     {
                         Id = MappingSetupItem.Id,
@@ -62,14 +62,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
                 _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
             }
         }
-
-        private void OnNameInputChange(ChangeEventArgs e)
-        {
-            _mappingSetupItem.Name = e.Value.ToString();
-
-            _shouldRender = true;
-        }
-    
         private void HandleSubmit()
         {
             OnSubmitCallback.InvokeAsync(_mappingSetupItem);

@@ -63,16 +63,29 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             _shouldRender = true;
         }
 
-        private List<MappingProviderItemModel> GetUnmappedProviderByInfo(ProviderModel<int> info)
+        private List<MappingProviderItemModel> GetUnmappedProviderByInfo(ProviderItemModel<Item<int>> info)
         {
             var providers = new List<MappingProviderItemModel>();
 
-            foreach (var provider in _unmappedSports)
+            if(info.SrId.Id > 0)
             {
-                if ((provider.Id == info.SrId.ToString() || provider.Id == info.BgId.ToString()) && provider.Id != "0")
+                providers.Add(new MappingProviderItemModel()
                 {
-                    providers.Add(provider);
-                }
+                    Id = info.SrId.Id.ToString(),
+                    Na = info.SrId.Name,
+                    ChTyId = (int)ChannelType.SR,
+                    OtPrLi = info.SrId.OtPrLi,
+                });
+            }
+            if(info.BgId.Id > 0)
+            {
+                providers.Add(new MappingProviderItemModel()
+                {
+                    Id = info.BgId.Id.ToString(),
+                    Na = info.BgId.Name,
+                    ChTyId = (int)ChannelType.BG,
+                    OtPrLi = info.SrId.OtPrLi,
+                });
             }
 
             return providers;
@@ -122,6 +135,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             if (providerItem == null) return;
 
             _currentMappingSetupProviderItems = _currentMappingSetupProviderItems.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
+
+            if (!_unmappedSports.Any(item => item.Id == providerItem.Id))
+            {
+                _unmappedSports.Add(providerItem);
+            }
 
             FilterProviderItems();
 
