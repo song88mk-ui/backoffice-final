@@ -33,7 +33,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             _shouldRender = ValidateParameterRender();
 
             if (_shouldRender) {
-                if (MappingSetupItem?.Id != _mappingSetupItem.Id) {
+                if (MappingSetupItem?.Id != null && MappingSetupItem?.Id != _mappingSetupItem.Id) {
                     _mappingSetupItem = new MappingSetupItemModel
                     {
                         Id = MappingSetupItem.Id,
