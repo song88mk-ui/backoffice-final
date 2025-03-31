@@ -85,7 +85,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
                     Id = info.BgId.Id.ToString(),
                     Na = info.BgId.Name,
                     ChTyId = (int)ChannelType.BG,
-                    OtPrLi = info.SrId.OtPrLi,
+                    OtPrLi = info.BgId.OtPrLi,
                 });
             }
 
