@@ -14,6 +14,7 @@ else
         </div>
     </div>
     <div class="modal-body pt-0">
+        <AlertMessage AlertModel="_alertModel" AlertClass="pb-2" />
         <div class="information-container mb-3">
             <MappingSetup IsEdit=true FormId="@_formId" MappingSetupItem="_mappingSetupItem" HasSubmitButton=false MappingSetupProviderItems="_currentMappingSetupProviderItems" OnSubmitCallback="HandleUpdateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
         </div>

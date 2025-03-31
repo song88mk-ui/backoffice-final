@@ -24,6 +24,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         private List<MappingSetupItemModel> _currentMappedItems = new List<MappingSetupItemModel>();
         private MappingSetupItemModel _mappingSetupItem = new MappingSetupItemModel();
         private string _formId = "editMappingFormId";
+        private AlertModel _alertModel;
         private bool _isPreLoader = true;
         private bool _shouldRender;
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
@@ -127,6 +128,15 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
                 ModalService.Cancel();
 
                 await Modal.OnSaveClickCallback.InvokeAsync();
+            }
+            else
+            {
+                _alertModel = new AlertModel()
+                {
+                    Status = AlertStatus.Error,
+                    Message = "Something went wrong. Please try again!",
+                    Opacity = 1.0m,
+                };
             }
         }
 

@@ -5,10 +5,8 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.States;
 using Serilog;
-using System.Text;
 
 namespace Backoffice.Web.Services;
 
