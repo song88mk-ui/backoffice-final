@@ -58,7 +58,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
             {
                 HideHeader = true
             };
-            ModalService.Open<EditMappingModal>("Edit Mapping", parameters, options);
+            ModalService.Open<EditMappingLeagueModal>("Edit Mapping", parameters, options);
 
         }
         public async Task OnSaveClickEvent()

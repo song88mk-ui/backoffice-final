@@ -12,6 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
     public partial class UnmappedLeague
     {
         [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Parameter] public EventCallback OnSuccessSaveCallback { get; set; }
 
         private List<MappingProviderItemModel> _unmappedSports;
         private List<MappingProviderItemModel> _tempFilteredUnmappedSports;
@@ -136,12 +137,24 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
         private async Task HandleSaveMappingClick()
         {
-            // todo: create if/switch case for different categories based on selected mapping category
-            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.League], BuildRequestPayload(_currentMappedItems));
-            _unmappedSports = _tempFilteredUnmappedSports;
-            ResetMappingItems();
 
-            _shouldRender = true;
+            Console.WriteLine("TEST");
+            await OnSuccessSaveCallback.InvokeAsync();
+
+            // // todo: create if/switch case for different categories based on selected mapping category
+            // var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.League], BuildRequestPayload(_currentMappedItems));
+            // _unmappedSports = _tempFilteredUnmappedSports;
+            // if (response != null && response.StatusCode == StatusCode.Success)
+            // {
+            //     _unmappedSports = _tempFilteredUnmappedSports;
+
+            //     ResetMappingItems();
+
+            //     await OnSuccessSaveCallback.InvokeAsync();
+            // }
+            // ResetMappingItems();
+
+            // _shouldRender = true;
         }
 
         private void HandleRemoveMappingSetupProviderItem(MappingProviderItemModel providerItem)

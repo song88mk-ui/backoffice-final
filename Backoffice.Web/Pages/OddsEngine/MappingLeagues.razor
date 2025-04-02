@@ -16,12 +16,12 @@
         </div>
         @if (_activeTab == MappingTab.Unmapped)
         {
-            <UnmappedLeague/>
+            <UnmappedLeague OnSuccessSaveCallback="ShowSuccessSaveMappingAlert"/>
         }
 
         @if (_activeTab == MappingTab.Mapped)
         {
-            <MappedLeague/>
+            <MappedLeague OnSuccessSaveCallback="ShowSuccessSaveMappingAlert"/>
         }
     </Authorized>
 </AuthorizeView>
