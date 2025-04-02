@@ -27,6 +27,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         private AlertModel _alertModel;
         private bool _isPreLoader = true;
         private bool _shouldRender;
+        private bool _isSportMappingFound = false;
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
         {
             { MappingCategory.Sport, "sport" },
@@ -46,7 +47,21 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
             var mappedResponse = await _providerMappingService.GetSportMappingBySpId(ModalParameters.TryGet<int>("SpId"));
             var sportMapping = mappedResponse.Result;
+            
+            if (sportMapping == null)
+            {
+                _alertModel = new AlertModel()
+                {
+                    Status = AlertStatus.Error,
+                    Message = "Sorry! Unable to find mapping for this sport.",
+                    Opacity = 1.0m,
+                };
+                _isPreLoader = false;
+                _shouldRender = true;
+                return;
+            }
 
+            _isSportMappingFound = true;
             _mappingSetupItem = new MappingSetupItemModel
             {
                 Id = sportMapping.SpId.ToString(),

@@ -15,6 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         [Parameter] public string FormId { get; set; } = "mappingSetupFormId";
         [Parameter] public bool HasSubmitButton { get; set; } = true;
         [Parameter] public bool IsEdit { get; set; } = false;
+        [Parameter] public bool ShouldResetValues { get; set; } = false;
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
         private bool _shouldRender;
@@ -27,6 +28,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
         protected override async Task OnParametersSetAsync()
         {
+            if (ShouldResetValues)
+            {
+                ResetValues();
+                ShouldResetValues = false;
+            }
             _shouldRender = ValidateParameterRender();
             if (!_shouldRender) return;
 
@@ -59,7 +65,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         private async Task HandleSubmit()
         {
             await OnSubmitCallback.InvokeAsync(_mappingSetupItem);
-            ResetValues();
         }
 
         private void HandleRemoveProviderItemClick(MappingProviderItemModel providerItem)
