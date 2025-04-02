@@ -5,10 +5,8 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.States;
 using Serilog;
-using System.Text;
 
 namespace Backoffice.Web.Services;
 
@@ -234,7 +232,7 @@ public class ProviderMappingService : IProviderMappingService
         }
     }
 
-    public async Task<BaseResponse<SportMappingModel>> GetSportMappingBySpId(int spId)
+    public async Task<BaseResponse<SportMappingItemModel>> GetSportMappingBySpId(int spId)
     {
         try
         {
@@ -242,15 +240,15 @@ public class ProviderMappingService : IProviderMappingService
 
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<BaseResponse<SportMappingModel>>
+                return JsonSerializer.Deserialize<BaseResponse<SportMappingItemModel>>
                 (
                     await response.Content.ReadAsStringAsync(),
                     new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                ) ?? new BaseResponse<SportMappingModel>();
+                ) ?? new BaseResponse<SportMappingItemModel>();
             }
             else
             {
-                return new BaseResponse<SportMappingModel>();
+                return new BaseResponse<SportMappingItemModel>();
             }
         }
         catch (Exception ex)
@@ -259,7 +257,7 @@ public class ProviderMappingService : IProviderMappingService
             if (ex.StackTrace != null)
                 Log.Error(ex.StackTrace.ToString());
 
-            return new BaseResponse<SportMappingModel>
+            return new BaseResponse<SportMappingItemModel>
             {
                 StatusCode = StatusCode.Error,
                 Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
