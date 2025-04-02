@@ -1,0 +1,28 @@
+@if (_isPreLoader)
+{
+    <div class="p-3">
+        <Preloader />
+    </div>
+}
+else
+{
+    <div class="modal-header">
+        <div class="title">@_translationState.GetValue("Edit Mapping")</div>
+        <div>
+            <button data-bs-dismiss="modal" @onclick="OnCloseClickEvent" class="btn-cancel">@_translationState.GetValue("Cancel")</button>
+            <button data-bs-dismiss="modal" type="submit" form="@_formId" class="btn-save">@_translationState.GetValue("Save changes")</button>
+        </div>
+    </div>
+    <div class="modal-body pt-0">
+        <AlertMessage AlertModel="_alertModel" AlertClass="pb-2" />
+        <div class="information-container mb-3">
+            <MappingSetup IsEdit=true FormId="@_formId" MappingSetupItem="_mappingSetupItem" HasSubmitButton=false MappingSetupProviderItems="_currentMappingSetupProviderItems" OnSubmitCallback="HandleUpdateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
+        </div>
+        <div class="information-container p-3">
+            @if (_tempFilteredUnmappedSports != null && _tempFilteredUnmappedSports.Count() > 0)
+            {
+                <MappingProvider MappingSetupProviderItems="_currentMappingSetupProviderItems" ProviderItems="_tempFilteredUnmappedSports" OnClickItemCallback="HandleProviderItemClick" />
+            }
+        </div>
+    </div>
+}

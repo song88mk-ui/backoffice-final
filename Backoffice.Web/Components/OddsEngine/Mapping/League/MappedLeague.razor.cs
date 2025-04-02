@@ -11,8 +11,10 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
     public partial class MappedLeague
     {
         private bool _shouldRender;
-        // [Inject] public IModalService ModalService { get; set; }
-        // [CascadingParameter] public ModalParameters ModalParameters { get; set; }
+        [Inject] public IModalService ModalService { get; set; }
+        [CascadingParameter] public ModalParameters ModalParameters { get; set; }
+        [Parameter] public EventCallback<bool> OnSuccessSaveCallback { get; set; }
+        [CascadingParameter] public CustomModal Modal { get; set; }
 
         protected override bool ShouldRender() => _shouldRender;
         private List<LeagueMappingModel> _leagueMapping = new();
@@ -56,8 +58,13 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
             {
                 HideHeader = true
             };
-            // ModalService.Open<Mapped>("Edit Mapping", parameters, options);
+            ModalService.Open<EditMappingModal>("Edit Mapping", parameters, options);
 
+        }
+        public async Task OnSaveClickEvent()
+        {
+            OnSuccessSaveCallback.InvokeAsync(true);
+            // await FetchSportMapping();
         }
 
     }
