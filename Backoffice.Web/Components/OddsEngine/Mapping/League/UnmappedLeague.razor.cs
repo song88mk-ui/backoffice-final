@@ -137,10 +137,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
         private async Task HandleSaveMappingClick()
         {
             // todo: create if/switch case for different categories based on selected mapping category
-            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.Sport], BuildRequestPayload(_currentMappedItems));
-
+            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_mappingCategories[MappingCategory.League], BuildRequestPayload(_currentMappedItems));
             _unmappedSports = _tempFilteredUnmappedSports;
-
             ResetMappingItems();
 
             _shouldRender = true;
