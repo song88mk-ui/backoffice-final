@@ -1,4 +1,7 @@
-﻿@using Backoffice.Web.Components.OddsEngine.Mapping.Common
+﻿@using Backoffice.Web.Components.OddsEngine.Mapping.Base
+@using Backoffice.Web.Components.OddsEngine.Mapping.Common
+
+@inherits BaseUnmapped
 
 <div class="main-content-grid">
     <div class="left">
@@ -7,14 +10,14 @@
                 <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
                 <img class="download-icon" src="icons/svg/download.svg" />
             </div>
-            <MappingSetup MappingSetupProviderItems="_currentMappingSetupProviderItems" OnSubmitCallback="HandleCreateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
+            <MappingSetup MappingSetupProviderItems="CurrentMappingSetupProviderItems" OnSubmitCallback="HandleCreateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
         </div>
-        <MappedItems CurrentMappedItems="_currentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" OnRemoveCallback="HandleRemoveMappedItem" />
+        <MappedItems CurrentMappedItems="CurrentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" OnRemoveCallback="HandleRemoveMappedItem" />
     </div>
     <div class="right">
-        @if (_tempFilteredUnmappedSports != null && _tempFilteredUnmappedSports.Count() > 0)
+        @if (TempFilteredUnmappedItems != null && TempFilteredUnmappedItems.Count() > 0)
         {
-            <MappingProvider MappingSetupProviderItems="_currentMappingSetupProviderItems" ProviderItems="_tempFilteredUnmappedSports" OnClickItemCallback="HandleProviderItemClick" />
+            <MappingProvider MappingSetupProviderItems="CurrentMappingSetupProviderItems" ProviderItems="TempFilteredUnmappedItems" OnClickItemCallback="HandleProviderItemClick" />
         }
     </div>
 </div>
