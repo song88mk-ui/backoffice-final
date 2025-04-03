@@ -39,7 +39,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
 
         }
 
-        private async Task HandleProviderItemClick(MappingProviderItemModel providerItem)
+        public async Task HandleProviderItemClick(MappingProviderItemModel providerItem)
         {
             if (providerItem == null) return;
 
@@ -81,7 +81,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             RenderComponent = true;
         }
 
-        private void HandleCreateMappingClick(MappingSetupItemModel item)
+        public void HandleCreateMappingClick(MappingSetupItemModel item)
         {
             CurrentMappedItems.Add(item);
 
