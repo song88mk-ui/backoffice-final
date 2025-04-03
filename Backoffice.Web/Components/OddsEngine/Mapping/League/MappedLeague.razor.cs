@@ -66,6 +66,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
             var parameters = new ModalParameters();
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("LeId", mappingItem.LeId);
+            parameters.Add("LeNa", mappingItem.LeNa);
             var options = new ModalOptions
             {
                 HideHeader = true

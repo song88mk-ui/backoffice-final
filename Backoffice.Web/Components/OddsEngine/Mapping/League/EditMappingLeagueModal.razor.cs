@@ -40,20 +40,20 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
         protected override bool ShouldRender() => _shouldRender;
         protected override async Task OnInitializedAsync()
         {
-            var response = await _providerMappingService.GetUnmappedSports();
+            var response = await _providerMappingService.GetUnmappedLeagues();
             _unmappedSports = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
             _tempFilteredUnmappedSports = _unmappedSports;
 
-            var mappedResponse = await _providerMappingService.GetSportMappingBySpId(37);
-            var sportMapping = mappedResponse.Result;
+            // var mappedResponse = await _providerMappingService.GetSportMappingBySpId(37);
+            // var sportMapping = mappedResponse.Result;
 
-            _mappingSetupItem = new MappingSetupItemModel
-            {
-                Id = sportMapping.SpId.ToString(),
-                Name = sportMapping.SpNa,
-                Providers = GetUnmappedProviderByInfo(sportMapping.Info)
-            };
-            _currentMappingSetupProviderItems = _mappingSetupItem.Providers;
+            // _mappingSetupItem = new MappingSetupItemModel
+            // {
+            //     Id = sportMapping.SpId.ToString(),
+            //     Name = sportMapping.SpNa,
+            //     Providers = GetUnmappedProviderByInfo(sportMapping.Info)
+            // };
+            // _currentMappingSetupProviderItems = _mappingSetupItem.Providers;
 
             FilterProviderItems();
 
