@@ -32,8 +32,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             { MappingCategory.Market, "market" },
             { MappingCategory.Selection, "selection" }
         };
-        private bool _shouldResetValues;
+
         private bool _shouldRender;
+
         protected override bool ShouldRender() => _shouldRender;
 
         protected override async Task OnInitializedAsync()
@@ -142,8 +143,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
         private void HandleCreateMappingClick(MappingSetupItemModel item)
         {
             _currentMappedItems.Add(item);
-
-            _shouldResetValues = true;
 
             ResetMappingItems(true, false);
 
