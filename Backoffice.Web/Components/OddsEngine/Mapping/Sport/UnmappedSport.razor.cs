@@ -74,7 +74,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
         private async Task HandleSaveMappingClick()
         {
-            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk("sports", BuildRequestPayload());
+            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk("sport", BuildRequestPayload());
 
             if (response != null && response.StatusCode == StatusCode.Success)
             {
