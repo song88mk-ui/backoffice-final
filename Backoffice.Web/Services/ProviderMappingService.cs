@@ -84,7 +84,11 @@ public class ProviderMappingService : IProviderMappingService
             }
             else
             {
-                return new BaseResponse<bool>();
+                return JsonSerializer.Deserialize<BaseResponse<bool>>
+                (
+                    await response.Content.ReadAsStringAsync(),
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                ) ?? new BaseResponse<bool>();
             }
         }
         catch (Exception ex)

@@ -149,7 +149,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
                 _alertModel = new AlertModel()
                 {
                     Status = AlertStatus.Error,
-                    Message = "Something went wrong. Please try again!",
+                    Message = response?.Message ?? "Something went wrong. Please try again!",
                     Opacity = 1.0m,
                 };
             }
