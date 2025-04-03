@@ -11,7 +11,7 @@
         }
         <div class="text-input">
             <span>@_translationState.GetValue("Name")</span>
-            <InputText type="text" class="form-control" placeholder="Enter Name" @bind-Value="_mappingSetupItem.Name" />
+            <input type="text" class="form-control" placeholder="Enter Name" value="@_mappingSetupItem.Name" @oninput="OnNameInputChange" />
             <ValidationMessage For="() => _mappingSetupItem.Name" />
         </div>
         <div>

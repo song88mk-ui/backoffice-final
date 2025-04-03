@@ -99,6 +99,13 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             return IsDisabledCreateBtn() ? "disabled" : "";
         }
 
+        private void OnNameInputChange(ChangeEventArgs e)
+        {
+            _mappingSetupItem.Name = e.Value.ToString();
+
+            _shouldRender = true;
+        }
+
         private bool ValidateParameterRender()
         {
             return !MappingSetupProviderItems.SequenceEqual(_mappingSetupItem.Providers) || !string.IsNullOrEmpty(MappingSetupItem?.Id);
