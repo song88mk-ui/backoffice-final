@@ -1,5 +1,6 @@
 using Backoffice.Shared.Enums;
 using Backoffice.Web.Models;
+using Backoffice.Shared.Enums;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -7,6 +8,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         private List<BreadcrumbModel> _breadcrumbs;
         private PageHeaderModel _pageHeaderModel;
+        private AlertModel _alertModel;
 
         private bool _shouldRender;
 
@@ -41,6 +43,18 @@ namespace Backoffice.Web.Pages.OddsEngine
             _activeTab = MappingTab.Unmapped;
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
+        }
+
+        public async void ShowSuccessSaveMappingAlert()
+        {
+            _alertModel = new AlertModel()
+            {
+                Status = AlertStatus.Success,
+                Message = "Mapping saved successfully!",
+                Opacity = 1.0m,
+            };
+
+            _shouldRender = true;
         }
 
         protected override bool ShouldRender() => _shouldRender;

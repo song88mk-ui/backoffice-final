@@ -24,8 +24,10 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         private List<MappingSetupItemModel> _currentMappedItems = new List<MappingSetupItemModel>();
         private MappingSetupItemModel _mappingSetupItem = new MappingSetupItemModel();
         private string _formId = "editMappingFormId";
+        private AlertModel _alertModel;
         private bool _isPreLoader = true;
         private bool _shouldRender;
+        private bool _isSportMappingFound = false;
         private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
         {
             { MappingCategory.Sport, "sport" },
@@ -45,7 +47,21 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
             var mappedResponse = await _providerMappingService.GetSportMappingBySpId(ModalParameters.TryGet<int>("SpId"));
             var sportMapping = mappedResponse.Result;
+            
+            if (sportMapping == null)
+            {
+                _alertModel = new AlertModel()
+                {
+                    Status = AlertStatus.Error,
+                    Message = "Sorry! Unable to find mapping for this sport.",
+                    Opacity = 1.0m,
+                };
+                _isPreLoader = false;
+                _shouldRender = true;
+                return;
+            }
 
+            _isSportMappingFound = true;
             _mappingSetupItem = new MappingSetupItemModel
             {
                 Id = sportMapping.SpId.ToString(),
@@ -63,16 +79,29 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             _shouldRender = true;
         }
 
-        private List<MappingProviderItemModel> GetUnmappedProviderByInfo(ProviderModel<int> info)
+        private List<MappingProviderItemModel> GetUnmappedProviderByInfo(ProviderItemModel<Item<int>> info)
         {
             var providers = new List<MappingProviderItemModel>();
 
-            foreach (var provider in _unmappedSports)
+            if(info.SrId.Id > 0)
             {
-                if ((provider.Id == info.SrId.ToString() || provider.Id == info.BgId.ToString()) && provider.Id != "0")
+                providers.Add(new MappingProviderItemModel()
                 {
-                    providers.Add(provider);
-                }
+                    Id = info.SrId.Id.ToString(),
+                    Na = info.SrId.Name,
+                    ChTyId = (int)ChannelType.SR,
+                    OtPrLi = info.SrId.OtPrLi,
+                });
+            }
+            if(info.BgId.Id > 0)
+            {
+                providers.Add(new MappingProviderItemModel()
+                {
+                    Id = info.BgId.Id.ToString(),
+                    Na = info.BgId.Name,
+                    ChTyId = (int)ChannelType.BG,
+                    OtPrLi = info.BgId.OtPrLi,
+                });
             }
 
             return providers;
@@ -115,6 +144,15 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
                 await Modal.OnSaveClickCallback.InvokeAsync();
             }
+            else
+            {
+                _alertModel = new AlertModel()
+                {
+                    Status = AlertStatus.Error,
+                    Message = "Something went wrong. Please try again!",
+                    Opacity = 1.0m,
+                };
+            }
         }
 
         private void HandleRemoveMappingSetupProviderItem(MappingProviderItemModel providerItem)
@@ -122,6 +160,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             if (providerItem == null) return;
 
             _currentMappingSetupProviderItems = _currentMappingSetupProviderItems.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
+
+            if (!_unmappedSports.Any(item => item.Id == providerItem.Id))
+            {
+                _unmappedSports.Add(providerItem);
+            }
 
             FilterProviderItems();
 

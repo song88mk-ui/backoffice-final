@@ -31,7 +31,6 @@
         <thead class="table-head text-white">
             <tr>
                 <th>League Name</th>
-                <th>Fixture Data/Time-in-Play</th>
                 <th>Source</th>
                 <th>ID</th>
                 <th>Date Mapped</th>
@@ -44,12 +43,18 @@
             {
             <tr>
                 <td>@mappingItem.LeNa</td>
-                <td></td>
                 <td>
-                    @* <div class="d-flex flex-row">
-                        <div class="source-item @(mappingItem.Info.SrId > 0 ? "bg-danger text-white" : "inactive")">SR</div>
-                        <div class="source-item @(mappingItem.Info.BgId > 0 ? "bg-primary text-white" : "inactive")">BG</div>
-                    </div> *@
+                    <div class="d-flex flex-row">
+                    @if (mappingItem.Info != null && mappingItem.Info.SrId != null)
+                    {
+                        <div class="source-item @(mappingItem.Info.SrId.All(number => number != 0) ? "bg-danger text-white" : "inactive")">SR</div>
+
+                    }  
+                    @if (mappingItem.Info != null && mappingItem.Info.BgId != null)
+                    {
+                        <div class="source-item @(mappingItem.Info.BgId.All(number => number != 0) ? "bg-primary text-white" : "inactive")">BG</div>
+                    }  
+                    </div>  
                 </td>
                 <td>@mappingItem.LeId</td>
                 <td>@mappingItem.Ti</td>
@@ -57,13 +62,15 @@
                     <button class="btn-icon" @onclick="() => HandleEditMappingClickEvent(mappingItem)">
                         <img src="icons/svg/icon-update.svg" />
                     </button>
-                    <img src="icons/svg/icon-trash.svg" />
+                    <button class="btn-icon" @onclick="() => HandleDeleteMappingClickEvent(mappingItem)">
+                        <img src="icons/svg/icon-trash.svg" />
+                    </button>
                 </td>
             </tr>
             }
         </tbody>
     </table>
     <div>
-        @* <CustomModal OnSaveClickCallback="OnSaveClickEvent" /> *@
+        <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
     </div>
 </div>

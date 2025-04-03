@@ -15,12 +15,10 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         [Parameter] public string FormId { get; set; } = "mappingSetupFormId";
         [Parameter] public bool HasSubmitButton { get; set; } = true;
         [Parameter] public bool IsEdit { get; set; } = false;
-
+        [Parameter] public bool ShouldResetValues { get; set; } = false;
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
-
         private bool _shouldRender;
-
         protected override bool ShouldRender() => _shouldRender;
 
         protected override async Task OnInitializedAsync()
@@ -30,50 +28,43 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
         protected override async Task OnParametersSetAsync()
         {
-            _shouldRender = ValidateParameterRender();
-
-            if (_shouldRender) {
-                if (MappingSetupItem?.Id != null && MappingSetupItem?.Name != null && MappingSetupItem?.Providers != null) {
-                    _mappingSetupItem = new MappingSetupItemModel
-                    {
-                        Id = MappingSetupItem.Id,
-                        Name = MappingSetupItem.Name,
-                        Providers = MappingSetupItem.Providers.Select(s =>
-                            new MappingProviderItemModel
-                            {
-                                Id = s.Id,
-                                Na = s.Na,
-                                ChTyId = s.ChTyId,
-                                OtPrLi = new ProviderModel<List<int>>
-                                {
-                                    SrId = s.OtPrLi.SrId,
-                                    BgId = s.OtPrLi.BgId
-                                },
-                                IsCurrentLinkedItem = s.IsCurrentLinkedItem,
-                                HasLinkedItem = s.HasLinkedItem,
-                            }).ToList()
-                    };
-                }
-                
-                _mappingSetupItem.Providers = new List<MappingProviderItemModel>(MappingSetupProviderItems);
-
-                _editContext = new EditContext(_mappingSetupItem);
-
-                _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
+            if (ShouldResetValues)
+            {
+                ResetValues();
+                ShouldResetValues = false;
             }
-        }
+            _shouldRender = ValidateParameterRender();
+            if (!_shouldRender) return;
 
-        private void OnNameInputChange(ChangeEventArgs e)
-        {
-            _mappingSetupItem.Name = e.Value.ToString();
-
-            _shouldRender = true;
+            if (!string.IsNullOrEmpty(MappingSetupItem.Id) && MappingSetupItem.Id != _mappingSetupItem.Id) {
+                _mappingSetupItem = new MappingSetupItemModel
+                {
+                    Id = MappingSetupItem.Id,
+                    Name = MappingSetupItem.Name,
+                    Providers = MappingSetupItem.Providers.Select(s =>
+                        new MappingProviderItemModel
+                        {
+                            Id = s.Id,
+                            Na = s.Na,
+                            ChTyId = s.ChTyId,
+                            OtPrLi = new ProviderModel<List<int>>
+                            {
+                                SrId = s.OtPrLi.SrId,
+                                BgId = s.OtPrLi.BgId
+                            },
+                            IsCurrentLinkedItem = s.IsCurrentLinkedItem,
+                            HasLinkedItem = s.HasLinkedItem,
+                        }).ToList()
+                };
+            }
+            
+            _mappingSetupItem.Providers = new List<MappingProviderItemModel>(MappingSetupProviderItems);
+            _editContext = new EditContext(_mappingSetupItem);
+            _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
         }
-    
-        private void HandleSubmit()
+        private async Task HandleSubmit()
         {
-            OnSubmitCallback.InvokeAsync(_mappingSetupItem);
-            ResetValues();
+            await OnSubmitCallback.InvokeAsync(_mappingSetupItem);
         }
 
         private void HandleRemoveProviderItemClick(MappingProviderItemModel providerItem)
