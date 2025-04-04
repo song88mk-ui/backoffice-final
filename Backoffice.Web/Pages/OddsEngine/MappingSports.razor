@@ -8,8 +8,6 @@
 
 <AuthorizeView Policy="sbc-mapping">
     <Authorized>
-        <AlertMessage AlertModel="_alertModel" AlertClass="mt-2" />
-
         <div class="col-md-12">
             <Breadcrumb Breadcrumbs="_breadcrumbs" />
         </div>
@@ -31,7 +29,7 @@
 
         @if (_activeTab == MappingTab.Mapped)
         {
-            <MappedSport OnSuccessSaveCallback="ShowSuccessSaveMappingAlert" />
+            <MappedSport />
         }
     </Authorized>
 </AuthorizeView>

@@ -74,22 +74,11 @@ public class ProviderMappingService : IProviderMappingService
         {
             var response = await GetHttpClient().PostAsync($"/api/trading/mapping/{category}", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-            if (response.IsSuccessStatusCode)
-            {
-                return JsonSerializer.Deserialize<BaseResponse<bool>>
-                (
-                    await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                ) ?? new BaseResponse<bool>();
-            }
-            else
-            {
-                return JsonSerializer.Deserialize<BaseResponse<bool>>
-                (
-                    await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                ) ?? new BaseResponse<bool>();
-            }
+            return JsonSerializer.Deserialize<BaseResponse<bool>>
+            (
+                await response.Content.ReadAsStringAsync(),
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+            ) ?? new BaseResponse<bool>();
         }
         catch (Exception ex)
         {
@@ -111,18 +100,11 @@ public class ProviderMappingService : IProviderMappingService
         {
             var response = await GetHttpClient().PostAsync($"/api/trading/mapping/{category}/bulk", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-            if (response.IsSuccessStatusCode)
-            {
-                return JsonSerializer.Deserialize<BaseResponse<bool>>
-                (
-                    await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                ) ?? new BaseResponse<bool>();
-            }
-            else
-            {
-                return new BaseResponse<bool>();
-            }
+            return JsonSerializer.Deserialize<BaseResponse<bool>>
+            (
+                await response.Content.ReadAsStringAsync(),
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+            ) ?? new BaseResponse<bool>();
         }
         catch (Exception ex)
         {
