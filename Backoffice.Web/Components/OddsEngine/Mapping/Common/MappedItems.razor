@@ -25,7 +25,7 @@
                         <div class="mapped-item-provider">
                             <span>Provider: </span>
                             <div class="mapped-item-provider-icons-container">
-                                @foreach(var provider in item.Providers)
+                                @foreach(var provider in item.Providers.DistinctBy(c => c.ChTyId))
                                 {
                                     <ProviderIcon ChannelTypeId="provider.ChTyId" />
                                 }
