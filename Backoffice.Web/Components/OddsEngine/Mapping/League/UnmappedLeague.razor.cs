@@ -36,7 +36,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
         private ProviderMappingBulkRequest BuildRequestPayload()
         {
-            var request = new ProviderMappingBulkRequest();
+            var request = new ProviderMappingBulkRequest
+            {
+                UserId = _userState.Model.Id
+            };
+
             int SrId = 0;
             int BgId = 0;
 
