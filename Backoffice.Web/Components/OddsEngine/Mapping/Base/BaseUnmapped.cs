@@ -108,7 +108,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
         {
             if (providerItem == null) return;
 
-            CurrentMappingSetupProviderItems = CurrentMappingSetupProviderItems.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
+            CurrentMappingSetupProviderItems = CurrentMappingSetupProviderItems.Where(item => JsonSerializer.Serialize(item) != JsonSerializer.Serialize(providerItem)).ToList();
 
             FilterProviderItems();
 
