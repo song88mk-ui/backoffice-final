@@ -38,3 +38,22 @@
     max-width: 160px;
     padding: 7px;
 }
+
+.mapping-setup-container {
+    background-color: #F4F4F4;
+    padding: 10px;
+}
+
+.mapping-setup-header {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .mapping-setup-header .header-label {
+        color: #000;
+        font-weight: 700;
+        font-size: 15px;
+        line-height: 22px;
+    }
