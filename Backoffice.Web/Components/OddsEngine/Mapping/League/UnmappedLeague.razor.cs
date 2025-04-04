@@ -38,39 +38,43 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
         private ProviderMappingBulkRequest BuildRequestPayload()
         {
-            var request = new ProviderMappingBulkRequest();
-            int SrId = 0;
-            int BgId = 0;
+            var request = new ProviderMappingBulkRequest
+            {
+                UserId = _userState.Model.Id
+            };
+
+            int intId = 0;
 
             foreach (var item in CurrentMappedItems)
             {
-                // info varies per mapping category
-                var info = new ProviderModel<int>()
+                var info = new ProviderModel<List<int>>()
                 {
-                    SrId = 0,
-                    BgId = 0,   
+                    SrId = new List<int>(),
+                    BgId = new List<int>()
                 };
 
-                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id, out SrId))
-                {
-                    info.SrId = SrId;
+                foreach (var provider in item.Providers) {
+                    if (Int32.TryParse(provider.Id, out intId))
+                    {
+                        switch (provider.ChTyId)
+                        {
+                            case (int)ChannelType.SR:
+                                info.SrId.Add(intId); 
+                                break;
+                            case (int)ChannelType.BG:
+                                info.BgId.Add(intId);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
                 }
 
-                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.Id, out BgId))
-                {
-                    info.BgId = BgId;
-                }
-
-                // todo: map SpId, SegId, LeId for requests that need it, BE will also update request such that ChTyId is nullable
                 request.Mapping.Add(
                     new ProviderMappingModel
                     {
                         Na = item.Name,
                         Info = JsonSerializer.Serialize(info),
-                        //SpId = item.SpId,
-                        //SegId = item.SegId,
-                        //LeId = item.LeId,
-                        ChTyId = 0
                     }
                 );
             }
