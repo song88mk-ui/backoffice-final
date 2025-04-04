@@ -14,6 +14,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
         protected override async Task OnInitializedAsync()
         {
+            IsAllowedMultipleItemsPerProvider = true;
+
             await FetchUnmappedLeagues();
         }
 

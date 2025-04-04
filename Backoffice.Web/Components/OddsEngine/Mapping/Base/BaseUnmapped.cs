@@ -17,6 +17,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
         public List<MappingProviderItemModel> CurrentMappingSetupProviderItems { get; set; }
         public List<MappingSetupItemModel> CurrentMappedItems { get; set; }
         public UpdateMappingTabCountModel CountCallbackModel { get; set; }
+        public bool IsAllowedMultipleItemsPerProvider { get; set; }
         public bool RenderComponent { get; set; } = false;
 
         public BaseUnmapped()
@@ -46,7 +47,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             int sameProviderIndex = CurrentMappingSetupProviderItems.FindIndex(x => x.ChTyId == providerItem.ChTyId);
             bool hasItemOfSameProvider = sameProviderIndex != -1;
 
-            if (hasItemOfSameProvider)
+            if (hasItemOfSameProvider && !IsAllowedMultipleItemsPerProvider)
             {
                 CurrentMappingSetupProviderItems[sameProviderIndex] = providerItem;
             }

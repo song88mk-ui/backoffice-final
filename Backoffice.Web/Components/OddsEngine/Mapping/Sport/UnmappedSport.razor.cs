@@ -12,6 +12,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
     {
         protected override async Task OnInitializedAsync()
         {
+            IsAllowedMultipleItemsPerProvider = false;
+
             await FetchUnmappedSports();
         }
 
