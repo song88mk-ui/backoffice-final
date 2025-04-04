@@ -8,19 +8,25 @@ namespace Backoffice.Web.Components.Common
     {
         [Inject] private ToastService? _toasterService { get; set; }
         private void ToastChanged(object? sender, EventArgs e)
-                                    => this.InvokeAsync(this.StateHasChanged); 
+                                    => InvokeAsync(StateHasChanged);
         protected override void OnInitialized()
         {
-            _toasterService.ToasterChanged += ToastChanged;
-            _toasterService.ToasterTimerElapsed += ToastChanged;
+            if (_toasterService != null)
+            {
+                _toasterService.ToasterChanged += ToastChanged;
+                _toasterService.ToasterTimerElapsed += ToastChanged;
+            }
         }
         private void ClearToast(Toaster toast)
-                                    => _toasterService.ClearToast(toast);
+                                    => _toasterService?.ClearToast(toast);
 
         public void Dispose()
         {
-            _toasterService.ToasterChanged -= ToastChanged;
-            _toasterService.ToasterTimerElapsed -= ToastChanged;
+            if (_toasterService != null)
+            {
+                _toasterService.ToasterChanged -= ToastChanged;
+                _toasterService.ToasterTimerElapsed -= ToastChanged;
+            }
         }
     }
-}
+}   

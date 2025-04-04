@@ -92,16 +92,19 @@ namespace Backoffice.Web.Services
                 this.ToasterChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public void ClearToast(Toast toast)
-        {
-            if (_toastList.Contains(toast))
-            {
-                //_toastList.Remove(_toastList.FirstOrDefault(x => x.Id == toast.Id));
+        //public void ClearToast(Toast toast)
+        //{
+        //    if (_toastList.Contains(toast))
+        //    {
+        //        //_toastList.Remove(_toastList.FirstOrDefault(x => x.Id == toast.Id));
 
-                if (!this.ClearBurntToast())
-                    this.ToasterChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
+        //        if (!this.ClearBurntToast())
+        //            this.ToasterChanged?.Invoke(this, EventArgs.Empty);
+        //    }
+        //}
+        public void ClearToast(Toast toast)
+            => _toastList.RemoveAll(item => item.Id == toast.Id);
+
         public void Dispose()
         {
             //Console.WriteLine("- {0} was disposed!", this.GetType().Name);
