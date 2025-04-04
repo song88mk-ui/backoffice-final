@@ -77,7 +77,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
         public async Task OnSaveClickEvent()
         {
             OnSuccessSaveCallback.InvokeAsync(true);
-            // await FetchSportMapping();
+            await FetchLeagueMapping();
         }
 
     }
