@@ -1,26 +1,12 @@
 <div>
     <div class="d-flex flex-row justify-content-between">
-
-        <div class="dropdowns-container">
-            <select class="dropdown">
-                <option value="" disabled selected hidden>@_translationState.GetValue("Date Created")</option>
-                <option value="Sports 1">Sports 1</option>
-                <option value="Sports 2">Sports 2</option>
-            </select>
-            <select class="dropdown">
-                <option value="" disabled selected hidden>@_translationState.GetValue("Source")</option>
-                <option value="Segment 1">Segment 1</option>
-                <option value="Segment 2">Segment 2</option>
-            </select>
-        </div>
-
+        <div />
         <div class="input-search input-group mb-3">
-            <input type="text"class="form-control no-left-border" placeholder="Search">
+            <input type="text"class="form-control no-left-border" @oninput="OnSearchTextChanged" placeholder="Search">
             <span class="input-group-text">
                 <img src="icons/svg/icon-search.svg" alt="Search Icon">
             </span>
         </div>
-
     </div>
 
     <table class="table">

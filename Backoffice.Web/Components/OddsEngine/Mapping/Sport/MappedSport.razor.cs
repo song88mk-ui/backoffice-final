@@ -5,6 +5,7 @@ using Backoffice.Web.Components.OddsEngine.Mapping.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using DebounceTimer = System.Timers.Timer;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 {
@@ -13,6 +14,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         private List<SportMappingModel> _sportMapping = new();
+        private string _searchText = string.Empty;
+        private DebounceTimer _debounceTimer;
         protected override async Task OnInitializedAsync()
         {
             await FetchSportMapping();
@@ -23,12 +26,29 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             var request = new MappingRequest
             {
                 Page = 1,
-                PageSize = 1000
+                PageSize = 1000,
+                SearchText = _searchText
             };
 
             var response = await _providerMappingService.GetSportMapping(request);
             _sportMapping = response.Result.SportMapping.OrderBy(sm => sm.SpNa).ToList();
         }
+
+        private void OnSearchTextChanged(ChangeEventArgs e)
+        {
+            _searchText = e.Value.ToString();
+
+            _debounceTimer?.Stop();
+            _debounceTimer = new DebounceTimer(1000);
+            _debounceTimer.Elapsed += async (_,_) =>
+            {
+                _debounceTimer.Stop();
+                await FetchSportMapping();
+                InvokeAsync(StateHasChanged);
+            };
+            _debounceTimer.Enabled = true;
+        }
+        
         public async Task HandleEditMappingClickEvent(SportMappingModel mappingItem)
         {
             var parameters = new ModalParameters();
