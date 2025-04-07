@@ -1891,7 +1891,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var response = await GetHttpClientV2(region).GetAsync($"mapping/sports/{sportId}/{userId}");
+                var response = await GetHttpClientV2(region).DeleteAsync($"mapping/sports/{sportId}/{userId}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
