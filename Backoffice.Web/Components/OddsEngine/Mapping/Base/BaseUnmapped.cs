@@ -20,6 +20,26 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
         public bool IsAllowedMultipleItemsPerProvider { get; set; }
         public bool RenderComponent { get; set; } = false;
 
+        public Dictionary<MappingCategory, string> _fetchMappingCategories = new Dictionary<MappingCategory, string>
+        {
+            { MappingCategory.Sport, "sports" },
+            { MappingCategory.Segment, "segments" },
+            { MappingCategory.League, "leagues" },
+            { MappingCategory.Fixture, "fixtures" },
+            { MappingCategory.Market, "markets" },
+            { MappingCategory.Selection, "selections" }
+        };
+
+        public Dictionary<MappingCategory, string> _saveMappingCategories = new Dictionary<MappingCategory, string>
+        {
+            { MappingCategory.Sport, "sport" },
+            { MappingCategory.Segment, "segment" },
+            { MappingCategory.League, "league" },
+            { MappingCategory.Fixture, "fixture" },
+            { MappingCategory.Market, "market" },
+            { MappingCategory.Selection, "selection" }
+        };
+
         public BaseUnmapped()
         {
             UnmappedItems = new List<MappingProviderItemModel>();
@@ -34,7 +54,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
         }
 
         protected override bool ShouldRender() => RenderComponent;
-        
+
         protected override async Task OnInitializedAsync()
         {
 

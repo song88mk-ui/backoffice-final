@@ -6,8 +6,7 @@ namespace Backoffice.Web.Services;
 
 public interface IProviderMappingService
 {
-    Task<BaseResponse<UnmappedResponse>> GetUnmappedSports();
-    Task<BaseResponse<UnmappedResponse>> GetUnmappedLeagues();
+    Task<BaseResponse<UnmappedResponse>> GetUnmappedItemsByCategory(string category);
     Task<BaseResponse<LeagueMappingResponse>> GetLeaguesMapping(MappingRequest request);
     Task<BaseResponse<SportMappingResponse>> GetSportMapping(MappingRequest request);
     Task<BaseResponse<SportMappingItemModel>> GetSportMappingBySpId(int spId);
