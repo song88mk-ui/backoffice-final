@@ -1887,6 +1887,38 @@ namespace Backoffice.API.Repositories
             }
         }
 
+        public async Task<BaseResponse<bool>> DeleteSportMappingById(string region, string sportId, string userId)
+        {
+            try
+            {
+                var response = await GetHttpClientV2(region).GetAsync($"mapping/sports/{sportId}/{userId}");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<SegmentMappingItemModel>> GetSegmentMappingById(string region, string segmentId)
         {
             try

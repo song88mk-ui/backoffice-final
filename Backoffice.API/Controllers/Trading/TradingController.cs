@@ -941,6 +941,22 @@ namespace Backoffice.API.Controllers.Trading
             }
         }
 
+        [HttpDelete("mapping/sports")]
+        public async Task<IActionResult> DeleteSportMappingById([FromQuery] string sportId, [FromQuery] string userId)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _tradingRepository.DeleteSportMappingById(region, sportId, userId);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpGet("mapping/segments/{segmentId}")]
         public async Task<IActionResult> GetSegmentMapping([FromRoute] string segmentId)
         {
@@ -975,7 +991,7 @@ namespace Backoffice.API.Controllers.Trading
 
         [HttpGet("mapping/fixtures/{fixtureId}")]
         public async Task<IActionResult> GetFixtureMapping([FromRoute] string fixtureId)
-        {// 
+        {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetFixtureMappingById(region, fixtureId);
