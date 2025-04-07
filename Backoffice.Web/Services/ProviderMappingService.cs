@@ -250,4 +250,35 @@ public class ProviderMappingService : IProviderMappingService
             };
         }
     }
+    public async Task<BaseResponse<LeagueMappingItemModel>> GetLeagueMappingByLeId(int leId)
+    {
+        try
+        {
+            var response = await GetHttpClient().GetAsync($"/api/trading/mapping/leagues/{leId}");
+            if (response.IsSuccessStatusCode)
+            {
+                return JsonSerializer.Deserialize<BaseResponse<LeagueMappingItemModel>>
+                (
+                    await response.Content.ReadAsStringAsync(),
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                ) ?? new BaseResponse<LeagueMappingItemModel>();
+            }
+            else
+            {
+                return new BaseResponse<LeagueMappingItemModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            if (ex.StackTrace != null)
+                Log.Error(ex.StackTrace.ToString());
+
+            return new BaseResponse<LeagueMappingItemModel>
+            {
+                StatusCode = StatusCode.Error,
+                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+            };
+        }
+    }
 }

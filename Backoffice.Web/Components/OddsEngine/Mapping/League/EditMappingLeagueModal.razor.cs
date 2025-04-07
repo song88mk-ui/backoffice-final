@@ -18,7 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter] private CustomModal Modal { get; set; }
-        private List<MappingProviderItemModel> _unmappedSports;
+        private List<MappingProviderItemModel> _unmappedCategory;
         private List<MappingProviderItemModel> _tempFilteredUnmappedSports;
         private List<MappingProviderItemModel> _currentMappingSetupProviderItems = new List<MappingProviderItemModel>();
         private List<MappingSetupItemModel> _currentMappedItems = new List<MappingSetupItemModel>();
@@ -41,19 +41,29 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
         protected override async Task OnInitializedAsync()
         {
             var response = await _providerMappingService.GetUnmappedLeagues();
-            _unmappedSports = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
-            _tempFilteredUnmappedSports = _unmappedSports;
-
-            // var mappedResponse = await _providerMappingService.GetSportMappingBySpId(37);
-            // var sportMapping = mappedResponse.Result;
-
-            // _mappingSetupItem = new MappingSetupItemModel
-            // {
-            //     Id = sportMapping.SpId.ToString(),
-            //     Name = sportMapping.SpNa,
-            //     Providers = GetUnmappedProviderByInfo(sportMapping.Info)
-            // };
-            // _currentMappingSetupProviderItems = _mappingSetupItem.Providers;
+            _unmappedCategory = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
+            _tempFilteredUnmappedSports = _unmappedCategory;
+            var mappedResponse = await _providerMappingService.GetLeagueMappingByLeId(ModalParameters.TryGet<int>("LeId"));
+            var leagueMapping = mappedResponse.Result;
+            if (leagueMapping == null)
+            {
+                _alertModel = new AlertModel()
+                {
+                    Status = AlertStatus.Error,
+                    Message = "Sorry! Unable to find mapping for this sport.",
+                    Opacity = 1.0m,
+                };
+                _isPreLoader = false;
+                _shouldRender = true;
+                return;
+            }
+            _mappingSetupItem = new MappingSetupItemModel
+            {
+                Id = leagueMapping.LeId.ToString(),
+                Name = leagueMapping.LeNa,
+                Providers = GetUnmappedProviderByInfo(leagueMapping.Info)
+            };
+            _currentMappingSetupProviderItems = _mappingSetupItem.Providers;
 
             FilterProviderItems();
 
@@ -64,29 +74,35 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
             _shouldRender = true;
         }
 
-        private List<MappingProviderItemModel> GetUnmappedProviderByInfo(ProviderItemModel<Item<int>> info)
+        private List<MappingProviderItemModel> GetUnmappedProviderByInfo(ProviderItemModel<List<Item<int>>> info)
         {
             var providers = new List<MappingProviderItemModel>();
 
-            if(info.SrId.Id > 0)
+            if(info.SrId.Count() > 0)
             {
-                providers.Add(new MappingProviderItemModel()
+                foreach(var item in info.SrId)
                 {
-                    Id = info.SrId.Id.ToString(),
-                    Na = info.SrId.Name,
-                    ChTyId = (int)ChannelType.SR,
-                    OtPrLi = info.SrId.OtPrLi,
-                });
+                    providers.Add(new MappingProviderItemModel()
+                    {
+                        Id = item.Id.ToString(),
+                        Na = item.Name,
+                        ChTyId = (int)ChannelType.SR,
+                        OtPrLi = item.OtPrLi,
+                    });
+                }
             }
-            if(info.BgId.Id > 0)
+            if(info.BgId.Count() > 0)
             {
-                providers.Add(new MappingProviderItemModel()
+                foreach(var item in info.BgId)
                 {
-                    Id = info.BgId.Id.ToString(),
-                    Na = info.BgId.Name,
-                    ChTyId = (int)ChannelType.BG,
-                    OtPrLi = info.BgId.OtPrLi,
-                });
+                    providers.Add(new MappingProviderItemModel()
+                    {
+                        Id = item.Id.ToString(),
+                        Na = item.Name,
+                        ChTyId = (int)ChannelType.BG,
+                        OtPrLi = item.OtPrLi,
+                    });
+                }
             }
 
             return providers;
@@ -146,9 +162,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
             _currentMappingSetupProviderItems = _currentMappingSetupProviderItems.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
 
-            if (!_unmappedSports.Any(item => item.Id == providerItem.Id))
+            if (!_unmappedCategory.Any(item => item.Id == providerItem.Id))
             {
-                _unmappedSports.Add(providerItem);
+                _unmappedCategory.Add(providerItem);
             }
 
             FilterProviderItems();
@@ -174,7 +190,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
         private void FilterProviderItems()
         {
-            _tempFilteredUnmappedSports = _unmappedSports;
+            _tempFilteredUnmappedSports = _unmappedCategory;
 
             var allItemsToBeFiltered = GetAllItemsToBeFiltered();
 
