@@ -1,0 +1,24 @@
+﻿@using Backoffice.Web.Components.OddsEngine.Mapping.Common
+@using Backoffice.Web.Components.OddsEngine.Mapping.Base
+
+@inherits BaseUnmapped
+
+<span class="title">League Mapping</span>
+<div class="main-content-grid">
+    <div class="left">
+        <div class="mapping-setup-container">
+            <div class="mapping-setup-header">
+                <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
+                <img class="download-icon" src="icons/svg/download.svg" />
+            </div>
+            <MappingSetup MappingSetupProviderItems="CurrentMappingSetupProviderItems" OnSubmitCallback="HandleCreateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
+        </div>
+        <MappedItems CurrentMappedItems="CurrentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" OnRemoveCallback="HandleRemoveMappedItem" />
+    </div>
+    <div class="right">
+        @if (TempFilteredUnmappedItems != null && TempFilteredUnmappedItems.Count() > 0)
+        {
+            <MappingProvider MappingSetupProviderItems="CurrentMappingSetupProviderItems" ProviderItems="TempFilteredUnmappedItems" OnClickItemCallback="HandleProviderItemClick" />
+        }
+    </div>
+</div>

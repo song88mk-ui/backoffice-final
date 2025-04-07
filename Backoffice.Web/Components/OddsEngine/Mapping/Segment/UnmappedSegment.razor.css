@@ -1,0 +1,59 @@
+﻿.title {
+    color: #1F1F1F;
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.main-content-grid {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.dropdowns-container {
+    margin: 10px 0px;
+}
+
+.main-content-grid .left,
+.main-content-grid .right {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    gap: 12px;
+    flex: 1 1 auto;
+}
+
+.main-content-grid .left {
+    min-width: 350px;
+    max-width: 33%;
+}
+
+.main-content-grid .right {
+    max-width: 66.5%;
+}
+
+.dropdown {
+    min-width: 160px;
+    max-width: 160px;
+    padding: 7px;
+}
+
+.mapping-setup-container {
+    background-color: #F4F4F4;
+    padding: 10px;
+}
+
+.mapping-setup-header {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .mapping-setup-header .header-label {
+        color: #000;
+        font-weight: 700;
+        font-size: 15px;
+        line-height: 22px;
+    }
