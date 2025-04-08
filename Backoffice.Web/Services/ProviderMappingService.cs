@@ -35,96 +35,11 @@ public class ProviderMappingService : IProviderMappingService
         return _client;
     }
 
-    public async Task<BaseResponse<UnmappedResponse>> GetUnmappedSports()
+    public async Task<BaseResponse<UnmappedResponse>> GetUnmappedItemsByCategory(string category)
     {
         try
         {
-            var response = await GetHttpClient().GetAsync($"/api/trading/unmapped/sports");
-
-            if (response.IsSuccessStatusCode)
-            {
-                return JsonSerializer.Deserialize<BaseResponse<UnmappedResponse>>
-                (
-                    await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                ) ?? new BaseResponse<UnmappedResponse>();
-            }
-            else
-            {
-                return new BaseResponse<UnmappedResponse>();
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex.Message);
-            if (ex.StackTrace != null)
-                Log.Error(ex.StackTrace.ToString());
-
-            return new BaseResponse<UnmappedResponse>
-            {
-                StatusCode = StatusCode.Error,
-                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-            };
-        }
-    }
-
-    public async Task<BaseResponse<bool>> AddOrUpdateProviderMapping(string category, ProviderMappingRequest request)
-    {
-        try
-        {
-            var response = await GetHttpClient().PostAsync($"/api/trading/mapping/{category}", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
-
-            return JsonSerializer.Deserialize<BaseResponse<bool>>
-            (
-                await response.Content.ReadAsStringAsync(),
-                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-            ) ?? new BaseResponse<bool>();
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex.Message);
-            if (ex.StackTrace != null)
-                Log.Error(ex.StackTrace.ToString());
-
-            return new BaseResponse<bool>
-            {
-                StatusCode = StatusCode.Error,
-                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-            };
-        }
-    }
-
-    public async Task<BaseResponse<bool>> AddOrUpdateProviderMappingBulk(string category, ProviderMappingBulkRequest request)
-    {
-        try
-        {
-            var response = await GetHttpClient().PostAsync($"/api/trading/mapping/{category}/bulk", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
-
-            return JsonSerializer.Deserialize<BaseResponse<bool>>
-            (
-                await response.Content.ReadAsStringAsync(),
-                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-            ) ?? new BaseResponse<bool>();
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex.Message);
-            if (ex.StackTrace != null)
-                Log.Error(ex.StackTrace.ToString());
-
-            return new BaseResponse<bool>
-            {
-                StatusCode = StatusCode.Error,
-                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-            };
-        }
-    }
-
-    public async Task<BaseResponse<UnmappedResponse>> GetUnmappedLeagues()
-    {
-        try
-        {
-            var response = await GetHttpClient().GetAsync($"/api/trading/unmapped/leagues");
+            var response = await GetHttpClient().GetAsync($"/api/trading/unmapped/{category}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -275,6 +190,58 @@ public class ProviderMappingService : IProviderMappingService
                 Log.Error(ex.StackTrace.ToString());
 
             return new BaseResponse<LeagueMappingItemModel>
+            {
+                StatusCode = StatusCode.Error,
+                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+            };
+        }
+    }
+
+    public async Task<BaseResponse<bool>> AddOrUpdateProviderMapping(string category, ProviderMappingRequest request)
+    {
+        try
+        {
+            var response = await GetHttpClient().PostAsync($"/api/trading/mapping/{category}", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+            return JsonSerializer.Deserialize<BaseResponse<bool>>
+            (
+                await response.Content.ReadAsStringAsync(),
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+            ) ?? new BaseResponse<bool>();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            if (ex.StackTrace != null)
+                Log.Error(ex.StackTrace.ToString());
+
+            return new BaseResponse<bool>
+            {
+                StatusCode = StatusCode.Error,
+                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+            };
+        }
+    }
+
+    public async Task<BaseResponse<bool>> AddOrUpdateProviderMappingBulk(string category, ProviderMappingBulkRequest request)
+    {
+        try
+        {
+            var response = await GetHttpClient().PostAsync($"/api/trading/mapping/{category}/bulk", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+            return JsonSerializer.Deserialize<BaseResponse<bool>>
+            (
+                await response.Content.ReadAsStringAsync(),
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+            ) ?? new BaseResponse<bool>();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            if (ex.StackTrace != null)
+                Log.Error(ex.StackTrace.ToString());
+
+            return new BaseResponse<bool>
             {
                 StatusCode = StatusCode.Error,
                 Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

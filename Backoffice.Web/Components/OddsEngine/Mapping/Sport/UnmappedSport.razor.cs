@@ -19,7 +19,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
         private async Task FetchUnmappedSports()
         {
-            var response = await _providerMappingService.GetUnmappedSports();
+            var response = await _providerMappingService.GetUnmappedItemsByCategory(_fetchMappingCategories[MappingCategory.Sport]);
 
             if (response != null && response?.Result != null && response?.StatusCode == StatusCode.Success)
             {
@@ -76,7 +76,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
         private async Task HandleSaveMappingClick()
         {
-            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk("sport", BuildRequestPayload());
+            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_saveMappingCategories[MappingCategory.Sport], BuildRequestPayload());
 
             if (response != null && response.StatusCode == StatusCode.Success)
             {

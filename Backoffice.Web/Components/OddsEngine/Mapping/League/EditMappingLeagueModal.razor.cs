@@ -27,7 +27,18 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
         private AlertModel _alertModel;
         private bool _isPreLoader = true;
         private bool _shouldRender;
-        private Dictionary<MappingCategory, string> _mappingCategories = new Dictionary<MappingCategory, string>
+
+        public Dictionary<MappingCategory, string> _fetchMappingCategories = new Dictionary<MappingCategory, string>
+        {
+            { MappingCategory.Sport, "sports" },
+            { MappingCategory.Segment, "segments" },
+            { MappingCategory.League, "leagues" },
+            { MappingCategory.Fixture, "fixtures" },
+            { MappingCategory.Market, "markets" },
+            { MappingCategory.Selection, "selections" }
+        };
+
+        public Dictionary<MappingCategory, string> _saveMappingCategories = new Dictionary<MappingCategory, string>
         {
             { MappingCategory.Sport, "sport" },
             { MappingCategory.Segment, "segment" },
@@ -40,7 +51,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
         protected override bool ShouldRender() => _shouldRender;
         protected override async Task OnInitializedAsync()
         {
-            var response = await _providerMappingService.GetUnmappedLeagues();
+            var response = await _providerMappingService.GetUnmappedItemsByCategory(_fetchMappingCategories[MappingCategory.League]);
             _unmappedCategory = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
             _tempFilteredUnmappedSports = _unmappedCategory;
             var mappedResponse = await _providerMappingService.GetLeagueMappingByLeId(ModalParameters.TryGet<int>("LeId"));
@@ -137,7 +148,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
                 }
             };
 
-            var response = await _providerMappingService.AddOrUpdateProviderMapping(_mappingCategories[MappingCategory.Sport], request);
+            var response = await _providerMappingService.AddOrUpdateProviderMapping(_saveMappingCategories[MappingCategory.League], request);
             
             if (response != null && response.StatusCode == StatusCode.Success)
             {

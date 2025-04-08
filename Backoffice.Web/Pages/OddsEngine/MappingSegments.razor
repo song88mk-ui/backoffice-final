@@ -1,0 +1,27 @@
+@using Backoffice.Web.Components.OddsEngine.Mapping.Segment
+
+@inherits BasePage
+@layout OEMonitoringLayout
+
+@page "/hk/odds-engine/mapping-segments"
+
+<AuthorizeView Policy="sbc-mapping">
+    <Authorized>
+        <div class="col-md-12">
+            <Breadcrumb Breadcrumbs="_breadcrumbs" />
+        </div>    
+        <div class="tab-container">
+            <div class="tab @(_activeTab == MappingTab.Unmapped ? "active-tab" : "inactive-tab")" @onclick="_ => HandleTabClick(MappingTab.Unmapped)">@_translationState.GetValue("Unmapped") (10)</div>
+            <div class="tab @(_activeTab == MappingTab.Mapped ? "active-tab" : "inactive-tab")" @onclick="_ => HandleTabClick(MappingTab.Mapped)">@_translationState.GetValue("Mapped") (10)</div>
+        </div>
+        @if (_activeTab == MappingTab.Unmapped)
+        {
+            <UnmappedSegment />
+        }
+
+        @if (_activeTab == MappingTab.Mapped)
+        {
+            
+        }
+    </Authorized>
+</AuthorizeView>
