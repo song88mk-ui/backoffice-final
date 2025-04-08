@@ -1,4 +1,4 @@
-@using Backoffice.Web.Components.OddsEngine.Mapping.League
+@using Backoffice.Web.Components.OddsEngine.Mapping.Segment
 
 @inherits BasePage
 @layout OEMonitoringLayout
@@ -16,7 +16,7 @@
         </div>
         @if (_activeTab == MappingTab.Unmapped)
         {
-            <UnmappedLeague />
+            <UnmappedSegment />
         }
 
         @if (_activeTab == MappingTab.Mapped)
