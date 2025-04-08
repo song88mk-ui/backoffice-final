@@ -148,7 +148,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
                 }
             };
 
-            var response = await _providerMappingService.AddOrUpdateProviderMapping(_saveMappingCategories[MappingCategory.Sport], request);
+            var response = await _providerMappingService.AddOrUpdateProviderMapping(_saveMappingCategories[MappingCategory.League], request);
             
             if (response != null && response.StatusCode == StatusCode.Success)
             {
