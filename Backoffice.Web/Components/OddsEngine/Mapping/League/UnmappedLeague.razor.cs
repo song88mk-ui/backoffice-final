@@ -21,7 +21,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
         private async Task FetchUnmappedLeagues()
         {
-            var response = await _providerMappingService.GetUnmappedItemsByCategory(_fetchMappingCategories[MappingCategory.League]);
+            var response = await _providerMappingService.GetUnmappedItemsByCategory(FetchMappingCategories[MappingCategory.League]);
 
             if (response != null && response?.Result != null && response?.StatusCode == StatusCode.Success)
             {
@@ -84,7 +84,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
         private async Task HandleSaveMappingClick()
         {
-            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_saveMappingCategories[MappingCategory.League], BuildRequestPayload());
+            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(SaveMappingCategories[MappingCategory.League], BuildRequestPayload());
 
             if (response != null && response.StatusCode == StatusCode.Success)
             {
