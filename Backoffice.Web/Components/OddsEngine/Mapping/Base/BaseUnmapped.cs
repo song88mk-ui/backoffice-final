@@ -40,7 +40,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             { MappingCategory.Selection, "selection" }
         };
 
-        public Dictionary<MappingCategory, List<int>> _providerItemFilters = new Dictionary<MappingCategory, List<int>>
+        public Dictionary<MappingCategory, List<int>> ProviderItemFilters = new Dictionary<MappingCategory, List<int>>
         {
             { MappingCategory.Sport, new List<int>() },
             { MappingCategory.Segment, new List<int>() },
@@ -160,27 +160,57 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             RenderComponent = true;
         }
 
-        public List<MappingProviderItemModel> GetAllItemsToBeFiltered()
+        public List<MappingProviderItemModel> GetMappingItemsToBeFiltered()
         {
-            List<MappingProviderItemModel> allItemsToBeFiltered = new List<MappingProviderItemModel>();
+            List<MappingProviderItemModel> itemsToFilter = new List<MappingProviderItemModel>();
 
-            allItemsToBeFiltered.AddRange(CurrentMappingSetupProviderItems);
+            itemsToFilter.AddRange(CurrentMappingSetupProviderItems);
 
             foreach (var mappedItem in CurrentMappedItems)
             {
-                allItemsToBeFiltered.AddRange(mappedItem.Providers);
+                itemsToFilter.AddRange(mappedItem.Providers);
             }
 
-            return allItemsToBeFiltered;
+            return itemsToFilter;
+        }
+
+        public List<MappingProviderItemModel> GetSelectedDropdownItems()
+        {
+            List<MappingProviderItemModel> itemsToInclude = new List<MappingProviderItemModel>();
+
+            //if (ProviderItemFilters[MappingCategory.Sport].Any())
+            //{
+            //    itemsToInclude.AddRange(UnmappedItems.Where(t => ProviderItemFilters[MappingCategory.Sport].Contains(t.SpId)));
+            //}
+
+            //if (ProviderItemFilters[MappingCategory.Segment].Any())
+            //{
+            //    itemsToInclude.AddRange(UnmappedItems.Where(t => ProviderItemFilters[MappingCategory.Segment].Contains(t.SegId)));
+            //}
+
+            //if (ProviderItemFilters[MappingCategory.League].Any())
+            //{
+            //    itemsToInclude.AddRange(UnmappedItems.Where(t => ProviderItemFilters[MappingCategory.League].Contains(t.LeId)));
+            //}
+
+            return itemsToInclude;
         }
 
         public void FilterProviderItems()
         {
-            TempFilteredUnmappedItems = UnmappedItems;
+            var selectedDropdownItems = GetSelectedDropdownItems();
 
-            var allItemsToBeFiltered = GetAllItemsToBeFiltered();
+            if (selectedDropdownItems.Any())
+            {
+                TempFilteredUnmappedItems = selectedDropdownItems;
+            } else
+            {
+                TempFilteredUnmappedItems = UnmappedItems;
+            }
 
-            foreach (var providerItem in allItemsToBeFiltered)
+            var allItemsToExclude = GetMappingItemsToBeFiltered();
+
+            foreach (var providerItem in allItemsToExclude)
             {
                 TempFilteredUnmappedItems = TempFilteredUnmappedItems.Where(x => JsonSerializer.Serialize(x) != JsonSerializer.Serialize(providerItem)).ToList();
             }
@@ -190,8 +220,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
 
         public void SetLinkedItems()
         {
-            int itemIndex = -1;
-
             List<string> srIds = new List<string>();
             List<string> bgIds = new List<string>();
 
@@ -226,6 +254,20 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
                 {
                     await JSRuntime.InvokeVoidAsync("scrollToTopOfElement", $".provider-{key}-items-container", "fast");
                 }
+            }
+        }
+
+        public void HandleApplyDropdownFilter(bool isAllValue, MappingCategory category, MappingProviderItemModel item, bool isChecked)
+        {
+            if (isChecked)
+            {
+                if (isAllValue)
+                {
+                    ProviderItemFilters[category].Clear();
+                    return;
+                }
+
+                ProviderItemFilters[category]
             }
         }
     }
