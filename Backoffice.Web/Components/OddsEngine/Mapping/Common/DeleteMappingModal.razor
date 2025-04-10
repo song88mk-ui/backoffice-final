@@ -1,0 +1,44 @@
+@if (_isPreLoader)
+{
+    <div class="p-3">
+        <Preloader />
+    </div>
+}
+else
+{
+    <div class="p-4 d-flex justify-content-between">
+        <img src="icons/svg/warning-icon-3.svg" />
+        <button type="button" class="btn-close" @onclick="OnCloseClickEvent"></button>
+    </div>
+    <div class="modal-body px-4 py-0">
+        <AlertMessage AlertModel="_alertModel" AlertClass="pb-2" />
+        @if(_isSportMappingFound)
+        {
+            <h4 class="title">Delete Mapped Sports</h4>
+            <p class="mb-4">
+                Are you sure you want to delete the mapped sports:
+                @{
+                    var providerCount = _providers.Count;
+                    for (int i = 0; i < providerCount; i++)
+                    {
+                        var provider = _providers[i];
+                        <span>@provider.Na (ID# @provider.Id) from <b>@providerIdToName[provider.ChTyId]</b></span>
+                        @if (i == providerCount - 2)
+                        {
+                            <span> and </span>
+                        }
+                        else if (i < providerCount - 2)
+                        {
+                            <span>, </span>
+                        }
+                    }
+                }?
+            </p>
+            <p class="mb-3">This action cannot be undone.</p>
+        }
+    </div>
+    <div class="modal-footer border-top-0 gap-3 p-4">
+        <button type="button" class="m-0 flex-fill btn btn-cancel modal-btn modal-close" @onclick="OnCloseClickEvent">@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="m-0 flex-fill btn btn-danger modal-btn modal-apply" @onclick="HandleDeleteMappingClick">@_translationState.GetValue("Delete")</button>
+    </div>
+}

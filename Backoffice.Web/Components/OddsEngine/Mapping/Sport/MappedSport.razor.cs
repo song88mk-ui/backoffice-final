@@ -62,6 +62,19 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             ModalService.Open<EditMappingModal>("Edit Mapping", parameters, options);
         }
 
+        public async Task HandleDeleteMappingClickEvent(SportMappingModel mappingItem)
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("DialogStyle", "max-width: 360px");
+            parameters.Add("SpId", mappingItem.SpId);
+            var options = new ModalOptions
+            {
+                HideHeader = true
+            };
+
+            ModalService.Open<DeleteMappingModal>("Delete Mapping", parameters, options);
+        }
+
         public async Task OnSaveClickEvent()
         {
             await FetchSportMapping();

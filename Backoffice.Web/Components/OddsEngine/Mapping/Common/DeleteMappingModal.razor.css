@@ -1,0 +1,20 @@
+.title {
+  font-weight: 600;
+  font-size: 20px;
+}
+
+p {
+  color: #475467;
+}
+
+button {
+  height: 44px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.btn-cancel {
+  border: 1px solid #d0d5dd;
+  color: #344054;
+  background: #fff;
+}
