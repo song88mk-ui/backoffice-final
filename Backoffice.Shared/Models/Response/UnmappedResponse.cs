@@ -19,8 +19,14 @@ namespace Backoffice.Shared.Models.Response
             OtPrLi.SrId = new List<int>();
             OtPrLi.BgId = new List<int>();
         }
-        public string Id { get; set; }
-        public string Na { get; set; }
+        public string SpId { get; set; }
+        public string SpNa { get; set; }
+        public string SegId { get; set; }
+        public string SegNa { get; set; }
+        public string LeId { get; set; }
+        public string LeNa { get; set; }
+        public string FiId { get; set; }
+        public string FiNa { get; set; }
         public int ChTyId { get; set; }
         public ProviderModel<List<int>> OtPrLi { get; set; }
     }
