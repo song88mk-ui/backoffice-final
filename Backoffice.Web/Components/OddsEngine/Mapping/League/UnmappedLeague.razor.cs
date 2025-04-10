@@ -54,7 +54,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
                 };
 
                 foreach (var provider in item.Providers) {
-                    if (Int32.TryParse(provider.Id, out intId))
+                    if (Int32.TryParse(provider.LeId, out intId))
                     {
                         switch (provider.ChTyId)
                         {

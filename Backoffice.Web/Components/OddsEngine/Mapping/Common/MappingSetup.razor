@@ -22,7 +22,7 @@
                         @foreach (var item in _mappingSetupItem.Providers)
                         {
                             <li class="item" @onclick="() => HandleRemoveProviderItemClick(item)">
-                            <div>@($"{item.Na} (ID#{item.Id})")</div>
+                            <div>@(GetItemLabel(item))</div>
                                 <ProviderIcon ChannelTypeId="item.ChTyId" />
                             </li>
                         }

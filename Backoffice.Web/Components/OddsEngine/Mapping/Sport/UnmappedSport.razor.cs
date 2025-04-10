@@ -52,12 +52,12 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                     BgId = 0,   
                 };
 
-                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id, out SrId))
+                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.SpId, out SrId))
                 {
                     info.SrId = SrId;
                 }
 
-                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.Id, out BgId))
+                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.SpId, out BgId))
                 {
                     info.BgId = BgId;
                 }

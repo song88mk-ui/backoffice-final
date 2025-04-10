@@ -55,7 +55,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
 
                 foreach (var provider in item.Providers)
                 {
-                    if (Int32.TryParse(provider.Id, out intId))
+                    if (Int32.TryParse(provider.SegId, out intId))
                     {
                         switch (provider.ChTyId)
                         {
