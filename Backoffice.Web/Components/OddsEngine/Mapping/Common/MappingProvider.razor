@@ -14,7 +14,7 @@
                         <div class="provider-item @GetLinkedItemCss(item)" @onclick="_ => HandleItemClick(item)">
                             <div class="provider-item-name-container">
                                 <img class="drag-icon" src="icons/svg/draggable.svg" />
-                                <span class="provider-item-name">@($"{item.Na} (#{item.Id})")</span>
+                                <span class="provider-item-name">@(GetItemLabel(item))</span>
                             </div>
                             @if (item.HasLinkedItem)
                             {
