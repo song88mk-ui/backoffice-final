@@ -157,6 +157,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
 
             FilterProviderItems();
 
+            SetLinkedItems();
+
             RenderComponent = true;
         }
 
@@ -231,8 +233,10 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
 
             foreach (var item in TempFilteredUnmappedItems)
             {
-                if ((srIds.Contains(item.Id) && item.ChTyId == (int)ChannelType.SR) ||
-                    (bgIds.Contains(item.Id) && item.ChTyId == (int)ChannelType.BG))
+                string idToCheck = !string.IsNullOrEmpty(item.FiId) ? item.FiId : !string.IsNullOrEmpty(item.LeId) ? item.LeId : !string.IsNullOrEmpty(item.SegId) ? item.SegId : item.SpId;
+
+                if ((srIds.Contains(idToCheck) && item.ChTyId == (int)ChannelType.SR) ||
+                    (bgIds.Contains(idToCheck) && item.ChTyId == (int)ChannelType.BG))
                 {
                     item.IsCurrentLinkedItem = true;
                     continue;
@@ -257,18 +261,18 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             }
         }
 
-        public void HandleApplyDropdownFilter(bool isAllValue, MappingCategory category, MappingProviderItemModel item, bool isChecked)
-        {
-            if (isChecked)
-            {
-                if (isAllValue)
-                {
-                    ProviderItemFilters[category].Clear();
-                    return;
-                }
+        //public void HandleApplyDropdownFilter(bool isAllValue, MappingCategory category, MappingProviderItemModel item, bool isChecked)
+        //{
+        //    if (isChecked)
+        //    {
+        //        if (isAllValue)
+        //        {
+        //            ProviderItemFilters[category].Clear();
+        //            return;
+        //        }
 
-                ProviderItemFilters[category]
-            }
-        }
+        //        ProviderItemFilters[category]
+        //    }
+        //}
     }
 }
