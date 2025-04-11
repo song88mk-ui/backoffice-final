@@ -19,12 +19,12 @@ else
     <div class="modal-body pt-0">
         <AlertMessage AlertModel="_alertModel" AlertClass="pb-2" />
         <div class="information-container mb-3">
-            <MappingSetup IsEdit=true FormId="@_formId" MappingSetupItem="_mappingSetupItem" HasSubmitButton=false MappingSetupProviderItems="_currentMappingSetupProviderItems" OnSubmitCallback="HandleUpdateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
+            <MappingSetup MappingCategory="MappingCategory.League" IsEdit=true FormId="@_formId" MappingSetupItem="_mappingSetupItem" HasSubmitButton=false MappingSetupProviderItems="_currentMappingSetupProviderItems" OnSubmitCallback="HandleUpdateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
         </div>
         <div class="information-container p-3">
             @if (_tempFilteredUnmappedSports != null && _tempFilteredUnmappedSports.Count() > 0)
             {
-                <MappingProvider MappingSetupProviderItems="_currentMappingSetupProviderItems" ProviderItems="_tempFilteredUnmappedSports" OnClickItemCallback="HandleProviderItemClick" />
+                <MappingProvider MappingCategory="MappingCategory.League" MappingSetupProviderItems="_currentMappingSetupProviderItems" ProviderItems="_tempFilteredUnmappedSports" OnClickItemCallback="HandleProviderItemClick" />
             }
         </div>
     </div>

@@ -20,7 +20,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
         public bool IsAllowedMultipleItemsPerProvider { get; set; }
         public bool RenderComponent { get; set; } = false;
 
-        public Dictionary<MappingCategory, string> _fetchMappingCategories = new Dictionary<MappingCategory, string>
+        public Dictionary<MappingCategory, string> FetchMappingCategories = new Dictionary<MappingCategory, string>
         {
             { MappingCategory.Sport, "sports" },
             { MappingCategory.Segment, "segments" },
@@ -30,7 +30,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             { MappingCategory.Selection, "selections" }
         };
 
-        public Dictionary<MappingCategory, string> _saveMappingCategories = new Dictionary<MappingCategory, string>
+        public Dictionary<MappingCategory, string> SaveMappingCategories = new Dictionary<MappingCategory, string>
         {
             { MappingCategory.Sport, "sport" },
             { MappingCategory.Segment, "segment" },
@@ -38,6 +38,13 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             { MappingCategory.Fixture, "fixture" },
             { MappingCategory.Market, "market" },
             { MappingCategory.Selection, "selection" }
+        };
+
+        public Dictionary<MappingCategory, List<int>> ProviderItemFilters = new Dictionary<MappingCategory, List<int>>
+        {
+            { MappingCategory.Sport, new List<int>() },
+            { MappingCategory.Segment, new List<int>() },
+            { MappingCategory.League, new List<int>() }
         };
 
         public BaseUnmapped()
@@ -150,30 +157,62 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
 
             FilterProviderItems();
 
+            SetLinkedItems();
+
             RenderComponent = true;
         }
 
-        public List<MappingProviderItemModel> GetAllItemsToBeFiltered()
+        public List<MappingProviderItemModel> GetMappingItemsToBeFiltered()
         {
-            List<MappingProviderItemModel> allItemsToBeFiltered = new List<MappingProviderItemModel>();
+            List<MappingProviderItemModel> itemsToFilter = new List<MappingProviderItemModel>();
 
-            allItemsToBeFiltered.AddRange(CurrentMappingSetupProviderItems);
+            itemsToFilter.AddRange(CurrentMappingSetupProviderItems);
 
             foreach (var mappedItem in CurrentMappedItems)
             {
-                allItemsToBeFiltered.AddRange(mappedItem.Providers);
+                itemsToFilter.AddRange(mappedItem.Providers);
             }
 
-            return allItemsToBeFiltered;
+            return itemsToFilter;
+        }
+
+        public List<MappingProviderItemModel> GetSelectedDropdownItems()
+        {
+            List<MappingProviderItemModel> itemsToInclude = new List<MappingProviderItemModel>();
+
+            //if (ProviderItemFilters[MappingCategory.Sport].Any())
+            //{
+            //    itemsToInclude.AddRange(UnmappedItems.Where(t => ProviderItemFilters[MappingCategory.Sport].Contains(t.SpId)));
+            //}
+
+            //if (ProviderItemFilters[MappingCategory.Segment].Any())
+            //{
+            //    itemsToInclude.AddRange(UnmappedItems.Where(t => ProviderItemFilters[MappingCategory.Segment].Contains(t.SegId)));
+            //}
+
+            //if (ProviderItemFilters[MappingCategory.League].Any())
+            //{
+            //    itemsToInclude.AddRange(UnmappedItems.Where(t => ProviderItemFilters[MappingCategory.League].Contains(t.LeId)));
+            //}
+
+            return itemsToInclude;
         }
 
         public void FilterProviderItems()
         {
-            TempFilteredUnmappedItems = UnmappedItems;
+            var selectedDropdownItems = GetSelectedDropdownItems();
 
-            var allItemsToBeFiltered = GetAllItemsToBeFiltered();
+            if (selectedDropdownItems.Any())
+            {
+                TempFilteredUnmappedItems = selectedDropdownItems;
+            } else
+            {
+                TempFilteredUnmappedItems = UnmappedItems;
+            }
 
-            foreach (var providerItem in allItemsToBeFiltered)
+            var allItemsToExclude = GetMappingItemsToBeFiltered();
+
+            foreach (var providerItem in allItemsToExclude)
             {
                 TempFilteredUnmappedItems = TempFilteredUnmappedItems.Where(x => JsonSerializer.Serialize(x) != JsonSerializer.Serialize(providerItem)).ToList();
             }
@@ -183,8 +222,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
 
         public void SetLinkedItems()
         {
-            int itemIndex = -1;
-
             List<string> srIds = new List<string>();
             List<string> bgIds = new List<string>();
 
@@ -196,8 +233,10 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
 
             foreach (var item in TempFilteredUnmappedItems)
             {
-                if ((srIds.Contains(item.Id) && item.ChTyId == (int)ChannelType.SR) ||
-                    (bgIds.Contains(item.Id) && item.ChTyId == (int)ChannelType.BG))
+                string idToCheck = !string.IsNullOrEmpty(item.FiId) ? item.FiId : !string.IsNullOrEmpty(item.LeId) ? item.LeId : !string.IsNullOrEmpty(item.SegId) ? item.SegId : item.SpId;
+
+                if ((srIds.Contains(idToCheck) && item.ChTyId == (int)ChannelType.SR) ||
+                    (bgIds.Contains(idToCheck) && item.ChTyId == (int)ChannelType.BG))
                 {
                     item.IsCurrentLinkedItem = true;
                     continue;
@@ -221,5 +260,19 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
                 }
             }
         }
+
+        //public void HandleApplyDropdownFilter(bool isAllValue, MappingCategory category, MappingProviderItemModel item, bool isChecked)
+        //{
+        //    if (isChecked)
+        //    {
+        //        if (isAllValue)
+        //        {
+        //            ProviderItemFilters[category].Clear();
+        //            return;
+        //        }
+
+        //        ProviderItemFilters[category]
+        //    }
+        //}
     }
 }

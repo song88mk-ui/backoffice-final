@@ -1,3 +1,4 @@
+using Backoffice.Shared.Enums;
 using Backoffice.Web.Models.OddsEngine.Mapping;
 using Microsoft.AspNetCore.Components;
 
@@ -8,6 +9,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         [Parameter] public EventCallback<MappingProviderItemModel> OnClickItemCallback { get; set; }
         [Parameter] public List<MappingProviderItemModel> ProviderItems { get; set; }
         [Parameter] public List<MappingProviderItemModel> MappingSetupProviderItems { get; set; }
+        [Parameter] public MappingCategory MappingCategory { get; set; }
 
         private List<MappingProviderItemModel> _filteredProviderItems { get; set; } = new List<MappingProviderItemModel>();
         private List<MappingProviderItemModel> _previousProviderItems = new List<MappingProviderItemModel>();
@@ -25,6 +27,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         };
 
         private string _searchQuery { get; set; } = string.Empty;
+        private string _propertyNameToSortBy;
+        private string _propertyNameToSearchBy;
+        private string _propertyNameToLabelItems;
         private bool _shouldRender;
 
         protected override bool ShouldRender() => _shouldRender;
@@ -37,20 +42,59 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             {
                 _mappingSetupProviderItems = MappingSetupProviderItems;
                 _filteredProviderItems = ProviderItems;
+                
+                SetDynamicProperties();
+
                 _groupProviderItems = GetGroupedProviderItems();
                 _previousProviderItems = new List<MappingProviderItemModel>(_filteredProviderItems);
             }
         }
 
+        private void SetDynamicProperties()
+        {
+            switch (MappingCategory)
+            {
+                case MappingCategory.Sport:
+                    _propertyNameToSortBy = "SpNa";
+                    _propertyNameToSearchBy = "SpNa";
+                    _propertyNameToLabelItems = "Sp";
+                    break;
+                case MappingCategory.Segment:
+                    _propertyNameToSortBy = "SegNa";
+                    _propertyNameToSearchBy = "SegNa";
+                    _propertyNameToLabelItems = "Seg";
+                    break;
+                case MappingCategory.League:
+                    _propertyNameToSortBy = "LeNa";
+                    _propertyNameToSearchBy = "LeNa";
+                    _propertyNameToLabelItems = "Le";
+                    break;
+                case MappingCategory.Fixture:
+                    _propertyNameToSortBy = "FiNa";
+                    _propertyNameToSearchBy = "FiNa";
+                    _propertyNameToLabelItems = "Fi";
+                    break;
+                default:
+                    _propertyNameToSortBy = "SpNa";
+                    _propertyNameToSearchBy = "SpNa";
+                    _propertyNameToLabelItems = "Sp";
+                    break;
+            }
+        }
+
         private Dictionary<int, List<MappingProviderItemModel>> GetGroupedProviderItems()
         {
-            return _filteredProviderItems.GroupBy(m => m.ChTyId).OrderBy(g => g.Key).ToDictionary(g => g.Key, g => g.OrderBy(x => x.Na).OrderBy(x => x.IsCurrentLinkedItem ? 0 : 1).ToList());
+            var propertyInfo = typeof(MappingProviderItemModel).GetProperty(_propertyNameToSortBy);
+
+            return _filteredProviderItems.GroupBy(m => m.ChTyId).ToDictionary(g => g.Key, g => g.OrderBy(x => propertyInfo.GetValue(x, null)).OrderBy(x => x.IsCurrentLinkedItem ? 0 : 1).ToList());
         }
 
         public void FilterProviderItems(ChangeEventArgs e)
         {
+            var propertyInfo = typeof(MappingProviderItemModel).GetProperty(_propertyNameToSearchBy);
+
             _searchQuery = e.Value.ToString();
-            _filteredProviderItems = ProviderItems.Where(m => m.Na.ToLower().Contains(_searchQuery.ToLower())).ToList();
+            _filteredProviderItems = ProviderItems.Where(m => propertyInfo.GetValue(m, null).ToString().ToLower().Contains(_searchQuery.ToLower())).ToList();
             _groupProviderItems = GetGroupedProviderItems();
         }
 
@@ -62,6 +106,14 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         private string GetLinkedItemCss(MappingProviderItemModel item)
         {
             return item.IsCurrentLinkedItem ? "highlight" : "";
+        }
+
+        private string GetItemLabel(MappingProviderItemModel item)
+        {
+            var idPropertyInfo = typeof(MappingProviderItemModel).GetProperty($"{_propertyNameToLabelItems}Id");
+            var labelPropertyInfo = typeof(MappingProviderItemModel).GetProperty($"{_propertyNameToLabelItems}Na");
+
+            return $"{labelPropertyInfo.GetValue(item, null)} (#{idPropertyInfo.GetValue(item, null)})";
         }
 
         private bool ValidateParameterRender()

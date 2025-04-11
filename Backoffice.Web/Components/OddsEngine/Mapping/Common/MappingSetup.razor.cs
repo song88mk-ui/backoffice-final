@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Enums;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 {
@@ -15,10 +16,12 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         [Parameter] public string FormId { get; set; } = "mappingSetupFormId";
         [Parameter] public bool HasSubmitButton { get; set; } = true;
         [Parameter] public bool IsEdit { get; set; } = false;
+        [Parameter] public MappingCategory MappingCategory { get; set; }
 
         private MappingSetupItemModel _mappingSetupItem;
         private EditContext _editContext;
 
+        private string _propertyNameToLabelItems;
         private bool _shouldRender;
         protected override bool ShouldRender() => _shouldRender;
 
@@ -32,6 +35,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             _shouldRender = ValidateParameterRender();
             if (!_shouldRender) return;
 
+            SetDynamicProperties();
+
             if (!string.IsNullOrEmpty(MappingSetupItem.Id) && MappingSetupItem.Id != _mappingSetupItem.Id) {
                 _mappingSetupItem = new MappingSetupItemModel
                 {
@@ -40,8 +45,14 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
                     Providers = MappingSetupItem.Providers.Select(s =>
                         new MappingProviderItemModel
                         {
-                            Id = s.Id,
-                            Na = s.Na,
+                            SpId = s.SpId,
+                            SpNa = s.SpNa,
+                            SegId = s.SegId,
+                            SegNa = s.SegNa,
+                            LeId = s.LeId,
+                            LeNa = s.LeNa,
+                            FiId = s.FiId,
+                            FiNa = s.FiNa,
                             ChTyId = s.ChTyId,
                             OtPrLi = new ProviderModel<List<int>>
                             {
@@ -58,6 +69,29 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             _editContext = new EditContext(_mappingSetupItem);
             _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));
         }
+
+        private void SetDynamicProperties()
+        {
+            switch (MappingCategory)
+            {
+                case MappingCategory.Sport:
+                    _propertyNameToLabelItems = "Sp";
+                    break;
+                case MappingCategory.Segment:
+                    _propertyNameToLabelItems = "Seg";
+                    break;
+                case MappingCategory.League:
+                    _propertyNameToLabelItems = "Le";
+                    break;
+                case MappingCategory.Fixture:
+                    _propertyNameToLabelItems = "Fi";
+                    break;
+                default:
+                    _propertyNameToLabelItems = "Sp";
+                    break;
+            }
+        }
+
         private async Task HandleSubmit()
         {
             await OnSubmitCallback.InvokeAsync(_mappingSetupItem);
@@ -104,6 +138,14 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             _mappingSetupItem.Name = e.Value.ToString();
 
             _shouldRender = true;
+        }
+
+        private string GetItemLabel(MappingProviderItemModel item)
+        {
+            var idPropertyInfo = typeof(MappingProviderItemModel).GetProperty($"{_propertyNameToLabelItems}Id");
+            var labelPropertyInfo = typeof(MappingProviderItemModel).GetProperty($"{_propertyNameToLabelItems}Na");
+
+            return $"{labelPropertyInfo.GetValue(item, null)} (#{idPropertyInfo.GetValue(item, null)})";
         }
 
         private bool ValidateParameterRender()

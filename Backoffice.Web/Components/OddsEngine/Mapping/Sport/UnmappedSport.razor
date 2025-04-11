@@ -10,14 +10,14 @@
                 <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
                 <img class="download-icon" src="icons/svg/download.svg" />
             </div>
-            <MappingSetup MappingSetupProviderItems="CurrentMappingSetupProviderItems" OnSubmitCallback="HandleCreateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
+            <MappingSetup MappingCategory="MappingCategory.Sport" MappingSetupProviderItems="CurrentMappingSetupProviderItems" OnSubmitCallback="HandleCreateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
         </div>
         <MappedItems CurrentMappedItems="CurrentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" OnRemoveCallback="HandleRemoveMappedItem" />
     </div>
     <div class="right">
         @if (TempFilteredUnmappedItems != null && TempFilteredUnmappedItems.Count() > 0)
         {
-            <MappingProvider MappingSetupProviderItems="CurrentMappingSetupProviderItems" ProviderItems="TempFilteredUnmappedItems" OnClickItemCallback="HandleProviderItemClick" />
+            <MappingProvider MappingCategory="MappingCategory.Sport" MappingSetupProviderItems="CurrentMappingSetupProviderItems" ProviderItems="TempFilteredUnmappedItems" OnClickItemCallback="HandleProviderItemClick" />
         }
     </div>
 </div>
