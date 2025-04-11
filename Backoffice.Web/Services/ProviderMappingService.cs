@@ -248,4 +248,30 @@ public class ProviderMappingService : IProviderMappingService
             };
         }
     }
+
+    public async Task<BaseResponse<bool>> DeleteSportMapping(string sportId, string userId)
+    {
+        try
+        {
+            var response = await GetHttpClient().DeleteAsync($"/api/trading/mapping/sports?sportId={sportId}&userId={userId}");
+
+            return JsonSerializer.Deserialize<BaseResponse<bool>>
+            (
+                await response.Content.ReadAsStringAsync(),
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+            ) ?? new BaseResponse<bool>();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            if (ex.StackTrace != null)
+                Log.Error(ex.StackTrace.ToString());
+
+            return new BaseResponse<bool>
+            {
+                StatusCode = StatusCode.Error,
+                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+            };
+        }
+    }
 }
