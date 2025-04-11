@@ -61,8 +61,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 				{
 					_providers.Add(new MappingProviderItemModel()
 					{
-						Id = mapping.Info.Id.ToString(),
-						Na = mapping.Info.Name,
+						SpId = mapping.Info.Id.ToString(),
+						SpNa = mapping.Info.Name,
 						ChTyId = (int)mapping.ChannelType,
 						OtPrLi = mapping.Info.OtPrLi,
 					});
