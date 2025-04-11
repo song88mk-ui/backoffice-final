@@ -64,7 +64,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
         public async Task HandleDeleteMappingClickEvent(LeagueMappingModel mappingItem)
         {
             var parameters = new ModalParameters();
-            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("DialogStyle", "max-width: 360px");
             parameters.Add("LeId", mappingItem.LeId);
             parameters.Add("LeNa", mappingItem.LeNa);
             var options = new ModalOptions

@@ -1,12 +1,18 @@
-<div class="container">
-    <span class="header">Delete Mapped League</span>
 
-    <div>Are you sure you want to delete the mapped league:@_leagueName</div>
-    <br />
-    <span>This action cannot be undone.</span>
-</div>
 
-<div class="btn-container d-flex justify-content-center">    
-    <button @onclick="OnCloseClickEvent" type="button" class="btn modal-btn btn-cancel">@_translationState.GetValue("Cancel")</button>
-    <button @onclick="OnDeleteClickEvent" type="button" class="btn modal-btn btn-delete">@_translationState.GetValue("Delete")</button>
-</div>
+    <div class="p-4 d-flex justify-content-between">
+        <img src="icons/svg/warning-icon-3.svg" />
+        <button type="button" class="btn-close" @onclick="OnCloseClickEvent"></button>
+    </div>
+    <div class="modal-body px-4 py-0">
+        <AlertMessage AlertModel="_alertModel" AlertClass="pb-2" />
+            <h4 class="title">Delete Mapped League</h4>
+            <p class="mb-4">
+                Are you sure you want to delete the mapped league:@_leagueName
+            </p>
+            <p class="mb-3">This action cannot be undone.</p>
+    </div>
+    <div class="btn-container d-flex justify-content-center"> 
+        <button @onclick="OnCloseClickEvent" type="button" class="btn modal-btn btn-cancel">@_translationState.GetValue("Cancel")</button>
+        <button @onclick="OnDeleteClickEvent" type="button" class="btn modal-btn btn-delete">@_translationState.GetValue("Delete")</button>
+    </div> 
