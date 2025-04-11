@@ -18,12 +18,12 @@ else
         @if(_isSportMappingFound)
         {
             <div class="information-container mb-3">
-                <MappingSetup IsEdit=true FormId="@_formId" MappingSetupItem="_mappingSetupItem" HasSubmitButton=false MappingSetupProviderItems="_currentMappingSetupProviderItems" OnSubmitCallback="HandleUpdateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
+                <MappingSetup MappingCategory="MappingCategory.Sport" IsEdit=true FormId="@_formId" MappingSetupItem="_mappingSetupItem" HasSubmitButton=false MappingSetupProviderItems="_currentMappingSetupProviderItems" OnSubmitCallback="HandleUpdateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
             </div>
             <div class="information-container p-3">
                 @if (_tempFilteredUnmappedSports != null && _tempFilteredUnmappedSports.Count() > 0)
                 {
-                    <MappingProvider MappingSetupProviderItems="_currentMappingSetupProviderItems" ProviderItems="_tempFilteredUnmappedSports" OnClickItemCallback="HandleProviderItemClick" />
+                    <MappingProvider MappingCategory="MappingCategory.Sport" MappingSetupProviderItems="_currentMappingSetupProviderItems" ProviderItems="_tempFilteredUnmappedSports" OnClickItemCallback="HandleProviderItemClick" />
                 }
             </div>
         }

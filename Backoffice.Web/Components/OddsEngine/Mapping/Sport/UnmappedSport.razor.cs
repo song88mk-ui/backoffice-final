@@ -19,7 +19,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
         private async Task FetchUnmappedSports()
         {
-            var response = await _providerMappingService.GetUnmappedItemsByCategory(_fetchMappingCategories[MappingCategory.Sport]);
+            var response = await _providerMappingService.GetUnmappedItemsByCategory(FetchMappingCategories[MappingCategory.Sport]);
 
             if (response != null && response?.Result != null && response?.StatusCode == StatusCode.Success)
             {
@@ -52,12 +52,12 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                     BgId = 0,   
                 };
 
-                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id, out SrId))
+                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.SpId, out SrId))
                 {
                     info.SrId = SrId;
                 }
 
-                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.Id, out BgId))
+                if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.SpId, out BgId))
                 {
                     info.BgId = BgId;
                 }
@@ -76,7 +76,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
         private async Task HandleSaveMappingClick()
         {
-            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_saveMappingCategories[MappingCategory.Sport], BuildRequestPayload());
+            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(SaveMappingCategories[MappingCategory.Sport], BuildRequestPayload());
 
             if (response != null && response.StatusCode == StatusCode.Success)
             {

@@ -21,7 +21,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
 
         private async Task FetchUnmappedSegments()
         {
-            var response = await _providerMappingService.GetUnmappedItemsByCategory(_fetchMappingCategories[MappingCategory.Segment]);
+            var response = await _providerMappingService.GetUnmappedItemsByCategory(FetchMappingCategories[MappingCategory.Segment]);
 
             if (response != null && response?.Result != null && response?.StatusCode == StatusCode.Success)
             {
@@ -55,7 +55,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
 
                 foreach (var provider in item.Providers)
                 {
-                    if (Int32.TryParse(provider.Id, out intId))
+                    if (Int32.TryParse(provider.SegId, out intId))
                     {
                         switch (provider.ChTyId)
                         {
@@ -85,7 +85,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
 
         private async Task HandleSaveMappingClick()
         {
-            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(_saveMappingCategories[MappingCategory.Segment], BuildRequestPayload());
+            var response = await _providerMappingService.AddOrUpdateProviderMappingBulk(SaveMappingCategories[MappingCategory.Segment], BuildRequestPayload());
 
             if (response != null && response.StatusCode == StatusCode.Success)
             {

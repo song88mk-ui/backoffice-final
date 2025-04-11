@@ -98,8 +98,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             {
                 providers.Add(new MappingProviderItemModel()
                 {
-                    Id = info.SrId.Id.ToString(),
-                    Na = info.SrId.Name,
+                    SpId = info.SrId.Id.ToString(),
+                    SpNa = info.SrId.Name,
                     ChTyId = (int)ChannelType.SR,
                     OtPrLi = info.SrId.OtPrLi,
                 });
@@ -108,8 +108,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             {
                 providers.Add(new MappingProviderItemModel()
                 {
-                    Id = info.BgId.Id.ToString(),
-                    Na = info.BgId.Name,
+                    SpId = info.BgId.Id.ToString(),
+                    SpNa = info.BgId.Name,
                     ChTyId = (int)ChannelType.BG,
                     OtPrLi = info.BgId.OtPrLi,
                 });
@@ -126,12 +126,12 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
                 BgId = 0,   
             };
 
-            if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.Id, out int SrId))
+            if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.SpId, out int SrId))
             {
                 info.SrId = SrId;
             }
 
-            if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.Id, out int BgId))
+            if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.BG)?.SpId, out int BgId))
             {
                 info.BgId = BgId;
             }
@@ -172,7 +172,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
             _currentMappingSetupProviderItems = _currentMappingSetupProviderItems.Where(item => item.ChTyId != providerItem.ChTyId).ToList();
 
-            if (!_unmappedSports.Any(item => item.Id == providerItem.Id))
+            if (!_unmappedSports.Any(item => item.SpId == providerItem.SpId))
             {
                 _unmappedSports.Add(providerItem);
             }
@@ -227,8 +227,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
             foreach (var item in _tempFilteredUnmappedSports)
             {
-                if ((srIds.Contains(item.Id) && item.ChTyId == (int)ChannelType.SR) || 
-                    (bgIds.Contains(item.Id) && item.ChTyId == (int)ChannelType.BG))
+                if ((srIds.Contains(item.SpId) && item.ChTyId == (int)ChannelType.SR) || 
+                    (bgIds.Contains(item.SpId) && item.ChTyId == (int)ChannelType.BG))
                 {
                     item.IsCurrentLinkedItem = true;
                     continue;
