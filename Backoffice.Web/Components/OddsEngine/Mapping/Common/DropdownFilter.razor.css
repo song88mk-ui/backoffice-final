@@ -29,12 +29,14 @@
     background-color: #FFF;
     color: #000;
     border: 1px solid #121212;
+    max-height: 50svh;
     position: absolute;
     left: 0;
     top: 40px;
     display: flex;
     flex-direction: column;
     gap: 3px;
+    overflow-y: auto;
 }
 
 .checkbox-item {
