@@ -20,7 +20,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _pageHeaderModel = new()
             {
-                Title = "League Mapping",
+                Title = "Segment Mapping",
                 ShowLanguageDropDown = false
             };
 
@@ -34,7 +34,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 },
                 new BreadcrumbModel 
                 {
-                    Name = "League Mapping",
+                    Name = "Segment Mapping",
                     Url = string.Empty,
                     IsCurrentPage = true
                 }
