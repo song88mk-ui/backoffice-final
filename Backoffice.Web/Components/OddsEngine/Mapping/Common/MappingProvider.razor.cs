@@ -6,10 +6,18 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 {
     public partial class MappingProvider
     {
-        [Parameter] public EventCallback<MappingProviderItemModel> OnClickItemCallback { get; set; }
-        [Parameter] public List<MappingProviderItemModel> ProviderItems { get; set; }
-        [Parameter] public List<MappingProviderItemModel> MappingSetupProviderItems { get; set; }
-        [Parameter] public MappingCategory MappingCategory { get; set; }
+        [Parameter] 
+        public EventCallback<MappingProviderItemModel> OnClickItemCallback { get; set; }
+        [Parameter] 
+        public List<MappingProviderItemModel> ProviderItems { get; set; }
+        [Parameter] 
+        public List<MappingProviderItemModel> MappingSetupProviderItems { get; set; }
+        [Parameter] 
+        public MappingCategory MappingCategory { get; set; }
+        [Parameter] 
+        public Dictionary<MappingCategory, MappingDropdownFilterGroup> DropdownFilters { get; set; }
+        [Parameter] 
+        public EventCallback<DropdownFilterCallbackModel> OnDropdownItemClickCallback { get; set; }
 
         private List<MappingProviderItemModel> _filteredProviderItems { get; set; } = new List<MappingProviderItemModel>();
         private List<MappingProviderItemModel> _previousProviderItems = new List<MappingProviderItemModel>();
@@ -30,6 +38,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         private string _propertyNameToSortBy;
         private string _propertyNameToSearchBy;
         private string _propertyNameToLabelItems;
+        private bool _showSportsDropdown;
+        private bool _showSegmentsDropdown;
+        private bool _showLeaguesDropdown;
         private bool _shouldRender;
 
         protected override bool ShouldRender() => _shouldRender;
@@ -58,26 +69,41 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
                     _propertyNameToSortBy = "SpNa";
                     _propertyNameToSearchBy = "SpNa";
                     _propertyNameToLabelItems = "Sp";
+                    _showSportsDropdown = false;
+                    _showSegmentsDropdown = false;
+                    _showLeaguesDropdown = false;
                     break;
                 case MappingCategory.Segment:
                     _propertyNameToSortBy = "SegNa";
                     _propertyNameToSearchBy = "SegNa";
                     _propertyNameToLabelItems = "Seg";
+                    _showSportsDropdown = true;
+                    _showSegmentsDropdown = false;
+                    _showLeaguesDropdown = false;
                     break;
                 case MappingCategory.League:
                     _propertyNameToSortBy = "LeNa";
                     _propertyNameToSearchBy = "LeNa";
                     _propertyNameToLabelItems = "Le";
+                    _showSportsDropdown = true;
+                    _showSegmentsDropdown = true;
+                    _showLeaguesDropdown = false;
                     break;
                 case MappingCategory.Fixture:
                     _propertyNameToSortBy = "FiNa";
                     _propertyNameToSearchBy = "FiNa";
                     _propertyNameToLabelItems = "Fi";
+                    _showSportsDropdown = true;
+                    _showSegmentsDropdown = true;
+                    _showLeaguesDropdown = true;
                     break;
                 default:
                     _propertyNameToSortBy = "SpNa";
                     _propertyNameToSearchBy = "SpNa";
                     _propertyNameToLabelItems = "Sp";
+                    _showSportsDropdown = false;
+                    _showSegmentsDropdown = false;
+                    _showLeaguesDropdown = false;
                     break;
             }
         }

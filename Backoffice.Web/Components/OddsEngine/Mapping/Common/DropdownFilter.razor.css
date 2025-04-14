@@ -13,7 +13,11 @@
     background-color: #FFF;
     color: #000;
     border: 1px solid #767676;
-    font-size: 14px;
+    padding: 0px 7px 0px 10px;
+    min-height: 36px;
+    max-height: 36px;
+    font-size: 12px;
+    font-weight: 500;
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

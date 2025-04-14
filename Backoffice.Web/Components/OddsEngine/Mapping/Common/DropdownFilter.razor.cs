@@ -1,8 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
 using Backoffice.Web.Models.OddsEngine.Mapping;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 {
@@ -51,7 +49,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
                 default:
                     break;
             }
-            return FilterGroup.SelectAllValue == true ? _translationState.GetValue("All Sports") : String.Join(", ", namesToJoin);
+            return FilterGroup.SelectAllValue == true ? FilterGroup.SelectAllLabel : String.Join(", ", namesToJoin);
         }
 
         private string GetCheckboxLabel(MappingDropdownFilterItemModel item)
