@@ -16,9 +16,9 @@
         <MappedItems CurrentMappedItems="CurrentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" OnRemoveCallback="HandleRemoveMappedItem" />
     </div>
     <div class="right">
-        @if (TempFilteredUnmappedItems != null && TempFilteredUnmappedItems.Count() > 0)
+        @if (TempFilteredUnmappedItems != null)
         {
-            <MappingProvider MappingCategory="MappingCategory.League" MappingSetupProviderItems="CurrentMappingSetupProviderItems" ProviderItems="TempFilteredUnmappedItems" OnClickItemCallback="HandleProviderItemClick" />
+            <MappingProvider MappingCategory="MappingCategory.League" MappingSetupProviderItems="CurrentMappingSetupProviderItems" ProviderItems="TempFilteredUnmappedItems" OnClickItemCallback="HandleProviderItemClick" DropdownFilters="DropdownFilters" OnDropdownItemClickCallback="HandleDropdownItemClick" />
         }
     </div>
 </div>

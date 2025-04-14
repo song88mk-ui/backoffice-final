@@ -260,27 +260,21 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
         {
             if (Init)
             {
-                var distinctSports = UnmappedItems.DistinctBy(x => x.SpId).Select(s =>
+                var initDropdownItems = UnmappedItems.Select(s =>
                     new MappingDropdownFilterItemModel
                     {
                         SportId = s.SpId,
-                        SportName = s.SpNa
-                    }).ToList();
-
-                var distinctSegments = UnmappedItems.DistinctBy(y => y.SegId).Select(s =>
-                    new MappingDropdownFilterItemModel
-                    {
+                        SportName = s.SpNa,
                         SegmentId = s.SegId,
-                        SegmentName = s.SegNa
-                    }).ToList();
-
-                var distinctLeagues = UnmappedItems.DistinctBy(x => x.LeId).Select(s =>
-                    new MappingDropdownFilterItemModel
-                    {
+                        SegmentName = s.SegNa,
                         LeagueId = s.LeId,
                         LeagueName = s.LeNa
-                    }).ToList();
+                    }
+                );
 
+                var distinctSports = initDropdownItems.DistinctBy(x => x.SportId).ToList();
+                var distinctSegments = initDropdownItems.DistinctBy(x => x.SegmentId).ToList();
+                var distinctLeagues = initDropdownItems.DistinctBy(x => x.LeagueId).ToList();
 
                 DropdownFilters[MappingCategory.Sport].Items = distinctSports;
                 DropdownFilters[MappingCategory.Segment].Items = distinctSegments;
