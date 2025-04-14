@@ -2,8 +2,6 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models.OddsEngine.Mapping;
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
