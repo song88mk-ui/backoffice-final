@@ -1,0 +1,22 @@
+﻿<div class="dropdown-container">
+    <input type="text" class="dropdown-label" value="@GetDropdownLabel()" readonly="true" @onclick="HandleClickDropdown"/>
+    @if (_showDropdown)
+    {
+        <div class="options-container">
+            <div class="checkbox-item">
+                <input type="checkbox" checked="@FilterGroup.SelectAllValue" @onchange="(e) => HandleItemClick(e, null)" />
+                <span class="checkbox-label">@FilterGroup.SelectAllLabel</span>
+            </div>
+            @foreach(var item in FilterGroup.Items)
+            {
+                if (item.IsVisible)
+                {
+                    <div class="checkbox-item">
+                        <input type="checkbox" checked="@item.IsChecked" @onchange="(e) => HandleItemClick(e, item)" />
+                        <span class="checkbox-label">@GetCheckboxLabel(item)</span>
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>
