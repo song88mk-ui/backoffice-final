@@ -1,0 +1,44 @@
+﻿.dropdown-container {
+    position: relative;
+    min-width: 200px;
+    max-width: 200px;
+}
+
+.dropdown-label, .options-container {
+    width: 100%;
+    padding: 7px;
+}
+
+.dropdown-label {
+    background-color: #FFF;
+    color: #000;
+    border: 1px solid #767676;
+    font-size: 14px;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    user-select: none;
+}
+
+.options-container {
+    background-color: #FFF;
+    color: #000;
+    border: 1px solid #121212;
+    position: absolute;
+    left: 0;
+    top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.checkbox-item {
+    display: flex;
+    gap: 5px;
+    align-items: start;
+}
+
+.checkbox-item input {
+    margin-top: 4px;
+}
