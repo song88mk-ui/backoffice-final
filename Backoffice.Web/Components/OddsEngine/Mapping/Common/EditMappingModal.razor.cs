@@ -249,6 +249,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
             if (hasItemOfSameProvider)
             {
+                if (!_unmappedSports.Any(sport => sport.SpId == _currentMappingSetupProviderItems[sameProviderIndex].SpId))
+                {
+                    _unmappedSports.Add(_currentMappingSetupProviderItems[sameProviderIndex]);
+                }
+                
                 _currentMappingSetupProviderItems[sameProviderIndex] = providerItem;
             }
             else
