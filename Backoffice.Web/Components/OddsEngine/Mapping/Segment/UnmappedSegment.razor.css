@@ -4,15 +4,6 @@
     justify-content: space-between;
 }
 
-.dropdowns-container {
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: row;
-    justify-content: start;
-    align-items: center;
-    gap: 12px;
-}
-
 .main-content-grid .left,
 .main-content-grid .right {
     display: flex;

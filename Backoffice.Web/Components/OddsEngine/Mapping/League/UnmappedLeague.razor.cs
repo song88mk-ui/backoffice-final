@@ -17,6 +17,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
             IsAllowedMultipleItemsPerProvider = true;
 
             await FetchUnmappedLeagues();
+
+            DropdownFilters[MappingCategory.Sport].SelectAllLabel = _translationState.GetValue("All Sports");
+            DropdownFilters[MappingCategory.Segment].SelectAllLabel = _translationState.GetValue("All Segments");
         }
 
         private async Task FetchUnmappedLeagues()
@@ -31,6 +34,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
                 CountCallbackModel.Count = UnmappedItems.Count();
 
                 await OnItemsCountUpdateCallback.InvokeAsync(CountCallbackModel);
+
+                SetDropdownFilters();
             }
 
             RenderComponent = true;
