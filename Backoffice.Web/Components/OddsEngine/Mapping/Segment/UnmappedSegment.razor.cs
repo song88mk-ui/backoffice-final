@@ -17,6 +17,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
             IsAllowedMultipleItemsPerProvider = true;
 
             await FetchUnmappedSegments();
+
+            DropdownFilters[MappingCategory.Sport].SelectAllLabel = _translationState.GetValue("All Sports");
         }
 
         private async Task FetchUnmappedSegments()
@@ -31,6 +33,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
                 CountCallbackModel.Count = UnmappedItems.Count();
 
                 await OnItemsCountUpdateCallback.InvokeAsync(CountCallbackModel);
+
+                SetDropdownFilters();
             }
 
             RenderComponent = true;

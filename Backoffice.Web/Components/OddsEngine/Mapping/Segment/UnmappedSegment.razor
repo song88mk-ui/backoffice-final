@@ -3,7 +3,13 @@
 
 @inherits BaseUnmapped
 
-<span class="title">Segment Mapping</span>
+<div class="dropdowns-container">
+    @if (DropdownFilters[MappingCategory.Sport].Items.Any())
+    {
+        <DropdownFilter FilterGroup="DropdownFilters[MappingCategory.Sport]" OnClickCallback="HandleDropdownItemClick" MappingCategory="MappingCategory.Sport" />
+    }
+</div>
+
 <div class="main-content-grid">
     <div class="left">
         <div class="mapping-setup-container">
