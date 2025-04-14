@@ -27,6 +27,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 CountCallbackModel.Count = UnmappedItems.Count();
 
                 await OnItemsCountUpdateCallback.InvokeAsync(CountCallbackModel);
+
+                SetDropdownFilters();
             }
 
             RenderComponent = true;
