@@ -4,10 +4,12 @@
 }
 
 .input-search {
-  width: 100%;
-  padding: 7px 30px 7px 10px;
-  font-size: 12px;
-  font-weight: 500;
+    width: 100%;
+    padding: 7px 30px 7px 10px;
+    min-height: 36px;
+    max-height: 36px;
+    font-size: 12px;
+    font-weight: 500;
 }
 
 .fa-search {
@@ -99,4 +101,19 @@
 .provider-item.highlight {
     background-color: #E6FFE5;
     border: 1px solid #6CEB67;
+}
+
+.filters-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.dropdowns-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
 }

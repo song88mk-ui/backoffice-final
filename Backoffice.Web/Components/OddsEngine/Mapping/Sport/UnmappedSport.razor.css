@@ -1,18 +1,4 @@
-﻿.dropdowns-container {
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-}
-
-.dropdown {
-    min-width: 160px;
-    max-width: 160px;
-    padding: 7px;
-}
-
-.main-content-grid {
+﻿.main-content-grid {
     width: 100%;
     display: flex;
     justify-content: space-between;

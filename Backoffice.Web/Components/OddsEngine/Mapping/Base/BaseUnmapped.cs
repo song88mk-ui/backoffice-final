@@ -18,6 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
         public List<MappingSetupItemModel> CurrentMappedItems { get; set; }
         public UpdateMappingTabCountModel CountCallbackModel { get; set; }
         public bool IsAllowedMultipleItemsPerProvider { get; set; }
+        public bool Init { get; set; } = true;
         public bool RenderComponent { get; set; } = false;
 
         public Dictionary<MappingCategory, string> FetchMappingCategories = new Dictionary<MappingCategory, string>
@@ -40,11 +41,11 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             { MappingCategory.Selection, "selection" }
         };
 
-        public Dictionary<MappingCategory, List<int>> ProviderItemFilters = new Dictionary<MappingCategory, List<int>>
+        public Dictionary<MappingCategory, MappingDropdownFilterGroup> DropdownFilters = new Dictionary<MappingCategory, MappingDropdownFilterGroup>
         {
-            { MappingCategory.Sport, new List<int>() },
-            { MappingCategory.Segment, new List<int>() },
-            { MappingCategory.League, new List<int>() }
+            { MappingCategory.Sport, new MappingDropdownFilterGroup() },
+            { MappingCategory.Segment, new MappingDropdownFilterGroup() },
+            { MappingCategory.League, new MappingDropdownFilterGroup() }
         };
 
         public BaseUnmapped()
@@ -126,6 +127,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
 
             ResetMappingItems();
 
+            SetDropdownFilters();
+
             await OnItemsCountUpdateCallback.InvokeAsync(CountCallbackModel);
 
             RenderComponent = true;
@@ -180,35 +183,27 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
         {
             List<MappingProviderItemModel> itemsToInclude = new List<MappingProviderItemModel>();
 
-            //if (ProviderItemFilters[MappingCategory.Sport].Any())
-            //{
-            //    itemsToInclude.AddRange(UnmappedItems.Where(t => ProviderItemFilters[MappingCategory.Sport].Contains(t.SpId)));
-            //}
+            var sportIdsToInclude = DropdownFilters[MappingCategory.Sport].Items.Where(x => x.IsChecked == true).Select(sp => sp.SportId).ToList();
+            var segmentIdsToInclude = DropdownFilters[MappingCategory.Segment].Items.Where(x => x.IsChecked == true).Select(se => se.SegmentId).ToList();
+            var leagueIdsToInclude = DropdownFilters[MappingCategory.League].Items.Where(x => x.IsChecked == true).Select(le => le.LeagueId).ToList();
 
-            //if (ProviderItemFilters[MappingCategory.Segment].Any())
-            //{
-            //    itemsToInclude.AddRange(UnmappedItems.Where(t => ProviderItemFilters[MappingCategory.Segment].Contains(t.SegId)));
-            //}
+            if (sportIdsToInclude.Count == 0 || segmentIdsToInclude.Count == 0 || leagueIdsToInclude.Count == 0)
+            {
+                return itemsToInclude;
+            }
 
-            //if (ProviderItemFilters[MappingCategory.League].Any())
-            //{
-            //    itemsToInclude.AddRange(UnmappedItems.Where(t => ProviderItemFilters[MappingCategory.League].Contains(t.LeId)));
-            //}
+            itemsToInclude = UnmappedItems.Where(y => 
+                sportIdsToInclude.Contains(y.SpId) && 
+                segmentIdsToInclude.Contains(y.SegId) && 
+                leagueIdsToInclude.Contains(y.LeId))
+                .ToList();
 
             return itemsToInclude;
         }
 
         public void FilterProviderItems()
         {
-            var selectedDropdownItems = GetSelectedDropdownItems();
-
-            if (selectedDropdownItems.Any())
-            {
-                TempFilteredUnmappedItems = selectedDropdownItems;
-            } else
-            {
-                TempFilteredUnmappedItems = UnmappedItems;
-            }
+            TempFilteredUnmappedItems = GetSelectedDropdownItems();
 
             var allItemsToExclude = GetMappingItemsToBeFiltered();
 
@@ -261,18 +256,91 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             }
         }
 
-        //public void HandleApplyDropdownFilter(bool isAllValue, MappingCategory category, MappingProviderItemModel item, bool isChecked)
-        //{
-        //    if (isChecked)
-        //    {
-        //        if (isAllValue)
-        //        {
-        //            ProviderItemFilters[category].Clear();
-        //            return;
-        //        }
+        public void SetDropdownFilters()
+        {
+            if (Init)
+            {
+                var initDropdownItems = UnmappedItems.Select(s =>
+                    new MappingDropdownFilterItemModel
+                    {
+                        SportId = s.SpId,
+                        SportName = s.SpNa,
+                        SegmentId = s.SegId,
+                        SegmentName = s.SegNa,
+                        LeagueId = s.LeId,
+                        LeagueName = s.LeNa
+                    }
+                );
 
-        //        ProviderItemFilters[category]
-        //    }
-        //}
+                var distinctSports = initDropdownItems.DistinctBy(x => x.SportId).ToList();
+                var distinctSegments = initDropdownItems.DistinctBy(x => x.SegmentId).ToList();
+                var distinctLeagues = initDropdownItems.DistinctBy(x => x.LeagueId).ToList();
+
+                DropdownFilters[MappingCategory.Sport].Items = distinctSports;
+                DropdownFilters[MappingCategory.Segment].Items = distinctSegments;
+                DropdownFilters[MappingCategory.League].Items = distinctLeagues;
+            } else
+            {
+                var selectedSportIds = DropdownFilters[MappingCategory.Sport].Items.Where(x => x.IsChecked == true).Select(y => y.SportId).ToList();
+                var selectedSegmentIds = DropdownFilters[MappingCategory.Segment].Items.Where(x => x.IsChecked == true).Select(y => y.SegmentId).ToList();
+
+                foreach (var segment in DropdownFilters[MappingCategory.Segment].Items)
+                {
+                    if (selectedSportIds.Contains(segment.SportId))
+                    {
+                        segment.IsVisible = true;
+                        continue;
+                    }
+
+                    segment.IsVisible = false;
+                }
+
+                foreach (var league in DropdownFilters[MappingCategory.League].Items)
+                {
+                    if (selectedSportIds.Contains(league.SportId) && selectedSegmentIds.Contains(league.SegmentId))
+                    {
+                        league.IsVisible = true;
+                        continue;
+                    }
+
+                    league.IsVisible = false;
+                }
+            }
+
+            Init = false;
+
+            RenderComponent = true;
+        }
+
+        public void HandleDropdownItemClick(DropdownFilterCallbackModel model)
+        {
+            if (model.Item == null)
+            {
+                DropdownFilters[model.MappingCategory].SelectAllValue = model.IsChecked;
+
+                foreach (var dropdownItem in DropdownFilters[model.MappingCategory].Items)
+                {
+                    dropdownItem.IsChecked = model.IsChecked;
+                }
+            }
+            else
+            {
+                model.Item.IsChecked = model.IsChecked;
+
+                if (DropdownFilters[model.MappingCategory].Items.Where(x => x.IsChecked == false).Count() == 0)
+                {
+                    DropdownFilters[model.MappingCategory].SelectAllValue = true;
+                }
+
+                if (DropdownFilters[model.MappingCategory].Items.Where(x => x.IsChecked == false).Count() > 0)
+                {
+                    DropdownFilters[model.MappingCategory].SelectAllValue = false;
+                }
+            }
+
+            SetDropdownFilters();
+
+            FilterProviderItems();
+        }
     }
 }

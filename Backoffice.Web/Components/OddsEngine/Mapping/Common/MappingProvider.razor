@@ -1,7 +1,24 @@
-<div class="search-container">
-    <input class="input-search" placeholder="@_translationState.GetValue("Search")" @bind="_searchQuery" @oninput="FilterProviderItems" />
-    <i class="fa fa-search" />
+<div class="filters-container">
+    <div class="dropdowns-container">
+        @if (DropdownFilters[MappingCategory.Sport].Items != null && _showSportsDropdown)
+        {
+            <DropdownFilter FilterGroup="DropdownFilters[MappingCategory.Sport]" OnClickCallback="OnDropdownItemClickCallback" MappingCategory="MappingCategory.Sport" />
+        }
+        @if (DropdownFilters[MappingCategory.Segment].Items != null && _showSegmentsDropdown)
+        {
+            <DropdownFilter FilterGroup="DropdownFilters[MappingCategory.Segment]" OnClickCallback="OnDropdownItemClickCallback" MappingCategory="MappingCategory.Segment" />
+        }
+        @if (DropdownFilters[MappingCategory.League].Items != null && _showLeaguesDropdown)
+        {
+            <DropdownFilter FilterGroup="DropdownFilters[MappingCategory.League]" OnClickCallback="OnDropdownItemClickCallback" MappingCategory="MappingCategory.League" />
+        }
+    </div>
+    <div class="search-container">
+        <input class="input-search" placeholder="@_translationState.GetValue("Search")" @bind="_searchQuery" @oninput="FilterProviderItems" />
+        <i class="fa fa-search" />
+    </div>
 </div>
+
 <div class="providers-container">
     <div class="providers-container">
         @foreach (var group in _groupProviderItems)
