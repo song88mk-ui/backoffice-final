@@ -14,4 +14,5 @@ public interface IProviderMappingService
     Task<BaseResponse<bool>> AddOrUpdateProviderMapping(string category, ProviderMappingRequest request);
     Task<BaseResponse<bool>> AddOrUpdateProviderMappingBulk(string category, ProviderMappingBulkRequest request);
     Task<BaseResponse<bool>> DeleteSportMapping(string sportId, string userId);
+    Task<BaseResponse<bool>> DeleteLeagueMapping(string leagueId, string userId);
 }
