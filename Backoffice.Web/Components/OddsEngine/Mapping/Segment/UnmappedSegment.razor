@@ -17,7 +17,16 @@
     <div class="right">
         @if (TempFilteredUnmappedItems != null)
         {
-            <MappingProvider MappingCategory="MappingCategory.Segment" MappingSetupProviderItems="CurrentMappingSetupProviderItems" ProviderItems="TempFilteredUnmappedItems" OnClickItemCallback="HandleProviderItemClick" DropdownFilters="DropdownFilters" OnDropdownItemClickCallback="HandleDropdownItemClick"/>
+            <MappingProvider 
+                MappingCategory="MappingCategory.Segment" 
+                MappingSetupProviderItems="CurrentMappingSetupProviderItems" 
+                ProviderItems="TempFilteredUnmappedItems" 
+                OnClickItemCallback="HandleProviderItemClick" 
+                DropdownFilters="DropdownFilters" 
+                OnDropdownItemClickCallback="HandleDropdownItemClick"
+                ClearSearchQuery="ClearSearchQuery"    
+                ClearSearchQueryCallback="SetClearSearchQueryValue"
+            />
         }
     </div>
 </div>

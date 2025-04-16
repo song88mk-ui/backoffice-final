@@ -17,7 +17,16 @@
     <div class="right">
         @if (TempFilteredUnmappedItems != null && TempFilteredUnmappedItems.Count() > 0)
         {
-            <MappingProvider MappingCategory="MappingCategory.Sport" MappingSetupProviderItems="CurrentMappingSetupProviderItems" ProviderItems="TempFilteredUnmappedItems" OnClickItemCallback="HandleProviderItemClick" DropdownFilters="DropdownFilters" OnDropdownItemClickCallback="HandleDropdownItemClick" />
+            <MappingProvider 
+                MappingCategory="MappingCategory.Sport" 
+                MappingSetupProviderItems="CurrentMappingSetupProviderItems" 
+                ProviderItems="TempFilteredUnmappedItems" 
+                OnClickItemCallback="HandleProviderItemClick" 
+                DropdownFilters="DropdownFilters" 
+                OnDropdownItemClickCallback="HandleDropdownItemClick" 
+                ClearSearchQuery="ClearSearchQuery"
+                ClearSearchQueryCallback="SetClearSearchQueryValue"
+            />
         }
     </div>
 </div>
