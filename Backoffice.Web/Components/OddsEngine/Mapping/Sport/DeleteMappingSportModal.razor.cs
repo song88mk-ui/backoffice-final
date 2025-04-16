@@ -7,12 +7,10 @@ using Backoffice.Web.Models.OddsEngine.Mapping;
 using Backoffice.Web.Services;
 using Backoffice.Web.Components.Common;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using System.Text.Json;
 
-namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
+namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 {
-    public partial class DeleteMappingModal: IDisposable
+    public partial class DeleteMappingSportModal: IDisposable
     {
 		[Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IModalService ModalService { get; set; }
@@ -36,7 +34,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
         {
             var mappedResponse = await _providerMappingService.GetSportMappingBySpId(ModalParameters.TryGet<int>("SpId"));
             var sportMapping = mappedResponse.Result;
-            
+
             if (sportMapping == null)
             {
                 _alertModel = new AlertModel()
@@ -45,6 +43,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
                     Message = "Sorry! Unable to find mapping for this sport.",
                     Opacity = 1.0m,
                 };
+                _isPreLoader = false;
                 return;
 			}
 			_sportId = sportMapping.SpId.ToString();

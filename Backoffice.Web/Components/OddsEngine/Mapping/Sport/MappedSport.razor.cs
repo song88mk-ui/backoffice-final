@@ -1,8 +1,6 @@
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
-using Backoffice.Web.Components.OddsEngine.Mapping.Common;
-using Backoffice.Web.Components.OddsEngine.Mapping.Sport;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -73,7 +71,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 HideHeader = true
             };
 
-            ModalService.Open<DeleteMappingModal>("Delete Mapping", parameters, options);
+            ModalService.Open<DeleteMappingSportModal>("Delete Mapping", parameters, options);
         }
 
         public async Task OnSaveClickEvent()
