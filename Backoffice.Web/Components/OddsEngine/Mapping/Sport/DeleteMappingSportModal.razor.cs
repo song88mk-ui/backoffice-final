@@ -7,6 +7,7 @@ using Backoffice.Web.Models.OddsEngine.Mapping;
 using Backoffice.Web.Services;
 using Backoffice.Web.Components.Common;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 {
