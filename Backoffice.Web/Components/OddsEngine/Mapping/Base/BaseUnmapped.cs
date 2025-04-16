@@ -83,6 +83,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             else
             {
                 CurrentMappingSetupProviderItems.Add(providerItem);
+                CurrentMappingSetupProviderItems = CurrentMappingSetupProviderItems.Distinct().ToList();
             }
 
             FilterProviderItems();
