@@ -93,13 +93,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
             if (response != null && response.StatusCode == StatusCode.Success)
             {
-                UnmappedItems = TempFilteredUnmappedItems;
-
-                CountCallbackModel.Count = UnmappedItems.Count();
-
-                ResetMappingItems();
-
-                await OnItemsCountUpdateCallback.InvokeAsync(CountCallbackModel);
+                await OnSuccessfulSave();
             }
 
             RenderComponent = true;
