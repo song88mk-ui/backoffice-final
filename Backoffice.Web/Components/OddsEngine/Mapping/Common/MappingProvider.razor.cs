@@ -6,18 +6,22 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 {
     public partial class MappingProvider
     {
-        [Parameter] 
+        [Parameter]
         public EventCallback<MappingProviderItemModel> OnClickItemCallback { get; set; }
-        [Parameter] 
+        [Parameter]
         public List<MappingProviderItemModel> ProviderItems { get; set; }
-        [Parameter] 
+        [Parameter]
         public List<MappingProviderItemModel> MappingSetupProviderItems { get; set; }
-        [Parameter] 
+        [Parameter]
         public MappingCategory MappingCategory { get; set; }
-        [Parameter] 
+        [Parameter]
         public Dictionary<MappingCategory, MappingDropdownFilterGroup> DropdownFilters { get; set; }
-        [Parameter] 
+        [Parameter]
         public EventCallback<DropdownFilterCallbackModel> OnDropdownItemClickCallback { get; set; }
+        [Parameter]
+        public bool ClearSearchQuery { get; set; }
+        [Parameter]
+        public EventCallback<bool> ClearSearchQueryCallback { get; set; }
 
         private List<MappingProviderItemModel> _filteredProviderItems { get; set; } = new List<MappingProviderItemModel>();
         private List<MappingProviderItemModel> _previousProviderItems = new List<MappingProviderItemModel>();
@@ -34,7 +38,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             },
         };
 
-        private string _searchQuery { get; set; } = string.Empty;
+        private string _searchQuery = string.Empty;
         private string _propertyNameToSortBy;
         private string _propertyNameToSearchBy;
         private string _propertyNameToLabelItems;
@@ -51,13 +55,22 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
             if (_shouldRender)
             {
-                _mappingSetupProviderItems = MappingSetupProviderItems;
-                _filteredProviderItems = ProviderItems;
-                
                 SetDynamicProperties();
 
+                var propertyInfo = typeof(MappingProviderItemModel).GetProperty(_propertyNameToSearchBy);
+
+                _searchQuery = ClearSearchQuery ? string.Empty : _searchQuery;
+
+                _filteredProviderItems = new List<MappingProviderItemModel>(ProviderItems.Where(m => propertyInfo.GetValue(m, null).ToString().ToLower().Contains(_searchQuery.ToLower())));
+                _previousProviderItems = new List<MappingProviderItemModel>(ProviderItems);
+                _mappingSetupProviderItems = new List<MappingProviderItemModel>(MappingSetupProviderItems);
+
                 _groupProviderItems = GetGroupedProviderItems();
-                _previousProviderItems = new List<MappingProviderItemModel>(_filteredProviderItems);
+
+                if (ClearSearchQuery)
+                {
+                    ClearSearchQueryCallback.InvokeAsync(false);
+                }
             }
         }
 
@@ -122,6 +135,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
             _searchQuery = e.Value.ToString();
             _filteredProviderItems = ProviderItems.Where(m => propertyInfo.GetValue(m, null).ToString().ToLower().Contains(_searchQuery.ToLower())).ToList();
             _groupProviderItems = GetGroupedProviderItems();
+
+            _shouldRender = true;
         }
 
         public void HandleItemClick(MappingProviderItemModel item)
@@ -144,7 +159,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
         private bool ValidateParameterRender()
         {
-            return !ProviderItems.SequenceEqual(_previousProviderItems) || !MappingSetupProviderItems.SequenceEqual(_mappingSetupProviderItems);
+            return !ProviderItems.SequenceEqual(_previousProviderItems) || !MappingSetupProviderItems.SequenceEqual(_mappingSetupProviderItems) || ClearSearchQuery;
         }
     }
-}     
+}
