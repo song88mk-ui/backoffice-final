@@ -143,7 +143,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 }
             };
 
-            var response = await _providerMappingService.AddOrUpdateProviderMapping(FetchMappingCategories[MappingCategory.Sport], request);
+            var response = await _providerMappingService.AddOrUpdateProviderMapping(SaveMappingCategories[MappingCategory.Sport], request);
             
             if (response != null && response.StatusCode == StatusCode.Success)
             {
