@@ -1,7 +1,7 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.Mapping.Sport
+@using Backoffice.Web.Pages.OddsEngine.Base
 
-
-@inherits BasePage
+@inherits BaseMappingPage
 @layout OEMonitoringLayout
 
 @page "/hk/odds-engine/mapping-sports"
@@ -29,7 +29,7 @@
 
         @if (_activeTab == MappingTab.Mapped)
         {
-            <MappedSport />
+            <MappedSport OnItemsCountUpdateCallback="SetMappingTabCount" />
         }
     </Authorized>
 </AuthorizeView>

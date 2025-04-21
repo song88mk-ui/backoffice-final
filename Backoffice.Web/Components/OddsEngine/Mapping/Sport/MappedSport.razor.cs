@@ -1,7 +1,9 @@
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
+using Backoffice.Web.Models.OddsEngine.Mapping;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using DebounceTimer = System.Timers.Timer;
@@ -18,6 +20,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
         protected override async Task OnInitializedAsync()
         {
             await FetchSportMapping();
+
+            RenderComponent = true;
         }
 
         private async Task FetchSportMapping()
@@ -76,7 +80,16 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
         public async Task OnSaveClickEvent()
         {
+            _searchText = string.Empty;
             await FetchSportMapping();
+
+            CountCallbackModel = new UpdateMappingTabCountModel
+            {
+                Tab = MappingTab.Mapped,
+                Count = _sportMapping.Count()
+            };
+
+            await OnItemsCountUpdateCallback.InvokeAsync(CountCallbackModel);
         }
     }
 }
