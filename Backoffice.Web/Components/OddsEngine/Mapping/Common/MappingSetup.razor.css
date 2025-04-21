@@ -9,7 +9,7 @@
     border-radius: 4px;
 }
 
-    .mapping-setup-content-container .text-input span {
+    .mapping-setup-content-container .text-input .text-input-label {
         color: #000;
         margin-bottom: 4px;
         display: block;
@@ -28,6 +28,11 @@
         font-weight: 500;
         font-size: 15px;
         font-style: italic;
+    }
+
+    .mapping-setup-content-container .text-input .text-input-error-msg {
+        color: red;
+        font-size: 14px;
     }
 
 .item-list-container {
