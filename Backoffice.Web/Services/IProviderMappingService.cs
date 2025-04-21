@@ -7,8 +7,9 @@ namespace Backoffice.Web.Services;
 public interface IProviderMappingService
 {
     Task<BaseResponse<UnmappedResponse>> GetUnmappedItemsByCategory(string category);
-    Task<BaseResponse<LeagueMappingResponse>> GetLeaguesMapping(MappingRequest request);
     Task<BaseResponse<SportMappingResponse>> GetSportMapping(MappingRequest request);
+    Task<BaseResponse<SegmentMappingResponse>> GetSegmentMapping(MappingRequest request);
+    Task<BaseResponse<LeagueMappingResponse>> GetLeaguesMapping(MappingRequest request);
     Task<BaseResponse<SportMappingItemModel>> GetSportMappingBySpId(int spId);
     Task<BaseResponse<LeagueMappingItemModel>> GetLeagueMappingByLeId(int leId);
     Task<BaseResponse<bool>> AddOrUpdateProviderMapping(string category, ProviderMappingRequest request);

@@ -99,7 +99,37 @@ public class ProviderMappingService : IProviderMappingService
             };
         }
     }
+    public async Task<BaseResponse<SegmentMappingResponse>> GetSegmentMapping(MappingRequest request)
+    {
+        try
+        {
+            var response = await GetHttpClient().PostAsync("/api/trading/mapping/segments", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+            if (response.IsSuccessStatusCode)
+            {
+                return JsonSerializer.Deserialize<BaseResponse<SegmentMappingResponse>>
+                (
+                    await response.Content.ReadAsStringAsync(),
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                ) ?? new BaseResponse<SegmentMappingResponse>();
+            }
+            else
+            {
+                return new BaseResponse<SegmentMappingResponse>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            if (ex.StackTrace != null)
+                Log.Error(ex.StackTrace.ToString());
 
+            return new BaseResponse<SegmentMappingResponse>
+            {
+                StatusCode = StatusCode.Error,
+                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+            };
+        }
+    }
     public async Task<BaseResponse<SportMappingResponse>> GetSportMapping(MappingRequest request)
     {
         try
