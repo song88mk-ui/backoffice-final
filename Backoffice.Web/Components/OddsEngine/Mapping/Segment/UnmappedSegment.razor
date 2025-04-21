@@ -10,7 +10,7 @@
                 <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
                 <img class="download-icon" src="icons/svg/download.svg" />
             </div>
-            <MappingSetup MappingCategory="MappingCategory.Segment" MappingSetupProviderItems="CurrentMappingSetupProviderItems" OnSubmitCallback="HandleCreateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
+            <MappingSetup MappingCategory="MappingCategory.Segment" MappingSetupProviderItems="CurrentMappingSetupProviderItems" CurrentMappedItems="CurrentMappedItems" OnSubmitCallback="HandleCreateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
         </div>
         <MappedItems CurrentMappedItems="CurrentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" OnRemoveCallback="HandleRemoveMappedItem" />
     </div>
