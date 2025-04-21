@@ -18,6 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
         public List<MappingSetupItemModel> CurrentMappedItems { get; set; }
         public UpdateMappingTabCountModel CountCallbackModel { get; set; }
         public bool IsAllowedMultipleItemsPerProvider { get; set; }
+        public bool ClearSearchQuery { get; set; }
         public bool Init { get; set; } = true;
         public bool RenderComponent { get; set; } = false;
 
@@ -82,6 +83,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             else
             {
                 CurrentMappingSetupProviderItems.Add(providerItem);
+                CurrentMappingSetupProviderItems = CurrentMappingSetupProviderItems.Distinct().ToList();
             }
 
             FilterProviderItems();
@@ -116,6 +118,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
 
             ResetMappingItems(true, false);
 
+            ClearSearchQuery = true;
+
             RenderComponent = true;
         }
 
@@ -128,6 +132,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             ResetMappingItems();
 
             SetDropdownFilters();
+
+            ClearSearchQuery = true;
 
             await OnItemsCountUpdateCallback.InvokeAsync(CountCallbackModel);
 
@@ -341,6 +347,13 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
             SetDropdownFilters();
 
             FilterProviderItems();
+        }
+
+        public void SetClearSearchQueryValue(bool value)
+        {
+            ClearSearchQuery = value;
+
+            RenderComponent = true;
         }
     }
 }
