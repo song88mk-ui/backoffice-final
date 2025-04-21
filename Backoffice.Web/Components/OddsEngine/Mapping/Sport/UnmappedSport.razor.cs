@@ -24,10 +24,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 UnmappedItems = response.Result.Unmapped.Select(s => new MappingProviderItemModel(s)).ToList();
                 TempFilteredUnmappedItems = UnmappedItems;
 
-                CountCallbackModel.Count = UnmappedItems.Count();
-
-                await OnItemsCountUpdateCallback.InvokeAsync(CountCallbackModel);
-
                 SetDropdownFilters();
             }
 
