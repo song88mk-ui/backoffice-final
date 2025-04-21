@@ -4,15 +4,19 @@
         @if (IsEdit)
         {
             <div class="text-input">
-                <span>@_translationState.GetValue("ID")</span>
+                <span class="text-input-label">@_translationState.GetValue("ID")</span>
                 <InputText class="form-control" type="text" readonly="true" @bind-Value="_mappingSetupItem.Id" />
                 <ValidationMessage For="() => _mappingSetupItem.Id" />
             </div>
         }
         <div class="text-input">
-            <span>@_translationState.GetValue("Name")</span>
+            <span class="text-input-label">@_translationState.GetValue("Name")</span>
             <input type="text" class="form-control" placeholder="Enter Name" value="@_mappingSetupItem.Name" @oninput="OnNameInputChange" />
             <ValidationMessage For="() => _mappingSetupItem.Name" />
+            @if (_isDuplicateLocalName)
+            {
+                <span class=" text-input-error-msg">Mapped items must have a unique name.</span>
+            }
         </div>
         <div>
             <div class="item-list-container">

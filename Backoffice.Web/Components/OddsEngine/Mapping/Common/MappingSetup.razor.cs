@@ -10,6 +10,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
     public partial class MappingSetup
     {
         [Parameter] public List<MappingProviderItemModel> MappingSetupProviderItems { get; set; }
+        [Parameter] public List<MappingSetupItemModel> CurrentMappedItems { get; set; } = new List<MappingSetupItemModel>();
         [Parameter] public EventCallback<MappingSetupItemModel> OnSubmitCallback { get; set; }
         [Parameter] public EventCallback<MappingProviderItemModel> OnRemoveProviderItemCallback { get; set; }
         [Parameter] public MappingSetupItemModel MappingSetupItem { get; set; } = new MappingSetupItemModel();
@@ -23,6 +24,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
         private string _propertyNameToLabelItems;
         private bool _shouldRender;
+        private bool _isDuplicateLocalName;
         protected override bool ShouldRender() => _shouldRender;
 
         protected override async Task OnInitializedAsync()
@@ -125,19 +127,28 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
         private bool IsDisabledCreateBtn()
         {
-            return string.IsNullOrWhiteSpace(_mappingSetupItem.Name) || !_mappingSetupItem.Providers.Any();
-        }
-
-        private string GetDisabledCreateBtnCss()
-        {
-            return IsDisabledCreateBtn() ? "disabled" : "";
+            return string.IsNullOrWhiteSpace(_mappingSetupItem.Name) || !_mappingSetupItem.Providers.Any() || _isDuplicateLocalName;
         }
 
         private void OnNameInputChange(ChangeEventArgs e)
         {
             _mappingSetupItem.Name = e.Value.ToString();
 
+            ValidateNameDuplicacy();
+
             _shouldRender = true;
+        }
+
+        private void ValidateNameDuplicacy()
+        {
+            _isDuplicateLocalName = CurrentMappedItems.Any(x => x.Name.ToLower().Trim() == _mappingSetupItem.Name.ToLower().Trim());
+
+            _shouldRender = true;
+        }
+
+        private string GetDisabledCreateBtnCss()
+        {
+            return IsDisabledCreateBtn() ? "disabled" : "";
         }
 
         private string GetItemLabel(MappingProviderItemModel item)
@@ -150,7 +161,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
         private bool ValidateParameterRender()
         {
-            return !MappingSetupProviderItems.SequenceEqual(_mappingSetupItem.Providers) || !string.IsNullOrEmpty(MappingSetupItem?.Id);
+            return !MappingSetupProviderItems.SequenceEqual(_mappingSetupItem.Providers) || !string.IsNullOrEmpty(MappingSetupItem?.Id) || CurrentMappedItems.Any();
         }
     }
 }
