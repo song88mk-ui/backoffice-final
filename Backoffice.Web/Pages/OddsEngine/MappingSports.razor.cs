@@ -87,20 +87,17 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = true;
         }
 
-        private void SetMappingTabCount(UpdateMappingTabCountModel model)
+        private async Task SetMappingTabCount(UpdateMappingTabCountModel model)
         {
-            var diffCount = 0;
             switch(model.Tab)
             {
                 case MappingTab.Unmapped:
-                    diffCount = _unmappedCount - model.Count;
                     _unmappedCount = model.Count;
-                    _mappedCount = _mappedCount + diffCount;
+                    await FetchMappedSports();
                     break;
                 case MappingTab.Mapped:
-                    diffCount = _mappedCount - model.Count;
                     _mappedCount = model.Count;
-                    _unmappedCount = _unmappedCount + diffCount;
+                    await FetchUnmappedSports();
                     break;
                 default:
                     break;
