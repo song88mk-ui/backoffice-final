@@ -1,0 +1,73 @@
+<div>
+    <div class="d-flex flex-row justify-content-between">
+
+        <div class="dropdowns-container">
+            <select class="dropdown">
+                <option value="" disabled selected hidden>@_translationState.GetValue("Date Created")</option>
+                <option value="Sports 1">Sports 1</option>
+                <option value="Sports 2">Sports 2</option>
+            </select>
+            <select class="dropdown">
+                <option value="" disabled selected hidden>@_translationState.GetValue("Source")</option>
+                <option value="Segment 1">Segment 1</option>
+                <option value="Segment 2">Segment 2</option>
+            </select>
+        </div>
+
+        <div class="input-search input-group mb-3">
+            <input type="text"class="form-control no-left-border" placeholder="@_translationState.GetValue("Search")" @bind="_searchQuery" @oninput="PerformSearch" >
+            <span class="input-group-text">
+                <img src="icons/svg/icon-search.svg" alt="Search Icon">
+            </span>
+
+        </div>
+
+    </div>
+
+    <table class="table">
+        <thead class="table-head text-white">
+            <tr>
+                <th>Segment Name</th>
+                <th>Source</th>
+                <th>ID</th>
+                <th>Date Mapped</th>
+                <th>Action</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var mappingItem in _filteredLeagueMapping)
+            {
+            <tr>
+                <td>@mappingItem.SegNa</td>
+                <td>
+                    <div class="d-flex flex-row">
+                    @if (mappingItem.Info != null && mappingItem.Info.SrId != null)
+                    {
+                        <div class="source-item @(mappingItem.Info.SrId.All(number => number != 0) ? "bg-danger text-white" : "inactive")">SR</div>
+
+                    }  
+                    @if (mappingItem.Info != null && mappingItem.Info.BgId != null)
+                    {
+                        <div class="source-item @(mappingItem.Info.BgId.All(number => number != 0) ? "bg-primary text-white" : "inactive")">BG</div>
+                    }  
+                    </div>  
+                </td>
+                <td>@mappingItem.SegId</td>
+                <td>@mappingItem.Ti</td>
+                <td class="action-row">
+                    <button class="btn-icon" @onclick="() => HandleEditMappingClickEvent(mappingItem)">
+                        <img src="icons/svg/icon-update.svg" />
+                    </button>
+                    <button class="btn-icon" @onclick="() => HandleDeleteMappingClickEvent(mappingItem)">
+                        <img src="icons/svg/icon-trash.svg" />
+                    </button>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        <!-- <CustomModal OnSaveClickCallback="OnSaveClickEvent" /> -->
+    </div>
+</div>
