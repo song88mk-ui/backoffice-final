@@ -12,6 +12,7 @@ public interface IProviderMappingService
     Task<BaseResponse<LeagueMappingResponse>> GetLeaguesMapping(MappingRequest request);
     Task<BaseResponse<SportMappingItemModel>> GetSportMappingBySpId(int spId);
     Task<BaseResponse<LeagueMappingItemModel>> GetLeagueMappingByLeId(int leId);
+    Task<BaseResponse<SegmentMappingItemModel>> GetSegmentMappingBySegId(int SegId);
     Task<BaseResponse<bool>> AddOrUpdateProviderMapping(string category, ProviderMappingRequest request);
     Task<BaseResponse<bool>> AddOrUpdateProviderMappingBulk(string category, ProviderMappingBulkRequest request);
     Task<BaseResponse<bool>> DeleteSportMapping(string sportId, string userId);

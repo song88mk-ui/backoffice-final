@@ -36,7 +36,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var mappingItem in _filteredLeagueMapping)
+            @foreach (var mappingItem in _filteredSegmentMapping)
             {
             <tr>
                 <td>@mappingItem.SegNa</td>
@@ -68,6 +68,6 @@
         </tbody>
     </table>
     <div>
-        <!-- <CustomModal OnSaveClickCallback="OnSaveClickEvent" /> -->
+        <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
     </div>
 </div>

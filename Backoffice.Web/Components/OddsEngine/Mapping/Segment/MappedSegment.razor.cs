@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
-using Backoffice.Web.Components.OddsEngine.Mapping.League;
+using Backoffice.Web.Components.OddsEngine.Mapping.Segment;
 using System.Text.Json;
 
 
@@ -19,8 +19,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
         [CascadingParameter] public CustomModal Modal { get; set; }
 
         protected override bool ShouldRender() => _shouldRender;
-        private List<SegmentMappingModel> _leagueMapping = new();
-        private List<SegmentMappingModel> _filteredLeagueMapping = new();
+        private List<SegmentMappingModel> _segmentMapping = new();
+        private List<SegmentMappingModel> _filteredSegmentMapping = new();
 
         private string _searchQuery { get; set; } = string.Empty;
        protected override async Task OnInitializedAsync()
@@ -37,17 +37,17 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
             };
 
             var response = await _providerMappingService.GetSegmentMapping(request);
-            _leagueMapping = response.Result.SegmentMapping.OrderBy(sm => sm.SegNa).ToList();
-            _filteredLeagueMapping = _leagueMapping;
+            _segmentMapping = response.Result.SegmentMapping.OrderBy(sm => sm.SegNa).ToList();
+            _filteredSegmentMapping = _segmentMapping;
             _shouldRender = true;
 
         }
         private void PerformSearch(ChangeEventArgs e)
         {
             _searchQuery = e.Value?.ToString();
-            _filteredLeagueMapping = string.IsNullOrWhiteSpace(_searchQuery)
-                ? _leagueMapping
-                : _leagueMapping.Where(item => item.SegNa.Contains(_searchQuery)).ToList();
+            _filteredSegmentMapping = string.IsNullOrWhiteSpace(_searchQuery)
+                ? _segmentMapping
+                : _segmentMapping.Where(item => item.SegNa.Contains(_searchQuery)).ToList();
             _shouldRender = true;
         }
 
@@ -61,7 +61,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
             {
                 HideHeader = true
             };
-            ModalService.Open<EditMappingLeagueModal>("Edit League Mapping", parameters, options);
+            ModalService.Open<EditMappingSegmentModal>("Edit Segment Mapping", parameters, options);
 
         }
         public async Task HandleDeleteMappingClickEvent(SegmentMappingModel mappingItem)
@@ -74,14 +74,14 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
             {
                 HideHeader = true
             };
-            ModalService.Open<DeleteMappingLeagueModal>("Delete League Mapping", parameters, options);
+            ModalService.Open<DeleteMappingSegmentModal>("Delete Segment Mapping", parameters, options);
 
         }
-        // public async Task OnSaveClickEvent()
-        // {
-        //     OnSuccessSaveCallback.InvokeAsync(true);
-        //     await FetchLeagueMapping();
-        // }
+        public async Task OnSaveClickEvent()
+        {
+            OnSuccessSaveCallback.InvokeAsync(true);
+            await FetchSegmentMapping();
+        }
 
     }
 }
