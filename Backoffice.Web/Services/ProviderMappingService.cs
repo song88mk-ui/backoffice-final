@@ -226,6 +226,38 @@ public class ProviderMappingService : IProviderMappingService
             };
         }
     }
+    public async Task<BaseResponse<SegmentMappingItemModel>> GetSegmentMappingBySegId(int SegId)
+    {
+        try
+        {
+            var response = await GetHttpClient().GetAsync($"/api/trading/mapping/segments/{SegId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return JsonSerializer.Deserialize<BaseResponse<SegmentMappingItemModel>>
+                (
+                    await response.Content.ReadAsStringAsync(),
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                ) ?? new BaseResponse<SegmentMappingItemModel>();
+            }
+            else
+            {
+                return new BaseResponse<SegmentMappingItemModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            if (ex.StackTrace != null)
+                Log.Error(ex.StackTrace.ToString());
+
+            return new BaseResponse<SegmentMappingItemModel>
+            {
+                StatusCode = StatusCode.Error,
+                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+            };
+        }
+    }
 
     public async Task<BaseResponse<bool>> AddOrUpdateProviderMapping(string category, ProviderMappingRequest request)
     {
