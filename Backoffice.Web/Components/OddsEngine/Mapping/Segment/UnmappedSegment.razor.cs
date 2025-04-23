@@ -10,8 +10,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
 {
     public partial class UnmappedSegment
     {
-        [Inject] public IJSRuntime JSRuntime { get; set; }
-
         protected override async Task OnInitializedAsync()
         {
             IsAllowedMultipleItemsPerProvider = true;
