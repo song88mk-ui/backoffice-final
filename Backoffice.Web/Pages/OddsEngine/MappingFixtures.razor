@@ -1,9 +1,9 @@
-﻿@using Backoffice.Web.Components.OddsEngine.Mapping.Sport
+﻿@using Backoffice.Web.Components.OddsEngine.Mapping.Fixture
 
 @inherits BasePage
 @layout OEMonitoringLayout
 
-@page "/hk/odds-engine/mapping-fixture"
+@page "/hk/odds-engine/mapping-fixtures"
 
 <AuthorizeView Policy="sbc-mapping">
     <Authorized>
@@ -15,20 +15,20 @@
             <div class="tab @(_activeTab == MappingTab.Mapped ? "active-tab" : "inactive-tab")" @onclick="_ => HandleTabClick(MappingTab.Mapped)">@_translationState.GetValue("Mapped") (10)</div>
         </div>
         <div class="header-container">
-            <OEPageHeader PageHeaderModel="_pageHeaderModel" PageHeaderClassName="mapping-fixture"/>
+            <OEPageHeader PageHeaderModel="_pageHeaderModel" PageHeaderClassName="mapping-fixture" />
             <div class="button-logs">
                 @_translationState.GetValue("Logs")
             </div>
         </div>
-        
+
         @if (_activeTab == MappingTab.Unmapped)
         {
-            <UnmappedSport />
+            <UnmappedFixture />
         }
 
         @if (_activeTab == MappingTab.Mapped)
         {
-            <MappedSport />
+            
         }
     </Authorized>
 </AuthorizeView>

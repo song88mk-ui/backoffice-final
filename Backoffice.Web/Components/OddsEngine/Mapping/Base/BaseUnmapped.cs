@@ -46,7 +46,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
         {
             { MappingCategory.Sport, new MappingDropdownFilterGroup() },
             { MappingCategory.Segment, new MappingDropdownFilterGroup() },
-            { MappingCategory.League, new MappingDropdownFilterGroup() }
+            { MappingCategory.League, new MappingDropdownFilterGroup() },
+            { MappingCategory.Fixture, new MappingDropdownFilterGroup() }
         };
 
         public BaseUnmapped()

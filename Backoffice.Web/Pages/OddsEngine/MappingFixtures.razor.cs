@@ -1,13 +1,13 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Models;
-using System.Drawing;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class Mapping
+    public partial class MappingFixtures
     {
         private List<BreadcrumbModel> _breadcrumbs;
         private PageHeaderModel _pageHeaderModel;
+        private AlertModel _alertModel;
 
         private bool _shouldRender;
 
@@ -25,13 +25,13 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _breadcrumbs = new List<BreadcrumbModel>
             {
-                new BreadcrumbModel 
+                new BreadcrumbModel
                 {
                     Name = "Mapping",
                     Url = string.Empty,
                     IsCurrentPage = false
                 },
-                new BreadcrumbModel 
+                new BreadcrumbModel
                 {
                     Name = "Fixture Mapping",
                     Url = string.Empty,
@@ -44,6 +44,18 @@ namespace Backoffice.Web.Pages.OddsEngine
             await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
+        public async void ShowSuccessSaveMappingAlert()
+        {
+            _alertModel = new AlertModel()
+            {
+                Status = AlertStatus.Success,
+                Message = "Mapping saved successfully!",
+                Opacity = 1.0m,
+            };
+
+            _shouldRender = true;
+        }
+
         protected override bool ShouldRender() => _shouldRender;
 
         private void HandleTabClick(MappingTab tab)
@@ -51,5 +63,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _activeTab = tab;
             _shouldRender = true;
         }
+
+
     }
 }

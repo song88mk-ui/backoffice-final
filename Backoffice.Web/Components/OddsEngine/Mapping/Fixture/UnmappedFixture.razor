@@ -1,0 +1,30 @@
+﻿@using Backoffice.Web.Components.OddsEngine.Mapping.Base
+@using Backoffice.Web.Components.OddsEngine.Mapping.Common
+
+@inherits BaseUnmapped
+
+<div class="main-content-grid">
+    <div class="left">
+        <div class="mapping-setup-container">
+            <div class="mapping-setup-header">
+                <span class="header-label">@_translationState.GetValue("Mapping Setup")</span>
+                <img class="download-icon" src="icons/svg/download.svg" />
+            </div>
+            <MappingSetup MappingCategory="MappingCategory.Fixture" MappingSetupProviderItems="CurrentMappingSetupProviderItems" CurrentMappedItems="CurrentMappedItems" OnSubmitCallback="HandleCreateMappingClick" OnRemoveProviderItemCallback="HandleRemoveMappingSetupProviderItem" />
+        </div>
+        <MappedItems CurrentMappedItems="CurrentMappedItems" OnSaveMappingCallback="HandleSaveMappingClick" OnRemoveCallback="HandleRemoveMappedItem" />
+    </div>
+    <div class="right">
+        @if (TempFilteredUnmappedItems != null && TempFilteredUnmappedItems.Count() > 0)
+        {
+            <MappingProvider MappingCategory="MappingCategory.Fixture"
+                MappingSetupProviderItems="CurrentMappingSetupProviderItems"
+                ProviderItems="TempFilteredUnmappedItems"
+                OnClickItemCallback="HandleProviderItemClick"
+                DropdownFilters="DropdownFilters"
+                OnDropdownItemClickCallback="HandleDropdownItemClick"
+                ClearSearchQuery="ClearSearchQuery"
+                ClearSearchQueryCallback="SetClearSearchQueryValue" />
+        }
+    </div>
+</div>
