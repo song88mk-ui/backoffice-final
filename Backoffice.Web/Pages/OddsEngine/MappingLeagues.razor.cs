@@ -1,70 +1,77 @@
 using Backoffice.Shared.Enums;
-using Backoffice.Web.Models;
-using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Models.OddsEngine.Mapping;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class MappingLeagues
     {
-        private List<BreadcrumbModel> _breadcrumbs;
-        private PageHeaderModel _pageHeaderModel;
-        private AlertModel _alertModel;
-
-        private bool _shouldRender;
-
-        private MappingTab _activeTab;
-
         protected override async Task OnInitializedAsync()
         {
             PageState.Page = this;
+            PageHeaderTitle = _translationState.GetValue("Leagues Mapping");
+            BreadcrumbsMappingLabel = _translationState.GetValue("Mapping");
+            BreadcrumbsCurrentPageLabel = _translationState.GetValue("Leagues Mapping");
 
-            _pageHeaderModel = new()
-            {
-                Title = "League Mapping",
-                ShowLanguageDropDown = false
-            };
+            SetBreadcrumbsAndHeader();
 
-            _breadcrumbs = new List<BreadcrumbModel>
-            {
-                new BreadcrumbModel 
-                {
-                    Name = "Mapping",
-                    Url = string.Empty,
-                    IsCurrentPage = false
-                },
-                new BreadcrumbModel 
-                {
-                    Name = "League Mapping",
-                    Url = string.Empty,
-                    IsCurrentPage = true
-                }
-            };
+            await FetchMappedLeagues();
 
-            _activeTab = MappingTab.Unmapped;
+            await FetchUnmappedLeagues();
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
+
+            RenderComponent = true;
         }
 
-        public async void ShowSuccessSaveMappingAlert()
+        private async Task FetchMappedLeagues()
         {
-            _alertModel = new AlertModel()
+            var request = new MappingRequest
             {
-                Status = AlertStatus.Success,
-                Message = "Mapping saved successfully!",
-                Opacity = 1.0m,
+                Page = 1,
+                PageSize = 1000,
             };
 
-            _shouldRender = true;
+            var response = await _providerMappingService.GetLeaguesMapping(request);
+
+            if (response.Result != null)
+            {
+                MappedCount = response.Result.TotalCount;
+            }
+
+            RenderComponent = true;
         }
 
-        protected override bool ShouldRender() => _shouldRender;
-
-        private void HandleTabClick(MappingTab tab)
+        private async Task FetchUnmappedLeagues()
         {
-            _activeTab = tab;
-            _shouldRender = true;
+            var response = await _providerMappingService.GetUnmappedItemsByCategory(FetchMappingCategories[MappingCategory.League]);
+
+            if (response.Result != null)
+            {
+                UnmappedCount = response.Result.Unmapped.Count();
+            }
+
+            RenderComponent = true;
         }
 
+        private async Task SetMappingTabCount(UpdateMappingTabCountModel model)
+        {
+            switch (model.Tab)
+            {
+                case MappingTab.Unmapped:
+                    UnmappedCount = model.Count;
+                    await FetchMappedLeagues();
+                    break;
+                case MappingTab.Mapped:
+                    MappedCount = model.Count;
+                    await FetchUnmappedLeagues();
+                    break;
+                default:
+                    break;
+            }
+
+            RenderComponent = true;
+        }
 
     }
 }
