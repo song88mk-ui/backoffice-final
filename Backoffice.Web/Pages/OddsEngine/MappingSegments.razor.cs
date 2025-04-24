@@ -1,70 +1,76 @@
 using Backoffice.Shared.Enums;
-using Backoffice.Web.Models;
-using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Models.OddsEngine.Mapping;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class MappingSegments
     {
-        private List<BreadcrumbModel> _breadcrumbs;
-        private PageHeaderModel _pageHeaderModel;
-        private AlertModel _alertModel;
-
-        private bool _shouldRender;
-
-        private MappingTab _activeTab;
-
         protected override async Task OnInitializedAsync()
         {
             PageState.Page = this;
+            PageHeaderTitle = _translationState.GetValue("Sports Mapping");
+            BreadcrumbsMappingLabel = _translationState.GetValue("Mapping");
+            BreadcrumbsCurrentPageLabel = _translationState.GetValue("Sports Mapping");
 
-            _pageHeaderModel = new()
-            {
-                Title = "Segment Mapping",
-                ShowLanguageDropDown = false
-            };
+            SetBreadcrumbsAndHeader();
 
-            _breadcrumbs = new List<BreadcrumbModel>
-            {
-                new BreadcrumbModel 
-                {
-                    Name = "Mapping",
-                    Url = string.Empty,
-                    IsCurrentPage = false
-                },
-                new BreadcrumbModel 
-                {
-                    Name = "Segment Mapping",
-                    Url = string.Empty,
-                    IsCurrentPage = true
-                }
-            };
+            await FetchMappedSegments();
 
-            _activeTab = MappingTab.Unmapped;
+            await FetchUnmappedSegments();
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
+
+            RenderComponent = true;
         }
 
-        public async void ShowSuccessSaveMappingAlert()
+        private async Task FetchMappedSegments()
         {
-            _alertModel = new AlertModel()
+            var request = new MappingRequest
             {
-                Status = AlertStatus.Success,
-                Message = "Mapping saved successfully!",
-                Opacity = 1.0m,
+                Page = 1,
+                PageSize = 1000,
             };
 
-            _shouldRender = true;
+            var response = await _providerMappingService.GetSegmentMapping(request);
+
+            if (response.Result != null)
+            {
+                MappedCount = response.Result.TotalCount;
+            }
+
+            RenderComponent = true;
         }
 
-        protected override bool ShouldRender() => _shouldRender;
-
-        private void HandleTabClick(MappingTab tab)
+        private async Task FetchUnmappedSegments()
         {
-            _activeTab = tab;
-            _shouldRender = true;
+            var response = await _providerMappingService.GetUnmappedItemsByCategory(FetchMappingCategories[MappingCategory.Segment]);
+
+            if (response.Result != null)
+            {
+                UnmappedCount = response.Result.Unmapped.Count();
+            }
+
+            RenderComponent = true;
         }
 
+        private async Task SetMappingTabCount(UpdateMappingTabCountModel model)
+        {
+            switch (model.Tab)
+            {
+                case MappingTab.Unmapped:
+                    UnmappedCount = model.Count;
+                    await FetchMappedSegments();
+                    break;
+                case MappingTab.Mapped:
+                    MappedCount = model.Count;
+                    await FetchUnmappedSegments();
+                    break;
+                default:
+                    break;
+            }
 
+            RenderComponent = true;
+        }
     }
 }

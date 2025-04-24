@@ -1,10 +1,8 @@
-@using Backoffice.Web.Components.OddsEngine.Mapping.Base
-
 <div>
     <div class="d-flex flex-row justify-content-between">
         <div />
         <div class="input-search input-group mb-3">
-            <input type="text"class="form-control no-left-border" value="@_searchText" @oninput="OnSearchTextChanged" placeholder="Search">
+            <input type="text"class="form-control no-left-border" value="@_searchQuery" @oninput="PerformSearch" placeholder="Search">
             <span class="input-group-text">
                 <img src="icons/svg/icon-search.svg" alt="Search Icon">
             </span>
@@ -26,7 +24,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var mappingItem in _sportMapping)
+            @foreach (var mappingItem in _filteredSportMapping)
             {
             <tr>
                 <td>@mappingItem.SpNa</td>

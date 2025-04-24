@@ -14,14 +14,12 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
     {
         [Inject] public IModalService ModalService { get; set; }
 
-        [CascadingParameter] public CustomModal Modal { get; set; }
-
         [Parameter] public EventCallback<UpdateMappingTabCountModel> OnItemsCountUpdateCallback { get; set; }
 
-        private List<SportMappingModel> _sportMapping = new();
-        private DebounceTimer _debounceTimer;
-        public UpdateMappingTabCountModel _countCallbackModel { get; set; }
-        private string _searchText = string.Empty;
+        private string _searchQuery = string.Empty;
+        private List<SportMappingModel> _sportMapping = new List<SportMappingModel>();
+        private List<SportMappingModel> _filteredSportMapping = new List<SportMappingModel>();
+        private UpdateMappingTabCountModel _countCallbackModel { get; set; }
         private bool _shouldRender;
 
         protected override bool ShouldRender() => _shouldRender;
@@ -38,26 +36,21 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             {
                 Page = 1,
                 PageSize = 1000,
-                SearchText = _searchText
             };
 
             var response = await _providerMappingService.GetSportMapping(request);
             _sportMapping = response.Result.SportMapping.OrderBy(sm => sm.SpNa).ToList();
+            _filteredSportMapping = _sportMapping;
+
+            _shouldRender = true;
         }
 
-        private void OnSearchTextChanged(ChangeEventArgs e)
+        private void PerformSearch(ChangeEventArgs e)
         {
-            _searchText = e.Value.ToString();
-
-            _debounceTimer?.Stop();
-            _debounceTimer = new DebounceTimer(1000);
-            _debounceTimer.Elapsed += async (_,_) =>
-            {
-                _debounceTimer.Stop();
-                await FetchSportMapping();
-                InvokeAsync(StateHasChanged);
-            };
-            _debounceTimer.Enabled = true;
+            _searchQuery = e.Value.ToString();
+            _filteredSportMapping = string.IsNullOrWhiteSpace(_searchQuery)
+                ? _sportMapping
+                : _sportMapping.Where(item => item.SpNa.Contains(_searchQuery)).ToList();
 
             _shouldRender = true;
         }
@@ -90,7 +83,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
         public async Task OnSaveClickEvent()
         {
-            _searchText = string.Empty;
+            _searchQuery = string.Empty;
             await FetchSportMapping();
 
             _countCallbackModel = new UpdateMappingTabCountModel
