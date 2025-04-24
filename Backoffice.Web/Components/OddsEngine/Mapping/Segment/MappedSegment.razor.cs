@@ -1,31 +1,33 @@
-using Backoffice.Web.Models;
-using Backoffice.Web.Services;
-using Microsoft.AspNetCore.Components;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
-using Backoffice.Web.Components.OddsEngine.Mapping.Segment;
-using System.Text.Json;
+using Backoffice.Web.Models;
+using Backoffice.Web.Models.OddsEngine.Mapping;
+using Backoffice.Web.Services;
+using Microsoft.AspNetCore.Components;
 
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
 {
     public partial class MappedSegment
     {
-        private bool _shouldRender;
         [Inject] public IModalService ModalService { get; set; }
-        [CascadingParameter] public ModalParameters ModalParameters { get; set; }
-        [Parameter] public EventCallback<bool> OnSuccessSaveCallback { get; set; }
-        [CascadingParameter] public CustomModal Modal { get; set; }
 
-        protected override bool ShouldRender() => _shouldRender;
-        private List<SegmentMappingModel> _segmentMapping = new();
-        private List<SegmentMappingModel> _filteredSegmentMapping = new();
+        [Parameter] public EventCallback<UpdateMappingTabCountModel> OnItemsCountUpdateCallback { get; set; }
 
         private string _searchQuery { get; set; } = string.Empty;
-       protected override async Task OnInitializedAsync()
+        private List<SegmentMappingModel> _segmentMapping = new List<SegmentMappingModel>();
+        private List<SegmentMappingModel> _filteredSegmentMapping = new List<SegmentMappingModel>();
+        private UpdateMappingTabCountModel _countCallbackModel { get; set; }
+        private bool _shouldRender;
+
+        protected override bool ShouldRender() => _shouldRender;
+        protected override async Task OnInitializedAsync()
         {
             await FetchSegmentMapping();
+
+            _shouldRender = true;
         }
         
         private async Task FetchSegmentMapping()
@@ -39,6 +41,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
             var response = await _providerMappingService.GetSegmentMapping(request);
             _segmentMapping = response.Result.SegmentMapping.OrderBy(sm => sm.SegNa).ToList();
             _filteredSegmentMapping = _segmentMapping;
+
             _shouldRender = true;
 
         }
@@ -79,8 +82,18 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
         }
         public async Task OnSaveClickEvent()
         {
-            OnSuccessSaveCallback.InvokeAsync(true);
+            _searchQuery = string.Empty;
             await FetchSegmentMapping();
+
+            _countCallbackModel = new UpdateMappingTabCountModel
+            {
+                Tab = MappingTab.Mapped,
+                Count = _segmentMapping.Count()
+            };
+
+            await OnItemsCountUpdateCallback.InvokeAsync(_countCallbackModel);
+
+            _shouldRender = true;
         }
 
     }

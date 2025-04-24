@@ -9,25 +9,25 @@
 <AuthorizeView Policy="sbc-mapping">
     <Authorized>
         <div class="col-md-12">
-            <Breadcrumb Breadcrumbs="_breadcrumbs" />
+            <Breadcrumb Breadcrumbs="BreadcrumbModel" />
         </div>
         <div class="tab-container">
-            <div class="tab @(_activeTab == MappingTab.Unmapped ? "active-tab" : "inactive-tab")" @onclick="_ => HandleTabClick(MappingTab.Unmapped)">@_translationState.GetValue("Unmapped") (@_unmappedCount)</div>
-            <div class="tab @(_activeTab == MappingTab.Mapped ? "active-tab" : "inactive-tab")" @onclick="_ => HandleTabClick(MappingTab.Mapped)">@_translationState.GetValue("Mapped") (@_mappedCount)</div>
+            <div class="tab @(ActiveTab == MappingTab.Unmapped ? "active-tab" : "inactive-tab")" @onclick="_ => HandleTabClick(MappingTab.Unmapped)">@_translationState.GetValue("Unmapped") (@UnmappedCount)</div>
+            <div class="tab @(ActiveTab == MappingTab.Mapped ? "active-tab" : "inactive-tab")" @onclick="_ => HandleTabClick(MappingTab.Mapped)">@_translationState.GetValue("Mapped") (@MappedCount)</div>
         </div>
         <div class="header-container">
-            <OEPageHeader PageHeaderModel="_pageHeaderModel" PageHeaderClassName="mapping-fixture"/>
+            <OEPageHeader PageHeaderModel="PageHeaderModel" PageHeaderClassName="mapping-fixture"/>
             <div class="button-logs">
                 @_translationState.GetValue("Logs")
             </div>
         </div>
         
-        @if (_activeTab == MappingTab.Unmapped)
+        @if (ActiveTab == MappingTab.Unmapped)
         {
             <UnmappedSport OnItemsCountUpdateCallback="SetMappingTabCount" />
         }
 
-        @if (_activeTab == MappingTab.Mapped)
+        @if (ActiveTab == MappingTab.Mapped)
         {
             <MappedSport OnItemsCountUpdateCallback="SetMappingTabCount" />
         }

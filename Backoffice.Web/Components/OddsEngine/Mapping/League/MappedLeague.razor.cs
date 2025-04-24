@@ -1,30 +1,34 @@
-using Backoffice.Web.Models;
-using Backoffice.Web.Services;
-using Microsoft.AspNetCore.Components;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Components.Common;
-using Backoffice.Web.Components.OddsEngine.Mapping.Common;
+using Backoffice.Web.Models;
+using Backoffice.Web.Models.OddsEngine.Mapping;
+using Backoffice.Web.Services;
+using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 {
     public partial class MappedLeague
     {
-        private bool _shouldRender;
         [Inject] public IModalService ModalService { get; set; }
-        [CascadingParameter] public ModalParameters ModalParameters { get; set; }
-        [Parameter] public EventCallback<bool> OnSuccessSaveCallback { get; set; }
-        [CascadingParameter] public CustomModal Modal { get; set; }
 
-        protected override bool ShouldRender() => _shouldRender;
+        [Parameter] public EventCallback<UpdateMappingTabCountModel> OnItemsCountUpdateCallback { get; set; }
+
+        private string _searchQuery { get; set; } = string.Empty;
         private List<LeagueMappingModel> _leagueMapping = new();
         private List<LeagueMappingModel> _filteredLeagueMapping = new();
-        private string _searchQuery { get; set; } = string.Empty;
-       protected override async Task OnInitializedAsync()
+        private UpdateMappingTabCountModel _countCallbackModel { get; set; }
+        private bool _shouldRender;
+
+        protected override bool ShouldRender() => _shouldRender;
+
+        protected override async Task OnInitializedAsync()
         {
             await FetchLeagueMapping();
+
+            _shouldRender = true;
         }
-        
+
         private async Task FetchLeagueMapping()
         {
             var request = new MappingRequest
@@ -36,8 +40,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
             var response = await _providerMappingService.GetLeaguesMapping(request);
             _leagueMapping = response.Result.LeagueMapping.OrderBy(sm => sm.LeNa).ToList();
             _filteredLeagueMapping = _leagueMapping;
-            _shouldRender = true;
 
+            _shouldRender = true;
         }
         private void PerformSearch(ChangeEventArgs e)
         {
@@ -76,8 +80,18 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
         }
         public async Task OnSaveClickEvent()
         {
-            OnSuccessSaveCallback.InvokeAsync(true);
+            _searchQuery = string.Empty;
             await FetchLeagueMapping();
+
+            _countCallbackModel = new UpdateMappingTabCountModel
+            {
+                Tab = MappingTab.Mapped,
+                Count = _leagueMapping.Count()
+            };
+
+            await OnItemsCountUpdateCallback.InvokeAsync(_countCallbackModel);
+
+            _shouldRender = true;
         }
 
     }
