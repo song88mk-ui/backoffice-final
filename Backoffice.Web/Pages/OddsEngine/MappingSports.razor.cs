@@ -1,6 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Mapping;
 
 namespace Backoffice.Web.Pages.OddsEngine

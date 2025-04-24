@@ -13,15 +13,23 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
     public partial class MappedSport
     {
         [Inject] public IModalService ModalService { get; set; }
+
         [CascadingParameter] public CustomModal Modal { get; set; }
+
+        [Parameter] public EventCallback<UpdateMappingTabCountModel> OnItemsCountUpdateCallback { get; set; }
+
         private List<SportMappingModel> _sportMapping = new();
-        private string _searchText = string.Empty;
         private DebounceTimer _debounceTimer;
+        public UpdateMappingTabCountModel _countCallbackModel { get; set; }
+        private string _searchText = string.Empty;
+        private bool _shouldRender;
+
+        protected override bool ShouldRender() => _shouldRender;
         protected override async Task OnInitializedAsync()
         {
             await FetchSportMapping();
 
-            RenderComponent = true;
+            _shouldRender = true;
         }
 
         private async Task FetchSportMapping()
@@ -50,6 +58,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 InvokeAsync(StateHasChanged);
             };
             _debounceTimer.Enabled = true;
+
+            _shouldRender = true;
         }
         
         public async Task HandleEditMappingClickEvent(SportMappingModel mappingItem)
@@ -83,13 +93,15 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
             _searchText = string.Empty;
             await FetchSportMapping();
 
-            CountCallbackModel = new UpdateMappingTabCountModel
+            _countCallbackModel = new UpdateMappingTabCountModel
             {
                 Tab = MappingTab.Mapped,
                 Count = _sportMapping.Count()
             };
 
-            await OnItemsCountUpdateCallback.InvokeAsync(CountCallbackModel);
+            await OnItemsCountUpdateCallback.InvokeAsync(_countCallbackModel);
+
+            _shouldRender = true;
         }
     }
 }
