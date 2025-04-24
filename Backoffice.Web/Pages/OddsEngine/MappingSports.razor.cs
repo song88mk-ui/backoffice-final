@@ -1,58 +1,28 @@
-﻿using Backoffice.Web.Models;
-using System.Drawing;
-using Backoffice.Shared.Models.Response;
+﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Enums;
+using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Mapping;
-using System.Text.Json;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class MappingSports
     {
-        private List<BreadcrumbModel> _breadcrumbs;
-        private PageHeaderModel _pageHeaderModel;
-        private int _unmappedCount;
-        private int _mappedCount;
-        private bool _shouldRender;
-        private MappingTab _activeTab;
-        protected override bool ShouldRender() => _shouldRender;
-
         protected override async Task OnInitializedAsync()
         {
             PageState.Page = this;
+            PageHeaderTitle = _translationState.GetValue("Sports Mapping");
+            BreadcrumbsMappingLabel = _translationState.GetValue("Mapping");
+            BreadcrumbsCurrentPageLabel = _translationState.GetValue("Sports Mapping");
 
-            _pageHeaderModel = new()
-            {
-                Title = "Sports Mapping",
-                ShowLanguageDropDown = false
-            };
-
-            _breadcrumbs = new List<BreadcrumbModel>
-            {
-                new BreadcrumbModel
-                {
-                    Name = "Mapping",
-                    Url = string.Empty,
-                    IsCurrentPage = false
-                },
-                new BreadcrumbModel
-                {
-                    Name = "Sports Mapping",
-                    Url = string.Empty,
-                    IsCurrentPage = true
-                }
-            };
+            SetBreadcrumbsAndHeader();
 
             await FetchMappedSports();
 
             await FetchUnmappedSports();
 
-            _activeTab = MappingTab.Unmapped;
-
             await PageState.AuthenticateAccessEvent.InvokeAsync();
 
-            _shouldRender = true;
+            RenderComponent = true;
         }
 
         private async Task FetchMappedSports()
@@ -67,8 +37,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             
             if (response.Result != null)
             {
-                _mappedCount = response.Result.TotalCount;
+                MappedCount = response.Result.TotalCount;
             }
+
+            RenderComponent = true;
         }
 
         private async Task FetchUnmappedSports()
@@ -77,14 +49,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (response.Result != null)
             {
-                _unmappedCount = response.Result.Unmapped.Count();
+                UnmappedCount = response.Result.Unmapped.Count();
             }
-        }
 
-        private void HandleTabClick(MappingTab tab)
-        {
-            _activeTab = tab;
-            _shouldRender = true;
+            RenderComponent = true;
         }
 
         private async Task SetMappingTabCount(UpdateMappingTabCountModel model)
@@ -92,18 +60,18 @@ namespace Backoffice.Web.Pages.OddsEngine
             switch(model.Tab)
             {
                 case MappingTab.Unmapped:
-                    _unmappedCount = model.Count;
+                    UnmappedCount = model.Count;
                     await FetchMappedSports();
                     break;
                 case MappingTab.Mapped:
-                    _mappedCount = model.Count;
+                    MappedCount = model.Count;
                     await FetchUnmappedSports();
                     break;
                 default:
                     break;
             }
 
-            _shouldRender = true;
+            RenderComponent = true;
         }
     }
 }
