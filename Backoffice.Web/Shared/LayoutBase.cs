@@ -14,7 +14,7 @@ using Microsoft.JSInterop;
 namespace Backoffice.Web.Shared
 {
     public abstract class LayoutBase : LayoutComponentBase
-    {
+    {//
         #region Properties
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
