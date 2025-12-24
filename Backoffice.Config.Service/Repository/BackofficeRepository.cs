@@ -39,7 +39,7 @@ namespace Backoffice.Config.Service.Repository
 
         public void UpdateClientMargin(long configTemplateId, IMessageBroker messageBroker)
         {
-            //_logger.LogInformation($"{configTemplateId} Processing...");
+            _logger.LogInformation("processing update client margin {configTemplateId}", configTemplateId);
             try
             {
                 var clients = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(c => c.PrematchConfigTemplateId == configTemplateId || c.LiveConfigTemplateId == configTemplateId).ToList();
@@ -121,11 +121,8 @@ namespace Backoffice.Config.Service.Repository
             {
                 _logger.LogError($"{ex.Message}\n{ex.StackTrace}");
             }
-            finally
-            {
-                _logger.LogInformation($"{configTemplateId} Finished!");
-            }
         }
+
         public void DeleteConfigTemplate(ConfigTemplate config)
         {
             var fixtureStatusId = config.FixtureStatusId;

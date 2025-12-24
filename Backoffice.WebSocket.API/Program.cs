@@ -1,11 +1,24 @@
-using Backoffice.WebSocket.API.Extensions;
 using Backoffice.WebSocket.API.Hubs;
+using Backoffice.WebSocket.API.Telemetry;
 using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, _, serilog) =>
+    {
+        serilog.ReadFrom.Configuration(context.Configuration);
+    });
+
+builder.Services.AddSingleton<Instrumentation>();
+builder.Services.AddTelemetry(new TelemetrySettings(
+    ServiceName: Instrumentation.ActivitySourceName,
+    ActivitySourceName: Instrumentation.ActivitySourceName,
+    MeterName: Instrumentation.MeterName));
 
 builder.Services.AddServerSideBlazor()
         .AddCircuitOptions(options => options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3));
@@ -25,11 +38,6 @@ builder.Services.AddResponseCompression(opts => opts.MimeTypes = ResponseCompres
         new[] { "application/octet-stream" }));
 
 builder.Services.AddHealthChecks();
-
-builder.Logging.ClearProviders();
-builder.Logging.AddSimpleConsole(opts => opts.SingleLine = true);
-
-builder.Services.AddTelemetry(builder.Configuration);
 
 var app = builder.Build();
 

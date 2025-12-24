@@ -48,7 +48,9 @@ namespace Backoffice.Utility
         }
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("Connecting to message broker");
             _messageBroker.Connect();
+            _logger.LogInformation("Connected, consuming messages");
             _messageBroker.MessageReceived += MessageReceivedEvent;
 
             return Task.CompletedTask;
@@ -64,55 +66,53 @@ namespace Backoffice.Utility
 
             var activityName = $"{e.RoutingKey} receive";
 
-            using var activity = this._activitySource.StartActivity(activityName, ActivityKind.Consumer, parentContext.ActivityContext);
-            try
+            using (var activity = this._activitySource.StartActivity(activityName, ActivityKind.Consumer, parentContext.ActivityContext))
             {
-
-                activity?.SetTag("messaging.system", "rabbitmq");
-                activity?.SetTag("messaging.destination_kind", "queue");
-                activity?.SetTag("messaging.rabbitmq.routing_key", e.RoutingKey);
-                activity?.SetTag("messaging.rabbitmq.message_type", messageType);
-
-                switch (messageType)
+                try
                 {
-                    case "LogActivity":
-                        var activityLog = JsonSerializer.Deserialize<OnActivityLogMessage>(payload);
-                        _backofficeRepository.ProcessActivityLog(activityLog);
-                        break;
-                    case "LogActivityList":
-                        var activityLogList = JsonSerializer.Deserialize<OnActivityLogListMessage>(payload);
-                        _backofficeRepository.ProcessActivityLog(activityLogList);
-                        break;
-                    case "ExportMessageSettlementHistory":
-                        var manualMessageSettlementHistory = JsonSerializer.Deserialize<OnGetMessageSettlementHistoryMessage>(payload);
-                        _backofficeRepository.ProcessOnGetMessageSettlementHistory(manualMessageSettlementHistory, _messageBroker, correlationId);
-                        break;
-                    case "ExportManualBetSettlementHistory":
-                        var manualBetSettlementHistory = JsonSerializer.Deserialize<OnGetManualBetSettlementHistoryMessage>(payload);
-                        _backofficeRepository.ProcessOnGetManualBetSettlementHistory(manualBetSettlementHistory, _messageBroker);
-                        break;
-                    case "ExportMarketSettlementHistory":
-                        var marketSettlementHistory = JsonSerializer.Deserialize<OnGetMarketSettlementHistoryMessage>(payload);
-                        _backofficeRepository.ProcessOnGetMarketSettlementHistory(marketSettlementHistory, _messageBroker);
-                        break;
-                    case "ExportOeConfigTemplate":
-                        var oeConfigTemplate = JsonSerializer.Deserialize<OnGetOeConfigTemplateMessage>(payload);
-                        _backofficeRepository.ProcessOnGetOeConfigTemplate(oeConfigTemplate, _messageBroker);
-                        break;
-                    case "ExportCancelBetHistory":
-                        var cancelBetHistory = JsonSerializer.Deserialize<OnGetCancelBetHistoryMessage>(payload);
-                        _backofficeRepository.ProcessOnGetCancelBetHistory(cancelBetHistory, _messageBroker);
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error: {ex.Message}");
 
-            }
-            finally
-            {
-              activity?.Stop();
+                    activity?.SetTag("messaging.system", "rabbitmq");
+                    activity?.SetTag("messaging.destination_kind", "queue");
+                    activity?.SetTag("messaging.rabbitmq.routing_key", e.RoutingKey);
+                    activity?.SetTag("messaging.rabbitmq.message_type", messageType);
+
+                    switch (messageType)
+                    {
+                        case "LogActivity":
+                            var activityLog = JsonSerializer.Deserialize<OnActivityLogMessage>(payload);
+                            _backofficeRepository.ProcessActivityLog(activityLog);
+                            break;
+                        case "LogActivityList":
+                            var activityLogList = JsonSerializer.Deserialize<OnActivityLogListMessage>(payload);
+                            _backofficeRepository.ProcessActivityLog(activityLogList);
+                            break;
+                        case "ExportMessageSettlementHistory":
+                            var manualMessageSettlementHistory = JsonSerializer.Deserialize<OnGetMessageSettlementHistoryMessage>(payload);
+                            _backofficeRepository.ProcessOnGetMessageSettlementHistory(manualMessageSettlementHistory, _messageBroker, correlationId);
+                            break;
+                        case "ExportManualBetSettlementHistory":
+                            var manualBetSettlementHistory = JsonSerializer.Deserialize<OnGetManualBetSettlementHistoryMessage>(payload);
+                            _backofficeRepository.ProcessOnGetManualBetSettlementHistory(manualBetSettlementHistory, _messageBroker);
+                            break;
+                        case "ExportMarketSettlementHistory":
+                            var marketSettlementHistory = JsonSerializer.Deserialize<OnGetMarketSettlementHistoryMessage>(payload);
+                            _backofficeRepository.ProcessOnGetMarketSettlementHistory(marketSettlementHistory, _messageBroker);
+                            break;
+                        case "ExportOeConfigTemplate":
+                            var oeConfigTemplate = JsonSerializer.Deserialize<OnGetOeConfigTemplateMessage>(payload);
+                            _backofficeRepository.ProcessOnGetOeConfigTemplate(oeConfigTemplate, _messageBroker);
+                            break;
+                        case "ExportCancelBetHistory":
+                            var cancelBetHistory = JsonSerializer.Deserialize<OnGetCancelBetHistoryMessage>(payload);
+                            _backofficeRepository.ProcessOnGetCancelBetHistory(cancelBetHistory, _messageBroker);
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("consume error: {exception}. stacktrace: {stacktrace}", ex.Message, ex.StackTrace);
+
+                }
             }
         }
 
@@ -126,10 +126,7 @@ namespace Backoffice.Utility
               return new[] {  Encoding.UTF8.GetString(bytes) };
             }
           }
-          catch (Exception ex)
-          {
-            _logger.LogError($"Failed to extract properites: {ex.Message}");
-          }
+          catch (Exception ex) {}
           return Enumerable.Empty<string>();
         }
     }

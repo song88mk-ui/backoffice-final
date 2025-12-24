@@ -7,6 +7,7 @@ using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -184,6 +185,16 @@ namespace Backoffice.Shared.Utilities
         }
         public void Connect(MessageBrokerCredentialModel messageBroker = null)
         {
+            var suffix = "";
+            using (MD5 hasher = MD5.Create())
+            {
+                byte[] bytes = hasher.ComputeHash(Encoding.UTF8.GetBytes(Environment.MachineName));
+                StringBuilder sb = new StringBuilder();
+                foreach(byte b in bytes)
+                    sb.Append(b.ToString("x2"));
+                suffix = sb.ToString().Substring(0,5);
+            }
+
             try
             {
                 if (messageBroker != null)
@@ -195,7 +206,7 @@ namespace Backoffice.Shared.Utilities
                     _password = messageBroker.Password;
                     _virtualHost = messageBroker.VirtualHost;
                     _exchange = messageBroker.Exchange;
-                    _queue = _isExclusive ? $"{messageBroker.Queue}.{Environment.MachineName.ToLower()}" : messageBroker.Queue;
+                    _queue = _isExclusive == true ? $"{messageBroker.Queue}.{suffix}" : messageBroker.Queue;
                     _consumerName = messageBroker.Consumer;
                     _routingKey = messageBroker.RoutingKey;
                     _prefetchCount = string.IsNullOrEmpty(messageBroker.PrefetchCount) ? "1000" : messageBroker.PrefetchCount;
@@ -210,7 +221,7 @@ namespace Backoffice.Shared.Utilities
                     _password = _configuration[$"{_messageBrokerName}:Password"];
                     _virtualHost = _configuration[$"{_messageBrokerName}:VirtualHost"];
                     _exchange = _configuration[$"{_messageBrokerName}:Exchange"];
-                    _queue = _isExclusive == true ? $"{_configuration[$"{_messageBrokerName}:Queue"]}.{Environment.MachineName.ToLower()}" : _configuration[$"{_messageBrokerName}:Queue"];
+                    _queue = _isExclusive == true ? $"{_configuration[$"{_messageBrokerName}:Queue"]}.{suffix}" : _configuration[$"{_messageBrokerName}:Queue"];
                     _consumerName = _configuration[$"{_messageBrokerName}:Consumer"];
                     _routingKey = _configuration[$"{_messageBrokerName}:RoutingKey"];
                     _prefetchCount = string.IsNullOrEmpty(_configuration[$"{_messageBrokerName}:PrefetchCount"]) ? "1000" : _configuration[$"{_messageBrokerName}:PrefetchCount"];

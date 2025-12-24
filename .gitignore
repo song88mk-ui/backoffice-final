@@ -4,5 +4,6 @@
 **/obj
 **/*.csproj.user
 **/PublishProfiles
+**/PublishProfiles/**
 **/Logs
-/Backoffice.API/.config/dotnet-tools.json
+**/.config/dotnet-tools.json

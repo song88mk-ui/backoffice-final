@@ -56,6 +56,7 @@ namespace Backoffice.WebSocket.Service
             _logger = logger;
             _sportsbookRepository = sportsbookService;
 
+            _logger.LogInformation("Connecting to WebSocket API at {WebSocketApi}", configuration["Custom:WebSocketAPI"]);
             _hubConnection = new HubConnectionBuilder()
                                 .WithUrl(configuration["Custom:WebSocketAPI"], options => options.Transports = HttpTransportType.WebSockets)
                                 .AddMessagePackProtocol(options =>
@@ -76,6 +77,7 @@ namespace Backoffice.WebSocket.Service
         }
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Stopping service");
             await _hubConnection.DisposeAsync();
 
             _messagesOnMonitoringOddsChange.CompleteAdding();
@@ -91,15 +93,19 @@ namespace Backoffice.WebSocket.Service
             _logger.LogInformation("Service is starting");
             try
             {
+                _logger.LogInformation("Processing Market Template Player Props");
                 await _sportsbookRepository.ProcessMarketTemplatePlayerProps();
+                _logger.LogInformation("Processing Clients Without Margin");
                 await _sportsbookRepository.ProcessClientsWithoutMargin();
 
+                _logger.LogInformation("Preparing threads");
                 _threadOnMonitoringOddsChange = new Thread(ThreadMonitoringOnOddsChange);
                 _threadOnMonitoringDetailsOddsChange = new Thread(ThreadMonitoringDetailsOnOddsChange);
                 _threadOnBetStopFixture = new Thread(ThreadBetStopFixture);
                 _threadOnBetStopGlobal = new Thread(ThreadBetStopGlobal);
                 _threadNotification = new Thread(ThreadNotification);
 
+                _logger.LogInformation("Starting threads");
                 _threadOnMonitoringOddsChange.Start();
                 _threadOnMonitoringDetailsOddsChange.Start();
                 _threadOnBetStopFixture.Start();
@@ -108,12 +114,14 @@ namespace Backoffice.WebSocket.Service
 
                 await _hubConnection.StartAsync();
 
+                _logger.LogInformation("Connecting to message broker");
                 _messageBroker.Connect();
+                _logger.LogInformation("Connected, processing incoming messages");
                 _messageBroker.MessageReceived += MessageReceivedEvent;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+                _logger.LogError("error starting service: {message} - {stacktrace}", ex.Message, ex.StackTrace);
             }
         }
 
@@ -161,7 +169,7 @@ namespace Backoffice.WebSocket.Service
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+                    _logger.LogError("message process error: {message} - {stacktrace}", ex.Message, ex.StackTrace);
                     activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 }
             }

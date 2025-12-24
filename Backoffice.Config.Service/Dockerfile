@@ -6,9 +6,18 @@ ADD Backoffice.Config.Service Backoffice.Config.Service
 
 WORKDIR /source/Backoffice.Config.Service
 
-RUN dotnet restore --verbosity normal
+ARG NUGET_PASSWORD
 
-RUN dotnet build --configuration Release
+RUN dotnet nuget add source \
+  --username FlyingCockatoo \
+  --password ${NUGET_PASSWORD} \
+  --store-password-in-clear-text \
+  --name github "https://nuget.pkg.github.com/FlyingCockatoo/index.json"
+
+RUN dotnet restore
+RUN dotnet build \
+  --no-restore \
+  --configuration Release
 
 RUN dotnet publish \
   --no-restore \
@@ -20,9 +29,7 @@ WORKDIR /app/publish
 RUN rm -f appsettings.*.json
 
 FROM mcr.microsoft.com/dotnet/aspnet:3.1
-EXPOSE 80
 WORKDIR /app
 
 COPY --from=build /app/publish .
 CMD ["dotnet", "Backoffice.Config.Service.dll"]
-

@@ -38,7 +38,9 @@ namespace Backoffice.Config.Service
         }
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("Connecting to message broker");
             _messageBroker.Connect();
+            _logger.LogInformation("Connected, processing incoming messages");
             _messageBroker.MessageReceived += MessageReceivedEvent;
 
             return Task.CompletedTask;
@@ -65,7 +67,7 @@ namespace Backoffice.Config.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error: {ex.Message}");
+                _logger.LogError("error processing message: {exception} {stacktrace}", ex.Message, ex.StackTrace);
             }
         }
     }

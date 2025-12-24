@@ -1,5 +1,5 @@
 using Backoffice.Shared.Utilities;
-using Backoffice.WebSocket.Service.Extensions;
+using Backoffice.WebSocket.Service.Telemetry;
 using Backoffice.WebSocket.Service.Repositories;
 using Backoffice.WebSocket.Service.Services;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace Backoffice.WebSocket.Service
 {
@@ -21,17 +22,23 @@ namespace Backoffice.WebSocket.Service
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog((context, _, serilog) =>
+                {
+                    serilog.ReadFrom.Configuration(context.Configuration);
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
-
-                    services.AddTelemetry(configuration);
+                    services.AddSingleton<Instrumentation>();
+                    services.AddTelemetry(new TelemetrySettings(
+                        ServiceName: Instrumentation.ActivitySourceName,
+                        ActivitySourceName: Instrumentation.ActivitySourceName,
+                        MeterName: Instrumentation.MeterName));
 
                     services.AddSingleton<IMemCache, MemCache>();
                     services.AddSingleton<IMessageBroker, MessageBroker>();
                     services.AddSingleton<ISportsbookService, SportsbookService>();
                     services.AddSingleton<ISportsbookRepository, SportsbookRepository>();
                     services.AddHostedService<Worker>();
-                }).UseWindowsService();
+                });
     }
 }

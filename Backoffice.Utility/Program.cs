@@ -4,12 +4,9 @@ using Backoffice.Utility.Telemetry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
 using System;
 using System.Reflection;
+using Serilog;
 
 namespace Backoffice.Utility
 {
@@ -22,52 +19,21 @@ namespace Backoffice.Utility
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog((context, _, serilog) =>
+                {
+                    serilog.ReadFrom.Configuration(context.Configuration);
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
-
-                    Action<ResourceBuilder> resource = r => r.AddService(
-                        serviceName: "Backoffice.Utility",
-                        serviceNamespace: configuration["Telemetry:Environment"],
-                        serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "latest",
-                        serviceInstanceId: Environment.MachineName);
-
                     services.AddSingleton<Instrumentation>();
-
-                    if (Convert.ToBoolean(configuration["Telemetry:Enabled"]))
-                    {
-                      services.AddOpenTelemetry()
-                        .ConfigureResource(resource)
-                        .WithTracing(tracing =>
-                        {
-                            tracing
-                              .AddSource(Instrumentation.ActivitySourceName)
-                              .SetSampler(new AlwaysOnSampler())
-                              .AddHttpClientInstrumentation()
-                              .AddSqlClientInstrumentation()
-                              .AddOtlpExporter(opts =>
-                              {
-                                opts.Protocol = OtlpExportProtocol.HttpProtobuf;
-                                opts.Endpoint = new Uri(configuration["Telemetry:Collector"]+"/v1/traces");
-                              });
-                        })
-                        .WithMetrics(metrics =>
-                        {
-                            metrics
-                              .AddMeter(Instrumentation.MeterName)
-                              .AddRuntimeInstrumentation()
-                              .AddHttpClientInstrumentation()
-                              .AddOtlpExporter(opts =>
-                              {
-                                opts.Protocol = OtlpExportProtocol.HttpProtobuf;
-                                opts.Endpoint = new Uri(configuration["Telemetry:Collector"]+"/v1/metrics");
-                              });
-                        });
-                    }
+                    services.AddTelemetry(new TelemetrySettings(
+                        ServiceName: Instrumentation.ActivitySourceName,
+                        ActivitySourceName: Instrumentation.ActivitySourceName,
+                        MeterName: Instrumentation.MeterName));
 
                     services.AddSingleton<IBackofficeRepository, BackofficeRepository>();
                     services.AddSingleton<IMessageBroker, MessageBroker>();
                     services.AddHostedService<Worker>();
-                }).UseWindowsService();
+                });
     }
 }
