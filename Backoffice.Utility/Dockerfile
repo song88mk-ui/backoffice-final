@@ -21,7 +21,7 @@ RUN dotnet build \
 RUN dotnet publish \
   --no-restore \
   -c Release \
-  -o /publish \
+  -o /app/publish \
   /p:UseAppHost=false
 
 WORKDIR /app/publish
