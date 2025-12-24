@@ -25,7 +25,6 @@ namespace Backoffice.API.Repositories
 
         private HttpClient _maintenanceHttpClient;
         private readonly bool _isStaging;
-        private readonly string _internalClient;
         private readonly ActivitySource _activitySource;
         private readonly ILogger<MaintenanceRepository> _logger;
 
@@ -38,7 +37,6 @@ namespace Backoffice.API.Repositories
                 Instrumentation instrumentation, ILogger<MaintenanceRepository> logger)
         {
             _isStaging = bool.Parse(configuration["IsStaging"]);
-            _internalClient = "71BBE7D8-FD04-459C-6D8B-08D9354E5B64";
 
             _tradingRepository = tradingRepository;
             _activitySource = instrumentation.ActivitySource;

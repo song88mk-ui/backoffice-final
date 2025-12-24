@@ -17,7 +17,7 @@ namespace Backoffice.API.Controllers.Backoffice
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class BetController : ControllerBase
     {
-        private readonly IPlatformRepository _platformRepository;        
+        private readonly IPlatformRepository _platformRepository;
         private readonly bool _isStaging;
 
         public BetController(IPlatformRepository platformRepository, IConfiguration configuration)
@@ -94,13 +94,13 @@ namespace Backoffice.API.Controllers.Backoffice
         [HttpPost("cancel")]
         public async Task<IActionResult> CancelBet([FromBody] BetModifyRequest request)
         {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;            
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = new BaseResponse<BetModifyResponse>();
             if (string.IsNullOrEmpty(region))
             {
-                result = await _platformRepository.CancelBet(request, "HK");                
-                
+                result = await _platformRepository.CancelBet(request, "HK");
+
                 if(!_isStaging)
                 {
                     result = await _platformRepository.CancelBet(request, "SA");

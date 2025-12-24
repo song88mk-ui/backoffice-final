@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Backoffice.API
 {
@@ -13,10 +14,9 @@ namespace Backoffice.API
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(logging =>
+                .UseSerilog((context, _, serilog) =>
                 {
-                    logging.ClearProviders();
-                    logging.AddSimpleConsole(opts => {opts.SingleLine = true;});
+                    serilog.ReadFrom.Configuration(context.Configuration);
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

@@ -7,7 +7,6 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
-using Microsoft.ApplicationInsights;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -32,7 +31,6 @@ namespace Backoffice.API.Repositories
     {
         #region Fields
         private readonly BackofficeContext _backofficeContext;
-        private readonly TelemetryClient _telemetryClient;
 
         private readonly IPlatformRepository _platformRepository;
         private readonly ITradingRepository _tradingRepository;
@@ -45,9 +43,8 @@ namespace Backoffice.API.Repositories
 
         #region Ctor
 
-        public BackofficeRepository(BackofficeContext backofficeContext, TelemetryClient telemetryClient, IPlatformRepository platformRepository, ITradingRepository tradingRepository, IMemCache memCache, IRabbitMqRepository rabbitMqRepository)
+        public BackofficeRepository(BackofficeContext backofficeContext, IPlatformRepository platformRepository, ITradingRepository tradingRepository, IMemCache memCache, IRabbitMqRepository rabbitMqRepository)
         {
-            _telemetryClient = telemetryClient;
             _backofficeContext = backofficeContext;
             _platformRepository = platformRepository;
             _tradingRepository = tradingRepository;
@@ -1352,7 +1349,7 @@ namespace Backoffice.API.Repositories
                         { "events", JsonSerializer.Serialize(events) }
                     };
 
-                    _telemetryClient.TrackEvent($"e:backoffice.client={request.ClientCode}", properties);
+                    //_telemetryClient.TrackEvent($"e:backoffice.client={request.ClientCode}", properties);
 
                     //return response;
                     return new BaseResponse<bool>()

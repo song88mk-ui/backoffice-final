@@ -11,11 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Instrumentation.AspNetCore;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -35,73 +30,11 @@ namespace Backoffice.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //
-            // Telemetry
-            Action<ResourceBuilder> configureResource = r => r.AddService(
-                serviceName: "Backoffice.API",
-                serviceNamespace: Configuration["Telemetry:Environment"],
-                serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "latest",
-                serviceInstanceId: Environment.MachineName);
-
             services.AddSingleton<Instrumentation>();
-
-            if (Convert.ToBoolean(Configuration["Telemetry:Enabled"]))
-            {
-
-                services
-                  .AddOpenTelemetry()
-                  .ConfigureResource(configureResource)
-                  .WithTracing(tracing =>
-                  {
-                      tracing
-                      .AddSource(Instrumentation.ActivitySourceName)
-                      .SetSampler(new AlwaysOnSampler())
-                      .AddHttpClientInstrumentation(
-                        (opts) => opts.FilterHttpRequestMessage =
-                          (req) =>
-                          {
-                              var uriString = req.RequestUri.ToString();
-                              var isAzureReq = uriString.Contains("azure.com") ||
-                                               uriString.Contains("visualstudio.com");
-                              return !isAzureReq;
-                          }
-                      )
-                      .AddAspNetCoreInstrumentation((aspCoreOpts) => aspCoreOpts.Filter = httpContext =>
-                      {
-                        var path = httpContext.Request.Path.ToString();
-                        var toExclude = path.StartsWith("/swagger") ||
-                                        path.StartsWith("/healthz");
-                        return !toExclude;
-                      })
-                      .AddSqlClientInstrumentation();
-
-                      services.Configure<AspNetCoreTraceInstrumentationOptions>(Configuration.GetSection("Telemetry:AspNetCoreInstrumentation"));
-
-                      tracing.AddOtlpExporter(exporterOpts =>
-                    {
-                        exporterOpts.Protocol = OtlpExportProtocol.HttpProtobuf;
-                        exporterOpts.Endpoint = new Uri(Configuration["Telemetry:Collector"] + "/v1/traces");
-                    });
-
-                  })
-                  .WithMetrics(metrics =>
-                  {
-                      metrics
-                      .AddMeter(Instrumentation.MeterName)
-                      .AddRuntimeInstrumentation()
-                      .AddHttpClientInstrumentation()
-                      .AddProcessInstrumentation()
-                      .AddAspNetCoreInstrumentation();
-
-                      metrics.AddOtlpExporter(exporterOpts =>
-                    {
-                        exporterOpts.Protocol = OtlpExportProtocol.HttpProtobuf;
-                        exporterOpts.Endpoint = new Uri(Configuration["Telemetry:Collector"] + "/v1/metrics");
-                    });
-
-                  });
-
-            } //if telemetry enabled
+            services.AddTelemetry(new TelemetrySettings(
+                ServiceName: Instrumentation.ActivitySourceName,
+                ActivitySourceName: Instrumentation.ActivitySourceName,
+                MeterName: Instrumentation.MeterName));
 
             services.AddControllers();
             services.AddCors(options =>
@@ -139,18 +72,23 @@ namespace Backoffice.API
                 var requirement = new OpenApiSecurityRequirement { { key, new List<string>() } };
                 option.AddSecurityRequirement(requirement);
             });
+
             services.AddControllers().AddJsonOptions(opt =>
             {
                 opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
+
             services.AddHttpClient<IAuthenticationRepository, AuthenticationRepository>(client =>
             {
                 client.BaseAddress = new Uri(Configuration["API:AuthenticationAPI:Uri"]);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Add("x-api-key", Configuration["API:AuthenticationAPI:Security:APIKey"]);
             });
+
+            var dbContextTimeout = Configuration.GetValue<int>("Custom:DbContextTimeout", 180);
             services.AddDbContextPool<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"], options =>
-                options.CommandTimeout(180))); //180 seconds timeout
+                options.CommandTimeout(dbContextTimeout)));
+
             services.AddHttpClient<IRabbitMqRepository, RabbitMqRepository>();
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
             services.AddHttpClient<IMaintenanceRepository, MaintenanceRepository>(client =>
@@ -158,6 +96,7 @@ namespace Backoffice.API
                 client.BaseAddress = new Uri(Configuration["API:Maintenance:Uri"]);
                 client.DefaultRequestHeaders.Add("x-api-key", "API:Maintenance:Security:ApiKey");
             });
+
             services.AddScoped<IPlatformRepository, PlatformRepository>();
             services.AddScoped<ITradingRepository, TradingRepository>();
             services.AddScoped<IBackofficeActivityLogRepository, BackofficeActivityLogRepository>();
@@ -165,7 +104,6 @@ namespace Backoffice.API
             services.AddTransient<ApiKeyFilter>();
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddHealthChecks();
-            services.AddApplicationInsightsTelemetry();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -180,8 +118,6 @@ namespace Backoffice.API
             app.UseRouting();
             app.UseCors();
             app.UseAuthorization();
-
-            //app.UseHttpsRedirection();
 
             app.UseEndpoints(endpoints =>
             {

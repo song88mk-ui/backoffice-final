@@ -33,6 +33,7 @@ namespace Backoffice.API.ActionFilter
         {
             _requiredClaim = new Claim(claimType, claimValue.ToString());
         }
+
         public AuthorizeAttribute()
         {
             _httpClient = new HttpClient();
@@ -40,6 +41,7 @@ namespace Backoffice.API.ActionFilter
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:AuthenticationAPI:Security:APIKey"]);
         }
+
         public async void OnAuthorization(AuthorizationFilterContext context)
         {
             try

@@ -31,6 +31,8 @@ jobs:
             image: backoffice-utility-service
           - path: Backoffice.Config.Service
             image: backoffice-config-service
+          - path: Backoffice.API
+            image: backoffice-bo-api
     steps:
       - name: Checkout
         uses: actions/checkout@v5

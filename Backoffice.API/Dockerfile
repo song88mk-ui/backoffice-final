@@ -7,12 +7,18 @@ ADD Backoffice.Shared Backoffice.Shared
 
 WORKDIR /source/Backoffice.API
 
-RUN dotnet restore --verbosity normal
+ARG NUGET_PASSWORD
 
+RUN dotnet nuget add source \
+  --username FlyingCockatoo \
+  --password ${NUGET_PASSWORD} \
+  --store-password-in-clear-text \
+  --name github "https://nuget.pkg.github.com/FlyingCockatoo/index.json"
+
+RUN dotnet restore
 RUN dotnet build \
   --no-restore \
   --configuration Release
-
 RUN dotnet publish \
   --no-restore \
   -c Release \
@@ -22,7 +28,6 @@ RUN dotnet publish \
 RUN cd /app/publish && rm -f appsettings.*.json
 
 FROM mcr.microsoft.com/dotnet/aspnet:3.1
-EXPOSE 80
 WORKDIR /app
 
 COPY --from=build /app/publish .
