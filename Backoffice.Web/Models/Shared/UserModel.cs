@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Models;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Models.Shared

@@ -178,9 +178,7 @@ namespace Backoffice.Shared.Utilities
                     _modelHk.BasicConsume(messageBroker.Queue, false, $"{messageBroker.Consumer}.{Guid.NewGuid()}", consumer);
                 }
             }
-            catch (Exception ex)
-            {
-            }
+            catch (Exception) {}
             #endregion
         }
         public void Connect(MessageBrokerCredentialModel messageBroker = null)
@@ -287,8 +285,7 @@ namespace Backoffice.Shared.Utilities
             }
             catch (Exception ex)
             {
-
-                throw;
+                throw ex;
             }
         }
 

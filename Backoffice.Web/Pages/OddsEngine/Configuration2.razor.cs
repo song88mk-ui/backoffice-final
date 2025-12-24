@@ -1,5 +1,4 @@
-﻿using Azure.Storage.Blobs.Models;
-using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Config;
@@ -159,7 +158,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _navMenuParamModel.MyTemplatesCount = -1;
             _navMenuParamModel.AssignedLeaguesCount = -1;
             _navMenuParamModel.UnAssignedLeaguesCount = -1;
-            
+
             _shouldRender = true;
 
             _cts?.Cancel();

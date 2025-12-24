@@ -1,7 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Models.OddsEngine.Monitoring;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Azure;
 
 namespace Backoffice.Web.Components.OddsEngine.Monitoring
 {
