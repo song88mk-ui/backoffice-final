@@ -661,7 +661,7 @@ namespace Backoffice.Utility.Repository
             catch (Exception ex)
             {
                 _logger.LogError("error retrieving activity logs using stored procedure: {exception} {stacktrace}",
-                        ex.Exception, ex.StackTrace);
+                        ex.Message, ex.StackTrace);
                 return null;
             }
         }
