@@ -27,9 +27,9 @@ namespace Backoffice.Shared.Data.Backoffice
         public DbSet<ConfigTemplateAssigned> ConfigTemplateAssigned { get; set; }
         public DbSet<ConfigTemplateAssignedMapping> ConfigTemplateAssignedMapping { get; set; }
         public DbSet<ActivityLog> ActivityLog { get; set; }
-        // Stored Procedure
-        public DbSet<ActivityLog> ReadActivityLog { get; set; }
         public DbSet<Translation> Translation { get; set; }
         public DbSet<ConfigTemplateModel> ConfigTemplateModel { get; set; }
+        // Stored Procedure
+        public DbSet<ActivityLog> ReadActivityLog { get; set; }
     }
 }
