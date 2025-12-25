@@ -85,7 +85,8 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
+                _logger.LogError("failed to add activity log: {exception}, stacktrace: {stackrace}",
+                        ex.Message, ex.StackTrace);
             }
         }
         public async Task ProcessActivityLog(OnActivityLogListMessage message)
@@ -129,7 +130,8 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
+                _logger.LogError("failed to process activity log: {exception}, stacktrace: {stackrace}",
+                        ex.Message, ex.StackTrace);
             }
         }
         public async Task ProcessOnGetMessageSettlementHistory(OnGetMessageSettlementHistoryMessage request, IMessageBroker messageBroker, string connectionId)
@@ -211,7 +213,8 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
+                _logger.LogError("failed to process on get message settlement history: {exception}, stacktrace: {stackrace}",
+                        ex.Message, ex.StackTrace);
             }
             finally
             {
@@ -219,6 +222,7 @@ namespace Backoffice.Utility.Repository
                 excel.Dispose();
             }
         }
+
         public async Task ProcessOnGetMarketSettlementHistory(OnGetMarketSettlementHistoryMessage request, IMessageBroker messageBroker)
         {
             // If you use EPPlus in a noncommercial context
@@ -302,7 +306,8 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
+                _logger.LogError("failed to process on get market settlement history: {exception}, stacktrace: {stackrace}",
+                        ex.Message, ex.StackTrace);
             }
             finally
             {
@@ -310,6 +315,7 @@ namespace Backoffice.Utility.Repository
                 excel.Dispose();
             }
         }
+
         public async Task ProcessOnGetManualBetSettlementHistory(OnGetManualBetSettlementHistoryMessage request, IMessageBroker messageBroker)
         {
             var title = "Manual Bet Settlement History";
@@ -384,13 +390,15 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
+                _logger.LogError("failed to process on get manual settlement history: {exception}, stacktrace: {stackrace}",
+                        ex.Message, ex.StackTrace);
             }
             finally
             {
                 excel.Dispose();
             }
         }
+
         public async Task ProcessOnGetCancelBetHistory(OnGetCancelBetHistoryMessage request, IMessageBroker messageBroker)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -482,13 +490,15 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
+                _logger.LogError("failed to process on get cancel history: {exception}, stacktrace: {stackrace}",
+                        ex.Message, ex.StackTrace);
             }
             finally
             {
                 excel.Dispose();
             }
         }
+
         public async Task ProcessOnGetOeConfigTemplate(OnGetOeConfigTemplateMessage request, IMessageBroker messageBroker)
         {
             try
@@ -522,7 +532,8 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
+                _logger.LogError("failed to process on get oe config template: {exception}, stacktrace: {stackrace}",
+                        ex.Message, ex.StackTrace);
             }
         }
 
@@ -649,6 +660,8 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
+                _logger.LogError("error retrieving activity logs using stored procedure: {exception} {stacktrace}",
+                        ex.Exception, ex.StackTrace);
                 return null;
             }
         }
@@ -730,7 +743,7 @@ namespace Backoffice.Utility.Repository
         private void InitMarketSettlementHistoryWorksheet(ExcelWorksheet worksheet)
         {
             // setting the properties
-            // of the work sheet 
+            // of the work sheet
             worksheet.DefaultRowHeight = 12;
 
             // Setting the properties
@@ -754,7 +767,7 @@ namespace Backoffice.Utility.Repository
         private void InitManualMessageSettlementHistoryWorksheet(ExcelWorksheet worksheet)
         {
             // setting the properties
-            // of the work sheet 
+            // of the work sheet
             worksheet.DefaultRowHeight = 12;
 
             // Setting the properties
