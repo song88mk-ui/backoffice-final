@@ -56,7 +56,7 @@ namespace Backoffice.WebSocket.Service
             _logger = logger;
             _sportsbookRepository = sportsbookService;
 
-            _logger.LogInformation("Connecting to WebSocket API at {WebSocketApi}", configuration["Custom:WebSocketAPI"]);
+            _logger.LogInformation("Creating Hub Connection to {WebSocketApi}", configuration["Custom:WebSocketAPI"]);
             _hubConnection = new HubConnectionBuilder()
                                 .WithUrl(configuration["Custom:WebSocketAPI"], options => options.Transports = HttpTransportType.WebSockets)
                                 .AddMessagePackProtocol(options =>
