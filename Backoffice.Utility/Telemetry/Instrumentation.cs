@@ -19,7 +19,7 @@ namespace Backoffice.Utility.Telemetry
       string? version = "latest";
       this.ActivitySource = new ActivitySource(ActivitySourceName, version);
       this.meter = new Meter(MeterName, version);
-      this.LogActivityDurationHistogram = this.meter.CreateHistogram<double>("bo.utility.log.activity.duration", "ms", "Log Activity Duration.");
+      this.LogActivityDurationHistogram = this.meter.CreateHistogram<double>("log.activity.duration", "ms", "Log Activity Duration.");
 
     }
 

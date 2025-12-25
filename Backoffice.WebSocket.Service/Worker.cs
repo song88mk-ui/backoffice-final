@@ -112,7 +112,9 @@ namespace Backoffice.WebSocket.Service
                 _threadOnBetStopGlobal.Start();
                 _threadNotification.Start();
 
+                _logger.LogInformation("Connecting to WebSocket API");
                 await _hubConnection.StartAsync();
+                _logger.LogInformation("Connected");
 
                 _logger.LogInformation("Connecting to message broker");
                 _messageBroker.Connect();
