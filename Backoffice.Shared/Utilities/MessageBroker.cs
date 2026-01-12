@@ -24,6 +24,7 @@ namespace Backoffice.Shared.Utilities
         private readonly IConfiguration _configuration;
 
         private string _hostName = string.Empty;
+        private int _hostPort = 5672;
         private string _userName = string.Empty;
         private string _password = string.Empty;
         private string _virtualHost = string.Empty;
@@ -44,6 +45,7 @@ namespace Backoffice.Shared.Utilities
         private readonly string _messageBrokerName;
 
         private string _externalHostName = string.Empty;
+        private int _externalHostPort = 5672;
         private string _externalUserName = string.Empty;
         private string _externalPassword = string.Empty;
         private string _externalVirtualHost = string.Empty;
@@ -79,6 +81,7 @@ namespace Backoffice.Shared.Utilities
         public void ExternalConnect()
         {
             _externalHostName = _configuration["ExternalMessageBroker:Host"];
+            _externalHostPort = string.IsNullOrEmpty(_configuration["ExternalMessageBroker:Port"]) ? 5672 : Convert.ToInt32(_configuration["ExternalMessageBroker:Port"]);
             _externalUserName = _configuration["ExternalMessageBroker:Username"];
             _externalPassword = _configuration["ExternalMessageBroker:Password"];
             _externalVirtualHost = _configuration["ExternalMessageBroker:VirtualHost"];
@@ -93,11 +96,12 @@ namespace Backoffice.Shared.Utilities
                     _externalConnectionFactory = new ConnectionFactory
                     {
                         HostName = _externalHostName,
-                        Port = 5672,
+                        Port = _externalHostPort,
                         UserName = _externalUserName,
                         Password = _externalPassword,
                         VirtualHost = _externalVirtualHost,
                         RequestedHeartbeat = 60,
+                        Ssl = new SslOption { Enabled = _externalHostPort == 5671 ? true : false, ServerName = _externalHostName },
                         NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
                     };
 
@@ -117,11 +121,12 @@ namespace Backoffice.Shared.Utilities
                 var connectionFactory = new ConnectionFactory
                 {
                     HostName = messageBroker.Host,
-                    Port = 5672,
+                    Port = messageBroker.Port,
                     UserName = messageBroker.Username,
                     Password = messageBroker.Password,
                     VirtualHost = messageBroker.VirtualHost,
                     RequestedHeartbeat = 60,
+                    Ssl = messageBroker.Ssl,
                     NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
                 };
 
@@ -200,6 +205,7 @@ namespace Backoffice.Shared.Utilities
                     _isExclusive = messageBroker.IsExclusive;
                     _isPriority = messageBroker.IsPriority;
                     _hostName = messageBroker.Host;
+                    _hostPort = messageBroker.Port;
                     _userName = messageBroker.Username;
                     _password = messageBroker.Password;
                     _virtualHost = messageBroker.VirtualHost;
@@ -215,6 +221,7 @@ namespace Backoffice.Shared.Utilities
                     _isExclusive = string.IsNullOrEmpty(_configuration[$"{_messageBrokerName}:IsExclusive"]) ? false : Convert.ToBoolean(_configuration[$"{_messageBrokerName}:IsExclusive"]);
                     _isPriority = string.IsNullOrEmpty(_configuration[$"{_messageBrokerName}:IsPriority"]) ? false : Convert.ToBoolean(_configuration[$"{_messageBrokerName}:IsPriority"]);
                     _hostName = _configuration[$"{_messageBrokerName}:Host"];
+                    _hostPort = string.IsNullOrEmpty(_configuration[$"{_messageBrokerName}:Port"]) ? 5672 : Convert.ToInt32(_configuration[$"{_messageBrokerName}:Port"]);
                     _userName = _configuration[$"{_messageBrokerName}:Username"];
                     _password = _configuration[$"{_messageBrokerName}:Password"];
                     _virtualHost = _configuration[$"{_messageBrokerName}:VirtualHost"];
@@ -230,11 +237,12 @@ namespace Backoffice.Shared.Utilities
                         _connectionFactory = new ConnectionFactory
                         {
                             HostName = _hostName,
-                            Port = 5672,
+                            Port = _hostPort,
                             UserName = _userName,
                             Password = _password,
                             VirtualHost = _virtualHost,
                             RequestedHeartbeat = 60,
+                            Ssl = new SslOption { Enabled = _hostPort == 5671 ? true : false, ServerName = _hostName },
                             NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
                         };
 
@@ -292,6 +300,7 @@ namespace Backoffice.Shared.Utilities
         public void ConnectWithManualAck()
         {
             _hostName = _configuration[$"{_messageBrokerName}:Host"];
+            _hostPort = string.IsNullOrEmpty(_configuration[$"{_messageBrokerName}:Port"]) ? 5672 : Convert.ToInt32(_configuration[$"{_messageBrokerName}:Port"]);
             _userName = _configuration[$"{_messageBrokerName}:Username"];
             _password = _configuration[$"{_messageBrokerName}:Password"];
             _virtualHost = _configuration[$"{_messageBrokerName}:VirtualHost"];
@@ -307,11 +316,12 @@ namespace Backoffice.Shared.Utilities
                     _connectionFactory = new ConnectionFactory
                     {
                         HostName = _hostName,
-                        Port = 5672,
+                        Port = _hostPort,
                         UserName = _userName,
                         Password = _password,
                         VirtualHost = _virtualHost,
                         RequestedHeartbeat = 60,
+                        Ssl = new SslOption { Enabled = _hostPort == 5671 ? true : false, ServerName = _hostName },
                         NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
                     };
 
