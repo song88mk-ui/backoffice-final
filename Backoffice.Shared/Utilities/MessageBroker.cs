@@ -23,6 +23,8 @@ namespace Backoffice.Shared.Utilities
 
         private readonly IConfiguration _configuration;
 
+        private readonly object _lock = new object();
+
         private string _hostName = string.Empty;
         private int _hostPort = 5672;
         private string _userName = string.Empty;
@@ -231,6 +233,7 @@ namespace Backoffice.Shared.Utilities
                     _routingKey = _configuration[$"{_messageBrokerName}:RoutingKey"];
                     _prefetchCount = string.IsNullOrEmpty(_configuration[$"{_messageBrokerName}:PrefetchCount"]) ? "1000" : _configuration[$"{_messageBrokerName}:PrefetchCount"];
                 }
+
                 if (_connection == null)
                 {
                     if (_connectionFactory == null)
@@ -419,6 +422,43 @@ namespace Backoffice.Shared.Utilities
             }
         }
 
+        public void CPublish<T>(T payload, string messageType, string routingKey, string correlationId)
+        {
+            try
+            {
+                var activityName = $"{routingKey} send";
+                using var activity = _activitySource.StartActivity(activityName, ActivityKind.Producer);
+
+                var conn = GetConnection();
+                using var channel = conn.CreateModel();
+
+                var properties = channel.CreateBasicProperties();
+                properties.CorrelationId = correlationId;
+                properties.DeliveryMode = 2;
+                properties.Type = messageType;
+
+                ActivityContext contextToInject = default;
+                if (activity != null)
+                {
+                    contextToInject = activity.Context;
+                }
+                else if (Activity.Current != null)
+                {
+                    contextToInject = Activity.Current.Context;
+                }
+
+                Propagator.Inject(new PropagationContext(contextToInject, Baggage.Current), properties, this.InjectTraceContextIntoBasicProperties);
+
+                var payloadBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload));
+
+                channel.BasicPublish(_exchange, routingKey, properties, payloadBytes);
+            }
+            catch (Exception)
+            {
+              // throw?
+            }
+        }
+
         public void Publish(string payload, string messageType, string routingKey, string correlationId)
         {
             try
@@ -453,6 +493,44 @@ namespace Backoffice.Shared.Utilities
             }
         }
 
+        public void CPublish(string payload, string messageType, string routingKey, string correlationId)
+        {
+            try
+            {
+              var activityName = $"{routingKey} send";
+              using var activity = _activitySource.StartActivity(activityName, ActivityKind.Producer);
+
+                var conn = GetConnection();
+                using var channel = conn.CreateModel();
+
+                var properties = channel.CreateBasicProperties();
+                properties.CorrelationId = correlationId;
+                properties.DeliveryMode = 2;
+                properties.Type = messageType;
+
+                ActivityContext contextToInject = default;
+                if (activity != null)
+                {
+                    contextToInject = activity.Context;
+                }
+                else if (Activity.Current != null)
+                {
+                    contextToInject = Activity.Current.Context;
+                }
+
+                Propagator.Inject(new PropagationContext(contextToInject, Baggage.Current), properties, this.InjectTraceContextIntoBasicProperties);
+
+                var payloadBytes = Encoding.UTF8.GetBytes(payload);
+
+                channel.BasicPublish(_exchange, routingKey, properties, payloadBytes);
+            }
+            catch (Exception)
+            {
+              // throw?
+            }
+        }
+
+
         private void InjectTraceContextIntoBasicProperties(IBasicProperties props, string key, string value)
         {
           try
@@ -464,9 +542,7 @@ namespace Backoffice.Shared.Utilities
             props.Headers[key] = value;
           }
           catch (Exception)
-          {
-            //
-          }
+          { }
         }
 
         public void Dispose()
@@ -480,9 +556,26 @@ namespace Backoffice.Shared.Utilities
             if (_connection != null)
                 _connection.Dispose();
         }
+
         private void BasicPublish(string routingKey, IBasicProperties properties, byte[] payloadBytes)
         {
             _model.BasicPublish(_exchange, routingKey, properties, payloadBytes);
+        }
+
+        private IConnection GetConnection()
+        {
+            if (_connection != null && _connection.IsOpen)
+                return _connection;
+
+            lock(_lock)
+            {
+                Connect(); //
+                if (_connection == null || !_connection.IsOpen)
+                {
+                    _connection = _connectionFactory.CreateConnection();
+                }
+            }
+            return _connection;
         }
     }
 }
