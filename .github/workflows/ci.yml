@@ -45,7 +45,7 @@ jobs:
         with:
           files: |
             ${{ matrix.app.path }}/**
-            Backoffice.Shared
+            Backoffice.Shared/**
             .github/workflows/**
 
       - name: Changes Check
