@@ -92,6 +92,11 @@ namespace Backoffice.Shared.Utilities
             _externalConsumerName = _configuration["ExternalMessageBroker:Consumer"];
             _externalRoutingKey = _configuration["ExternalMessageBroker:RoutingKey"];
 
+            var clientProperties = new Dictionary<string, object>
+            {
+                { "application_name", "Song88 Platform" }
+            };
+
             if (_externalConnection == null)
             {
                 if (_externalConnectionFactory == null)
@@ -104,7 +109,8 @@ namespace Backoffice.Shared.Utilities
                         VirtualHost = _externalVirtualHost,
                         RequestedHeartbeat = 60,
                         Ssl = new SslOption { Enabled = _externalHostPort == 5671 ? true : false, ServerName = _externalHostName },
-                        NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
+                        NetworkRecoveryInterval = TimeSpan.FromSeconds(5),
+                        ClientProperties = clientProperties
                     };
 
                 _externalConnection = _externalConnectionFactory.CreateConnection();
@@ -200,6 +206,12 @@ namespace Backoffice.Shared.Utilities
                 suffix = sb.ToString().Substring(0,5);
             }
 
+            var clientProperties = new Dictionary<string, object>
+            {
+                { "host_name", Environment.MachineName },
+                { "application_name", "Song88 BO" }
+            };
+
             try
             {
                 if (messageBroker != null)
@@ -246,7 +258,8 @@ namespace Backoffice.Shared.Utilities
                             VirtualHost = _virtualHost,
                             RequestedHeartbeat = 60,
                             Ssl = new SslOption { Enabled = _hostPort == 5671 ? true : false, ServerName = _hostName },
-                            NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
+                            NetworkRecoveryInterval = TimeSpan.FromSeconds(5),
+                            ClientProperties = clientProperties
                         };
 
                     _connection = _connectionFactory.CreateConnection();
@@ -313,6 +326,12 @@ namespace Backoffice.Shared.Utilities
             _routingKey = _configuration[$"{_messageBrokerName}:RoutingKey"];
             _prefetchCount = string.IsNullOrEmpty(_configuration[$"{_messageBrokerName}:PrefetchCount"]) ? "1000" : _configuration[$"{_messageBrokerName}:PrefetchCount"];
 
+            var clientProperties = new Dictionary<string, object>
+            {
+                { "host_name", Environment.MachineName },
+                { "application_name", "Song88 BO" }
+            };
+
             if (_connection == null)
             {
                 if (_connectionFactory == null)
@@ -325,7 +344,8 @@ namespace Backoffice.Shared.Utilities
                         VirtualHost = _virtualHost,
                         RequestedHeartbeat = 60,
                         Ssl = new SslOption { Enabled = _hostPort == 5671 ? true : false, ServerName = _hostName },
-                        NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
+                        NetworkRecoveryInterval = TimeSpan.FromSeconds(5),
+                        ClientProperties = clientProperties
                     };
 
                 _connection = _connectionFactory.CreateConnection();
