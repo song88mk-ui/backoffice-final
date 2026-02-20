@@ -367,7 +367,7 @@ namespace Backoffice.API.Repositories
             try
             {
                 var clients = GetClientInformation()
-                    .Where(c => c.IsDeleted == false && c.StatusId == (int)ClientStatus.Normal && (c.ApplicationId == (int)Application2.SBC || c.ApplicationId == (int)Application.Sportsbook))
+                    .Where(c => c.IsDeleted == false && c.StatusId == (int)ClientStatus.Normal && (c.ApplicationId == (int)Application2.SBC || c.ApplicationId == (int)Application2.SB))
                     .Select(client => new ClientResponse.Client
                     {
                         ClientId = client.ClientId,
@@ -400,7 +400,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var query = GetClientInformation().Where(c => c.IsDeleted == false && (c.ApplicationId == (int)Application2.SBC || c.ApplicationId == (int)Application.Sportsbook));
+                var query = GetClientInformation().Where(c => c.IsDeleted == false && (c.ApplicationId == (int)Application2.SBC || c.ApplicationId == (int)Application2.SB));
 
                 if (brands != null)
                 {
@@ -1016,7 +1016,7 @@ namespace Backoffice.API.Repositories
                             ModifiedBy = 0,
                             ModifiedDate = DateTime.UtcNow,
                             StatusId = request.StatusId,
-                            ApplicationId = (int)Application.Sportsbook,
+                            ApplicationId = (int)Application2.SB,
                             SportsbookShare = request.RevenueShare.SportsbookShare,
                             JackpotShare = request.RevenueShare.JackpotShare,
                             ClientShare = 0,
@@ -1040,7 +1040,7 @@ namespace Backoffice.API.Repositories
 
                         if (client != null)
                         {
-                            client.ApplicationId = (int)Application.Sportsbook;
+                            client.ApplicationId = (int)Application2.SB;
                             client.Name = request.Name;
                             client.Email = request.Email;
                             client.TelephoneNumber = request.TelephoneNumber;

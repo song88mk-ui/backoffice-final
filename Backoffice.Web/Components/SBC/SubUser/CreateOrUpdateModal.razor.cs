@@ -224,8 +224,8 @@ namespace Backoffice.Web.Components.SBC.SubUser
 
             var request = new UserRegisterRequest()
             {
-                AppId = (int)Application.Backoffice,
-                AppName = Application.Backoffice.ToString(),
+                AppId = (int)Application2.BO,
+                AppName = Application2.BO.ToString(),
                 Email = "sbsubaccount@fci.com",
                 MainUserId = SubUserClaims.MainUserId,
                 NickName = SubUser.NickName,

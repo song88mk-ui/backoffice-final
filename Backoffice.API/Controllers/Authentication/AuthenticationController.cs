@@ -36,7 +36,7 @@ namespace Backoffice.API.Controllers.Authentication
             if(string.IsNullOrEmpty(content.UserAgent))
                 content.UserAgent = HttpContext.Request.Headers["user-agent"].FirstOrDefault() ?? "";
 
-            content.Provider = $"{(int)Application.Backoffice}";
+            content.Provider = $"{(int)Application2.BO}";
 
             var result = await _authenticationRepository.Login(content);
 

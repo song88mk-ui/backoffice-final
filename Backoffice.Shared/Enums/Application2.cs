@@ -1,13 +1,13 @@
 ﻿
 namespace Backoffice.Shared.Enums
 {
-    public enum Application
-    {
-        Backoffice = 1001,
-        Sportsbook = 1002,
-        AgentManagementSystem = 1003,
-        ClientChecklist = 1004
-    }
+    //public enum Application
+    //{
+    //    Backoffice = 1001,
+    //    Sportsbook = 1002,
+    //    AgentManagementSystem = 1003,
+    //    ClientChecklist = 1004
+    //}
 
     public enum Application2
     {

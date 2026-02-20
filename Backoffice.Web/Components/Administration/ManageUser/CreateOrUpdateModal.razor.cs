@@ -241,15 +241,15 @@ namespace Backoffice.Web.Components.Administration.ManageUser
             IsPreLoader = true;
             await InvokeAsync(StateHasChanged);
 
-            UserRegister.AppId = (int)Application.Backoffice;
-            UserRegister.AppName = Application.Backoffice.ToString();
+            UserRegister.AppId = (int)Application2.BO;
+            UserRegister.AppName = Application2.BO.ToString();
 
             if (IsValid(UserRegister))
             {
                 var request = new UserRegisterRequest()
                 {
-                    AppId = (int)Application.Backoffice,
-                    AppName = Application.Backoffice.ToString(),
+                    AppId = (int)Application2.BO,
+                    AppName = Application2.BO.ToString(),
                     UserIdRef = 0l,
                     Email = UserRegister.Email,
                     MainUserId = "",
