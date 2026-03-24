@@ -394,6 +394,50 @@ namespace Backoffice.Web.Services
 
         #region Methods - Client
 
+        public async Task<BaseResponse<PlatformClientModel>> GetPlatformClients()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"sportsbook/client/platform/list");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<BaseResponse<List<PlatformClientResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                    return new BaseResponse<PlatformClientModel>()
+                    {
+                        StatusCode = result.StatusCode,
+                        Message = result.Message,
+                        Result = new PlatformClientModel
+                        {
+                            Clients = result.Result
+                        }
+                    };
+                }
+                else
+                {
+                    return new BaseResponse<PlatformClientModel>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})",
+                        Result = new PlatformClientModel()
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<PlatformClientModel>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<ClientModel>> GetClients()
         {
             try

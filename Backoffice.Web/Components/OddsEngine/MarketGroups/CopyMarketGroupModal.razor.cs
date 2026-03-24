@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
 
-        public List<ClientInformationModel> ClientInformations { get; set; }
+        public List<PlatformClientResponse> ClientInformations { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }

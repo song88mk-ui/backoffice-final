@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.Shared;
@@ -64,17 +65,17 @@ namespace Backoffice.Web.States
             }
 
         }
-        public void SetTradingClients(List<ClientInformationModel> clients)
+        public void SetTradingClients(List<PlatformClientResponse> clients)
         {
             if (clients != null && clients.Any())
             {
                 if (!_isSuperAdmin)
                     clients = clients.Where(c => _clientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
-                base.Model.TradingClients = new List<ClientInformationModel>(clients);
+                base.Model.TradingClients = new List<PlatformClientResponse>(clients);
             }
             else
-                base.Model.TradingClients = new List<ClientInformationModel>();
+                base.Model.TradingClients = new List<PlatformClientResponse>();
 
             OnPropertyChanged();
         }

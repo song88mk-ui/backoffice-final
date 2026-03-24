@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -17,7 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
-        public List<ClientInformationModel> ClientInformations { get; set; }
+        public List<PlatformClientResponse> ClientInformations { get; set; }
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
 

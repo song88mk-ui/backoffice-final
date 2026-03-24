@@ -102,5 +102,19 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
+
+        [HttpGet("platform/list")]
+        public async Task<IActionResult> GetPlatformClients()
+        {
+            var result = await _backofficeRepository.GetPlatformClients();
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace Backoffice.Web.Shared.OddsEngine
     {
         #region Properties
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         private HeaderNavMenu _headerNavMenuReference;
         private SportClickCallbackModel _selectedSport;
@@ -30,10 +31,11 @@ namespace Backoffice.Web.Shared.OddsEngine
             _navMenuParameter.NavMenuAccess = PermissionCategory.OE;
 
             var ctsToken = _cts.Token;
-            var tradingClientTask = await TradingService.GetClientList(ctsToken);
+
+            var clientResult = (await BackofficeService.GetPlatformClients()).Result;
 
             if (!ctsToken.IsCancellationRequested)
-                UserState.SetTradingClients(tradingClientTask.Result);
+                UserState.SetTradingClients(clientResult.Clients);
 
             base.InitializeState();
         }

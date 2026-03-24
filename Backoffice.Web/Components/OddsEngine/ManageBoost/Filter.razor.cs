@@ -1,12 +1,10 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Web.Components.Common;
-using System.Drawing;
-using Backoffice.Web.States;
 using System.ComponentModel;
+using Backoffice.Shared.Models.Response;
 
 namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 {
@@ -33,7 +31,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         private List<SelectListItemModel<int>> _segments;
         private List<SelectListItemModel<int>> _leagues;
         private LanguageCode _languageCode;
-        private List<ClientInformationModel> _clientListReference = new List<ClientInformationModel>();
+        private List<PlatformClientResponse> _clientListReference = new List<PlatformClientResponse>();
         #endregion
 
         #region Methods
@@ -164,7 +162,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
             {
-                _clientListReference = new List<ClientInformationModel>(_userState.Model.TradingClients);
+                _clientListReference = new List<PlatformClientResponse>(_userState.Model.TradingClients);
 
                 _clients = await LoadClients();
                 SelectedClientCode = _clients.FirstOrDefault().Value;

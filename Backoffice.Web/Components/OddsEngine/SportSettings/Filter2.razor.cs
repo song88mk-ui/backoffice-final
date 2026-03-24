@@ -1,5 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using System.ComponentModel;
@@ -24,7 +25,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         private int _counter;
         private LanguageCode _languageCode;
-        private List<ClientInformationModel> _clientListReference = new List<ClientInformationModel>();
+        private List<PlatformClientResponse> _clientListReference = new List<PlatformClientResponse>();
 
         protected override async Task OnInitializedAsync()
         {
@@ -128,7 +129,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         {
             if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
             {
-                _clientListReference = new List<ClientInformationModel>(_userState.Model.TradingClients);
+                _clientListReference = new List<PlatformClientResponse>(_userState.Model.TradingClients);
 
                 _clients = _userState.Model.TradingClients.Select(s => new SelectListItemModel<string>
                 {

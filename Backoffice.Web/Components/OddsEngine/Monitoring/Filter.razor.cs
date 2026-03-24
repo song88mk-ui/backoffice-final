@@ -33,7 +33,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         private bool _init = true;
 
         private string _clientReference;
-        private List<ClientInformationModel> _clientListReference = new List<ClientInformationModel>();
+        private List<PlatformClientResponse> _clientListReference = new List<PlatformClientResponse>();
         #endregion
 
         #region Methods
@@ -53,7 +53,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
             if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
             {
-                _clientListReference = new List<ClientInformationModel>(_userState.Model.TradingClients);
+                _clientListReference = new List<PlatformClientResponse>(_userState.Model.TradingClients);
                 _init = true;
             }
 

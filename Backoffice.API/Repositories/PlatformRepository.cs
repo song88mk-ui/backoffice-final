@@ -38,6 +38,39 @@ namespace Backoffice.API.Repositories
         }
 
         #region Client
+        public async Task<BaseResponse<List<PlatformClientResponse>>> GetClients(string region)
+        {
+            try
+            {
+                var response = await GetHttpClient(region).GetAsync($"v1/clients");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonConvert.DeserializeObject<BaseResponse<List<PlatformClientResponse>>>(await response.Content.ReadAsStringAsync());
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonConvert.DeserializeObject<BaseResponse<List<PlatformClientResponse>>>(await response.Content.ReadAsStringAsync());
+                    else
+                    {
+                        return new BaseResponse<List<PlatformClientResponse>>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<PlatformClientResponse>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+
+        }
+
         public async Task<BaseResponse<PlatformClientResponse>> AddOrUpdateClient(ClientRequest request, string region, List<Event> events)
         {
             try

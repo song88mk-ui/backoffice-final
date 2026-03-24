@@ -1477,6 +1477,23 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+
+        public async Task<BaseResponse<List<PlatformClientResponse>>> GetPlatformClients()
+        {
+            try
+            {
+                return await _platformRepository.GetClients("HK");
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<PlatformClientResponse>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = null
+                };
+            }
+        }
         #endregion
 
         #region Config

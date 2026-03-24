@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.OddsEngine.BoostedSettings;
 using Backoffice.Web.Models;
@@ -25,7 +26,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string _tHeadClass;
         private string _searchText;
         protected List<BoostedSettingsModel> _clientsView;
-        private List<ClientInformationModel> _clientListReference = new List<ClientInformationModel>();
+        private List<PlatformClientResponse> _clientListReference = new List<PlatformClientResponse>();
         private CancellationTokenSource _cts;
 
         private bool _init = true;
@@ -72,7 +73,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
             {
-                _clientListReference = new List<ClientInformationModel>(_userState.Model.TradingClients);
+                _clientListReference = new List<PlatformClientResponse>(_userState.Model.TradingClients);
                 _init = true;
             }
 
@@ -176,7 +177,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
             {
-                _clientListReference = new List<ClientInformationModel>(_userState.Model.TradingClients);
+                _clientListReference = new List<PlatformClientResponse>(_userState.Model.TradingClients);
 
                 await GetContent();
                 StateHasChanged();

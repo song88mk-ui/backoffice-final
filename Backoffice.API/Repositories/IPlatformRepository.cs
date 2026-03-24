@@ -10,6 +10,7 @@ namespace Backoffice.API.Repositories
     public interface IPlatformRepository
     {
         #region Client
+        Task<BaseResponse<List<PlatformClientResponse>>> GetClients(string region);
         Task<BaseResponse<PlatformClientResponse>> AddOrUpdateClient(ClientRequest request, string region, List<Event> events);
         Task<BaseResponse<StatusCode>> ProcessBackofficeClientBetConfig(AddOrUpdateBetConfigRequest request, string region);
         Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates(string region);

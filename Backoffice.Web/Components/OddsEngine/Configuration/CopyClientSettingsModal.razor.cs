@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 
@@ -12,7 +13,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private EventCallback<AlertModel> OnCopyClientSettingsCallback { get; set; }
 
-        private List<ClientInformationModel> Clients { get; set; }
+        private List<PlatformClientResponse> Clients { get; set; }
 
         private KeyValuePair<string, string> SelectedFromClient { get; set; }
         private KeyValuePair<string, string> SelectedToClient { get; set; }
@@ -20,7 +21,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            Clients = new List<ClientInformationModel>();
+            Clients = new List<PlatformClientResponse>();
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback<AlertModel>>("OnCopyClientSettingsCallback");
             await Initialize();
         }

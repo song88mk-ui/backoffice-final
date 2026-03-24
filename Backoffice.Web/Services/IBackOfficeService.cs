@@ -12,7 +12,6 @@ namespace Backoffice.Web.Services
         string Page { get; set; }
         LanguageCode LanguageCode { get; set; }
         event EventHandler<UnauthorizedEventArgs> Unauthorized;
-
         Task<BaseResponse<MaintenanceResponse>> GetMaintenanceV2();
         Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
@@ -20,6 +19,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<MessageResponse>> AddActivityLogList(ActivityLogListRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request, string region);
         Task<BaseResponse<ActivityLogResponse>> GetManualBetSettlementActivityLogs(ManualBetSettlementActivityLogRequest request);
+        Task<BaseResponse<PlatformClientModel>> GetPlatformClients();
         Task<BaseResponse<ClientModel>> GetClients();
         Task<BaseResponse<ClientModel>> GetClientsV2(CancellationToken cancellationToken = default);
         Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);
