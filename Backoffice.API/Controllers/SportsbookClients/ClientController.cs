@@ -18,9 +18,11 @@ namespace Backoffice.API.Controllers.SportsbookClients
     public class ClientController : Controller
     {
         private readonly IBackofficeRepository _backofficeRepository;
-        public ClientController(IBackofficeRepository backofficeRepository)
+        private readonly ISportsbookRepository _sportsbookRepository;
+        public ClientController(IBackofficeRepository backofficeRepository, ISportsbookRepository sportsbookRepository)
         {
             _backofficeRepository = backofficeRepository;
+            _sportsbookRepository = sportsbookRepository;
         }
 
         [HttpGet("list")]
@@ -118,9 +120,9 @@ namespace Backoffice.API.Controllers.SportsbookClients
         }
 
         [HttpPost("markettemplategroups")]
-        public async Task<IActionResult> GetPlatformClients(ClientMarketTemplateRequest request)
+        public async Task<IActionResult> GetClientMarketTemplateGroups(ClientMarketTemplateRequest request)
         {
-            var result = await _backofficeRepository.GetClientMarketTemplateGroups(request);
+            var result = await _sportsbookRepository.GetClientMarketTemplateGroups(request);
 
             switch (result.StatusCode)
             {
@@ -130,5 +132,54 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
+
+        #region  Market Group
+        [HttpPost("markettemplategroup/post")]
+        public async Task<IActionResult> AddOrUpdateClientMarketTemplateGroup([FromBody] ClientPostMarketTemplateGroupRequest request)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _sportsbookRepository.AddOrUpdateClientMarketTemplateGroup(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("markettemplategroup/delete")]
+        public async Task<IActionResult> DeleteClientMarketTemplateGroup([FromBody] ClientDeleteMarketTemplateGroupRequest request)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _sportsbookRepository.DeleteClientMarketTemplateGroup(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("markettemplategroup/copy")]
+        public async Task<IActionResult> CopyClientMarketTemplateGroup([FromBody] ClientCopyMarketTemplateGroupRequest request)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _sportsbookRepository.CopyClientMarketTemplateGroup(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        #endregion
     }
 }

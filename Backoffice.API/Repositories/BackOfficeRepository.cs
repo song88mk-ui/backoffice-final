@@ -1497,23 +1497,6 @@ namespace Backoffice.API.Repositories
             }
         }
 
-
-        public async Task<BaseResponse<ClientMarketTemplateGroupResponse>> GetClientMarketTemplateGroups(ClientMarketTemplateRequest request)
-        {
-            try
-            {
-                return await _sportsbookRepository.GetClientMarketTemplateGroups(request.ClientId, request.SportId, request.FixtureStatusId);
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<ClientMarketTemplateGroupResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
-                    Result = null
-                };
-            }
-        }
         #endregion
 
         #region Config

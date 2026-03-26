@@ -23,7 +23,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
         Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates();
         Task<BaseResponse<List<PlatformClientResponse>>> GetPlatformClients();
-        Task<BaseResponse<ClientMarketTemplateGroupResponse>> GetClientMarketTemplateGroups(ClientMarketTemplateRequest request);
+        
         #region Config
         Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplates(string searchText, List<int> sportIds = null, List<int> scopeIds = null);
         Task<BaseResponse<int>> GetConfigTemplatesCount();
