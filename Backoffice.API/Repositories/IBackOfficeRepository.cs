@@ -3,6 +3,7 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -22,6 +23,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
         Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates();
         Task<BaseResponse<List<PlatformClientResponse>>> GetPlatformClients();
+        Task<BaseResponse<ClientMarketTemplateGroupResponse>> GetClientMarketTemplateGroups(ClientMarketTemplateRequest request);
         #region Config
         Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplates(string searchText, List<int> sportIds = null, List<int> scopeIds = null);
         Task<BaseResponse<int>> GetConfigTemplatesCount();

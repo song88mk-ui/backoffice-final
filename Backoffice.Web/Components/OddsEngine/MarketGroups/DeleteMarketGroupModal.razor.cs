@@ -70,7 +70,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 return;
             }
 
-            var marketTemplateGroupResponse = await _tradingService.DeleteClientMarketTemplateGroup(new ClientDeleteMarketTemplateGroupRequest
+            var marketTemplateGroupResponse = await _backofficeService.DeleteClientMarketTemplateGroup(new ClientDeleteMarketTemplateGroupRequest
             {
                 ClientId = MarketGroupModel.ClientId,
                 SportId = MarketGroupModel.SportId,

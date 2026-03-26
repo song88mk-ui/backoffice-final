@@ -76,7 +76,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 FixtureStatusId = MarketGroupModel.FixtureStatusId
             });
 
-            var marketTemplateGroupResponse = await _tradingService.AddOrUpdateClientMarketTemplateGroup(new ClientPostMarketTemplateGroupRequest
+            var marketTemplateGroupResponse = await _backofficeService.AddOrUpdateClientMarketTemplateGroup(new ClientPostMarketTemplateGroupRequest
             {
                 ClientId = MarketGroupModel.ClientId,
                 SportId = MarketGroupModel.SportId,

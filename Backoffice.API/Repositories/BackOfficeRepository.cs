@@ -33,6 +33,7 @@ namespace Backoffice.API.Repositories
         private readonly BackofficeContext _backofficeContext;
 
         private readonly IPlatformRepository _platformRepository;
+        private readonly ISportsbookRepository _sportsbookRepository;
         private readonly ITradingRepository _tradingRepository;
         private readonly IRabbitMqRepository _rabbitMqRepository;
         private readonly IMemCache _memCache;
@@ -43,10 +44,11 @@ namespace Backoffice.API.Repositories
 
         #region Ctor
 
-        public BackofficeRepository(BackofficeContext backofficeContext, IPlatformRepository platformRepository, ITradingRepository tradingRepository, IMemCache memCache, IRabbitMqRepository rabbitMqRepository)
+        public BackofficeRepository(BackofficeContext backofficeContext, IPlatformRepository platformRepository, ISportsbookRepository sportsbookRepository, ITradingRepository tradingRepository, IMemCache memCache, IRabbitMqRepository rabbitMqRepository)
         {
             _backofficeContext = backofficeContext;
             _platformRepository = platformRepository;
+            _sportsbookRepository = sportsbookRepository;
             _tradingRepository = tradingRepository;
             _memCache = memCache;
             _rabbitMqRepository = rabbitMqRepository;
@@ -1487,6 +1489,24 @@ namespace Backoffice.API.Repositories
             catch (Exception ex)
             {
                 return new BaseResponse<List<PlatformClientResponse>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = null
+                };
+            }
+        }
+
+
+        public async Task<BaseResponse<ClientMarketTemplateGroupResponse>> GetClientMarketTemplateGroups(ClientMarketTemplateRequest request)
+        {
+            try
+            {
+                return await _sportsbookRepository.GetClientMarketTemplateGroups(request.ClientId, request.SportId, request.FixtureStatusId);
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ClientMarketTemplateGroupResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",

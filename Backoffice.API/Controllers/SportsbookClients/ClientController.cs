@@ -116,5 +116,19 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
+
+        [HttpPost("markettemplategroups")]
+        public async Task<IActionResult> GetPlatformClients(ClientMarketTemplateRequest request)
+        {
+            var result = await _backofficeRepository.GetClientMarketTemplateGroups(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
     }
 }

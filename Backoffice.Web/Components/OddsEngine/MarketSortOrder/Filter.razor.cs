@@ -213,7 +213,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
             if (!string.IsNullOrEmpty(_filterModel.SelectedClientCode) && _filterModel.SelectedClientCode != "NA" && _filterModel.SelectedSportId != 0)
             {
-                var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
+                var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == _filterModel.SelectedClientCode).ClientId;
+
+                var marketTemplateGroupResponse = (await _backofficeService.GetClientMarketTemplateGroups(clientId, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
 
                 if (marketTemplateGroupResponse != null)
                 {

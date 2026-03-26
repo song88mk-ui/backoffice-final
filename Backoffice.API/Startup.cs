@@ -98,6 +98,7 @@ namespace Backoffice.API
             });
 
             services.AddScoped<IPlatformRepository, PlatformRepository>();
+            services.AddScoped<ISportsbookRepository, SportsbookRepository>();
             services.AddScoped<ITradingRepository, TradingRepository>();
             services.AddScoped<IBackofficeActivityLogRepository, BackofficeActivityLogRepository>();
             services.AddSingleton<IMemCache, MemCache>();

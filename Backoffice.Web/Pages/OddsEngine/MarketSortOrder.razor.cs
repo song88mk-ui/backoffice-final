@@ -341,9 +341,11 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (!string.IsNullOrEmpty(_filterModel.SelectedClientCode) && _filterModel.SelectedClientCode != "NA" && _filterModel.SelectedSportId != 0)
             {
+                var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == _filterModel.SelectedClientCode).ClientId;
+
                 var marketTemplateResponse = (await _tradingService.GetClientMarketTemplates(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId, _translationState.ActiveLanguageCode)).Result;
 
-                var marketTemplateGroupResponse = (await _tradingService.GetClientMarketTemplateGroups(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
+                var marketTemplateGroupResponse = (await _backofficeService.GetClientMarketTemplateGroups(clientId, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
 
                 _clientMarketTemplateGroupsRef = marketTemplateGroupResponse?.ClientMarketTemplateGroups
                     .Select(s => new ClientMarketTemplateGroup

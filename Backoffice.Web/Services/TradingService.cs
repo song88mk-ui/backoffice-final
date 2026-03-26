@@ -47,35 +47,149 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await GetHttpClient().GetAsync($"api/trading/sports/{fixtureTypeId}");
-
-                if (response.IsSuccessStatusCode)
+                return new BaseResponse<SportsTreeModel>()
                 {
-                    return JsonSerializer.Deserialize<BaseResponse<SportsTreeModel>>
-                        (
-                            await response.Content.ReadAsStringAsync(),
-                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                        ) ?? new BaseResponse<SportsTreeModel>();
-                }
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    Result = new SportsTreeModel
                     {
-                        return JsonSerializer.Deserialize<BaseResponse<SportsTreeModel>>
-                        (
-                            await response.Content.ReadAsStringAsync(),
-                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                        ) ?? new BaseResponse<SportsTreeModel>();
-                    }
-                    else
-                    {
-                        return new BaseResponse<SportsTreeModel>
+                        Sports = new List<Models.SportModel>
                         {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
+                            new Models.SportModel{
+                                SportId = 17,
+                                SportName = "American Football",
+                                SortOrder = 1
+                            },
+                            new Models.SportModel{
+                                SportId = 271554,
+                                SportName = "Badminton",
+                                SortOrder = 2
+                            },
+                            new Models.SportModel{
+                                SportId = 3,
+                                SportName = "Baseball",
+                                SortOrder = 3
+                            },
+                            new Models.SportModel{
+                                SportId = 4,
+                                SportName = "Basketball",
+                                SortOrder = 4
+                            },
+                            new Models.SportModel{
+                                SportId = 7950337,
+                                SportName = "Beach Volleyball",
+                                SortOrder = 5
+                            },
+                            new Models.SportModel{
+                                SportId = 5,
+                                SportName = "Boxing",
+                                SortOrder = 6
+                            },
+                            new Models.SportModel{
+                                SportId = 6,
+                                SportName = "Cricket",
+                                SortOrder = 7
+                            },
+                            new Models.SportModel{
+                                SportId = 8,
+                                SportName = "Darts",
+                                SortOrder = 8
+                            },
+                            new Models.SportModel{
+                                SportId = 10915624,
+                                SportName = "eSports",
+                                SortOrder = 9
+                            },
+                            new Models.SportModel{
+                                SportId = 10,
+                                SportName = "Football",
+                                SortOrder = 10
+                            },
+                            new Models.SportModel{
+                                SportId = 491393,
+                                SportName = "Futsal",
+                                SortOrder = 11
+                            },
+                            new Models.SportModel{
+                                SportId = 99614,
+                                SportName = "Handball",
+                                SortOrder = 12
+                            },
+                            new Models.SportModel{
+                                SportId = 15,
+                                SportName = "Ice Hockey",
+                                SortOrder = 13
+                            },
+                            new Models.SportModel{
+                                SportId = 300115,
+                                SportName = "Martial Arts/UFC",
+                                SortOrder = 14
+                            },
+                            new Models.SportModel{
+                                SportId = 73744,
+                                SportName = "Rugby Union",
+                                SortOrder = 15
+                            },
+                            new Models.SportModel{
+                                SportId = 437727,
+                                SportName = "Squash",
+                                SortOrder = 16
+                            },
+                            new Models.SportModel{
+                                SportId = 269467,
+                                SportName = "Table Tennis",
+                                SortOrder = 17
+                            },
+                            new Models.SportModel{
+                                SportId = 24,
+                                SportName = "Tennis",
+                                SortOrder = 18
+                            },
+                            new Models.SportModel{
+                                SportId = 11205870,
+                                SportName = "Virtual Cricket",
+                                SortOrder = 19
+                            },
+                            new Models.SportModel{
+                                SportId = 91189,
+                                SportName = "Volleyball",
+                                SortOrder = 20
+                            },
+                            new Models.SportModel{
+                                SportId = 276032,
+                                SportName = "Water Polo",
+                                SortOrder = 21
+                            }
+                        }
                     }
-                }
+                };
+                //var response = await GetHttpClient().GetAsync($"api/trading/sports/{fixtureTypeId}");
+
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    return JsonSerializer.Deserialize<BaseResponse<SportsTreeModel>>
+                //        (
+                //            await response.Content.ReadAsStringAsync(),
+                //            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                //        ) ?? new BaseResponse<SportsTreeModel>();
+                //}
+                //else
+                //{
+                //    if (response.StatusCode == HttpStatusCode.BadRequest)
+                //    {
+                //        return JsonSerializer.Deserialize<BaseResponse<SportsTreeModel>>
+                //        (
+                //            await response.Content.ReadAsStringAsync(),
+                //            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                //        ) ?? new BaseResponse<SportsTreeModel>();
+                //    }
+                //    else
+                //    {
+                //        return new BaseResponse<SportsTreeModel>
+                //        {
+                //            StatusCode = StatusCode.Error,
+                //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                //        };
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -95,36 +209,151 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await GetHttpClient().WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
-                                                .GetAsync($"api/trading/sports/lookup");
-
-                if (response.IsSuccessStatusCode)
+                return new BaseResponse<SportsLookupResponse>()
                 {
-                    return JsonSerializer.Deserialize<BaseResponse<SportsLookupResponse>>
-                        (
-                            await response.Content.ReadAsStringAsync(),
-                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                        ) ?? new BaseResponse<SportsLookupResponse>();
-                }
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    Result = new SportsLookupResponse
                     {
-                        return JsonSerializer.Deserialize<BaseResponse<SportsLookupResponse>>
-                        (
-                            await response.Content.ReadAsStringAsync(),
-                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                        ) ?? new BaseResponse<SportsLookupResponse>();
-                    }
-                    else
-                    {
-                        return new BaseResponse<SportsLookupResponse>
+                        SportLookup = new List<Backoffice.Shared.Models.Response.SportLookup>
                         {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 17,
+                                SportName = "American Football",
+                                //SortOrder = 1
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 271554,
+                                SportName = "Badminton",
+                                //SortOrder = 2
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 3,
+                                SportName = "Baseball",
+                                //SortOrder = 3
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 4,
+                                SportName = "Basketball",
+                                //SortOrder = 4
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 7950337,
+                                SportName = "Beach Volleyball",
+                                //SortOrder = 5
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 5,
+                                SportName = "Boxing",
+                                //SortOrder = 6
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 6,
+                                SportName = "Cricket",
+                                //SortOrder = 7
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 8,
+                                SportName = "Darts",
+                                //SortOrder = 8
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 10915624,
+                                SportName = "eSports",
+                                //SortOrder = 9
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 10,
+                                SportName = "Football",
+                                //SortOrder = 10
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 491393,
+                                SportName = "Futsal",
+                                //SortOrder = 11
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 99614,
+                                SportName = "Handball",
+                                //SortOrder = 12
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 15,
+                                SportName = "Ice Hockey",
+                                //SortOrder = 13
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 300115,
+                                SportName = "Martial Arts/UFC",
+                                //SortOrder = 14
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 73744,
+                                SportName = "Rugby Union",
+                                //SortOrder = 15
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 437727,
+                                SportName = "Squash",
+                                //SortOrder = 16
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 269467,
+                                SportName = "Table Tennis",
+                                //SortOrder = 17
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 24,
+                                SportName = "Tennis",
+                                //SortOrder = 18
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 11205870,
+                                SportName = "Virtual Cricket",
+                                //SortOrder = 19
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 91189,
+                                SportName = "Volleyball",
+                                //SortOrder = 20
+                            },
+                            new Backoffice.Shared.Models.Response.SportLookup{
+                                SportId = 276032,
+                                SportName = "Water Polo",
+                                //SortOrder = 21
+                            }
+                        }
                     }
-                }
+                };
+
+                //var response = await GetHttpClient().WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
+                //                                .GetAsync($"api/trading/sports/lookup");
+
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    return JsonSerializer.Deserialize<BaseResponse<SportsLookupResponse>>
+                //        (
+                //            await response.Content.ReadAsStringAsync(),
+                //            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                //        ) ?? new BaseResponse<SportsLookupResponse>();
+                //}
+                //else
+                //{
+                //    if (response.StatusCode == HttpStatusCode.BadRequest)
+                //    {
+                //        return JsonSerializer.Deserialize<BaseResponse<SportsLookupResponse>>
+                //        (
+                //            await response.Content.ReadAsStringAsync(),
+                //            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                //        ) ?? new BaseResponse<SportsLookupResponse>();
+                //    }
+                //    else
+                //    {
+                //        return new BaseResponse<SportsLookupResponse>
+                //        {
+                //            StatusCode = StatusCode.Error,
+                //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                //        };
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -806,28 +1035,28 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<ClientMarketTemplateGroupResponse>> GetClientMarketTemplateGroups(string clientCode, int sportId, int fixtureStatusId)
-        {
-            try
-            {
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientMarketTemplateGroupResponse>>
-                (await GetHttpClient().GetStreamAsync($"api/trading/client/marketgroup/{clientCode}/{sportId}/{fixtureStatusId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //public async Task<BaseResponse<ClientMarketTemplateGroupResponse>> GetClientMarketTemplateGroups(string clientCode, int sportId, int fixtureStatusId)
+        //{
+        //    try
+        //    {
+        //        var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientMarketTemplateGroupResponse>>
+        //        (await GetHttpClient().GetStreamAsync($"api/trading/client/marketgroup/{clientCode}/{sportId}/{fixtureStatusId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
+        //        return result;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error(ex.Message);
+        //        if (ex.StackTrace != null)
+        //            Log.Error(ex.StackTrace.ToString());
 
-                return new BaseResponse<ClientMarketTemplateGroupResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
+        //        return new BaseResponse<ClientMarketTemplateGroupResponse>
+        //        {
+        //            StatusCode = StatusCode.Error,
+        //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+        //        };
+        //    }
+        //}
 
         public async Task<BaseResponse<ClientMarketTemplateResponse>> AddOrUpdateClientMarketTemplatesOrder(ClientMarketTemplateRequest request)
         {
@@ -865,111 +1094,6 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<ClientPostMarketTemplateGroupResponse>> AddOrUpdateClientMarketTemplateGroup(ClientPostMarketTemplateGroupRequest request)
-        {
-            try
-            {
-                var response = await GetHttpClient().PostAsync($"api/trading/client/markettemplategroup/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientPostMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientPostMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<ClientPostMarketTemplateGroupResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
-
-                return new BaseResponse<ClientPostMarketTemplateGroupResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-        public async Task<BaseResponse<bool>> DeleteClientMarketTemplateGroup(ClientDeleteMarketTemplateGroupRequest request)
-        {
-            try
-            {
-                var response = await GetHttpClient().PostAsync($"api/trading/client/markettemplategroup/delete", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
-
-                return new BaseResponse<bool>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-        public async Task<BaseResponse<ClientMarketTemplateGroupResponse>> CopyClientMarketTemplateGroup(ClientCopyMarketTemplateGroupRequest request)
-        {
-            try
-            {
-                var response = await GetHttpClient().PostAsync($"api/trading/client/markettemplategroup/copy", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<ClientMarketTemplateGroupResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
-
-                return new BaseResponse<ClientMarketTemplateGroupResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
         public async Task<BaseResponse<ManualBetDetailsResponse>> GetManualBetDetails(ManualBetDetailsRequest request)
         {
             try

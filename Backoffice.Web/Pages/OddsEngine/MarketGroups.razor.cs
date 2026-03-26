@@ -306,7 +306,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     MarketTemplateGroups = marketTemplateGroups
                 };
 
-                var response = await _tradingService.AddOrUpdateClientMarketTemplateGroup(request);
+                var response = await _backofficeService.AddOrUpdateClientMarketTemplateGroup(request);
 
                 if (response.StatusCode == StatusCode.Success)
                 {
@@ -358,7 +358,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (!string.IsNullOrEmpty(MarketGroupModel.ClientCode) && MarketGroupModel.SportId != 0)
             {
-                var marketTemplateGroupResponse = (await _tradingService.GetClientMarketTemplateGroups(MarketGroupModel.ClientCode, MarketGroupModel.SportId, MarketGroupModel.FixtureStatusId)).Result;
+                var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == MarketGroupModel.ClientCode).ClientId;
+
+                var marketTemplateGroupResponse = (await _backofficeService.GetClientMarketTemplateGroups(clientId, MarketGroupModel.SportId, MarketGroupModel.FixtureStatusId)).Result;
 
                 MarketGroupModel.MarketTemplateGroups = marketTemplateGroupResponse.ClientMarketTemplateGroups
                     .Select(s => new ClientMarketTemplateGroupDTO

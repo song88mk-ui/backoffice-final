@@ -151,7 +151,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 return;
             }
 
-            var marketTemplateGroupResponse = (await _tradingService.GetClientMarketTemplateGroups(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId)).Result;
+            var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == SelectedClientCode).ClientId;
+
+            var marketTemplateGroupResponse = (await _backofficeService.GetClientMarketTemplateGroups(clientId, SelectedSportId, SelectedFixtureStatusId)).Result;
 
             var copyFromMarketGroupModel = new MarketGroupModel()
             {

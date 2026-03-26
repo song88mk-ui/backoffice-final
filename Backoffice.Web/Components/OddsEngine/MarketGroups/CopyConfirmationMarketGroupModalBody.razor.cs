@@ -65,7 +65,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 CopyToFixtureStatusId = CopyToFixtureStatusId
             };
 
-            var response = (await _tradingService.CopyClientMarketTemplateGroup(request));
+            var response = (await _backofficeService.CopyClientMarketTemplateGroup(request));
 
             if (response.StatusCode == StatusCode.Success)
             {
