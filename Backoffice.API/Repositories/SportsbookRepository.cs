@@ -2,12 +2,12 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+using MongoDB.Driver;
+using OE.Shared.Data.Sportsbook.Collections;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -20,6 +20,9 @@ namespace Backoffice.API.Repositories
 {
     public class SportsbookRepository : ISportsbookRepository
     {
+        private static IMongoDatabase _db;
+        private static IMongoCollection<MarketLookup> _marketLookupCollection;
+
         private readonly IConfiguration _configuration;
         private readonly IBackofficeActivityLogRepository _activityLogRepository;
         private readonly IMemCache _memCache;
@@ -29,6 +32,14 @@ namespace Backoffice.API.Repositories
             _configuration = configuration;
             _activityLogRepository = activityLogRepository;
             _memCache = memCache;
+
+            if (_db == null)
+            {
+                var client = new MongoClient(_configuration["Custom:MongoDB-Sportsbook"]);
+                _db = client.GetDatabase("Sportsbook");
+
+                _marketLookupCollection = _db.GetCollection<MarketLookup>("MarketLookup").WithReadPreference(new ReadPreference(ReadPreferenceMode.Secondary));
+            }
         }
 
         #region Client
@@ -172,6 +183,7 @@ namespace Backoffice.API.Repositories
         //        };
         //    }
         //}
+
         public async Task<BaseResponse<ClientPostMarketTemplateGroupResponse>> AddOrUpdateClientMarketTemplateGroup(ClientPostMarketTemplateGroupRequest request, string region)
         {
             try
@@ -182,7 +194,7 @@ namespace Backoffice.API.Repositories
                     {
                         if (marketGroup.Name.ToLower() == "all markets" && string.IsNullOrEmpty(marketGroup.MarketTemplateIds))
                         {
-                            var marketTemplateIds = (await _tradingRepository.GetMarketLookup(new MarketLookupRequest
+                            var marketTemplateIds = (await GetMarketLookup(new MarketLookupRequest
                             {
                                 FixtureTypeId = (int)FixtureType.Match,
                                 SportId = request.SportId
@@ -342,6 +354,29 @@ namespace Backoffice.API.Repositories
                 return _configuration[$"API:SportsbookAPI:SA:Uri"];
             else
                 return _configuration[$"API:SportsbookAPI:HK:Uri"];
+        }
+
+        public async Task<BaseResponse<MarketLookupResponse>> GetMarketLookup(MarketLookupRequest request, string langCode = "")
+        {
+            var marketLookupFilter = Builders<MarketLookup>.Filter.Where(c => c.SpId == request.SportId && c.FiTyId == request.FixtureTypeId);
+            var marketTemplates = await _marketLookupCollection.Find(marketLookupFilter).ToListAsync();
+
+            var marketTemplateIds = marketTemplates.Select(s => $"{langCode}:{s.MaTeId}").ToList();
+            //var translations = marketTranslationLookupCollection.Find(c => marketTemplateIds.Contains(c.MaTeTrLoId)).ToList();
+
+            return new BaseResponse<MarketLookupResponse>
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = new MarketLookupResponse
+                {
+                    MarketLookup = marketTemplates.Select(s => new MarketLookupModel
+                    {
+                        MarketTemplateId = s.MaTeId,
+                        MarketTemplateName = s.MaTeNa
+                    }).ToList()
+                }
+            };
         }
     }
 }
