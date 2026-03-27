@@ -281,7 +281,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         }
 
                         if (!newModel.Name.Equals(oldModel.Name, StringComparison.OrdinalIgnoreCase) ||
-                            !newModel.MarketTemplateIds.Equals(oldModel.MarketTemplateIds, StringComparison.OrdinalIgnoreCase) ||
+                            (!newModel.MarketTemplateIds?.Equals(oldModel.MarketTemplateIds, StringComparison.OrdinalIgnoreCase) ?? false) ||
                             newModel.IsActive != oldModel.IsActive ||
                             newModel.SortOrder != oldModel.SortOrder)
                         {

@@ -22,7 +22,7 @@ namespace Backoffice.Shared.Models.Response
         public int MarketTemplateGroupId { get; set; }
         public string Name { get; set; }
         public int SortOrder { get; set; }
-        public string MarketTemplateIds { get; set; }
+        public string MarketTemplateIds { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public int FixtureStatusId { get; set; }
     }

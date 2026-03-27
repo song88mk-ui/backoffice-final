@@ -1,7 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages.SBC;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Serilog;
 using System.ComponentModel;
