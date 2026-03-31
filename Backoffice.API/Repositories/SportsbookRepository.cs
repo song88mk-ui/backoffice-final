@@ -3,7 +3,6 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using OE.Shared.Data.Sportsbook.Collections;
@@ -14,7 +13,9 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static Backoffice.Shared.Models.Response.LeagueLookupResponse;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using SportLookup = OE.Shared.Data.Sportsbook.Collections.SportLookup;
 
 namespace Backoffice.API.Repositories
 {
@@ -22,6 +23,9 @@ namespace Backoffice.API.Repositories
     {
         private static IMongoDatabase _db;
         private static IMongoCollection<MarketLookup> _marketLookupCollection;
+        private static IMongoCollection<SportLookup> _sportLookupCollection;
+        private static IMongoCollection<SegmentLookup> _segmentLookupCollection;
+        private static IMongoCollection<LeagueLookup> _leagueLookupCollection;
 
         private readonly IConfiguration _configuration;
         private readonly IBackofficeActivityLogRepository _activityLogRepository;
@@ -38,6 +42,9 @@ namespace Backoffice.API.Repositories
                 var client = new MongoClient(_configuration["Custom:MongoDB-Sportsbook"]);
                 _db = client.GetDatabase("Sportsbook");
 
+                _sportLookupCollection = _db.GetCollection<SportLookup>("SportLookup").WithReadPreference(new ReadPreference(ReadPreferenceMode.Secondary));
+                _segmentLookupCollection = _db.GetCollection<SegmentLookup>("SegmentLookup").WithReadPreference(new ReadPreference(ReadPreferenceMode.Secondary));
+                _leagueLookupCollection = _db.GetCollection<LeagueLookup>("LeagueLookup").WithReadPreference(new ReadPreference(ReadPreferenceMode.Secondary));
                 _marketLookupCollection = _db.GetCollection<MarketLookup>("MarketLookup").WithReadPreference(new ReadPreference(ReadPreferenceMode.Secondary));
             }
         }
@@ -356,6 +363,115 @@ namespace Backoffice.API.Repositories
                 return _configuration[$"API:SportsbookAPI:HK:Uri"];
         }
 
+        #region Lookup
+
+        public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string langCode = "EN")
+            => await _memCache.GetCache($"sportLookUp-{langCode}", async () =>
+            {
+                try
+                {
+                    var sportsLookup = await _sportLookupCollection.Find(_ => true).ToListAsync();
+
+                    var sportIds = sportsLookup.Select(s => $"{langCode}:{s.SpId}").ToList();
+                    //var translationLookup = sportTranslationLookupCollection.Find(c => sportIds.Contains(c.SpTrLoId)).ToList();
+
+                    return new BaseResponse<SportsLookupResponse>
+                    {
+                        StatusCode = StatusCode.Success,
+                        Message = StatusCode.Success.ToString(),
+                        Result = new SportsLookupResponse
+                        {
+                            SportLookup = sportsLookup.Select(s => new SportLookupModel
+                            {
+                                SportId = s.SpId,
+                                SportName = s.SpNa //translationLookup.FirstOrDefault(c => c.SpTrLoId == $"{langCode}:{s.SpId}")?.SpNa ?? s.SpNa
+                            }).OrderBy(o => o.SportName).ToList()
+                        }
+                    };
+                }
+                catch (Exception ex)
+                {
+
+                    throw;
+                }
+            }, 24);
+
+        public async Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string langCode = "EN")
+        {
+            try
+            {
+                var leagueLookupFilter = Builders<LeagueLookup>.Filter.Empty;
+                if (sportId > 0 && segmentId > 0)
+                {
+                    leagueLookupFilter = Builders<LeagueLookup>.Filter.Where(c => c.SpId == sportId && c.SegId == segmentId);
+                }
+                else if (sportId > 0 && segmentId == 0)
+                {
+                    leagueLookupFilter = Builders<LeagueLookup>.Filter.Where(c => c.SpId == sportId);
+                }
+                else if (sportId == 0 && segmentId > 0)
+                {
+                    leagueLookupFilter = Builders<LeagueLookup>.Filter.Where(c => c.SegId == segmentId);
+                }
+
+                var leagueLookup = await _leagueLookupCollection.Find(leagueLookupFilter).ToListAsync();
+                var leagueIds = leagueLookup.Select(s => $"{langCode}:{s.SpId}:{s.SegId}:{s.LeId}").ToList();
+                //var translationLookup = leagueTranslationLookupCollection.Find(c => leagueIds.Contains(c.LeTrLoId)).ToList();
+
+
+                return new BaseResponse<LeagueLookupResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new LeagueLookupResponse
+                    {
+                        LeagueLookup = leagueLookup.Select(s => new LeagueLookupModel
+                        {
+                            LeagueId = s.LeId,
+                            LeagueName = s.LeNa, //translationLookup.FirstOrDefault(c => c.LeTrLoId == $"{langCode}:{s.SpId}:{s.SegId}:{s.LeId}")?.LeNa ?? s.LeNa,
+                            SportId = s.SpId,
+                            SegmentId = s.SegId
+                        }).OrderBy(o => o.SportId).ThenBy(o => o.SegmentId).ThenBy(o => o.LeagueName).ToList()
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<LeagueLookupResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string langCode = "EN")
+        //=> await _memCache.GetCache($"sportLookUp-{langCode}", async () =>
+        {
+            var segmentLookupFilter = sportId == 0 ? Builders<SegmentLookup>.Filter.Empty : Builders<SegmentLookup>.Filter.Where(c => c.SpId == sportId);
+            var segmentLookup = await _segmentLookupCollection.Find(segmentLookupFilter).ToListAsync();
+
+            var segmentIds = segmentLookup.Select(s => $"{langCode}:{s.SpId}:{s.SegId}").ToList();
+            //var translationLookup = segmentTranslationLookupCollection.Find(c => segmentIds.Contains(c.SegTrLoId)).ToList();
+
+            return new BaseResponse<SegmentLookupResponse>
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = new SegmentLookupResponse
+                {
+                    SegmentLookup = segmentLookup.Select(s => new SegmentLookupModel
+                    {
+                        SegmentId = s.SegId,
+                        SegmentName = s.SegNa, //translationLookup.FirstOrDefault(c => c.SegTrLoId == $"{langCode}:{s.SpId}:{s.SegId}")?.SegNa ?? s.SegNa,
+                        SportId = s.SpId
+                    }).OrderBy(o => o.SportId).ThenBy(o => o.SegmentName).ToList()
+                }
+            };
+        }
+        //, 1);
+
+
         public async Task<BaseResponse<MarketLookupResponse>> GetMarketLookup(MarketLookupRequest request, string langCode = "")
         {
             var marketLookupFilter = Builders<MarketLookup>.Filter.Where(c => c.SpId == request.SportId && c.FiTyId == request.FixtureTypeId);
@@ -378,5 +494,7 @@ namespace Backoffice.API.Repositories
                 }
             };
         }
+
+        #endregion
     }
 }

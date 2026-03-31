@@ -1,5 +1,6 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Backoffice.API.Controllers.SportsbookClients
@@ -119,6 +121,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
 
+        #region  Market Group
         [HttpPost("markettemplategroups")]
         public async Task<IActionResult> GetClientMarketTemplateGroups(ClientMarketTemplateRequest request)
         {
@@ -133,7 +136,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
 
-        #region  Market Group
         [HttpPost("markettemplategroup/post")]
         public async Task<IActionResult> AddOrUpdateClientMarketTemplateGroup([FromBody] ClientPostMarketTemplateGroupRequest request)
         {
@@ -180,6 +182,55 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
+        #endregion
+
+        #region Lookup - Sport/Segment/League
+        [HttpGet("sports/lookup")]
+        public async Task<IActionResult> GetSportLookup()
+        {
+            var languageCode = string.IsNullOrEmpty(HttpContext.Request.Headers["x-language-code"].FirstOrDefault())
+                                                ? "EN"
+                                                : HttpContext.Request.Headers["x-language-code"].FirstOrDefault().Trim().ToUpper();
+
+            var result = await _sportsbookRepository.GetSportLookup(languageCode);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("segment/lookup/{sportId}")]
+        public async Task<IActionResult> GetSegmentLookup(int sportId)
+        {
+            var result = await _sportsbookRepository.GetSegmentLookup(sportId);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("league/lookup/{sportId}/{segmentId}")]
+        public async Task<IActionResult> GetLeagueLookup(int sportId, int segmentId)
+        {
+            var result = await _sportsbookRepository.GetLeagueLookup(sportId, segmentId);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         #endregion
     }
 }

@@ -282,7 +282,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
         private async Task<List<SelectListItemModel<int>>> GetSports()
         {
-            var result = (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString().ToUpper())).Result;
+            var result = (await _backofficeService.GetSportLookup(_translationState.ActiveLanguageCode.ToString().ToUpper())).Result;
 
             if (result == null)
                 return new List<SelectListItemModel<int>>();
@@ -298,7 +298,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
         private async Task<List<SelectListItemModel<int>>> GetSegments(int sportId)
         {
-            var result = (await TradingService.GetSegmentLookup(sportId)).Result;
+            var result = (await _backofficeService.GetSegmentLookup(sportId)).Result;
 
             var segments = result.SegmentLookup?.Select(s => new SelectListItemModel<int>()
             {
@@ -311,7 +311,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
         private async Task<List<SelectListItemModel<int>>> GetLeagues(int sportId, int segmentId)
         {
-            var result = (await TradingService.GetLeagueLookup(sportId, segmentId)).Result;
+            var result = (await _backofficeService.GetLeagueLookup(sportId, segmentId)).Result;
 
             var leagues = result.LeagueLookup.Select(s => new SelectListItemModel<int>()
             {

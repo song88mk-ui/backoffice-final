@@ -64,7 +64,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                     Name = _translationState.GetValue("No Clients Available")
                 });
 
-            var sports = (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
+            var sports = (await _backofficeService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
 
             if (sports != null)
             {

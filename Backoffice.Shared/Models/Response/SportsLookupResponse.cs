@@ -6,12 +6,12 @@ namespace Backoffice.Shared.Models.Response
     {
         public SportsLookupResponse()
         {
-            SportLookup = new List<SportLookup>();
+            SportLookup = new List<SportLookupModel>();
         }
-        public List<SportLookup> SportLookup { get; set; }        
+        public List<SportLookupModel> SportLookup { get; set; }        
     }
 
-    public class SportLookup
+    public class SportLookupModel
     {
         public int SportId { get; set; }
         public string SportName { get; set; }

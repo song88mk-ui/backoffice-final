@@ -72,7 +72,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     CopyToClientName = client.ClientName;
                     SelectedClientCode = Clients.FirstOrDefault().Value;
 
-                    var sports = (await _tradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
+                    var sports = (await _backofficeService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
 
                     if (sports != null)
                     {

@@ -227,7 +227,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async Task<List<SelectListItemModel<string>>> LoadSports()
         {
-            var response = await _tradingService.GetSportLookup(_languageCode.ToString());
+            var response = await _backofficeService.GetSportLookup(_languageCode.ToString());
 
             if (response.StatusCode != StatusCode.Success)
                 return new List<SelectListItemModel<string>>();

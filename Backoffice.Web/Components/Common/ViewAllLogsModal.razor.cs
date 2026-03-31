@@ -364,17 +364,17 @@ namespace Backoffice.Web.Components.Common
 
         private async Task<SportsLookupResponse> GetSports()
         {
-            return (await _tradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString().ToUpper())).Result;
+            return (await _backofficeService.GetSportLookup(_translationState.ActiveLanguageCode.ToString().ToUpper())).Result;
         }
 
         private async Task<SegmentLookupResponse> GetSegments(int sportId)
         {
-            return sportId != 0 ? (await _tradingService.GetSegmentLookup(sportId)).Result : null;
+            return sportId != 0 ? (await _backofficeService.GetSegmentLookup(sportId)).Result : null;
         }
 
         private async Task<LeagueLookupResponse> GetLeagues(int sportId, int segmentId)
         {
-            return sportId != 0 && segmentId != 0 ? (await _tradingService.GetLeagueLookup(sportId, segmentId)).Result : null;
+            return sportId != 0 && segmentId != 0 ? (await _backofficeService.GetLeagueLookup(sportId, segmentId)).Result : null;
         }
 
         private string EvaluateBoostedSettingsActivity(string changeData)

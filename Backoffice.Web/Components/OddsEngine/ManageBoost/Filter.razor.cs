@@ -192,7 +192,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         private async Task<List<SelectListItemModel<int>>> LoadSports()
         {
-            var response = await _tradingService.GetSportLookup(_languageCode.ToString());
+            var response = await _backofficeService.GetSportLookup(_languageCode.ToString());
 
             var sportsLookup = response.Result;
             if (sportsLookup == null)
@@ -215,7 +215,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         private async Task<List<SelectListItemModel<int>>> LoadSegments(int sportId)
         {
-            var response = await _tradingService.GetSegmentLookup(sportId, _languageCode);
+            var response = await _backofficeService.GetSegmentLookup(sportId, _languageCode);
 
             var segmentsLookup = response.Result;
             if (segmentsLookup == null)
@@ -238,7 +238,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         private async Task<List<SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
         {
-            var response = await _tradingService.GetLeagueLookup(sportId, segmentId, _languageCode);
+            var response = await _backofficeService.GetLeagueLookup(sportId, segmentId, _languageCode);
 
             var leaguesLookup = response.Result;
             if (leaguesLookup == null)

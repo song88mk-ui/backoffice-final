@@ -17,6 +17,12 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<bool>> DeleteClientMarketTemplateGroup(ClientDeleteMarketTemplateGroupRequest request, string region);
         Task<BaseResponse<ClientMarketTemplateGroupResponse>> CopyClientMarketTemplateGroup(ClientCopyMarketTemplateGroupRequest request, string region);
         #endregion
+
+        #region Lookup
+        Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string langCode = "EN");
+        Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string langCode = "EN");
+        Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string langCode = "EN");
+        #endregion
         Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region);
 
     }

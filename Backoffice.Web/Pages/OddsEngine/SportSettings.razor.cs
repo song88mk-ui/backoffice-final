@@ -63,8 +63,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _isPreload = true;
 
-            _segmentLookupTask = Task.Run(() => _tradingService.GetSegmentLookup(0, _languageCode));
-            _leagueLookupTask = Task.Run(() => _tradingService.GetLeagueLookup(0, 0, _languageCode));
+            _segmentLookupTask = Task.Run(() => _backofficeService.GetSegmentLookup(0, _languageCode));
+            _leagueLookupTask = Task.Run(() => _backofficeService.GetLeagueLookup(0, 0, _languageCode));
 
             await Task.CompletedTask;
             _isUpdate = false;
@@ -130,7 +130,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isPreload = true;
             if (!_sportLookupSettings.Any())
             {
-                var sportLookupResponse = await _tradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
+                var sportLookupResponse = await _backofficeService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
 
                 await Task.WhenAll(_leagueLookupTask, _segmentLookupTask);
                 var leagueLookupResponse = _leagueLookupTask.Result.Result;

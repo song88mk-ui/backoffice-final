@@ -84,7 +84,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             if (response.StatusCode == StatusCode.Success && response.Result != null)
             {
-                var sportLookUp = await _tradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
+                var sportLookUp = await _backofficeService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
 
                 EditConfigTemplateFilterModel.ConfigTemplate = response.Result;                                                   
                 EditConfigTemplateFilterModel.SportName = sportLookUp.Result.SportLookup.FirstOrDefault(e => e.SportId == response.Result.SportId)?.SportName ?? string.Empty;
