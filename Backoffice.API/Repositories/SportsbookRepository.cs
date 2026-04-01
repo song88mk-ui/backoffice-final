@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using OE.Shared.Data.Sportsbook;
 using OE.Shared.Data.Sportsbook.Collections;
-using OE.Shared.Data.Sportsbook.MongoDB.Collections;
 using OE.Shared.Data.Sportsbook.SQLEntities;
 using System;
 using System.Collections.Generic;
