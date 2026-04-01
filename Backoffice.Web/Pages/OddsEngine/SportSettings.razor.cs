@@ -363,17 +363,17 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (!_isPreload)
                     _isPreload = true;
 
-                var sportsOrderTask = _tradingService.GetClientSportOrderList(new ClientSportOrderListRequest
+                var sportsOrderTask = _backofficeService.GetClientSportOrderList(new ClientSportOrderListRequest
                 {
                     ClientCode = _clientCode
                 });
 
-                var segmentOrderTask = _tradingService.GetClientSegmentOrderList(new ClientSegmentOrderListRequest
+                var segmentOrderTask = _backofficeService.GetClientSegmentOrderList(new ClientSegmentOrderListRequest
                 {
                     ClientCode = _clientCode
                 });
 
-                var leagueOrderTask = _tradingService.GetClientLeagueOrderList(new ClientLeagueOrderListRequest
+                var leagueOrderTask = _backofficeService.GetClientLeagueOrderList(new ClientLeagueOrderListRequest
                 {
                     ClientCode = _clientCode
                 });
@@ -577,7 +577,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 var activityLog = GetActivityLogModel(changes, _sportSettings, newSportOrder);
 
-                var response = await _tradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
+                var response = await _backofficeService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
                 {
                     ClientCode = _clientCode,
                     UserId = _userState.Model.Id,

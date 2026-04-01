@@ -1,7 +1,9 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using OE.Shared.Data.Sportsbook.SQLEntities;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Backoffice.API.Repositories
@@ -22,6 +24,15 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string langCode = "EN");
         Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string langCode = "EN");
         Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string langCode = "EN");
+        #endregion
+
+        #region Sport Settings
+        Task<BaseResponse<ClientSportSettingResponse>> AddOrUpdateClientSportSettings(ClientSportSettingRequest request);
+        Task<BaseResponse<List<ClientSportOrderListResponse>>> GetClientSportOrderList(ClientSportOrderListRequest request);
+        Task<BaseResponse<List<ClientSportOrderAuditResponse>>> GetClientSportOrderAuditList(ClientSportOrderAuditRequest request);
+        Task<BaseResponse<List<ClientSegmentOrderListResponse>>> GetClientSegmentOrderList(ClientSegmentOrderListRequest request);
+        Task<BaseResponse<List<ClientLeagueOrderListResponse>>> GetClientLeagueOrderList(ClientLeagueOrderListRequest request);
+        Task<BaseResponse<List<TierLeagueOrder>>> GetTierLeagueOrderList();
         #endregion
         Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region);
 

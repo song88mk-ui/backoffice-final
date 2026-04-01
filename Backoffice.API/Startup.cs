@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using OE.Shared.Data.Sportsbook;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -86,6 +87,9 @@ namespace Backoffice.API
             });
 
             var dbContextTimeout = Configuration.GetValue<int>("Custom:DbContextTimeout", 180);
+            services.AddDbContext<SportsbookContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:Sportsbook"], options =>
+                options.CommandTimeout(dbContextTimeout)));
+
             services.AddDbContextPool<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"], options =>
                 options.CommandTimeout(dbContextTimeout)));
 

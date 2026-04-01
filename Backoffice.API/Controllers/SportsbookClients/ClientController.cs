@@ -184,6 +184,93 @@ namespace Backoffice.API.Controllers.SportsbookClients
         }
         #endregion
 
+        #region Sport Settings
+        [HttpPost("sportsettings")]
+        public async Task<IActionResult> AddOrUpdateClientSportSettings([FromBody] ClientSportSettingRequest request)
+        {
+            var result = await _sportsbookRepository.AddOrUpdateClientSportSettings(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("sportorder/list")]
+        public async Task<IActionResult> GetClientSportOrderList([FromBody] ClientSportOrderListRequest request)
+        {
+            var result = await _sportsbookRepository.GetClientSportOrderList(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("sportorder/audit/list")]
+        public async Task<IActionResult> GetClientSportOrderAuditList([FromBody] ClientSportOrderAuditRequest request)
+        {
+            var result = await _sportsbookRepository.GetClientSportOrderAuditList(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("segmentorder/list")]
+        public async Task<IActionResult> GetClientSegmentOrderList([FromBody] ClientSegmentOrderListRequest request)
+        {
+            var result = await _sportsbookRepository.GetClientSegmentOrderList(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("leagueorder/list")]
+        public async Task<IActionResult> GetClientLeagueOrderList([FromBody] ClientLeagueOrderListRequest request)
+        {
+            var result = await _sportsbookRepository.GetClientLeagueOrderList(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("tier/leagueorder/list")]
+        public async Task<IActionResult> GetTierLeagueOrderList()
+        {
+            var result = await _sportsbookRepository.GetTierLeagueOrderList();
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        #endregion
+
         #region Lookup - Sport/Segment/League
         [HttpGet("sports/lookup")]
         public async Task<IActionResult> GetSportLookup()

@@ -2141,7 +2141,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.PostAsync($"api/trading/client/sportorder/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"sportsbook/client/sportorder/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<List<ClientSportOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -2176,7 +2176,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.PostAsync($"api/trading/client/segmentorder/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"sportsbook/client/segmentorder/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<List<ClientSegmentOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -2211,7 +2211,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.PostAsync($"api/trading/client/leagueorder/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"sportsbook/client/leagueorder/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<List<ClientLeagueOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -2246,7 +2246,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.PostAsync($"api/trading/tier/leagueorder/list", new StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"sportsbook/client/tier/leagueorder/list", new StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<List<TierLeagueOrderModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -2281,7 +2281,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.PostAsync($"api/trading/client/sportsettings", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"sportsbook/client/sportsettings", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<ClientSportSettingResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

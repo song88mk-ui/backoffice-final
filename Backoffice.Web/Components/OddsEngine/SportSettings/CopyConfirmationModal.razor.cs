@@ -51,7 +51,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 SportsSortOrder = ModalParameters.TryGet<List<SportsSortOrder>>("Sports")
             };
 
-            var response = (await TradingService.AddOrUpdateClientSportSettings(request)).Result;
+            var response = (await _backofficeService.AddOrUpdateClientSportSettings(request)).Result;
 
             if (response.StatusCode == StatusCode.Success)
             {
