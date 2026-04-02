@@ -30,7 +30,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public List<SelectListItemModel<int>> FixtureStatuses { get; set; }
         public List<MarketSortOrderModel.ClientMarketTemplateGroup> ClientMarketTemplateGroups { get; set; }
         private MarketSortOrderFilterModel _filterModel;
-        private List<ClientInformationModel> ClientsInformation;
+        //private List<ClientInformationModel> ClientsInformation;
         #endregion
 
         #region Methods
@@ -45,24 +45,27 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             FixtureStatuses = new List<SelectListItemModel<int>>();
             ClientMarketTemplateGroups = new List<MarketSortOrderModel.ClientMarketTemplateGroup>();
             TradingService.Region = Region.ToUpper();
-            ClientsInformation = new();
+            //ClientsInformation = new();
 
-            var response = await TradingService.GetClientList();
+            //var response = await TradingService.GetClientList();
 
-            ClientsInformation = response.Result;
-
-            Clients = ClientsInformation.Select(s => new SelectListItemModel<string>
+            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
             {
-                Name = s.ClientName,
-                Value = s.ClientCode
-            }).OrderBy(x => x.Name).ToList();
+                Clients = _userState.Model.TradingClients.Select(s => new SelectListItemModel<string>
+                {
+                    Value = s.ClientCode,
+                    Name = s.ClientName
+                }).ToList();
 
-            if (Clients == null || Clients.Count == 0)
+            }
+            else
+            {
                 Clients.Add(new SelectListItemModel<string>
                 {
                     Value = "",
                     Name = _translationState.GetValue("No Clients Available")
                 });
+            }
 
             var sports = (await _backofficeService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
 
@@ -95,10 +98,12 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                 Name = FixtureStatus.Live.ToString()
             });
 
+            var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == Clients.FirstOrDefault().Value).ClientId;
+
             _filterModel = new()
             {
-                ClientId = ClientsInformation?.FirstOrDefault()?.ClientId.ToString() ?? string.Empty,
-                SelectedClientCode = ClientsInformation?.FirstOrDefault()?.ClientCode ?? string.Empty,
+                ClientId = clientId.ToString() ?? string.Empty,
+                SelectedClientCode = Clients.FirstOrDefault().Value ?? string.Empty,
                 SelectedSportId = Sports.FirstOrDefault()?.Value ?? -1,
                 SelectedFixtureStatusId = FixtureStatuses.FirstOrDefault()?.Value ?? -1
             };
@@ -110,8 +115,10 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             IsPreLoader = true;
             await InvokeAsync(StateHasChanged);
 
+            var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == e.Value.ToString()).ClientId;
+
             _filterModel.SelectedClientCode = e.Value?.ToString() ?? string.Empty;
-            _filterModel.ClientId = ClientsInformation.FirstOrDefault(x => x.ClientCode == e.Value.ToString())?.ClientId.ToString() ?? string.Empty;
+            _filterModel.ClientId = clientId.ToString() ?? string.Empty;
             IsUpdate = false;
 
             await OnCancelCallback.InvokeAsync();
@@ -224,7 +231,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                     {
                         Id = s.MarketTemplateGroupId,
                         Name = s.Name,
-                        MarketTemplateIds = s.MarketTemplateIds.Split(",").ToList(),
+                        MarketTemplateIds = s.MarketTemplateIds?.Split(",").ToList() ?? new List<string>(),
                         SortOrder = s.SortOrder,
                         IsSelected = s.Name == "All Markets" ? true : false,
                     }).ToList();

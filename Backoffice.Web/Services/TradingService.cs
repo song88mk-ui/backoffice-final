@@ -507,67 +507,7 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        
-        public async Task<BaseResponse<ClientMarketTemplateResponse>> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId, LanguageCode langCode)
-        {
-            try
-            {
-                var respond = await GetHttpClient().WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
-                                                .GetStreamAsync($"api/trading/client/markettemplate/{clientCode}/{sportId}/{fixtureStatusId}");
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientMarketTemplateResponse>>
-                (respond, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
-
-                return new BaseResponse<ClientMarketTemplateResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-
-        public async Task<BaseResponse<bool>> CopyClientMarketSortOrder(CopyClientMarketSortOrderRequest request)
-        {
-            try
-            {
-                var response = await GetHttpClient().PostAsync($"api/trading/client/markettemplate/copy", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
-
-                return new BaseResponse<bool>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
 
         //public async Task<BaseResponse<ClientMarketTemplateGroupResponse>> GetClientMarketTemplateGroups(string clientCode, int sportId, int fixtureStatusId)
         //{
@@ -591,42 +531,6 @@ namespace Backoffice.Web.Services
         //        };
         //    }
         //}
-
-        public async Task<BaseResponse<ClientMarketTemplateResponse>> AddOrUpdateClientMarketTemplatesOrder(ClientMarketTemplateRequest request)
-        {
-            try
-            {
-                var response = await GetHttpClient().PostAsync($"api/trading/client/markettemplate", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<ClientMarketTemplateResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
-
-                return new BaseResponse<ClientMarketTemplateResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
 
         public async Task<BaseResponse<ManualBetDetailsResponse>> GetManualBetDetails(ManualBetDetailsRequest request)
         {

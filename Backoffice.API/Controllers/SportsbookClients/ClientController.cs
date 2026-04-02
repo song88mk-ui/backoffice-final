@@ -271,6 +271,52 @@ namespace Backoffice.API.Controllers.SportsbookClients
 
         #endregion
 
+        #region Market Sort Order
+
+        [HttpGet("markettemplate/{clientCode}/{sportId}/{fixtureStatusId}")]
+        public async Task<IActionResult> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId)
+        {
+            var result = await _sportsbookRepository.GetClientMarketTemplates(clientCode, sportId, fixtureStatusId, "EN");
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("markettemplate")]
+        public async Task<IActionResult> AddOrUpdateClientMarketTemplatesOrder([FromBody] ClientMarketTemplateRequest request)
+        {
+            var result = await _sportsbookRepository.AddOrUpdateClientMarketTemplatesOrder(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("markettemplate/copy")]
+        public async Task<IActionResult> CopyClientMarketTemplatesOrder([FromBody] CopyClientMarketSortOrderRequest request)
+        {
+            var result = await _sportsbookRepository.CopyClientMarketTemplatesOrder(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        #endregion
+
         #region Lookup - Sport/Segment/League
         [HttpGet("sports/lookup")]
         public async Task<IActionResult> GetSportLookup()

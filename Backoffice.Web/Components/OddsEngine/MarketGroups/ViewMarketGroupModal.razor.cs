@@ -33,7 +33,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             FixtureStatusId = ModalParameters.TryGet<int>("FixtureStatusId");
             MarketTemplateGroupName = ModalParameters.TryGet<string>("MarketTemplateGroupName");
 
-            var result = (await _tradingService.GetClientMarketTemplates(ClientCode, SportId, FixtureStatusId, _translationState.ActiveLanguageCode)).Result;
+            var result = (await _backofficeService.GetClientMarketTemplates(ClientCode, SportId, FixtureStatusId, _translationState.ActiveLanguageCode)).Result;
 
             ClientMarketTemplates = result != null ? result.MarketTemplates : new List<ClientMarketTemplateModel>();
 

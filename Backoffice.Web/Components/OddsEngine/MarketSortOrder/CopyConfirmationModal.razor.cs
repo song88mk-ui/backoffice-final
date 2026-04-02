@@ -58,7 +58,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                 UserId = userId
             };
 
-            var response = await TradingService.CopyClientMarketSortOrder(request);
+            var response = await _backofficeService.CopyClientMarketSortOrder(request);
 
             if (response.StatusCode == StatusCode.Success)
             {

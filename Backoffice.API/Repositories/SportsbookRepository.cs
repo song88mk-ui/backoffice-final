@@ -781,6 +781,208 @@ namespace Backoffice.API.Repositories
 
         #endregion
 
+        #region Market Sort Order
+
+        public async Task<BaseResponse<ClientMarketTemplateResponse>> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId, string langCode)
+        {
+            try
+            {
+
+                var clientList = (await _platformRepository.GetClients("HK")).Result;
+                var client = clientList.FirstOrDefault(c => c.ClientCode == clientCode);
+
+                if (client == null)
+                {
+                    return new BaseResponse<ClientMarketTemplateResponse>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')}"
+                    };
+                }
+
+                var request = new ClientMarketTemplateRequest
+                {
+                    ClientId = client.ClientId,
+                    SportId = sportId,
+                    FixtureStatusId = fixtureStatusId
+                };
+
+                request.MarketTemplates = (await GetMarketLookup(new MarketLookupRequest
+                {
+                    FixtureTypeId = (int)FixtureType.Match,
+                    SportId = sportId
+                }, langCode)).Result.MarketLookup
+                .Select(s => new ClientMarketTemplateModel
+                {
+                    MarketTemplateId = s.MarketTemplateId,
+                    MarketTemplateName = s.MarketTemplateName,
+                    SortOrder = 0
+                })
+                //.OrderBy(o => int.Parse(o.MarketTemplateId))
+                .ToList();
+
+                var response = await GetHttpClient().PostAsync($"client/markettemplates", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<ClientMarketTemplateResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ClientMarketTemplateResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ClientMarketTemplateResponse>> AddOrUpdateClientMarketTemplatesOrder(ClientMarketTemplateRequest request)
+        {
+            try
+            {
+                var response = await GetHttpClient().PostAsync($"client/markettemplatesorder", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<ClientMarketTemplateResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse <ClientMarketTemplateResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+
+        public async Task<BaseResponse<bool>> CopyClientMarketTemplatesOrder(CopyClientMarketSortOrderRequest request)
+        {
+            try
+            {
+                var existingClientMarketTemplateOrder = new List<ClientMarketTemplateOrder>();
+                var newClientMarketTemplateOrder = new List<ClientMarketTemplateOrder>();
+
+                var existingClientMarketTemplateGroup = new List<ClientMarketTemplateGroup>();
+                var newClientMarketTemplateGroup = new List<ClientMarketTemplateGroup>();
+
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    existingClientMarketTemplateOrder = await _sportsbookContext.ClientMarketTemplateOrder.Where(x => x.ClientId == request.CopyToClientId && x.SportId == request.CopyToSportId).ToListAsync();
+                    if (existingClientMarketTemplateOrder.Any())
+                    {
+                        _sportsbookContext.ClientMarketTemplateOrder.RemoveRange(existingClientMarketTemplateOrder);
+                    }
+
+                    var sourceClientMarketTemplateOrder = await _sportsbookContext.ClientMarketTemplateOrder.AsNoTracking().Where(x => x.ClientId == request.CopyFromClientId && x.SportId == request.CopyFromSportId).ToListAsync();
+                    if (sourceClientMarketTemplateOrder.Any())
+                    {
+                        newClientMarketTemplateOrder = sourceClientMarketTemplateOrder.Select(x => new ClientMarketTemplateOrder()
+                        {
+                            ClientId = request.CopyToClientId,
+                            SportId = request.CopyToSportId,
+                            MarketTemplateId = x.MarketTemplateId,
+                            SortOrder = x.SortOrder
+                        }).ToList();
+                    }
+                    await _sportsbookContext.AddRangeAsync(newClientMarketTemplateOrder);
+
+                    existingClientMarketTemplateGroup = await _sportsbookContext.ClientMarketTemplateGroup.Where(x => x.ClientId == request.CopyToClientId && x.SportId == request.CopyToSportId && x.FixtureStatusId == request.CopyToFixtureStatusId).ToListAsync();
+                    if (existingClientMarketTemplateGroup.Any())
+                    {
+                        _sportsbookContext.ClientMarketTemplateGroup.RemoveRange(existingClientMarketTemplateGroup);
+                    }
+
+                    var sourceClientMarketTemplateGroup = await _sportsbookContext.ClientMarketTemplateGroup.AsNoTracking().Where(x => x.ClientId == request.CopyFromClientId && x.SportId == request.CopyFromSportId && x.FixtureStatusId == request.CopyFromFixtureStatusId).ToListAsync();
+                    if (sourceClientMarketTemplateGroup.Any())
+                    {
+                        newClientMarketTemplateGroup = sourceClientMarketTemplateGroup.Select(x => new ClientMarketTemplateGroup()
+                        {
+                            ClientId = request.CopyToClientId,
+                            SportId = request.CopyToSportId,
+                            FixtureStatusId = request.CopyToFixtureStatusId,
+                            Id = x.Id,
+                            Name = x.Name,
+                            SortOrder = x.SortOrder,
+                            IsActive = x.IsActive,
+                            MarketTemplates = x.MarketTemplates
+                        }).ToList();
+                    }
+                    await _sportsbookContext.AddRangeAsync(newClientMarketTemplateGroup);
+
+                    await _sportsbookContext.SaveChangesAsync();
+                    scope.Complete();
+                }
+
+                //await _sportsbookContext.ActivityLog.AddAsync(new OE.Shared.Data.Trading.Entities.ActivityLog()
+                //{
+                //    Page = Page.OE_Administration_MarketSortOrder.ToString().Replace("_", "."),
+                //    Payload = JsonSerializer.Serialize(request),
+                //    Activity = Activity.Update.ToString(),
+                //    From = JsonSerializer.Serialize(existingClientMarketTemplateOrder),
+                //    To = JsonSerializer.Serialize(newClientMarketTemplateOrder),
+                //    UserId = request.UserId,
+                //    TimeStamp = DateTime.UtcNow,
+                //});
+
+                //await _sportsbookContext.ActivityLog.AddAsync(new OE.Shared.Data.Trading.Entities.ActivityLog()
+                //{
+                //    Page = Page.OE_Administration_MarketSortOrder.ToString().Replace("_", "."),
+                //    Payload = JsonSerializer.Serialize(request),
+                //    Activity = Activity.Update.ToString(),
+                //    From = JsonSerializer.Serialize(existingClientMarketTemplateGroup),
+                //    To = JsonSerializer.Serialize(newClientMarketTemplateGroup),
+                //    UserId = request.UserId,
+                //    TimeStamp = DateTime.UtcNow,
+                //});
+                await _sportsbookContext.SaveChangesAsync();
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = true,
+                    Message = "Copy market sort order successful"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Result = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        #endregion
+
         #region Lookup
 
         public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string langCode = "EN")

@@ -173,7 +173,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }).ToList()
             };
 
-            var response = await _tradingService.AddOrUpdateClientMarketTemplatesOrder(request);
+            var response = await _backofficeService.AddOrUpdateClientMarketTemplatesOrder(request);
 
             _isPreLoader = false;
             if (response.StatusCode == StatusCode.Success)
@@ -343,7 +343,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == _filterModel.SelectedClientCode).ClientId;
 
-                var marketTemplateResponse = (await _tradingService.GetClientMarketTemplates(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId, _translationState.ActiveLanguageCode)).Result;
+                var marketTemplateResponse = (await _backofficeService.GetClientMarketTemplates(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId, _translationState.ActiveLanguageCode)).Result;
 
                 var marketTemplateGroupResponse = (await _backofficeService.GetClientMarketTemplateGroups(clientId, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
 
@@ -352,7 +352,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     {
                         Id = s.MarketTemplateGroupId,
                         Name = s.Name,
-                        MarketTemplateIds = s.MarketTemplateIds.Split(",").ToList(),
+                        MarketTemplateIds = s.MarketTemplateIds?.Split(",").ToList() ?? new List<string>(),
                         SortOrder = s.SortOrder,
                         IsSelected = s.Name == "All Markets" ? true : false,
                     }).ToList() ?? new();

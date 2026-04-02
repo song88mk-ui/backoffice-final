@@ -2,7 +2,6 @@
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using OE.Shared.Data.Sportsbook.SQLEntities;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -18,6 +17,12 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<ClientPostMarketTemplateGroupResponse>> AddOrUpdateClientMarketTemplateGroup(ClientPostMarketTemplateGroupRequest request, string region);
         Task<BaseResponse<bool>> DeleteClientMarketTemplateGroup(ClientDeleteMarketTemplateGroupRequest request, string region);
         Task<BaseResponse<ClientMarketTemplateGroupResponse>> CopyClientMarketTemplateGroup(ClientCopyMarketTemplateGroupRequest request, string region);
+        #endregion
+
+        #region Client Market Sort Order
+        Task<BaseResponse<ClientMarketTemplateResponse>> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId, string langCode);
+        Task<BaseResponse<ClientMarketTemplateResponse>> AddOrUpdateClientMarketTemplatesOrder(ClientMarketTemplateRequest request);
+        Task<BaseResponse<bool>> CopyClientMarketTemplatesOrder(CopyClientMarketSortOrderRequest request);
         #endregion
 
         #region Lookup
