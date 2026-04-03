@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
+using Sport = Backoffice.Shared.Models.Sport;
 
 namespace Backoffice.Shared.Utilities
 {
