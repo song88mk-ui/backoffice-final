@@ -157,7 +157,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-            _modalService.Open<CopyMarketGroupModal>($"Edit Market Group", parameters, options);
+            _modalService.Open<CopyMarketGroupModal>($"Copy Market Group", parameters, options);
         }
 
         public async Task OnViewLogsClickedEvent()
