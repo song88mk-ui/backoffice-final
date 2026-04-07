@@ -1,4 +1,4 @@
-﻿@inherits BasePage
+@inherits BasePage
 
 @page "/admin/dashboard"
 <AuthorizeView Policy="admin-dashboard">
@@ -9,9 +9,38 @@
                     <div class="col-md-12">
                         <PageHeader PageHeaderModel="_pageHeaderModel" />
                     </div>
-                    @if (!string.IsNullOrEmpty(IFrameSrc))
+
+                    @* Tableau - Top *@
+                    @if (_isTableauPreLoader)
                     {
-                        <iframe class="tableau-iframe" src="@IFrameSrc"></iframe>
+                        <Preloader />
+                    }
+                    else if (!string.IsNullOrEmpty(_tableauSrc))
+                    {
+                        <div class="col-md-12 mb-4">
+                            <iframe class="tableau-iframe" src="@_tableauSrc"></iframe>
+                        </div>
+                    }
+
+                    @* Metabase - Bottom *@
+                    <div class="col-md-12 px-4 mb-3">
+                        <div class="sport-selector d-flex align-items-center gap-3">
+                            <label class="form-label mb-0 fw-semibold">Sport</label>
+                            <select class="form-select sport-select" @onchange="@OnSportChanged">
+                                @foreach (var sport in _sports)
+                                {
+                                    <option value="@sport" selected="@(_selectedSport == sport)">@sport</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    @if (_isMetabasePreLoader)
+                    {
+                        <Preloader />
+                    }
+                    else if (!string.IsNullOrEmpty(IFrameSrc))
+                    {
+                        <iframe class="metabase-iframe"src="@IFrameSrc"></iframe>
                     }
                 </div>
             </div>
