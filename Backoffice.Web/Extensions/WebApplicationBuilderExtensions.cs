@@ -85,6 +85,7 @@ namespace Backoffice.Web.Extensions
         }
         public static WebApplicationBuilder AddServices(this WebApplicationBuilder builder)
         {
+            builder.Services.AddScoped<MetabaseService>();
             builder.Services.AddScoped<IModalService, ModalService>();
             builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
 

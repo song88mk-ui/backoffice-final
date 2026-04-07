@@ -1,6 +1,3 @@
-﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -10,12 +7,15 @@ namespace Backoffice.Web.Pages.Administration
     public partial class Dashboard : IDisposable
     {
         #region Properties
-        [Inject] public ITableauService TableauService { get; set; }
-        [Inject] public IAuthenticationService AuthenticationService { get; set; }
+        [Inject] public MetabaseService MetabaseService { get; set; }
 
         public string IFrameSrc { get; set; }
 
         #endregion
+
+        private bool _isPreLoader = true;
+        private IReadOnlyList<string> _sports = Array.Empty<string>();
+        private string _selectedSport;
 
         private PageHeaderModel _pageHeaderModel;
 
@@ -30,20 +30,27 @@ namespace Backoffice.Web.Pages.Administration
                 Title = "Sports",
                 IconClass = "ico ico-sports"
             };
-            await PageState.AuthenticateAccessEvent.InvokeAsync();
 
-            await OnInitializeEvent();
+            _sports = MetabaseService.Sports;
+            _selectedSport = _sports.FirstOrDefault() ?? string.Empty;
+
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
-        private async Task OnInitializeEvent()
+        private void LoadEmbedUrl()
         {
-            var reportRoles = (await AuthenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
-            {
-                RoleId = _userState.Model.RoleId,
-                ClaimType = AdminPermission.Admin_Dashboard.ToString().Replace("_", ".")
-            })).Result ?? new ReportRolesUrlResponse();
+            _isPreLoader = true;
 
-            IFrameSrc = await TableauService.GetTableauUrl(reportRoles.Url);
+            if (!string.IsNullOrEmpty(_selectedSport))
+                IFrameSrc = MetabaseService.GetEmbedUrl(_selectedSport);
+
+            _isPreLoader = false;
+        }
+
+        private void OnSportChanged(ChangeEventArgs e)
+        {
+            _selectedSport = e.Value?.ToString() ?? string.Empty;
+            LoadEmbedUrl();
         }
 
         public void Dispose()
