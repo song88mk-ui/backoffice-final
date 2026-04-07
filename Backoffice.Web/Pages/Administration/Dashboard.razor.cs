@@ -1,6 +1,3 @@
-using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -11,16 +8,12 @@ namespace Backoffice.Web.Pages.Administration
     {
         #region Properties
         [Inject] public MetabaseService MetabaseService { get; set; }
-        [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
         public string IFrameSrc { get; set; }
 
         #endregion
 
-        private bool _isTableauPreLoader = true;
-        private bool _isMetabasePreLoader = true;
-        private string? _tableauSrc;
-        private string? _roleId;
+        private bool _isPreLoader = true;
         private IReadOnlyList<string> _sports = Array.Empty<string>();
         private string _selectedSport;
 
@@ -44,43 +37,14 @@ namespace Backoffice.Web.Pages.Administration
             await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
-        protected override async Task OnParametersSetAsync()
-        {
-            if (_roleId != _userState.Model.RoleId)
-            {
-                _roleId = _userState.Model.RoleId;
-                await LoadTableauUrl();
-                LoadEmbedUrl();
-            }
-        }
-
-        private async Task LoadTableauUrl()
-        {
-            try
-            {
-                var reportRoles = (await _authenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
-                {
-                    RoleId = _roleId,
-                    ClaimType = AdminPermission.Admin_Dashboard.ToString().Replace("_", ".")
-                })).Result ?? new ReportRolesUrlResponse();
-
-                _tableauSrc = await _tableauService.GetTableauUrl(reportRoles.Url);
-            }
-            catch (Exception) { }
-            finally
-            {
-                _isTableauPreLoader = false;
-            }
-        }
-
         private void LoadEmbedUrl()
         {
-            _isMetabasePreLoader = true;
+            _isPreLoader = true;
 
             if (!string.IsNullOrEmpty(_selectedSport))
                 IFrameSrc = MetabaseService.GetEmbedUrl(_selectedSport);
 
-            _isMetabasePreLoader = false;
+            _isPreLoader = false;
         }
 
         private void OnSportChanged(ChangeEventArgs e)

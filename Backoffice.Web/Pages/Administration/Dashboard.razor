@@ -10,19 +10,6 @@
                         <PageHeader PageHeaderModel="_pageHeaderModel" />
                     </div>
 
-                    @* Tableau - Top *@
-                    @if (_isTableauPreLoader)
-                    {
-                        <Preloader />
-                    }
-                    else if (!string.IsNullOrEmpty(_tableauSrc))
-                    {
-                        <div class="col-md-12 mb-4">
-                            <iframe class="tableau-iframe" src="@_tableauSrc"></iframe>
-                        </div>
-                    }
-
-                    @* Metabase - Bottom *@
                     <div class="col-md-12 px-4 mb-3">
                         <div class="sport-selector d-flex align-items-center gap-3">
                             <label class="form-label mb-0 fw-semibold">Sport</label>
@@ -34,7 +21,7 @@
                             </select>
                         </div>
                     </div>
-                    @if (_isMetabasePreLoader)
+                    @if (_isPreLoader)
                     {
                         <Preloader />
                     }
