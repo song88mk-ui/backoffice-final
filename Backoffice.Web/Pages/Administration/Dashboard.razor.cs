@@ -35,6 +35,8 @@ namespace Backoffice.Web.Pages.Administration
             _selectedSport = _sports.FirstOrDefault() ?? string.Empty;
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
+
+            LoadEmbedUrl();
         }
 
         private void LoadEmbedUrl()
