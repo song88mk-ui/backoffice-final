@@ -10,24 +10,13 @@
                         <PageHeader PageHeaderModel="_pageHeaderModel" />
                     </div>
 
-                    <div class="col-md-12 px-4 mb-3">
-                        <div class="sport-selector d-flex align-items-center gap-3">
-                            <label class="form-label mb-0 fw-semibold">Sport</label>
-                            <select class="form-select sport-select" @onchange="@OnSportChanged">
-                                @foreach (var sport in _sports)
-                                {
-                                    <option value="@sport" selected="@(_selectedSport == sport)">@sport</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
                     @if (_isPreLoader)
                     {
                         <Preloader />
                     }
                     else if (!string.IsNullOrEmpty(IFrameSrc))
                     {
-                        <iframe class="metabase-iframe"src="@IFrameSrc"></iframe>
+                        <iframe class="metabase-iframe" src="@IFrameSrc"></iframe>
                     }
                 </div>
             </div>
