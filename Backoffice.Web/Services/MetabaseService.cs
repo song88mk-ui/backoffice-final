@@ -9,23 +9,21 @@ public class MetabaseService
     private readonly string _siteUrl;
     private readonly string _secretKey;
     private readonly int _dashboardId;
-    public IReadOnlyList<string> Sports { get; }
 
     public MetabaseService(IConfiguration configuration)
     {
         _siteUrl = configuration["Metabase:SiteUrl"]!;
         _secretKey = configuration["Metabase:SecretKey"]!;
         _dashboardId = int.Parse(configuration["Metabase:DashboardId"]!);
-        Sports = configuration.GetSection("Metabase:Sports").Get<List<string>>() ?? new List<string>();
     }
 
-    public string GetEmbedUrl(string sportName)
+    public string GetEmbedUrl(string clientName)
     {
         var header = new { alg = "HS256", typ = "JWT" };
         var payload = new
         {
             resource = new { dashboard = _dashboardId },
-            @params = new { text = new[] { sportName } },
+            @params = new { client = new[] { clientName } },
             exp = DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds()
         };
 

@@ -14,8 +14,6 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         private bool _isPreLoader = true;
-        private IReadOnlyList<string> _sports = Array.Empty<string>();
-        private string _selectedSport;
 
         private PageHeaderModel _pageHeaderModel;
 
@@ -27,12 +25,9 @@ namespace Backoffice.Web.Pages.Administration
 
             _pageHeaderModel = new()
             {
-                Title = "Sports",
+                Title = "Dashboard",
                 IconClass = "ico ico-sports"
             };
-
-            _sports = MetabaseService.Sports;
-            _selectedSport = _sports.FirstOrDefault() ?? string.Empty;
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
 
@@ -42,17 +37,8 @@ namespace Backoffice.Web.Pages.Administration
         private void LoadEmbedUrl()
         {
             _isPreLoader = true;
-
-            if (!string.IsNullOrEmpty(_selectedSport))
-                IFrameSrc = MetabaseService.GetEmbedUrl(_selectedSport);
-
+            IFrameSrc = MetabaseService.GetEmbedUrl(_userState.Model.Name);
             _isPreLoader = false;
-        }
-
-        private void OnSportChanged(ChangeEventArgs e)
-        {
-            _selectedSport = e.Value?.ToString() ?? string.Empty;
-            LoadEmbedUrl();
         }
 
         public void Dispose()
