@@ -14,12 +14,9 @@
                     {
                         <Preloader />
                     }
-                    else
+                    else if (!string.IsNullOrEmpty(_iFrameSrc))
                     {
-                        @if (!string.IsNullOrEmpty(_iFrameSrc))
-                        {
-                            <iframe class="tableau-iframe" src="@_iFrameSrc"></iframe>
-                        }
+                        <iframe class="metabase-iframe" src="@_iFrameSrc"></iframe>
                     }
                 </div>
             </div>
