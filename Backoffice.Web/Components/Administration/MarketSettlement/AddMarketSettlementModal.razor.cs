@@ -70,11 +70,12 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
             {
                 Guid.TryParse(AddMarketSettlement.BetId, out var betId);
 
-                var betRequest = new BetSelectionDetailsRequest
+                var betRequest = new ManualBetDetailsRequest
                 {
-                    BetId = betId
+                    BetIds = new List<string> { betId.ToString() }
                 };
-                var betSelections = (await TradingService.GetBetSelectionDetails(betRequest)).Result;
+                //var betSelections = (await TradingService.GetBetSelectionDetails(betRequest)).Result;
+                var betSelections = (await BackofficeService.GetManualBetDetails(betRequest)).Result.Bets.FirstOrDefault();
                 if (betSelections.Selections != null && betSelections.Selections.Any())
                 {
                     foreach (var selection in betSelections.Selections.OrderBy(s => s.FixtureName).ThenBy(s => s.MarketId))
