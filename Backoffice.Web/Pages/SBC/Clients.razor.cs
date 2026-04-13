@@ -93,21 +93,21 @@ namespace Backoffice.Web.Pages.SBC
 
                 virtualSports.SportLookup = sports.SportLookup.Where(s => SportHelper.IsVirtualSportId(s.SportId)).Select(s => new Models.SportLookup
                 {
-                    SportId = s.SportId + 1000,
-                    SportName = $"Virtual {s.SportName}"
+                    SportId = s.SportId,
+                    SportName = $"{s.SportName}"
                 }).ToList();
 
-                virtualSports.SportLookup.Add(new Models.SportLookup
-                {
-                    SportId = 1055,
-                    SportName = "Virtual Horse Racing"
-                });
+                //virtualSports.SportLookup.Add(new Models.SportLookup
+                //{
+                //    SportId = 1055,
+                //    SportName = "Virtual Horse Racing"
+                //});
 
-                virtualSports.SportLookup.Add(new Models.SportLookup
-                {
-                    SportId = 1058,
-                    SportName = "Virtual Dog Racing"
-                });
+                //virtualSports.SportLookup.Add(new Models.SportLookup
+                //{
+                //    SportId = 1058,
+                //    SportName = "Virtual Dog Racing"
+                //});
             }
 
             var parameters = new ModalParameters();
@@ -143,21 +143,21 @@ namespace Backoffice.Web.Pages.SBC
 
                 virtualSports.SportLookup = sports.SportLookup.Where(s => SportHelper.IsVirtualSportId(s.SportId)).Select(s => new Models.SportLookup
                 {
-                    SportId = s.SportId + 1000,
-                    SportName = $"Virtual {s.SportName}"
+                    SportId = s.SportId,
+                    SportName = $"{s.SportName}"
                 }).ToList();
 
-                virtualSports.SportLookup.Add(new Models.SportLookup
-                {
-                    SportId = 1055,
-                    SportName = "Virtual Horse Racing"
-                });
+                //virtualSports.SportLookup.Add(new Models.SportLookup
+                //{
+                //    SportId = 1055,
+                //    SportName = "Virtual Horse Racing"
+                //});
 
-                virtualSports.SportLookup.Add(new Models.SportLookup
-                {
-                    SportId = 1058,
-                    SportName = "Virtual Dog Racing"
-                });
+                //virtualSports.SportLookup.Add(new Models.SportLookup
+                //{
+                //    SportId = 1058,
+                //    SportName = "Virtual Dog Racing"
+                //});
             }
 
             client.BetSettings = (await BackofficeService.GetBetSetting(new BetSettingRequest
