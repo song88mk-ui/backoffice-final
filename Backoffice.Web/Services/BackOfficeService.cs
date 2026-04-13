@@ -872,33 +872,33 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<SportsLookupModel>> GetSportsAsync()
-        {
-            try
-            {
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsLookupModel>>
-                (await _httpClient.GetStreamAsync($"api/trading/sports/lookup"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //public async Task<BaseResponse<SportsLookupModel>> GetSportsAsync()
+        //{
+        //    try
+        //    {
+        //        var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsLookupModel>>
+        //        (await _httpClient.GetStreamAsync($"api/trading/sports/lookup"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-                return result ?? new BaseResponse<SportsLookupModel>
-                {
-                    StatusCode = StatusCode.Success,
-                    Message = $"{StatusCode.Success}",
-                    Result = new SportsLookupModel()
-                };
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
+        //        return result ?? new BaseResponse<SportsLookupModel>
+        //        {
+        //            StatusCode = StatusCode.Success,
+        //            Message = $"{StatusCode.Success}",
+        //            Result = new SportsLookupModel()
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error(ex.Message);
+        //        if (ex.StackTrace != null)
+        //            Log.Error(ex.StackTrace.ToString());
 
-                return new BaseResponse<SportsLookupModel>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
+        //        return new BaseResponse<SportsLookupModel>
+        //        {
+        //            StatusCode = StatusCode.Error,
+        //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+        //        };
+        //    }
+        //}
 
         public async Task<BaseResponse<ClientParlayBonusModel>> GetClientParlayBonus(GetParlayBonusRequest request)
         {

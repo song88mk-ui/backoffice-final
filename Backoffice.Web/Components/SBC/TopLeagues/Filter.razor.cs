@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -95,7 +96,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         {
             SetClients();
 
-            var sportResponse = await _backofficeService.GetSportsAsync();
+            var sportResponse = await _backofficeService.GetSportLookup(LanguageCode.EN.ToString());
             var sports = sportResponse.Result;
 
             if (sports != null && sports.SportLookup.Any())

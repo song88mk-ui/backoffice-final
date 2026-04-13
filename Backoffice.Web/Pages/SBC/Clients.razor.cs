@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.Components.SBC.Clients;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -28,7 +29,6 @@ namespace Backoffice.Web.Pages.SBC
         public bool IsPreload { get; set; }
         public decimal Opacity { get; set; }
 
-        private static int[] virtualSportIds = new int[] { 1001, 1002, 1003, 1005, 1021 };
         private string[] cryptoCurrencies = new string[] { Currency.BTC.ToString(), Currency.ETH.ToString() };
 
 
@@ -77,16 +77,21 @@ namespace Backoffice.Web.Pages.SBC
         public async Task OnCreateClientClickEvent()
         {
             Alerts.Clear();
-            var sports = (await BackofficeService.GetSportsAsync()).Result;
+            var sports = (await BackofficeService.GetSportLookup(LanguageCode.EN.ToString())).Result;
             var realSports = new SportsLookupModel();
             var virtualSports = new SportsLookupModel();
             var exchangeRates = (await BackofficeService.GetExchangeRates()).Result;
 
             if (sports != null && sports.SportLookup != null && sports.SportLookup.Any())
             {
-                realSports.SportLookup = sports.SportLookup.Where(s => s.SportId < 1000).ToList();
+                realSports.SportLookup = sports.SportLookup.Where(s => !SportHelper.IsVirtualSportId(s.SportId) == true)
+                .Select(s => new Models.SportLookup
+                {
+                    SportId = s.SportId,
+                    SportName = s.SportName
+                }).ToList();
 
-                virtualSports.SportLookup = sports.SportLookup.Where(s => virtualSportIds.Contains(s.SportId + 1000)).Select(s => new Models.SportLookup
+                virtualSports.SportLookup = sports.SportLookup.Where(s => SportHelper.IsVirtualSportId(s.SportId)).Select(s => new Models.SportLookup
                 {
                     SportId = s.SportId + 1000,
                     SportName = $"Virtual {s.SportName}"
@@ -122,16 +127,21 @@ namespace Backoffice.Web.Pages.SBC
         public async Task OnEditClientClickEvent(ClientListResponse.Client client)
         {
             Alerts.Clear();
-            var sports = (await BackofficeService.GetSportsAsync()).Result;
+            var sports = (await BackofficeService.GetSportLookup(LanguageCode.EN.ToString())).Result;
             var realSports = new SportsLookupModel();
             var virtualSports = new SportsLookupModel();
             var exchangeRates = (await BackofficeService.GetExchangeRates()).Result;
 
             if (sports != null && sports.SportLookup != null && sports.SportLookup.Any())
             {
-                realSports.SportLookup = sports.SportLookup.Where(s => s.SportId < 1000).ToList();
+                realSports.SportLookup = sports.SportLookup.Where(s => !SportHelper.IsVirtualSportId(s.SportId) == true)
+                    .Select(s => new Models.SportLookup
+                    {
+                        SportId = s.SportId,
+                        SportName = s.SportName
+                    }).ToList();
 
-                virtualSports.SportLookup = sports.SportLookup.Where(s => virtualSportIds.Contains(s.SportId + 1000)).Select(s => new Models.SportLookup
+                virtualSports.SportLookup = sports.SportLookup.Where(s => SportHelper.IsVirtualSportId(s.SportId)).Select(s => new Models.SportLookup
                 {
                     SportId = s.SportId + 1000,
                     SportName = $"Virtual {s.SportName}"

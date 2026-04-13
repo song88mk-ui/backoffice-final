@@ -283,7 +283,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
         private async Task LoadSports()
         {
-            var sports = (await BackofficeService.GetSportsAsync()).Result;
+            var sports = (await BackofficeService.GetSportLookup(LanguageCode.EN.ToString())).Result;
 
             Sports = sports.SportLookup.Select(s => new SelectListItemWithCheckboxModel<string>
             {

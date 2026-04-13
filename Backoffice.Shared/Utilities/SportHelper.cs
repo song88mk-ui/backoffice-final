@@ -38,5 +38,18 @@ namespace Backoffice.Shared.Utilities
             { Sport.Tennis, "Tennis" },
             { Sport.Volleyball, "Volleyball" }
         };
+
+        public static bool IsVirtualSportId(int sportId)
+        {
+            var listOfVirtualSports = new List<int>();
+
+            listOfVirtualSports.Add(11205870);
+            //todo: append virtual sports here
+
+            return listOfVirtualSports.Contains(sportId);
+        }
+
+
+
     }
 }
