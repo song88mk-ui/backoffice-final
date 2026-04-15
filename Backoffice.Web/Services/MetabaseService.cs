@@ -1,6 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Backoffice.Web.Services;
 
@@ -17,27 +20,24 @@ public class MetabaseService
         _dashboardId = int.Parse(configuration["Metabase:DashboardId"]!);
     }
 
-    public string GetEmbedUrl(string clientName)
+    public string GetEmbedUrl(List<string> clientCodes)
     {
-        var header = new { alg = "HS256", typ = "JWT" };
-        var payload = new
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var payload = new JwtPayload
         {
-            resource = new { dashboard = _dashboardId },
-            @params = new { client = new[] { clientName } },
-            exp = DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds()
+            { "resource", new { dashboard = _dashboardId } },
+            { "params", new { client = clientCodes.ToArray() } },
+            { "exp", DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds() }
         };
 
-        var headerB64  = Base64UrlEncode(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(header)));
-        var payloadB64 = Base64UrlEncode(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload)));
+        var token = new JwtSecurityToken(new JwtHeader(credentials), payload);
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-        var signingInput = $"{headerB64}.{payloadB64}";
+        var embedUrl = $"{_siteUrl}/embed/dashboard/{tokenString}#bordered=true&titled=true";
 
-        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_secretKey));
-        var signature = Base64UrlEncode(hmac.ComputeHash(Encoding.UTF8.GetBytes(signingInput)));
-
-        return $"{_siteUrl}/embed/dashboard/{signingInput}.{signature}#bordered=true&titled=true";
+        return embedUrl;
     }
-
-    private static string Base64UrlEncode(byte[] input) =>
-        Convert.ToBase64String(input).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+    
 }
