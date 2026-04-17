@@ -59,7 +59,7 @@ namespace Backoffice.Web.Pages.SBC
         private async Task LoadEmbedUrl()
         {
             var adminClientCodes = await GetClientCodeList();
-            var sportsbookClientCodes = _userState.Model.SportsbookClients.Select(s => s.ClientCode).ToList();;
+            var sportsbookClientCodes = _userState.Model.SportsbookClients.Select(s => s.ClientCode).ToList();
 
             if ((_userState.Model.RoleName.ToLower() == "super admin" || _userState.Model.RoleName.ToLower() == "admin") && adminClientCodes != null && adminClientCodes.Any())
             {
@@ -71,10 +71,10 @@ namespace Backoffice.Web.Pages.SBC
             }
             else 
             {
-                _clientCodes = new List<string>() { "NONE" };
+                _isPreLoader = false;
+                return;
             }
 
-            _isPreLoader = true;
             _iFrameSrc = MetabaseService.GetEmbedUrl(_clientCodes);
             _isPreLoader = false;
         }
