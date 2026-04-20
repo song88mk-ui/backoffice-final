@@ -5,6 +5,7 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -13,6 +14,7 @@ namespace Backoffice.Web.Pages.SBC
         #region Properties
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public MetabaseService MetabaseService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
 
         #endregion
 
@@ -61,6 +63,7 @@ namespace Backoffice.Web.Pages.SBC
             var adminClientCodes = await GetClientCodeList();
             var sportsbookClientCodes = _userState.Model.SportsbookClients.Select(s => s.ClientCode).ToList();
 
+            await JSRuntime.InvokeVoidAsync("console.log", new {  SportsbookClientCodes = sportsbookClientCodes });
             if ((_userState.Model.RoleName.ToLower() == "super admin" || _userState.Model.RoleName.ToLower() == "admin") && adminClientCodes != null && adminClientCodes.Any())
             {
                 _clientCodes = adminClientCodes;
