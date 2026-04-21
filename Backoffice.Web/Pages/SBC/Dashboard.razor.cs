@@ -58,6 +58,8 @@ namespace Backoffice.Web.Pages.SBC
 
         private async Task LoadEmbedUrl()
         {
+            await _userState.SportsbookClientsReadyAsync;
+
             var adminClientCodes = await GetClientCodeList();
             var sportsbookClientCodes = _userState.Model.SportsbookClients.Select(s => s.ClientCode).ToList();
 

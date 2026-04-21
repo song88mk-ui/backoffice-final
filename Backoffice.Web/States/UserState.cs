@@ -23,6 +23,15 @@ namespace Backoffice.Web.States
 
         private bool _isSuperAdmin;
         private List<string> _clientCodes { get; set; } = new List<string>();
+        private TaskCompletionSource _sportsbookClientsReadyTcs = new();
+
+        #endregion
+
+        #region Properties (SportsbookClients readiness)
+
+        // Awaitable signal: completes once SetSportsbookClients has been called.
+        // Pages that depend on SportsbookClients should await this before reading the value.
+        public Task SportsbookClientsReadyAsync => _sportsbookClientsReadyTcs.Task;
 
         #endregion
 
@@ -91,6 +100,7 @@ namespace Backoffice.Web.States
             else
                 base.Model.SportsbookClients = new List<Client>();
 
+            _sportsbookClientsReadyTcs.TrySetResult();
             OnPropertyChanged();
         }
         #endregion
