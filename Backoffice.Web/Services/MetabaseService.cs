@@ -28,8 +28,7 @@ public class MetabaseService
         var payload = new JwtPayload
         {
             { "resource", new { dashboard = _dashboardId } },
-            { "params", new { client = clientCodes.ToArray() } },
-            { "exp", DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds() }
+            { "params", new { client = clientCodes.ToArray() } }
         };
 
         var token = new JwtSecurityToken(new JwtHeader(credentials), payload);
