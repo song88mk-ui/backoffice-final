@@ -255,19 +255,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isMarketPreLoader = true;
             await InvokeAsync(StateHasChanged);
 
-            _marketTemplates = new List<ClientMarketTemplate>();
-            if (_selectedMarketGroupId != 1)
-            {
-                var marketTemplateGroup = _clientMarketTemplateGroupsRef.FirstOrDefault(x => x.Id == _selectedMarketGroupId);
-                _marketTemplates.AddRange(_filteredMarketTemplatesRef.Where(x => marketTemplateGroup.MarketTemplateIds.Contains(x.MarketTemplateId)).ToList());
-            }
-            else
-            {
-                _marketTemplates.AddRange(_filteredMarketTemplatesRef);
-            }
+            await LoadData();
 
             _isUpdate = false;
-            _isMarketPreLoader = false;
             await InvokeAsync(StateHasChanged);
         }
 

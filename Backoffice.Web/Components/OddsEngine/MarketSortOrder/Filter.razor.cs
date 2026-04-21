@@ -97,7 +97,14 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                 Value = (int)FixtureStatus.Live,
                 Name = FixtureStatus.Live.ToString()
             });
-
+            if (Clients.FirstOrDefault().Value == "")
+            {
+                Clients = _userState.Model.TradingClients.Select(s => new SelectListItemModel<string>
+                {
+                    Value = s.ClientCode,
+                    Name = s.ClientName
+                }).ToList();
+            }
             var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == Clients.FirstOrDefault().Value).ClientId;
 
             _filterModel = new()
