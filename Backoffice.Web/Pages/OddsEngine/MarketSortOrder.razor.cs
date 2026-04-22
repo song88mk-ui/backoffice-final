@@ -118,8 +118,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnUpdateClickEvent()
         {
             _isUpdate = true;
-
-            if (_selectedMarketGroupId == 1)
+            if (_selectedMarketGroupId == 1 || _selectedMarketGroupId == 28 || _selectedMarketGroupId == 29)
                 await EnableSortingAndSelect2();
             else 
                 await DisableSortingAndSelect2();
