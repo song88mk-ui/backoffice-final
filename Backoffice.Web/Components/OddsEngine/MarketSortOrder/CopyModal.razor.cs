@@ -38,6 +38,12 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
             if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
             {
+                ClientInformations = _userState.Model.TradingClients.Select(c => new ClientInformationModel
+                {
+                    ClientCode = c.ClientCode,
+                    ClientId = c.ClientId,
+                    ClientName = c.ClientName,
+                }).ToList();
                 Clients = _userState.Model.TradingClients.Select(s => new SelectListItemModel<string>
                 {
                     Value = s.ClientCode,
