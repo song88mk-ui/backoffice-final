@@ -38,6 +38,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private List<BreadcrumbModel> _breadcrumbs;
         private AlertModel _alertModel; 
         private int _selectedMarketGroupId;
+        private int _allMarketsGroupId;
         #region Methods
 
         protected override async Task OnInitializedAsync()
@@ -118,8 +119,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnUpdateClickEvent()
         {
             _isUpdate = true;
-
-            if (_selectedMarketGroupId == 1)
+            bool exists = _clientMarketTemplateGroupsRef.Any(item => item.Id == _selectedMarketGroupId);            
+            if (exists)
                 await EnableSortingAndSelect2();
             else 
                 await DisableSortingAndSelect2();
@@ -200,17 +201,17 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             _selectedMarketGroupId = id;
             _marketTemplates = new();
-            if (id != 1)
+            if (id == _allMarketsGroupId)
+            {
+                _marketTemplates.AddRange(_filteredMarketTemplatesRef);
+            }
+            else
             {
                 var marketTemplateGroup = _clientMarketTemplateGroupsRef.FirstOrDefault(x => x.Id == id);
                 _marketTemplates.AddRange(_filteredMarketTemplatesRef.Where(x => marketTemplateGroup.MarketTemplateIds.Contains(x.MarketTemplateId)).ToList());
             }
-            else
-            {
-                _marketTemplates.AddRange(_filteredMarketTemplatesRef);
-            }
             _isMarketGroupClicked = true;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
 
         public async Task PrepareMarketSortOrderModel(MarketSortOrderFilterModel model)
@@ -255,19 +256,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isMarketPreLoader = true;
             await InvokeAsync(StateHasChanged);
 
-            _marketTemplates = new List<ClientMarketTemplate>();
-            if (_selectedMarketGroupId != 1)
-            {
-                var marketTemplateGroup = _clientMarketTemplateGroupsRef.FirstOrDefault(x => x.Id == _selectedMarketGroupId);
-                _marketTemplates.AddRange(_filteredMarketTemplatesRef.Where(x => marketTemplateGroup.MarketTemplateIds.Contains(x.MarketTemplateId)).ToList());
-            }
-            else
-            {
-                _marketTemplates.AddRange(_filteredMarketTemplatesRef);
-            }
+            await LoadData();
 
             _isUpdate = false;
-            _isMarketPreLoader = false;
             await InvokeAsync(StateHasChanged);
         }
 
@@ -368,8 +359,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     }).ToList() ?? new List<ClientMarketTemplate>();
             }
 
-            _selectedMarketGroupId = _clientMarketTemplateGroupsRef.FirstOrDefault(x => x.Name.ToUpper() == "ALL MARKETS")?.Id ?? -1;
-
+            _allMarketsGroupId = _clientMarketTemplateGroupsRef.FirstOrDefault(x => x.Name.ToUpper() == "ALL MARKETS")?.Id ?? -1;
+            _selectedMarketGroupId = _allMarketsGroupId;
             _marketGroups = _clientMarketTemplateGroupsRef?
                 .Where(s => s.Id != _selectedMarketGroupId)
                 .Select(s => new SelectListItemModel<int>
