@@ -1,4 +1,4 @@
-﻿@inherits BasePage
+@inherits BasePage
 
 @page "/dashboard"
 
@@ -14,9 +14,9 @@
                     {
                         <Preloader />
                     }
-                    else if (!string.IsNullOrEmpty(_iFrameSrc))
+                    else if (_hasAccess)
                     {
-                        <iframe class="metabase-iframe" src="@_iFrameSrc"></iframe>
+                        <div id="metabase-container" class="metabase-container"></div>
                     }
                     else
                     {
