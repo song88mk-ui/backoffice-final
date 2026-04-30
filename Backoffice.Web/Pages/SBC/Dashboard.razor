@@ -16,7 +16,15 @@
                     }
                     else if (_hasAccess)
                     {
-                        <div id="metabase-container" class="metabase-container"></div>
+                        <metabase-dashboard
+                            dashboard-id="@MetabaseService.DashboardId"
+                            with-title="true"
+                            with-downloads="true"
+                            with-subscriptions="false"
+                            drills="true"
+                            initial-parameters="@_parametersJson"
+                        >
+                        </metabase-dashboard>
                     }
                     else
                     {

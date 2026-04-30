@@ -14,9 +14,17 @@
                     {
                         <Preloader />
                     }
-                    else if (!string.IsNullOrEmpty(IFrameSrc))
+                    else if (_hasAccess)
                     {
-                        <iframe class="metabase-iframe" src="@IFrameSrc"></iframe>
+                        <metabase-dashboard
+                            dashboard-id="@MetabaseService.DashboardId"
+                            with-title="true"
+                            with-downloads="true"
+                            with-subscriptions="false"
+                            drills="true"
+                            initial-parameters="@_parametersJson"
+                        >
+                        </metabase-dashboard>
                     }
                     else
                     {

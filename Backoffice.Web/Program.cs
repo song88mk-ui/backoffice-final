@@ -71,18 +71,6 @@ app.UseRouting();
 
 app.MapBlazorHub(o => { o.Transports = HttpTransportType.WebSockets; });
 
-// Metabase Interactive Embedding — JWT SSO token endpoint.
-// Called by embed.js in the browser; protected by a short-lived one-time key stored in MemCache.
-app.MapGet("/api/metabase/sso", (string key, IMemCache memCache, MetabaseService metabaseService) =>
-{
-    var username = memCache.GetCache<string>(key);
-    if (string.IsNullOrEmpty(username))
-        return Results.Unauthorized();
-
-    var jwt = metabaseService.GetSsoToken(username);
-    return Results.Ok(new { jwt });
-});
-
 app.MapFallbackToPage("/_Host");
 
 app.Run();

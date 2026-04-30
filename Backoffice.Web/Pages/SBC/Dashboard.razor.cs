@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -15,7 +14,6 @@ namespace Backoffice.Web.Pages.SBC
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public MetabaseService MetabaseService { get; set; }
-        [Inject] public IMemCache MemCache { get; set; }
         [Inject] public IJSRuntime JS { get; set; }
 
         #endregion
@@ -25,7 +23,8 @@ namespace Backoffice.Web.Pages.SBC
         private bool _isPreLoader = true;
         private bool _hasAccess = false;
         private bool _metabaseInitialized = false;
-        private string _ssoKey;
+        private string _ssoToken;
+        private string _parametersJson;
         private List<string> _clientCodes { get; set; } = new List<string>();
 
         #endregion
@@ -48,15 +47,13 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!string.IsNullOrEmpty(_ssoKey) && !_metabaseInitialized)
+            if (!string.IsNullOrEmpty(_ssoToken) && !_metabaseInitialized)
             {
                 _metabaseInitialized = true;
-                var clientCodesJson = JsonSerializer.Serialize(_clientCodes);
                 await JS.InvokeVoidAsync("initMetabaseDashboard",
-                    $"/api/metabase/sso?key={_ssoKey}",
                     MetabaseService.SiteUrl,
-                    MetabaseService.DashboardId,
-                    clientCodesJson);
+                    _ssoToken
+                );
             }
         }
 
@@ -94,9 +91,8 @@ namespace Backoffice.Web.Pages.SBC
                 return;
             }
 
-            _ssoKey = Guid.NewGuid().ToString("N");
-            MemCache.AddOrUpdateCache(_ssoKey, _userState.Model.Name, DateTimeOffset.UtcNow.AddMinutes(10));
-
+            _ssoToken = MetabaseService.GetSsoToken();
+            _parametersJson = JsonSerializer.Serialize(new { client = _clientCodes });
             _hasAccess = true;
             _isPreLoader = false;
         }
