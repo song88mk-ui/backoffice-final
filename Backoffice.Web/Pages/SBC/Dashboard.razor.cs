@@ -1,26 +1,30 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.SBC
 {
     public partial class Dashboard : IDisposable
     {
         #region Properties
+
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public MetabaseService MetabaseService { get; set; }
+        [Inject] public IJSRuntime JS { get; set; }
 
         #endregion
 
         #region Fields
 
-        private string _iFrameSrc;
         private bool _isPreLoader = true;
-        
+        private bool _hasAccess = false;
+        private bool _metabaseInitialized = false;
+        private string _ssoToken;
+        private string _parametersJson;
         private List<string> _clientCodes { get; set; } = new List<string>();
 
         #endregion
@@ -38,8 +42,19 @@ namespace Backoffice.Web.Pages.SBC
             };
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await LoadEmbedData();
+        }
 
-            await LoadEmbedUrl();
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (!string.IsNullOrEmpty(_ssoToken) && !_metabaseInitialized)
+            {
+                _metabaseInitialized = true;
+                await JS.InvokeVoidAsync("initMetabaseDashboard",
+                    MetabaseService.SiteUrl,
+                    _ssoToken
+                );
+            }
         }
 
         private async Task<List<string>> GetClientCodeList()
@@ -52,11 +67,10 @@ namespace Backoffice.Web.Pages.SBC
                 SortBy = (ClientSorting)0
             };
             var response = await BackofficeService.GetClientList(request);
-
             return response.Result.Clients.Select(c => c.ClientCode).ToList();
         }
 
-        private async Task LoadEmbedUrl()
+        private async Task LoadEmbedData()
         {
             await _userState.SportsbookClientsReadyAsync;
 
@@ -71,13 +85,15 @@ namespace Backoffice.Web.Pages.SBC
             {
                 _clientCodes = sportsbookClientCodes;
             }
-            else 
+            else
             {
                 _isPreLoader = false;
                 return;
             }
 
-            _iFrameSrc = MetabaseService.GetEmbedUrl(_clientCodes);
+            _ssoToken = MetabaseService.GetSsoToken();
+            _parametersJson = JsonSerializer.Serialize(new { client = _clientCodes });
+            _hasAccess = true;
             _isPreLoader = false;
         }
 

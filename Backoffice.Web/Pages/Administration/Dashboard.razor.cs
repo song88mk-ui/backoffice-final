@@ -5,6 +5,7 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -13,12 +14,15 @@ namespace Backoffice.Web.Pages.Administration
         #region Properties
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public MetabaseService MetabaseService { get; set; }
-
-        public string IFrameSrc { get; set; }
+        [Inject] public IJSRuntime JS { get; set; }
 
         #endregion
 
         private bool _isPreLoader = true;
+        private bool _hasAccess = false;
+        private bool _metabaseInitialized = false;
+        private string _ssoToken;
+        private string _parametersJson;
 
         private PageHeaderModel _pageHeaderModel;
 
@@ -38,7 +42,19 @@ namespace Backoffice.Web.Pages.Administration
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
 
-            await LoadEmbedUrl();
+            await LoadEmbedData();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (!string.IsNullOrEmpty(_ssoToken) && !_metabaseInitialized)
+            {
+                _metabaseInitialized = true;
+                await JS.InvokeVoidAsync("initMetabaseDashboard",
+                    MetabaseService.SiteUrl,
+                    _ssoToken
+                );
+            }
         }
 
         private async Task<List<string>> GetClientCodeList()
@@ -55,7 +71,7 @@ namespace Backoffice.Web.Pages.Administration
             return response.Result.Clients.Select(c => c.ClientCode).ToList();
         }
 
-        private async Task LoadEmbedUrl()
+        private async Task LoadEmbedData()
         {
             await _userState.SportsbookClientsReadyAsync;
             
@@ -76,7 +92,9 @@ namespace Backoffice.Web.Pages.Administration
                 return;
             }
 
-            IFrameSrc = MetabaseService.GetEmbedUrl(_clientCodes);
+            _ssoToken = MetabaseService.GetSsoToken();
+            _parametersJson = JsonSerializer.Serialize(new { client = _clientCodes });
+            _hasAccess = true;
             _isPreLoader = false;
         }
 

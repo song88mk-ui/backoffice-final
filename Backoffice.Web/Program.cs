@@ -70,6 +70,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.MapBlazorHub(o => { o.Transports = HttpTransportType.WebSockets; });
+
 app.MapFallbackToPage("/_Host");
 
 app.Run();
