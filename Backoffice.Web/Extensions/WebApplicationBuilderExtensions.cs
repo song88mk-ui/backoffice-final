@@ -132,6 +132,8 @@ namespace Backoffice.Web.Extensions
                 client.DefaultRequestHeaders.Add("x-api-key", builder?.Configuration["API:Backoffice:Security:APIKey"]);
                 client.DefaultRequestHeaders.Add("x-region", builder?.Configuration["API:Region"]);
             });
+
+            builder.Services.AddHttpClient("metabase");
             //builder.Services.AddHttpClient<IBackofficeService, BackofficeService>(client =>
             //{
             //    client.BaseAddress = new Uri(builder?.Configuration["API:Backoffice:Uri"] ?? string.Empty);
