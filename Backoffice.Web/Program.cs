@@ -71,6 +71,13 @@ app.UseRouting();
 
 app.MapBlazorHub(o => { o.Transports = HttpTransportType.WebSockets; });
 
+app.MapGet("/api/metabase/sso-token", (MetabaseService metabaseService) =>
+{
+    var jwt = metabaseService.GetSsoToken();
+    return Results.Ok(new { jwt });
+});
+
+
 app.MapFallbackToPage("/_Host");
 
 app.Run();
