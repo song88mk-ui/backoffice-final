@@ -23,7 +23,6 @@ namespace Backoffice.Web.Pages.SBC
         private bool _isPreLoader = true;
         private bool _hasAccess = false;
         private bool _metabaseInitialized = false;
-        private string _ssoToken;
         private string _parametersJson;
         private List<string> _clientCodes { get; set; } = new List<string>();
 
@@ -47,12 +46,12 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!string.IsNullOrEmpty(_ssoToken) && !_metabaseInitialized)
+            if (!_metabaseInitialized)
             {
                 _metabaseInitialized = true;
                 await JS.InvokeVoidAsync("initMetabaseDashboard",
-                    MetabaseService.SiteUrl,
-                    _ssoToken
+                    "/api/metabase/sso-token",
+                    MetabaseService.SiteUrl
                 );
             }
         }
@@ -91,7 +90,6 @@ namespace Backoffice.Web.Pages.SBC
                 return;
             }
 
-            _ssoToken = MetabaseService.GetSsoToken();
             _parametersJson = JsonSerializer.Serialize(new { client = _clientCodes });
             _hasAccess = true;
             _isPreLoader = false;

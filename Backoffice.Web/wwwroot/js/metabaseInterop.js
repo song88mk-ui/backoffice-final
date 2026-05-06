@@ -1,10 +1,10 @@
-window.initMetabaseDashboard = async (instanceUrl, ssoToken) => {
+window.initMetabaseDashboard = async (providerUri, instanceUrl) => {
     if (!document.querySelector('script[data-metabase-embed]')) {
         window.defineMetabaseConfig = (config) => { window.metabaseConfig = config; };
 
         window.defineMetabaseConfig({
+            jwtProviderUri: providerUri,
             instanceUrl: instanceUrl,
-            fetchRequestToken: async () => ({ jwt: ssoToken })
         });
         await new Promise((resolve, reject) => {
             const script = document.createElement('script');
