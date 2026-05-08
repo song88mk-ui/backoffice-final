@@ -75,11 +75,33 @@ namespace Backoffice.Web.Pages.SBC
             ModalService.Open<StaticTranslationEditModal>("Edit Translation", parameters, options);
         }
 
+        private async Task OnDeleteTranslation(KeyValuePair<string, string> translation)
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("TranslationKey", translation.Key);
+            parameters.Add("OnDeleteCallback", (Func<Task>)(async () => await DeleteTranslationValue(translation.Key)));
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-md");
+
+            var options = new ModalOptions();
+            ModalService.Open<StaticTranslationDeleteModal>("Delete Translation", parameters, options);
+        }
+
         private Task SaveTranslationValue(string key, string newValue)
         {
             if (Translations.ContainsKey(key))
             {
                 Translations[key] = newValue;
+            }
+
+            return InvokeAsync(StateHasChanged);
+        }
+
+        private Task DeleteTranslationValue(string key)
+        {
+            if (Translations.ContainsKey(key))
+            {
+                Translations.Remove(key);
             }
 
             return InvokeAsync(StateHasChanged);

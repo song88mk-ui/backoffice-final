@@ -1,6 +1,9 @@
 @inherits BasePage
 @using Backoffice.Web.Models
+@using Backoffice.Web.Components.Common
+@using Backoffice.Web.Shared
 @using Backoffice.Shared.Enums
+@using Microsoft.AspNetCore.Components.Authorization
 
 @page "/translations/static"
 
@@ -45,8 +48,9 @@
                                             <tr>
                                                 <td>@translation.Key</td>
                                                 <td>@translation.Value</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-primary" @onclick="() => OnEditTranslation(translation)">Edit</button>
+                                                <td class="d-flex">
+                                                    <button class="btn btn-sm btn-primary me-2" @onclick="() => OnEditTranslation(translation)">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => OnDeleteTranslation(translation)">Delete</button>
                                                 </td>
                                             </tr>
                                         }
