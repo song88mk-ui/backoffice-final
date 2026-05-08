@@ -1,0 +1,68 @@
+@inherits BasePage
+@using Backoffice.Web.Models
+@using Backoffice.Shared.Enums
+
+@page "/translations/static"
+
+<AuthorizeView>
+    <Authorized>
+        <div class="row">
+            <div class="main-content col-md-12 mb-4 pb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageHeaderModel="_pageHeaderModel" />
+                    </div>
+                    <div class="col-md-12">
+                        @if (Translations != null && Translations.Any())
+                        {
+                             <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="languageSelect" class="form-label">Select Language</label>
+                                    <select id="languageSelect" class="form-select" value="@SelectedLanguageCode" @onchange="OnLanguageChanged">
+                                        <option value="EN">English (EN)</option>
+                                        <option value="JA">Japanese (JA)</option>
+                                        <option value="BR">Portuguese (BR)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="searchInput" class="form-label">Search Translations</label>
+                                    <input id="searchInput" type="text" class="form-control" placeholder="Search translations..." @bind-value="SearchText" @bind-value:event="oninput" />
+                                </div>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Key</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var translation in FilteredTranslations)
+                                        {
+                                            <tr>
+                                                <td>@translation.Key</td>
+                                                <td>@translation.Value</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info" role="alert">
+                                Loading translations...
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <CustomModal />
+    </Authorized>
+    <NotAuthorized>
+        <LoginRedirect />
+    </NotAuthorized>
+</AuthorizeView>
