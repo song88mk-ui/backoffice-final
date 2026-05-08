@@ -36,6 +36,7 @@
                                         <tr>
                                             <th>Key</th>
                                             <th>Value</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -44,6 +45,9 @@
                                             <tr>
                                                 <td>@translation.Key</td>
                                                 <td>@translation.Value</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary" @onclick="() => OnEditTranslation(translation)">Edit</button>
+                                                </td>
                                             </tr>
                                         }
                                     </tbody>

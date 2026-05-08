@@ -10,6 +10,7 @@ namespace Backoffice.Web.Pages.SBC
     public partial class StaticTranslation : BasePage
     {
         [Inject] public IBackofficeService BackofficeService { get; set; }
+        [Inject] public IModalService ModalService { get; set; }
         [Inject] public TranslationState TranslationState { get; set; }
 
         private PageHeaderModel _pageHeaderModel = new PageHeaderModel()
@@ -46,7 +47,6 @@ namespace Backoffice.Web.Pages.SBC
 
         private async Task OnLanguageChanged(ChangeEventArgs e)
         {
-            Console.WriteLine($"Selected Language Code: {e.Value}");
             if (e.Value != null)
             {
                 SelectedLanguageCode = e.Value.ToString();
@@ -60,6 +60,29 @@ namespace Backoffice.Web.Pages.SBC
                     Translations = new Dictionary<string, string>();
                 }
             }
+        }
+
+        private async Task OnEditTranslation(KeyValuePair<string, string> translation)
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("TranslationKey", translation.Key);
+            parameters.Add("TranslationValue", translation.Value);
+            parameters.Add("OnSaveCallback", (Func<string, Task>)(async newValue => await SaveTranslationValue(translation.Key, newValue)));
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-md");
+
+            var options = new ModalOptions();
+            ModalService.Open<StaticTranslationEditModal>("Edit Translation", parameters, options);
+        }
+
+        private Task SaveTranslationValue(string key, string newValue)
+        {
+            if (Translations.ContainsKey(key))
+            {
+                Translations[key] = newValue;
+            }
+
+            return InvokeAsync(StateHasChanged);
         }
     }
 }
