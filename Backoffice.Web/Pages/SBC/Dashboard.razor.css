@@ -3,8 +3,8 @@
     border-radius: 3px;
 }
 
-.metabase-dashboard {
+metabase-dashboard {
     display: block;
     width: 100%;
-    min-height: 85vh;
+    height: 100vh;
 }
