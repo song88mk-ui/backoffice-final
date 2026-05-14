@@ -23,6 +23,12 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
 
+        public List<Backoffice.Web.Models.SportModel> Sports { get; set; }
+        public int SelectedSportId { get; set; }
+
+        public List<SelectListItemModel<int>> Scopes { get; set; }
+        public int SelectedScopeId { get; set; }
+
         #endregion
 
         #region Methods
@@ -31,11 +37,14 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         {
             ClientInformations = new List<ClientInformationModel>();
             Clients = new List<SelectListItemModel<string>>();
+            Sports = new List<Backoffice.Web.Models.SportModel>();
+            Scopes = new List<SelectListItemModel<int>>();
 
             FromClientCode = ModalParameters.TryGet<string>("FromClientCode");
             FromSportId = ModalParameters.TryGet<int>("FromSportId");
             FromFixtureStatusId = ModalParameters.TryGet<int>("FromFixtureStatusId");
 
+            // Load clients
             if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
             {
                 ClientInformations = _userState.Model.TradingClients.Select(c => new ClientInformationModel
@@ -58,11 +67,45 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                     Name = _translationState.GetValue("No Clients Available")
                 });
             }
+
+            // Load sports
+            try
+            {
+                var sportsResponse = await TradingService.GetSports(0); // 0 for all fixture types
+                if (sportsResponse != null && sportsResponse.Result != null)
+                {
+                    Sports = sportsResponse.Result.Sports ?? new List<Backoffice.Web.Models.SportModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading sports: {ex.Message}");
+            }
+
+            // Load scopes
+            Scopes = Enum.GetValues(typeof(Scope))
+                .Cast<Scope>()
+                .Select(s => new SelectListItemModel<int>
+                {
+                    Value = (int)s,
+                    Name = s.ToString()
+                })
+                .ToList();
         }
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
             SelectedClientCode = e.Value.ToString();
+        }
+
+        public async Task OnSportChangedEvent(ChangeEventArgs e)
+        {
+            SelectedSportId = Convert.ToInt32(e.Value);
+        }
+
+        public async Task OnScopeChangedEvent(ChangeEventArgs e)
+        {
+            SelectedScopeId = Convert.ToInt32(e.Value);
         }
 
         public async Task OnCancelClickEvent()
@@ -72,7 +115,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         public async Task OnCopyClickEvent()
         {
-            if (string.IsNullOrEmpty(SelectedClientCode) || FromClientCode == SelectedClientCode)
+            if (string.IsNullOrEmpty(SelectedClientCode) || FromClientCode == SelectedClientCode || SelectedSportId <= 0 || SelectedScopeId < 0)
                 return;
 
             var fromClient = ClientInformations.FirstOrDefault(c => c.ClientCode == FromClientCode);
@@ -89,6 +132,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
             parameters.Add("SportId", FromSportId);
             parameters.Add("FixtureStatusId", FromFixtureStatusId);
+
+            parameters.Add("SelectedSportId", SelectedSportId);
+            parameters.Add("SelectedScopeId", SelectedScopeId);
 
             parameters.Add("UserId", _userState.Model.Id);
 
