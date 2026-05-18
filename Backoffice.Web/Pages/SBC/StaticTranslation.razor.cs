@@ -62,12 +62,27 @@ namespace Backoffice.Web.Pages.SBC
             }
         }
 
+        private async Task OnAddTranslation()
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("TranslationKey", string.Empty);
+            parameters.Add("TranslationValue", string.Empty);
+            parameters.Add("IsNew", true);
+            parameters.Add("OnSaveCallback", (Func<string, string, Task>)(async (key, newValue) => await SaveTranslationValue(key, newValue)));
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-md");
+
+            var options = new ModalOptions();
+            ModalService.Open<StaticTranslationEditModal>("Add Translation", parameters, options);
+        }
+
         private async Task OnEditTranslation(KeyValuePair<string, string> translation)
         {
             var parameters = new ModalParameters();
             parameters.Add("TranslationKey", translation.Key);
             parameters.Add("TranslationValue", translation.Value);
-            parameters.Add("OnSaveCallback", (Func<string, Task>)(async newValue => await SaveTranslationValue(translation.Key, newValue)));
+            parameters.Add("IsNew", false);
+            parameters.Add("OnSaveCallback", (Func<string, string, Task>)(async (key, newValue) => await SaveTranslationValue(key, newValue)));
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
 
@@ -89,11 +104,12 @@ namespace Backoffice.Web.Pages.SBC
 
         private Task SaveTranslationValue(string key, string newValue)
         {
-            if (Translations.ContainsKey(key))
+            if (string.IsNullOrWhiteSpace(key))
             {
-                Translations[key] = newValue;
+                return Task.CompletedTask;
             }
 
+            Translations[key] = newValue;
             return InvokeAsync(StateHasChanged);
         }
 

@@ -16,7 +16,7 @@
                         <PageHeader PageHeaderModel="_pageHeaderModel" />
                     </div>
                     <div class="col-md-12">
-                        @if (Translations != null && Translations.Any())
+                        @if (Translations != null)
                         {
                              <div class="row mb-3">
                                 <div class="col-md-6">
@@ -32,31 +32,44 @@
                                     <input id="searchInput" type="text" class="form-control" placeholder="Search translations..." @bind-value="SearchText" @bind-value:event="oninput" />
                                 </div>
                             </div>
-                            
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Key</th>
-                                            <th>Value</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var translation in FilteredTranslations)
-                                        {
-                                            <tr>
-                                                <td>@translation.Key</td>
-                                                <td>@translation.Value</td>
-                                                <td class="d-flex">
-                                                    <button class="btn btn-sm btn-primary me-2" @onclick="() => OnEditTranslation(translation)">Edit</button>
-                                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => OnDeleteTranslation(translation)">Delete</button>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+
+                            <div class="d-flex justify-content-end mb-3">
+                                <button class="btn btn-success" @onclick="OnAddTranslation">Add Translation</button>
                             </div>
+
+                            @if (FilteredTranslations.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Key</th>
+                                                <th>Value</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var translation in FilteredTranslations)
+                                            {
+                                                <tr>
+                                                    <td>@translation.Key</td>
+                                                    <td>@translation.Value</td>
+                                                    <td class="d-flex">
+                                                        <button class="btn btn-sm btn-primary me-2" @onclick="() => OnEditTranslation(translation)">Edit</button>
+                                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => OnDeleteTranslation(translation)">Delete</button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info" role="alert">
+                                    No translations found for the selected language.
+                                </div>
+                            }
                         }
                         else
                         {
