@@ -18,11 +18,12 @@
                     {
                         <metabase-dashboard
                             dashboard-id="@MetabaseService.DashboardId"
-                            with-title="true"
+                            with-title="false"
                             with-downloads="true"
                             with-subscriptions="false"
                             drills="true"
                             initial-parameters="@_parametersJson"
+                            hidden-parameters='["client"]'
                         >
                         </metabase-dashboard>
                     }
