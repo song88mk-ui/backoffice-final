@@ -1,0 +1,43 @@
+.white-label{
+    color:white
+}
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 42px;
+    background-color: #232323;
+    color: white;
+}
+
+.pagination-info{
+    margin-left: 10px;
+    color: #FFF;
+    text-align: center;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+.selected-page {
+    background-color: #E4422E;
+    color: white;
+}
+.pagination-label{
+    color:white
+}
+.table-header {
+    background-color: #354156;
+    color: white;
+}
+.add-translation-btn {
+    background-color: #232323;
+    color: white;
+    border: none;
+    border-radius: 2px;
+    display: flex;
+    padding: 6px 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}

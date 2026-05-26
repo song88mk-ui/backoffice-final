@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Backoffice.Shared.Enums;
 using Backoffice.Web.Models;
 using Backoffice.Web.Pages.Base;
@@ -20,15 +23,61 @@ namespace Backoffice.Web.Pages.SBC
         };
 
         private Dictionary<string, string> Translations { get; set; }
-        private string SearchText { get; set; } = string.Empty;
+
+        private string _searchText = string.Empty;
+        private string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (_searchText != value)
+                {
+                    _searchText = value;
+                    ResetPagination();
+                }
+            }
+        }
 
         private string SelectedLanguageCode { get; set; } = "EN";
 
+        private int CurrentPage { get; set; } = 1;
+        private int PageSize { get; set; } = 10;
+
+        private int TotalFilteredCount => FilteredTranslations.Count();
+        private int TotalPages => (int)Math.Ceiling(TotalFilteredCount / (double)PageSize);
+
+        private IEnumerable<int> PageNumbers
+        {
+            get
+            {
+                if (TotalPages <= 10)
+                {
+                    return Enumerable.Range(1, TotalPages);
+                }
+
+                var start = Math.Max(1, CurrentPage - 4);
+                var end = Math.Min(TotalPages, start + 8);
+                if (end - start < 8)
+                {
+                    start = Math.Max(1, end - 8);
+                }
+
+                return Enumerable.Range(start, end - start + 1);
+            }
+        }
+
         private IEnumerable<KeyValuePair<string, string>> FilteredTranslations =>
-            string.IsNullOrWhiteSpace(SearchText)
-                ? Translations
-                : Translations.Where(t => t.Key.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                                          t.Value.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+            Translations == null
+                ? Enumerable.Empty<KeyValuePair<string, string>>()
+                : string.IsNullOrWhiteSpace(SearchText)
+                    ? Translations
+                    : Translations.Where(t => t.Key.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                              t.Value.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+
+        private IEnumerable<KeyValuePair<string, string>> PagedTranslations =>
+            FilteredTranslations
+                .Skip((CurrentPage - 1) * PageSize)
+                .Take(PageSize);
 
         protected override async Task OnInitializedAsync()
         {
@@ -42,6 +91,7 @@ namespace Backoffice.Web.Pages.SBC
                 Translations = new Dictionary<string, string>();
             }
 
+            ResetPagination();
             await base.OnInitializedAsync();
         }
 
@@ -59,6 +109,8 @@ namespace Backoffice.Web.Pages.SBC
                 {
                     Translations = new Dictionary<string, string>();
                 }
+
+                ResetPagination();
             }
         }
 
@@ -118,9 +170,69 @@ namespace Backoffice.Web.Pages.SBC
             if (Translations.ContainsKey(key))
             {
                 Translations.Remove(key);
+                EnsureValidCurrentPage();
             }
 
             return InvokeAsync(StateHasChanged);
+        }
+
+        private void ResetPagination()
+        {
+            CurrentPage = 1;
+        }
+
+        private void EnsureValidCurrentPage()
+        {
+            if (TotalPages == 0)
+            {
+                CurrentPage = 1;
+                return;
+            }
+
+            if (CurrentPage > TotalPages)
+            {
+                CurrentPage = TotalPages;
+            }
+
+            if (CurrentPage < 1)
+            {
+                CurrentPage = 1;
+            }
+        }
+
+        private void PreviousPage()
+        {
+            if (CurrentPage > 1)
+            {
+                CurrentPage--;
+            }
+        }
+
+        private void NextPage()
+        {
+            if (CurrentPage < TotalPages)
+            {
+                CurrentPage++;
+            }
+        }
+
+        private void GoToPage(int page)
+        {
+            if (page < 1 || page > TotalPages)
+            {
+                return;
+            }
+
+            CurrentPage = page;
+        }
+
+        private void OnPageSizeChanged(ChangeEventArgs e)
+        {
+            if (int.TryParse(e.Value?.ToString(), out var newSize) && newSize > 0)
+            {
+                PageSize = newSize;
+                ResetPagination();
+            }
         }
     }
 }
