@@ -1,8 +1,5 @@
-using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Backoffice.Web.Services;
@@ -10,33 +7,35 @@ namespace Backoffice.Web.Services;
 public class MetabaseService
 {
     private readonly string _siteUrl;
-    private readonly string _secretKey;
+    private readonly string _ssoSecretKey;
     private readonly int _dashboardId;
+    private readonly string _email;
+
+    public string SiteUrl => _siteUrl;
+    public int DashboardId => _dashboardId;
 
     public MetabaseService(IConfiguration configuration)
     {
         _siteUrl = configuration["Metabase:SiteUrl"]!;
-        _secretKey = configuration["Metabase:SecretKey"]!;
+        _ssoSecretKey = configuration["Metabase:SsoSecretKey"]!;
         _dashboardId = int.Parse(configuration["Metabase:DashboardId"]!);
+        _email = configuration["Metabase:Email"]!;
     }
-
-    public string GetEmbedUrl(List<string> clientCodes)
+    
+    public string GetSsoToken()
     {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_ssoSecretKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+        var now = DateTimeOffset.UtcNow;
         var payload = new JwtPayload
         {
-            { "resource", new { dashboard = _dashboardId } },
-            { "params", new { client = clientCodes.ToArray() } }
+            { "email", _email },
+            { "iat", now.ToUnixTimeSeconds() },
+            { "exp", now.AddHours(1).ToUnixTimeSeconds() }
         };
 
         var token = new JwtSecurityToken(new JwtHeader(credentials), payload);
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-        var embedUrl = $"{_siteUrl}/embed/dashboard/{tokenString}#bordered=true&titled=true";
-
-        return embedUrl;
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    
 }

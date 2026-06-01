@@ -1,4 +1,12 @@
-﻿@if (SportsTree != null)
+﻿@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error:</strong> @ErrorMessage
+        <button type="button" class="btn-close" @onclick="() => ErrorMessage = string.Empty"></button>
+    </div>
+}
+
+@if (SportsTree != null)
 {
     <div class="row">
         <div class="col-2">

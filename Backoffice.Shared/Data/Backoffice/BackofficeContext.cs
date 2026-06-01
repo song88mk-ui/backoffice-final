@@ -15,7 +15,7 @@ namespace Backoffice.Shared.Data.Backoffice
             modelBuilder.Entity<ConfigTemplate>().HasKey(k => new { k.Id });
             modelBuilder.Entity<ConfigTemplateMargin>().HasKey(k => new { k.ConfigTemplateId, k.SportId, k.FixtureTypeId, k.FixtureStatusId, k.MarketTemplateId });
             modelBuilder.Entity<ConfigTemplateAssigned>().HasKey(k => new { k.Id });
-            modelBuilder.Entity<Translation>().HasKey(k => new { k.LanguageCode, k.Name });
+            //modelBuilder.Entity<Translation>().HasKey(k => new { k.LanguageCode, k.Name });
             modelBuilder.Entity<ConfigTemplateAssignedMapping>().HasKey(k => new { k.ConfigTemplateAssignedId, k.ConfigTemplateId, k.FixtureStatusId });
         }
 
@@ -27,7 +27,7 @@ namespace Backoffice.Shared.Data.Backoffice
         public DbSet<ConfigTemplateAssigned> ConfigTemplateAssigned { get; set; }
         public DbSet<ConfigTemplateAssignedMapping> ConfigTemplateAssignedMapping { get; set; }
         public DbSet<ActivityLog> ActivityLog { get; set; }
-        public DbSet<Translation> Translation { get; set; }
+        //public DbSet<Translation> Translation { get; set; }
         public DbSet<ConfigTemplateModel> ConfigTemplateModel { get; set; }
         // Stored Procedure
         public DbSet<ActivityLog> ReadActivityLog { get; set; }

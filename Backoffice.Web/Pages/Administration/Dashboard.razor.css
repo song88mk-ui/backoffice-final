@@ -1,6 +1,10 @@
-﻿.metabase-iframe {
-    width: 100%;
-    height: 85vh;
-    border: none;
+﻿.main-content {
+    background-color: #FFFFFF;
+    border-radius: 3px;
+}
+
+metabase-dashboard {
     display: block;
+    width: 100%;
+    height: 100vh;
 }

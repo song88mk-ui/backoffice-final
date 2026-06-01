@@ -2,6 +2,7 @@ using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
 using Backoffice.API.Telemetry;
 using Backoffice.Shared.Data.Backoffice;
+using Backoffice.Shared.Data.Translation;
 using Backoffice.Shared.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -91,6 +92,9 @@ namespace Backoffice.API
                 options.CommandTimeout(dbContextTimeout)));
 
             services.AddDbContextPool<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"], options =>
+                options.CommandTimeout(dbContextTimeout)));
+
+            services.AddDbContextPool<TranslationContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:Translation"], options =>
                 options.CommandTimeout(dbContextTimeout)));
 
             services.AddHttpClient<IRabbitMqRepository, RabbitMqRepository>();

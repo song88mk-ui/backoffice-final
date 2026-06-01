@@ -1,6 +1,8 @@
 ﻿using Backoffice.API.Models;
 using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Data.Backoffice.Entities;
+using Backoffice.Shared.Data.Translation;
+using Backoffice.Shared.Data.Translation.Entities;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Extensions;
 using Backoffice.Shared.Models;
@@ -31,6 +33,7 @@ namespace Backoffice.API.Repositories
     {
         #region Fields
         private readonly BackofficeContext _backofficeContext;
+        private readonly TranslationContext _translationContext;
 
         private readonly IPlatformRepository _platformRepository;
         private readonly ISportsbookRepository _sportsbookRepository;
@@ -44,9 +47,10 @@ namespace Backoffice.API.Repositories
 
         #region Ctor
 
-        public BackofficeRepository(BackofficeContext backofficeContext, IPlatformRepository platformRepository, ISportsbookRepository sportsbookRepository, ITradingRepository tradingRepository, IMemCache memCache, IRabbitMqRepository rabbitMqRepository)
+        public BackofficeRepository(BackofficeContext backofficeContext, TranslationContext translationContext, IPlatformRepository platformRepository, ISportsbookRepository sportsbookRepository, ITradingRepository tradingRepository, IMemCache memCache, IRabbitMqRepository rabbitMqRepository)
         {
             _backofficeContext = backofficeContext;
+            _translationContext = translationContext;
             _platformRepository = platformRepository;
             _sportsbookRepository = sportsbookRepository;
             _tradingRepository = tradingRepository;
@@ -2493,10 +2497,10 @@ namespace Backoffice.API.Repositories
 
             return activityLogs;
         }
-        private List<Translation> GetTranslations()
+        private List<BackofficeStatic> GetTranslations()
         {
-            //return _memCache.GetCache("tr", () => _backofficeContext.Translation.AsNoTracking().ToList(), 24);
-            return _backofficeContext.Translation.AsNoTracking().ToList();
+            //return _memCache.GetCache("tr", () => _translationContext.BackofficeStatic.AsNoTracking().ToList(), 24);
+            return _translationContext.BackofficeStatic.AsNoTracking().ToList();
         }
         private async Task<int> GetAssignedCount(List<string> clientCodes)
         {

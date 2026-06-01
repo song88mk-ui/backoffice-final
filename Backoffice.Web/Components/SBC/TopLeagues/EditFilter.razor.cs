@@ -18,6 +18,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         public SportModel SelectedSport { get; set; }
         public SegmentModel SelectedSegment { get; set; }
         public LeagueModel SelectedLeague { get; set; }
+        public string ErrorMessage { get; set; } = string.Empty;
 
         #endregion
 
@@ -29,21 +30,27 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             SelectedSegment = new SegmentModel();
             SelectedLeague = new LeagueModel();
             SportsTree = new SportsTreeModel();
-
-            SportsTree = (await BackofficeService.GetSportstreeByClientId(ClientId)).Result;
-
-            if (SportsTree != null)
-                SelectedSport = SportsTree.Sports.FirstOrDefault(s => s.SportId == SportId);
-
-            var model = new EditTopLeaguesModel
+            ErrorMessage = string.Empty;
+            try
             {
-                Sports = SportsTree.Sports ?? new List<SportModel>(),
-                SelectedSport = SelectedSport,
-                SelectedSegment = SelectedSegment,
-                SelectedLeague = SelectedLeague
-            };
+                SportsTree = (await BackofficeService.GetSportstreeByClientId(ClientId)).Result;
+                if (SportsTree != null)
+                    SelectedSport = SportsTree.Sports.FirstOrDefault(s => s.SportId == SportId);
 
-            await OnInitCallback.InvokeAsync(model);
+                var model = new EditTopLeaguesModel
+                {
+                    Sports = SportsTree.Sports ?? new List<SportModel>(),
+                    SelectedSport = SelectedSport,
+                    SelectedSegment = SelectedSegment,
+                    SelectedLeague = SelectedLeague
+                };   
+                await OnInitCallback.InvokeAsync(model);         
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Error loading data: {ex.Message}";
+            }
+
         }
 
         public async void OnSegmentChangedEvent(ChangeEventArgs e)
