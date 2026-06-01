@@ -55,7 +55,11 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-end mb-3">
+                            <div class="d-flex justify-content-end mb-3 gap-2">
+                                <button class="btn btn-secondary" @onclick="OnExportToExcel" disabled="@(!CanExportToExcel)">
+                                    <i class="fa fa-file-excel-o me-1"></i>
+                                    Export to Excel
+                                </button>
                                 <button class="add-translation-btn" @onclick="OnAddTranslation">Add Translation</button>
                             </div>
 

@@ -245,6 +245,25 @@ window.password_show_hide2 = (ele) => {
 //    }
 //}
 
+window.downloadFileFromText = (fileName, text, mimeType) => {
+    var blob = new Blob([text], { type: mimeType + ';charset=utf-8;' });
+
+    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(blob, fileName);
+        return;
+    }
+
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function () {
+        URL.revokeObjectURL(link.href);
+    }, 100);
+}
+
 window.ValidateParlayBonusMinOdds = (refEl) => {
     var element = $(refEl);
     var isDisabled = false;

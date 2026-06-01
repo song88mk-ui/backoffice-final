@@ -1,20 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Backoffice.Shared.Enums;
 using Backoffice.Web.Models;
 using Backoffice.Web.Pages.Base;
 using Backoffice.Web.Services;
 using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.SBC
 {
     public partial class StaticTranslation : BasePage
     {
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public TranslationState TranslationState { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; } = null!;
+        [Inject] public IModalService ModalService { get; set; } = null!;
+        [Inject] public TranslationState TranslationState { get; set; } = null!;
+        [Inject] public IJSRuntime JSRuntime { get; set; } = null!;
 
         private PageHeaderModel _pageHeaderModel = new PageHeaderModel()
         {
@@ -22,7 +25,7 @@ namespace Backoffice.Web.Pages.SBC
             IconClass = "ico ico-translations"
         };
 
-        private Dictionary<string, string> Translations { get; set; }
+        private Dictionary<string, string> Translations { get; set; } = new Dictionary<string, string>();
 
         private string _searchText = string.Empty;
         private string SearchText
@@ -99,7 +102,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             if (e.Value != null)
             {
-                SelectedLanguageCode = e.Value.ToString();
+                SelectedLanguageCode = e.Value?.ToString() ?? SelectedLanguageCode;
                 var response = await BackofficeService.GetStaticTranslationSportsbook(SelectedLanguageCode);
                 if (response != null && response.StatusCode == StatusCode.Success && response.Result != null)
                 {
@@ -233,6 +236,40 @@ namespace Backoffice.Web.Pages.SBC
                 PageSize = newSize;
                 ResetPagination();
             }
+        }
+
+        private bool CanExportToExcel => FilteredTranslations.Any();
+
+        private async Task OnExportToExcel()
+        {
+            var csvBuilder = new StringBuilder();
+            csvBuilder.AppendLine("Key,Value");
+
+            foreach (var translation in FilteredTranslations)
+            {
+                csvBuilder.AppendLine($"{EscapeCsv(translation.Key)},{EscapeCsv(translation.Value)}");
+            }
+
+            var fileName = $"StaticTranslations-{SelectedLanguageCode}-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";
+            var csvText = "\uFEFF" + csvBuilder.ToString();
+
+            await JSRuntime.InvokeVoidAsync("downloadFileFromText", fileName, csvText, "text/csv");
+        }
+
+        private string EscapeCsv(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            var escaped = value.Replace("\"", "\"\"");
+            if (escaped.Contains(',') || escaped.Contains('"') || escaped.Contains('\n') || escaped.Contains('\r'))
+            {
+                escaped = $"\"{escaped}\"";
+            }
+
+            return escaped;
         }
     }
 }
