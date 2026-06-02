@@ -1647,8 +1647,7 @@ namespace Backoffice.Web.Services
                                                     { "x-api-key", _configuration["Sportsbook:PlatformApi:Security:APIKey"] },
                                                     { "x-client-id", _configuration["Sportsbook:PlatformApi:Security:ClientId"] },
                                                     { "x-language-code", langCode }
-                                                })
-                                                .GetAsync("https://platform-api.stg.song88.com/v1/sportsbook/translations");
+                                                }).GetAsync($"{_configuration["Sportsbook:PlatformApi:Uri"]}/v1/sportsbook/translations");
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
