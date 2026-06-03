@@ -56,6 +56,8 @@ namespace Backoffice.Web.Services
 
         #region ConfigTemplate
         Task<BaseResponse<TranslationResponse>> GetTranslation(LanguageCode langCode);
+        Task<BaseResponse<List<SportsbookTranslationResponse>>> GetStaticTranslationSportsbook(string langCode);
+
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId);
         Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, CancellationToken cancellationToken = default);
         Task<BaseResponse<long>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);

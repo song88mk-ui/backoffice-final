@@ -9,7 +9,8 @@ namespace Backoffice.Shared.Enums
         Admin,
         SBC,
         PMS,
-        OE
+        OE,
+        Translations
     }
     public enum AdminPermission
     {

@@ -1,0 +1,35 @@
+@inherits BasePage
+@using Backoffice.Web.Models
+
+@page "/sportsbook-translations"
+
+<AuthorizeView>
+    <Authorized>
+        <div class="row">
+            <div class="main-content col-md-12 mb-4 pb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageHeaderModel="_pageHeaderModel" />
+                    </div>
+                    <div class="col-md-12">
+                        <div class="alert alert-info" role="alert">
+                            This is the Sportsbook Translations page. Add your translation management UI here.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <CustomModal />
+    </Authorized>
+    <NotAuthorized>
+        <LoginRedirect />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private PageHeaderModel _pageHeaderModel = new PageHeaderModel()
+    {
+        Title = "Sportsbook Translations",
+        IconClass = "ico ico-translations"
+    };
+}

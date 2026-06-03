@@ -199,6 +199,34 @@ namespace Backoffice.Web.Shared
                     }
                 }
 
+                if (!NavMenus.Menus.Any(m => m.Id == "sub-menu-translations"))
+                {
+                    NavMenus.Menus.Add(new MenuModel
+                    {
+                        Id = "sub-menu-translations",
+                        Name = "Translation",
+                        IconName = "translations",
+                        Url = "#sub-menu-translations",
+                        SubMenus = new List<MenuModel>
+                        {
+                            new MenuModel
+                            {
+                                Id = "menu-static-translation",
+                                Name = "Static Translation",
+                                IconName = "translations",
+                                Url = "translations/static"
+                            },
+                            new MenuModel
+                            {
+                                Id = "menu-dynamic-translation",
+                                Name = "Dynamic Translation",
+                                IconName = "translations",
+                                Url = "translations/dynamic"
+                            }
+                        }
+                    });
+                }
+
                 NavMenuParameter = new NavMenuParameter()
                 {
                     NavMenuAccess = page.Contains("/admin") ? PermissionCategory.Admin : PermissionCategory.SBC,

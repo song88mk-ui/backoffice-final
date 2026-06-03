@@ -1638,6 +1638,46 @@ namespace Backoffice.Web.Services
                 };
             }
         }
+
+        public async Task<BaseResponse<List<SportsbookTranslationResponse>>> GetStaticTranslationSportsbook(string langCode)
+        {
+            try
+            {
+                var response = await _httpClient.WithRequestHeader(new Dictionary<string, string>() {
+                                                    { "x-api-key", _configuration["Sportsbook:PlatformApi:Security:APIKey"] },
+                                                    { "x-client-id", _configuration["Sportsbook:PlatformApi:Security:ClientId"] },
+                                                    { "x-language-code", langCode }
+                                                }).GetAsync($"{_configuration["Sportsbook:PlatformApi:Uri"]}/v1/sportsbook/translations");
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var result = JsonSerializer.Deserialize<BaseResponse<List<SportsbookTranslationResponse>>>(responseContent, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return result;
+                }
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<List<SportsbookTranslationResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(response));
+                        return new BaseResponse<List<SportsbookTranslationResponse>>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<SportsbookTranslationResponse>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
         public async Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId)
         {
             try

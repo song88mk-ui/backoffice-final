@@ -1,0 +1,152 @@
+@inherits BasePage
+@using Backoffice.Web.Models
+@using Backoffice.Web.Components.Common
+@using Backoffice.Web.Shared
+@using Backoffice.Shared.Enums
+@using Microsoft.AspNetCore.Components.Authorization
+
+@page "/translations/dynamic"
+
+<AuthorizeView>
+    <Authorized>
+        <div class="row">
+            <div class="main-content col-md-12 mb-4 pb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageHeaderModel="_pageHeaderModel" />
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class="left-content">
+                        <div class="dropdowns-container">
+                            <div class="dropdown">
+                                <label for="productSelect" class="form-label">Product</label>
+                                <select id="product" class="form-select">
+                                    <option value="EN">English (EN)</option>
+                                    <option value="JA">Japanese (JA)</option>
+                                    <option value="BR">Portuguese (BR)</option>
+                                </select>
+                            </div>
+                            <div class="dropdown">
+                                <label for="statusSelect" class="form-label">Status</label>
+                                <select id="statusSelect" class="form-select">
+                                    <option value="All">All</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="dropdown">
+                                <label for="languageSelect" class="form-label">Select Language</label>
+                                <select id="languageSelect" class="form-select">
+                                    <option value="EN">English (EN)</option>
+                                    <option value="JA">Japanese (JA)</option>
+                                    <option value="BR">Portuguese (BR)</option>
+                                </select>
+                            </div>
+                            <div class="dropdown">
+                                <label for="entityTypeSelect" class="form-label">Entity Type</label>
+                                <select id="entityTypeSelect" class="form-select">
+                                    <option value="All">All</option>
+                                    <option value="Product">Product</option>
+                                    <option value="Category">Category</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table table-striped table-hover">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Default</th>
+                                                <th>Short</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>English</td>
+                                                <td>en_US</td>
+                                                <td>EN</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>Spanish</td>
+                                                <td>es_ES</td>
+                                                <td>ES</td>
+                                            </tr>
+                                            <tr>
+                                                <td>3</td>
+                                                <td>French</td>
+                                                <td>fr_FR</td>
+                                                <td>FR</td>
+                                            </tr>
+                                            <tr>
+                                                <td>4</td>
+                                                <td>German</td>
+                                                <td>de_DE</td>
+                                                <td>DE</td>
+                                            </tr>
+                                            <tr>
+                                                <td>5</td>
+                                                <td>Portuguese</td>
+                                                <td>pt_BR</td>
+                                                <td>PT</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-content">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="search">
+                                    <input type="text" class="form-control"
+                                           placeholder="Search by ID, Name, Default, or Short..." @bind="_searchTerm"
+                                           @oninput="OnSearchChanged" />
+                                </div>
+                            </div>
+                            <span class="label-translation-market">Translation Market</span>
+                            <div class="input-container">
+                                <span class="label-input-text">Default</span>
+                                <input type="text" class="form-control"
+                                           placeholder="Default"/>      
+                            </div>
+                            <div class="input-container">
+                                <span class="label-input-text">Short</span>
+                                <input type="text" class="form-control"
+                                           placeholder="Short"/>      
+                            </div>
+                            <div class="button-container">
+                                <button class="btn btn-primary w-100">Translate</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <CustomModal />
+    </Authorized>
+    <NotAuthorized>
+        <LoginRedirect />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private PageHeaderModel _pageHeaderModel = new PageHeaderModel()
+    {
+        Title = "Dynamic Translation",
+        IconClass = "ico ico-translations"
+    };
+
+    private string _searchTerm = string.Empty;
+
+    private void OnSearchChanged(ChangeEventArgs e)
+    {
+        _searchTerm = e.Value?.ToString() ?? string.Empty;
+    }
+}
