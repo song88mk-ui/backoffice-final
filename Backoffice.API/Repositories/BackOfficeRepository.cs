@@ -8,6 +8,7 @@ using Backoffice.Shared.Extensions;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -2189,50 +2190,8 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<CopyClientConfigResponse>() { StatusCode = StatusCode.Error, Message = ex.Message };
             }
         }
-        public async Task<BaseResponse<TranslationResponse>> GetTranslationsByLanguageCode(LanguageCode langCode)
-        {
-            var languageCode = langCode.ToString().ToUpper();
-            var key = $"tr-{languageCode}";
-
-            var cache = _memCache.GetCache<TranslationResponse>(key);
-
-            if (cache != null)
-                return new BaseResponse<TranslationResponse>
-                {
-                    StatusCode = StatusCode.Success,
-                    Message = StatusCode.Success.ToString(),
-                    Result = cache
-                };
-
-            var translations = GetTranslations();
-            var englishTranslations = translations.Where(c => c.LanguageCode == "EN").ToList();
-            var reqTranslations = translations.Where(c => c.LanguageCode == languageCode).ToList();
 
 
-            var combinedResult = englishTranslations.Concat(reqTranslations)
-                .GroupBy(g => g.Name)
-                .Select(s => new
-                {
-                    Name = s.Key,
-                    s.OrderByDescending(x => reqTranslations.Contains(x)).First().Value
-                })
-                .ToDictionary(s => s.Name, x => x.Value);
-
-            var result = new TranslationResponse()
-            {
-                LanguageCode = languageCode,
-                Translations = combinedResult
-            };
-
-            _memCache.AddOrUpdateCache(key, result, 24);
-
-            return new BaseResponse<TranslationResponse>()
-            {
-                StatusCode = StatusCode.Success,
-                Message = StatusCode.Success.ToString(),
-                Result = result
-            };
-        }
         #endregion
 
         #region Methods - Top Fixtures
@@ -2559,5 +2518,93 @@ namespace Backoffice.API.Repositories
         }
 
         #endregion
+
+        #region Translation
+        public async Task<BaseResponse<bool>> CachePreload(OnDeleteCacheMessage request)
+        {
+
+            await _rabbitMqRepository.Publish(new MessageRequest()
+            {
+                CorrelationId = Guid.NewGuid().ToString(),
+                MessageType = GetMessageType(request.CacheType),
+                RoutingKey = $"r.oe.cachesync.{GetMessageType(request.CacheType).ToLower()}",
+                Payload = JsonSerializer.Serialize(request)
+            });
+
+            return new BaseResponse<bool>()
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = true
+            };
+        }
+
+        public async Task<BaseResponse<TranslationResponse>> GetTranslationsByLanguageCode(LanguageCode langCode)
+        {
+            var languageCode = langCode.ToString().ToUpper();
+            var key = $"tr-{languageCode}";
+
+            var cache = _memCache.GetCache<TranslationResponse>(key);
+
+            if (cache != null)
+                return new BaseResponse<TranslationResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = cache
+                };
+
+            var translations = GetTranslations();
+            var englishTranslations = translations.Where(c => c.LanguageCode == "EN").ToList();
+            var reqTranslations = translations.Where(c => c.LanguageCode == languageCode).ToList();
+
+
+            var combinedResult = englishTranslations.Concat(reqTranslations)
+                .GroupBy(g => g.Name)
+                .Select(s => new
+                {
+                    Name = s.Key,
+                    s.OrderByDescending(x => reqTranslations.Contains(x)).First().Value
+                })
+                .ToDictionary(s => s.Name, x => x.Value);
+
+            var result = new TranslationResponse()
+            {
+                LanguageCode = languageCode,
+                Translations = combinedResult
+            };
+
+            _memCache.AddOrUpdateCache(key, result, 24);
+
+            return new BaseResponse<TranslationResponse>()
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = result
+            };
+        }
+        #endregion
+
+        #region Private Methods
+
+        private static string GetMessageType(CacheType cacheType)
+        {
+            return cacheType switch
+            {
+                CacheType.MarketSortOrder => "OnMarketSortOrderChange",
+                CacheType.SportSortOrder => "OnSportSortOrderChange",
+                CacheType.UserFavorites => "OnUpdateUserFavorites",
+                CacheType.Maintenance => "OnMaintenance",
+                CacheType.ParlayBonus => "OnParlayBonusChange",
+                CacheType.Client => "OnClientChange",
+                CacheType.DynamicTranslation => "OnDynamicTranslationChange",
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(cacheType),
+                    cacheType,
+                    "Unsupported cache type")
+            };
+        }
+        #endregion
     }
+
 }

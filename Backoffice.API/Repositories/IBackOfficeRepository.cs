@@ -3,6 +3,7 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -35,7 +36,6 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1, LanguageCode langCode = LanguageCode.EN);
         Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMarginById(long templateId);
         Task<BaseResponse<bool>> AddOrUpdateConfigTemplateMargin(ConfigTemplateMarginModel request);
-        Task<BaseResponse<CopyClientConfigResponse>> CopyClientConfig(CopyClientConfigRequest request);
         #endregion
 
         #region TOP FIXTURES
@@ -46,5 +46,10 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request, List<string> brands = null);
 
         Task<BaseResponse<TranslationResponse>> GetTranslationsByLanguageCode(LanguageCode langCode);
+
+        #region Translation
+        Task<BaseResponse<CopyClientConfigResponse>> CopyClientConfig(CopyClientConfigRequest request);
+        Task<BaseResponse<bool>> CachePreload(OnDeleteCacheMessage request);
+        #endregion
     }
 }

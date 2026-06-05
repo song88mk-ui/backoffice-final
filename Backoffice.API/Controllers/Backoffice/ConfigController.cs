@@ -6,6 +6,7 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -321,7 +322,7 @@ namespace Backoffice.API.Controllers.Backoffice
             switch (result.StatusCode)
             {
                 case BoStatusCode.Success:
-                    return Ok(result);
+                       return Ok(result);
                 default:
                     return BadRequest(result);
             }
@@ -329,6 +330,45 @@ namespace Backoffice.API.Controllers.Backoffice
         #endregion
 
         #region Translation
+
+        [HttpPost("cachepreload")]
+        public async Task<IActionResult> CachePreload([FromBody] OnDeleteCacheMessage request)
+        {
+            if (request == null)
+            {
+                return BadRequest("Request is required.");
+            }
+
+            // DynamicTranslation validation
+            if (request.CacheType == CacheType.DynamicTranslation)
+            {
+                if (request.CacheKeys == null || !request.CacheKeys.Any())
+                {
+                    return BadRequest("CacheKeys is required for DynamicTranslation.");
+                }
+
+                if (!Enum.IsDefined(typeof(LanguageCode), request.LanguageCode))
+                {
+                    return BadRequest("LanguageCode is required for DynamicTranslation.");
+                }
+            }
+            // Other cache types validation
+            else
+            {
+                if (string.IsNullOrWhiteSpace(request.CacheKey))
+                {
+                    return BadRequest("CacheKey is required.");
+                }
+            }
+
+            var result = await _backofficeRepository.CachePreload(request);
+
+            return Ok(new
+            {
+                Success = true,
+                Message = "Cache invalidation request published successfully.",
+            });
+        }
 
         [AllowAnonymous]
         [HttpGet("translations")]
