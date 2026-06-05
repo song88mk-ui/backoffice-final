@@ -12,6 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+        [Inject] public ToastService ToastService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
@@ -68,13 +69,17 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                 });
             }
 
-            // Load sports
+            // Load sports from the same lookup used by the MarketSortOrder filter so both lists match.
             try
             {
-                var sportsResponse = await TradingService.GetSports(0); // 0 for all fixture types
-                if (sportsResponse != null && sportsResponse.Result != null)
+                var sportsResponse = await _backofficeService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
+                if (sportsResponse?.Result?.SportLookup != null)
                 {
-                    Sports = sportsResponse.Result.Sports ?? new List<Backoffice.Web.Models.SportModel>();
+                    Sports = sportsResponse.Result.SportLookup.Select(s => new Backoffice.Web.Models.SportModel
+                    {
+                        SportId = s.SportId,
+                        SportName = s.SportName
+                    }).ToList();
                 }
             }
             catch (Exception ex)
@@ -115,17 +120,33 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         public async Task OnCopyClickEvent()
         {
-            if (string.IsNullOrEmpty(SelectedClientCode) || FromClientCode == SelectedClientCode || SelectedSportId <= 0 || SelectedScopeId < 0)
+            if (string.IsNullOrEmpty(SelectedClientCode) || SelectedSportId <= 0 || SelectedScopeId < 0)
+            {
+                ToastService.AddToast(Toast.NewToast(
+                    _translationState.GetValue("Copy Market Sort Order"),
+                    _translationState.GetValue("Please select the client, sport, and scope you want to copy to.")));
                 return;
+            }
+
+            if (FromClientCode == SelectedClientCode && SelectedSportId == FromSportId && SelectedScopeId == FromFixtureStatusId)
+            {
+                ToastService.AddToast(Toast.NewToast(
+                    _translationState.GetValue("Copy Market Sort Order"),
+                    _translationState.GetValue("You're copying to the same client, sport, and scope. Change at least one before copying.")));
+                return;
+            }
 
             var fromClient = ClientInformations.FirstOrDefault(c => c.ClientCode == FromClientCode);
             var toClient = ClientInformations.FirstOrDefault(c => c.ClientCode == SelectedClientCode);
 
+            var toSportName = Sports.FirstOrDefault(s => s.SportId == SelectedSportId)?.SportName;
+            var toScopeName = Scopes.FirstOrDefault(s => s.Value == SelectedScopeId)?.Name;
+
             var parameters = new ModalParameters();
 
             parameters.Add("ClientName", toClient.ClientName);
-            parameters.Add("SportName", ModalParameters.TryGet<string>("FromSportName"));
-            parameters.Add("FixtureStatusName", ModalParameters.TryGet<string>("FromFixtureStatusName"));
+            parameters.Add("SportName", toSportName);
+            parameters.Add("FixtureStatusName", toScopeName);
 
             parameters.Add("FromClientId", fromClient.ClientId);
             parameters.Add("ToClientId", toClient.ClientId);
