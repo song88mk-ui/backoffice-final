@@ -106,7 +106,6 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                     Value = s.SportId.ToString(),
                     Name = s.SportName
                 }).ToList();
-                var sport = Sports.FirstOrDefault(c => c.Value == "17");
                 var sport = Sports.FirstOrDefault(c => c.Value == ((int)Backoffice.Shared.Enums.Sport.Soccer).ToString());
 
                 SelectedSportId = sport.Value;
