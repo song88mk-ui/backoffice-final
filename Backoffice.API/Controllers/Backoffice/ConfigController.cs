@@ -332,6 +332,7 @@ namespace Backoffice.API.Controllers.Backoffice
         #region Translation
 
         [HttpPost("cachepreload")]
+        [AllowAnonymous]
         public async Task<IActionResult> CachePreload([FromBody] OnDeleteCacheMessage request)
         {
             if (request == null)
