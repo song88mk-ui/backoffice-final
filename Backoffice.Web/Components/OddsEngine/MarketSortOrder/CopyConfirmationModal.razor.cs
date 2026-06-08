@@ -42,19 +42,22 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             var fromClientId = ModalParameters.TryGet<Guid>("FromClientId");
             var toClientId = ModalParameters.TryGet<Guid>("ToClientId");
 
-            var sportId = ModalParameters.TryGet<int>("SportId");
-            var fixtureStatusId = ModalParameters.TryGet<int>("FixtureStatusId");
+            var fromSportId = ModalParameters.TryGet<int>("SportId");
+            var fromFixtureStatusId = ModalParameters.TryGet<int>("FixtureStatusId");
+
+            var toSportId = ModalParameters.TryGet<int>("SelectedSportId");
+            var toFixtureStatusId = ModalParameters.TryGet<int>("SelectedScopeId");
 
             var userId = ModalParameters.TryGet<string>("UserId");
 
             var request = new CopyClientMarketSortOrderRequest
             {
                 CopyFromClientId = fromClientId,
-                CopyFromSportId = sportId,
-                CopyFromFixtureStatusId = fixtureStatusId,
+                CopyFromSportId = fromSportId,
+                CopyFromFixtureStatusId = fromFixtureStatusId,
                 CopyToClientId = toClientId,
-                CopyToSportId = sportId,
-                CopyToFixtureStatusId = fixtureStatusId,
+                CopyToSportId = toSportId,
+                CopyToFixtureStatusId = toFixtureStatusId,
                 UserId = userId
             };
 
