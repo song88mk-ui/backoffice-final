@@ -340,27 +340,32 @@ namespace Backoffice.API.Controllers.Backoffice
                 return BadRequest("Request is required.");
             }
 
-            // DynamicTranslation validation
-            if (request.CacheType == CacheType.DynamicTranslation)
+            if (!request.PurgeAll)
             {
-                if (request.CacheKeys == null || !request.CacheKeys.Any())
+                if (request.CacheType == CacheType.DynamicTranslation)
                 {
-                    return BadRequest("CacheKeys is required for DynamicTranslation.");
-                }
+                    if (request.CacheKeys == null || !request.CacheKeys.Any())
+                    {
+                        return BadRequest(
+                            "CacheKeys is required for DynamicTranslation when InvalidateAll is false.");
+                    }
 
-                if (!Enum.IsDefined(typeof(LanguageCode), request.LanguageCode))
+                    if (!Enum.IsDefined(typeof(LanguageCode), request.LanguageCode))
+                    {
+                        return BadRequest(
+                            "LanguageCode is required for DynamicTranslation.");
+                    }
+                }
+                else
                 {
-                    return BadRequest("LanguageCode is required for DynamicTranslation.");
+                    if (string.IsNullOrWhiteSpace(request.CacheKey))
+                    {
+                        return BadRequest(
+                            "CacheKey is required when InvalidateAll is false.");
+                    }
                 }
             }
-            // Other cache types validation
-            else
-            {
-                if (string.IsNullOrWhiteSpace(request.CacheKey))
-                {
-                    return BadRequest("CacheKey is required.");
-                }
-            }
+
 
             var result = await _backofficeRepository.CachePreload(request);
 

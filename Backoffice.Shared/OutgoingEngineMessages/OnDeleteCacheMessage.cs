@@ -12,5 +12,6 @@ namespace Backoffice.Shared.OutgoingEngineMessages
         public string CacheKey { get; set; } = string.Empty;
         public List<string> CacheKeys { get; set; } = new List<string>();
         public LanguageCode LanguageCode { get; set; } = LanguageCode.EN;
+        public bool PurgeAll { get; set; } = false;
     }
 }
