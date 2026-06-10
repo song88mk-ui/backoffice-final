@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -544,6 +545,18 @@ namespace Backoffice.API.Repositories
                 //    await _tradingContext.SaveChangesAsync();
                 //    scope.Complete();
                 //}
+
+                await Publish(new MessageRequest
+                {
+                    Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                    {
+                        ClientCode = request.ClientCode,
+                        CacheType = CacheType.SportSortOrder
+                    }),
+                    CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                    MessageType = "OnSportSortOrderChange",
+                    RoutingKey = $"r.oe.cachesync.onsportsortorderchange"
+                }, "HK");
             }
             catch (Exception ex)
             {
@@ -856,7 +869,21 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient().PostAsync($"client/markettemplatesorder", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
+                {
+                    await Publish(new MessageRequest
+                    {
+                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                        {
+                            ClientId = request.ClientId,
+                            ClientCode = request.ClientCode,
+                            CacheType = CacheType.MarketSortOrder
+                        }),
+                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                        MessageType = "OnMarketSortOrderChange",
+                        RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
+                    }, "HK");
                     return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
@@ -962,6 +989,18 @@ namespace Backoffice.API.Repositories
                 //    TimeStamp = DateTime.UtcNow,
                 //});
                 await _sportsbookContext.SaveChangesAsync();
+
+                await Publish(new MessageRequest
+                {
+                    Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                    {
+                        ClientId = request.CopyToClientId,
+                        CacheType = CacheType.MarketSortOrder
+                    }),
+                    CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                    MessageType = "OnMarketSortOrderChange",
+                    RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
+                }, "HK");
 
                 return new BaseResponse<bool>
                 {

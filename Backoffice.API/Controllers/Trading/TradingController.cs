@@ -481,21 +481,21 @@ namespace Backoffice.API.Controllers.Trading
                     return BadRequest(result);
             }
         }
-        [HttpPost("client/sportsettings")]
-        public async Task<IActionResult> AddOrUpdateClientSportSettings([FromBody] ClientSportSettingRequest request)
-        {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+        //[HttpPost("client/sportsettings")]
+        //public async Task<IActionResult> AddOrUpdateClientSportSettings([FromBody] ClientSportSettingRequest request)
+        //{
+        //    var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.AddOrUpdateClientSportSettings(request, region);
+        //    var result = await _tradingRepository.AddOrUpdateClientSportSettings(request, region);
 
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
+        //    switch (result.StatusCode)
+        //    {
+        //        case Shared.Enums.StatusCode.Success:
+        //            return Ok(result);
+        //        default:
+        //            return BadRequest(result);
+        //    }
+        //}
 
         [HttpPost("client/sportorder/list")]
         public async Task<IActionResult> GetClientSportOrderList([FromBody] ClientSportOrderListRequest request)

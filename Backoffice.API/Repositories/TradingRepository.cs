@@ -722,315 +722,315 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<ClientSportSettingResponse>> AddOrUpdateClientSportSettings(ClientSportSettingRequest request, string region)
-        {
-            try
-            {
-                var response = await GetHttpClient(region).PostAsync($"client/sportsettings", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+        //public async Task<BaseResponse<ClientSportSettingResponse>> AddOrUpdateClientSportSettings(ClientSportSettingRequest request, string region)
+        //{
+        //    try
+        //    {
+        //        var response = await GetHttpClient(region).PostAsync($"client/sportsettings", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                if (response.IsSuccessStatusCode)
-                {
-                    await Publish(new MessageRequest
-                    {
-                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
-                        {
-                            ClientCode = request.ClientCode,
-                            CacheType = CacheType.SportSortOrder
-                        }),
-                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
-                        MessageType = "OnSportSortOrderChange",
-                        RoutingKey = $"r.oe.cachesync.onsportsortorderchange"
-                    }, "HK");
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            await Publish(new MessageRequest
+        //            {
+        //                Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+        //                {
+        //                    ClientCode = request.ClientCode,
+        //                    CacheType = CacheType.SportSortOrder
+        //                }),
+        //                CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+        //                MessageType = "OnSportSortOrderChange",
+        //                RoutingKey = $"r.oe.cachesync.onsportsortorderchange"
+        //            }, "HK");
 
-                    return JsonSerializer.Deserialize<BaseResponse<ClientSportSettingResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                }
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientSportSettingResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<ClientSportSettingResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<ClientSportSettingResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
+        //            return JsonSerializer.Deserialize<BaseResponse<ClientSportSettingResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //        }
+        //        else
+        //        {
+        //            if (response.StatusCode == HttpStatusCode.BadRequest)
+        //                return JsonSerializer.Deserialize<BaseResponse<ClientSportSettingResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //            else
+        //            {
+        //                return new BaseResponse<ClientSportSettingResponse>
+        //                {
+        //                    StatusCode = StatusCode.Error,
+        //                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+        //                };
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new BaseResponse<ClientSportSettingResponse>
+        //        {
+        //            StatusCode = StatusCode.Error,
+        //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+        //        };
+        //    }
+        //}
 
-        public async Task<BaseResponse<List<ClientSportOrderListResponse>>> GetClientSportOrderList(ClientSportOrderListRequest request, string langCode, string region)
-        {
-            try
-            {
-                var response = await GetHttpClient(region, langCode).PostAsync($"client/sportorder/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+        //public async Task<BaseResponse<List<ClientSportOrderListResponse>>> GetClientSportOrderList(ClientSportOrderListRequest request, string langCode, string region)
+        //{
+        //    try
+        //    {
+        //        var response = await GetHttpClient(region, langCode).PostAsync($"client/sportorder/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<ClientSportOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<ClientSportOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<List<ClientSportOrderListResponse>>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<List<ClientSportOrderListResponse>>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-        public async Task<BaseResponse<List<ClientSportOrderAuditResponse>>> GetClientSportOrderAuditList(ClientSportOrderAuditRequest request, string region)
-        {
-            try
-            {
-                var response = await GetHttpClient(region).PostAsync($"client/sportorder/audit/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+        //        if (response.IsSuccessStatusCode)
+        //            return JsonSerializer.Deserialize<BaseResponse<List<ClientSportOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //        else
+        //        {
+        //            if (response.StatusCode == HttpStatusCode.BadRequest)
+        //                return JsonSerializer.Deserialize<BaseResponse<List<ClientSportOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //            else
+        //            {
+        //                return new BaseResponse<List<ClientSportOrderListResponse>>
+        //                {
+        //                    StatusCode = StatusCode.Error,
+        //                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+        //                };
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new BaseResponse<List<ClientSportOrderListResponse>>
+        //        {
+        //            StatusCode = StatusCode.Error,
+        //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+        //        };
+        //    }
+        //}
+        //public async Task<BaseResponse<List<ClientSportOrderAuditResponse>>> GetClientSportOrderAuditList(ClientSportOrderAuditRequest request, string region)
+        //{
+        //    try
+        //    {
+        //        var response = await GetHttpClient(region).PostAsync($"client/sportorder/audit/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<ClientSportOrderAuditResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<ClientSportOrderAuditResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<List<ClientSportOrderAuditResponse>>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<List<ClientSportOrderAuditResponse>>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-        public async Task<BaseResponse<List<ClientSegmentOrderListResponse>>> GetClientSegmentOrderList(ClientSegmentOrderListRequest request, string region)
-        {
-            try
-            {
-                var response = await GetHttpClient(region).PostAsync($"client/segmentorder/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+        //        if (response.IsSuccessStatusCode)
+        //            return JsonSerializer.Deserialize<BaseResponse<List<ClientSportOrderAuditResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //        else
+        //        {
+        //            if (response.StatusCode == HttpStatusCode.BadRequest)
+        //                return JsonSerializer.Deserialize<BaseResponse<List<ClientSportOrderAuditResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //            else
+        //            {
+        //                return new BaseResponse<List<ClientSportOrderAuditResponse>>
+        //                {
+        //                    StatusCode = StatusCode.Error,
+        //                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+        //                };
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new BaseResponse<List<ClientSportOrderAuditResponse>>
+        //        {
+        //            StatusCode = StatusCode.Error,
+        //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+        //        };
+        //    }
+        //}
+        //public async Task<BaseResponse<List<ClientSegmentOrderListResponse>>> GetClientSegmentOrderList(ClientSegmentOrderListRequest request, string region)
+        //{
+        //    try
+        //    {
+        //        var response = await GetHttpClient(region).PostAsync($"client/segmentorder/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<ClientSegmentOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<ClientSegmentOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<List<ClientSegmentOrderListResponse>>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<List<ClientSegmentOrderListResponse>>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-        public async Task<BaseResponse<List<ClientLeagueOrderListResponse>>> GetClientLeagueOrderList(ClientLeagueOrderListRequest request, string region)
-        {
-            try
-            {
-                var response = await GetHttpClient(region).PostAsync($"client/leagueorder/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+        //        if (response.IsSuccessStatusCode)
+        //            return JsonSerializer.Deserialize<BaseResponse<List<ClientSegmentOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //        else
+        //        {
+        //            if (response.StatusCode == HttpStatusCode.BadRequest)
+        //                return JsonSerializer.Deserialize<BaseResponse<List<ClientSegmentOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //            else
+        //            {
+        //                return new BaseResponse<List<ClientSegmentOrderListResponse>>
+        //                {
+        //                    StatusCode = StatusCode.Error,
+        //                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+        //                };
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new BaseResponse<List<ClientSegmentOrderListResponse>>
+        //        {
+        //            StatusCode = StatusCode.Error,
+        //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+        //        };
+        //    }
+        //}
+        //public async Task<BaseResponse<List<ClientLeagueOrderListResponse>>> GetClientLeagueOrderList(ClientLeagueOrderListRequest request, string region)
+        //{
+        //    try
+        //    {
+        //        var response = await GetHttpClient(region).PostAsync($"client/leagueorder/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<ClientLeagueOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<ClientLeagueOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<List<ClientLeagueOrderListResponse>>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<List<ClientLeagueOrderListResponse>>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-        public async Task<BaseResponse<ClientMarketTemplateGroupResponse>> GetClientMarketTemplateGroups(string clientCode, int sportId, int fixtureStatusId, string region)
-        {
-            try
-            {
-                var response = await GetHttpClient(region).GetAsync($"client/marketgroup/{clientCode}/{sportId}/{fixtureStatusId}");
+        //        if (response.IsSuccessStatusCode)
+        //            return JsonSerializer.Deserialize<BaseResponse<List<ClientLeagueOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //        else
+        //        {
+        //            if (response.StatusCode == HttpStatusCode.BadRequest)
+        //                return JsonSerializer.Deserialize<BaseResponse<List<ClientLeagueOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //            else
+        //            {
+        //                return new BaseResponse<List<ClientLeagueOrderListResponse>>
+        //                {
+        //                    StatusCode = StatusCode.Error,
+        //                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+        //                };
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new BaseResponse<List<ClientLeagueOrderListResponse>>
+        //        {
+        //            StatusCode = StatusCode.Error,
+        //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+        //        };
+        //    }
+        //}
+        //public async Task<BaseResponse<ClientMarketTemplateGroupResponse>> GetClientMarketTemplateGroups(string clientCode, int sportId, int fixtureStatusId, string region)
+        //{
+        //    try
+        //    {
+        //        var response = await GetHttpClient(region).GetAsync($"client/marketgroup/{clientCode}/{sportId}/{fixtureStatusId}");
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<ClientMarketTemplateGroupResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<ClientMarketTemplateGroupResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-        public async Task<BaseResponse<ClientMarketTemplateResponse>> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId, string langCode, string region)
-        {
-            try
-            {
-                var response = await GetHttpClient(region, langCode).GetAsync($"client/markettemplate/{clientCode}/{sportId}/{fixtureStatusId}");
+        //        if (response.IsSuccessStatusCode)
+        //            return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //        else
+        //        {
+        //            if (response.StatusCode == HttpStatusCode.BadRequest)
+        //                return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //            else
+        //            {
+        //                return new BaseResponse<ClientMarketTemplateGroupResponse>
+        //                {
+        //                    StatusCode = StatusCode.Error,
+        //                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+        //                };
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new BaseResponse<ClientMarketTemplateGroupResponse>
+        //        {
+        //            StatusCode = StatusCode.Error,
+        //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+        //        };
+        //    }
+        //}
+        //public async Task<BaseResponse<ClientMarketTemplateResponse>> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId, string langCode, string region)
+        //{
+        //    try
+        //    {
+        //        var response = await GetHttpClient(region, langCode).GetAsync($"client/markettemplate/{clientCode}/{sportId}/{fixtureStatusId}");
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<ClientMarketTemplateResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<ClientMarketTemplateResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-        public async Task<BaseResponse<ClientMarketTemplateResponse>> AddOrUpdateClientMarketTemplatesOrder(ClientMarketTemplateRequest request, string region)
-        {
-            try
-            {
-                var response = await GetHttpClient(region).PostAsync($"client/markettemplate", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+        //        if (response.IsSuccessStatusCode)
+        //            return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //        else
+        //        {
+        //            if (response.StatusCode == HttpStatusCode.BadRequest)
+        //                return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //            else
+        //            {
+        //                return new BaseResponse<ClientMarketTemplateResponse>
+        //                {
+        //                    StatusCode = StatusCode.Error,
+        //                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+        //                };
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new BaseResponse<ClientMarketTemplateResponse>
+        //        {
+        //            StatusCode = StatusCode.Error,
+        //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+        //        };
+        //    }
+        //}
+        //public async Task<BaseResponse<ClientMarketTemplateResponse>> AddOrUpdateClientMarketTemplatesOrder(ClientMarketTemplateRequest request, string region)
+        //{
+        //    try
+        //    {
+        //        var response = await GetHttpClient(region).PostAsync($"client/markettemplate", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                if (response.IsSuccessStatusCode)
-                {
-                    await Publish(new MessageRequest
-                    {
-                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
-                        {
-                            ClientId = request.ClientId,
-                            ClientCode = request.ClientCode,
-                            CacheType = CacheType.MarketSortOrder
-                        }),
-                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
-                        MessageType = "OnMarketSortOrderChange",
-                        RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
-                    }, "HK");
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            await Publish(new MessageRequest
+        //            {
+        //                Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+        //                {
+        //                    ClientId = request.ClientId,
+        //                    ClientCode = request.ClientCode,
+        //                    CacheType = CacheType.MarketSortOrder
+        //                }),
+        //                CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+        //                MessageType = "OnMarketSortOrderChange",
+        //                RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
+        //            }, "HK");
 
-                    return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                }
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<ClientMarketTemplateResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<ClientMarketTemplateResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-        public async Task<BaseResponse<bool>> CopyClientMarketTemplatesOrder(CopyClientMarketSortOrderRequest request, string region)
-        {
-            try
-            {
-                var response = await GetHttpClient(region).PostAsync($"client/markettemplate/copy", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+        //            return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //        }
+        //        else
+        //        {
+        //            if (response.StatusCode == HttpStatusCode.BadRequest)
+        //                return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //            else
+        //            {
+        //                return new BaseResponse<ClientMarketTemplateResponse>
+        //                {
+        //                    StatusCode = StatusCode.Error,
+        //                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+        //                };
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new BaseResponse<ClientMarketTemplateResponse>
+        //        {
+        //            StatusCode = StatusCode.Error,
+        //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+        //        };
+        //    }
+        //}
+        //public async Task<BaseResponse<bool>> CopyClientMarketTemplatesOrder(CopyClientMarketSortOrderRequest request, string region)
+        //{
+        //    try
+        //    {
+        //        var response = await GetHttpClient(region).PostAsync($"client/markettemplate/copy", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<bool>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
+        //        if (response.IsSuccessStatusCode)
+        //            return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //        else
+        //        {
+        //            if (response.StatusCode == HttpStatusCode.BadRequest)
+        //                return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        //            else
+        //            {
+        //                return new BaseResponse<bool>
+        //                {
+        //                    StatusCode = StatusCode.Error,
+        //                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+        //                };
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new BaseResponse<bool>
+        //        {
+        //            StatusCode = StatusCode.Error,
+        //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+        //        };
+        //    }
+        //}
 
         #endregion
 
