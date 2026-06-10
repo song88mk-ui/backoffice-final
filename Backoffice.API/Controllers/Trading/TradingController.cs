@@ -497,133 +497,133 @@ namespace Backoffice.API.Controllers.Trading
         //    }
         //}
 
-        [HttpPost("client/sportorder/list")]
-        public async Task<IActionResult> GetClientSportOrderList([FromBody] ClientSportOrderListRequest request)
-        {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
-            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
+        //[HttpPost("client/sportorder/list")]
+        //public async Task<IActionResult> GetClientSportOrderList([FromBody] ClientSportOrderListRequest request)
+        //{
+        //    var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+        //    var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetClientSportOrderList(request, langCode, region);
+        //    var result = await _tradingRepository.GetClientSportOrderList(request, langCode, region);
 
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-        [HttpPost("client/sportorder/audit/list")]
-        public async Task<IActionResult> GetClientSportOrderAuditList([FromBody] ClientSportOrderAuditRequest request)
-        {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+        //    switch (result.StatusCode)
+        //    {
+        //        case Shared.Enums.StatusCode.Success:
+        //            return Ok(result);
+        //        default:
+        //            return BadRequest(result);
+        //    }
+        //}
+        //[HttpPost("client/sportorder/audit/list")]
+        //public async Task<IActionResult> GetClientSportOrderAuditList([FromBody] ClientSportOrderAuditRequest request)
+        //{
+        //    var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetClientSportOrderAuditList(request, region);
+        //    var result = await _tradingRepository.GetClientSportOrderAuditList(request, region);
 
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
+        //    switch (result.StatusCode)
+        //    {
+        //        case Shared.Enums.StatusCode.Success:
+        //            return Ok(result);
+        //        default:
+        //            return BadRequest(result);
+        //    }
+        //}
 
-        [HttpPost("client/segmentorder/list")]
-        public async Task<IActionResult> GetClientSegmentOrderList([FromBody] ClientSegmentOrderListRequest request)
-        {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+        //[HttpPost("client/segmentorder/list")]
+        //public async Task<IActionResult> GetClientSegmentOrderList([FromBody] ClientSegmentOrderListRequest request)
+        //{
+        //    var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetClientSegmentOrderList(request, region);
+        //    var result = await _tradingRepository.GetClientSegmentOrderList(request, region);
 
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
+        //    switch (result.StatusCode)
+        //    {
+        //        case Shared.Enums.StatusCode.Success:
+        //            return Ok(result);
+        //        default:
+        //            return BadRequest(result);
+        //    }
+        //}
 
-        [HttpPost("client/leagueorder/list")]
-        public async Task<IActionResult> GetClientLeagueOrderList([FromBody] ClientLeagueOrderListRequest request)
-        {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+        //[HttpPost("client/leagueorder/list")]
+        //public async Task<IActionResult> GetClientLeagueOrderList([FromBody] ClientLeagueOrderListRequest request)
+        //{
+        //    var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetClientLeagueOrderList(request, region);
+        //    var result = await _tradingRepository.GetClientLeagueOrderList(request, region);
 
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-        [HttpGet("client/marketgroup/{clientCode}/{sportId}/{fixtureStatusId}")]
-        public async Task<IActionResult> GetClientMarketTemplateGroups(string clientCode, int sportId, int fixtureStatusId)
-        {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+        //    switch (result.StatusCode)
+        //    {
+        //        case Shared.Enums.StatusCode.Success:
+        //            return Ok(result);
+        //        default:
+        //            return BadRequest(result);
+        //    }
+        //}
+        //[HttpGet("client/marketgroup/{clientCode}/{sportId}/{fixtureStatusId}")]
+        //public async Task<IActionResult> GetClientMarketTemplateGroups(string clientCode, int sportId, int fixtureStatusId)
+        //{
+        //    var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetClientMarketTemplateGroups(clientCode, sportId, fixtureStatusId, region);
+        //    var result = await _tradingRepository.GetClientMarketTemplateGroups(clientCode, sportId, fixtureStatusId, region);
 
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
+        //    switch (result.StatusCode)
+        //    {
+        //        case Shared.Enums.StatusCode.Success:
+        //            return Ok(result);
+        //        default:
+        //            return BadRequest(result);
+        //    }
+        //}
 
-        [HttpGet("client/markettemplate/{clientCode}/{sportId}/{fixtureStatusId}")]
-        public async Task<IActionResult> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId)
-        {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
-            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
+        //[HttpGet("client/markettemplate/{clientCode}/{sportId}/{fixtureStatusId}")]
+        //public async Task<IActionResult> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId)
+        //{
+        //    var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+        //    var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetClientMarketTemplates(clientCode, sportId, fixtureStatusId, langCode, region);
+        //    var result = await _tradingRepository.GetClientMarketTemplates(clientCode, sportId, fixtureStatusId, langCode, region);
 
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
+        //    switch (result.StatusCode)
+        //    {
+        //        case Shared.Enums.StatusCode.Success:
+        //            return Ok(result);
+        //        default:
+        //            return BadRequest(result);
+        //    }
+        //}
 
-        [HttpPost("client/markettemplate")]
-        public async Task<IActionResult> AddOrUpdateClientMarketTemplatesOrder([FromBody] ClientMarketTemplateRequest request)
-        {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+        //[HttpPost("client/markettemplate")]
+        //public async Task<IActionResult> AddOrUpdateClientMarketTemplatesOrder([FromBody] ClientMarketTemplateRequest request)
+        //{
+        //    var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.AddOrUpdateClientMarketTemplatesOrder(request, region);
+        //    var result = await _tradingRepository.AddOrUpdateClientMarketTemplatesOrder(request, region);
 
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
+        //    switch (result.StatusCode)
+        //    {
+        //        case Shared.Enums.StatusCode.Success:
+        //            return Ok(result);
+        //        default:
+        //            return BadRequest(result);
+        //    }
+        //}
 
-        [HttpPost("client/markettemplate/copy")]
-        public async Task<IActionResult> CopyClientMarketTemplatesOrder([FromBody] CopyClientMarketSortOrderRequest request)
-        {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+        //[HttpPost("client/markettemplate/copy")]
+        //public async Task<IActionResult> CopyClientMarketTemplatesOrder([FromBody] CopyClientMarketSortOrderRequest request)
+        //{
+        //    var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.CopyClientMarketTemplatesOrder(request, region);
+        //    var result = await _tradingRepository.CopyClientMarketTemplatesOrder(request, region);
 
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
+        //    switch (result.StatusCode)
+        //    {
+        //        case Shared.Enums.StatusCode.Success:
+        //            return Ok(result);
+        //        default:
+        //            return BadRequest(result);
+        //    }
+        //}
 
         #endregion
 
