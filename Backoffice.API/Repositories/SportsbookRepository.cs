@@ -204,24 +204,40 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                if (request.IsAdd)
+                // Always ensure "All Markets" exists and is up-to-date
+                var marketTemplateIds = (await GetMarketLookup(new MarketLookupRequest
                 {
-                    foreach (var marketGroup in request.MarketTemplateGroups)
-                    {
-                        if (marketGroup.Name.ToLower() == "all markets" && string.IsNullOrEmpty(marketGroup.MarketTemplateIds))
-                        {
-                            var marketTemplateIds = (await GetMarketLookup(new MarketLookupRequest
-                            {
-                                FixtureTypeId = (int)FixtureType.Match,
-                                SportId = request.SportId
-                            })).Result.MarketLookup
-                                .Select(s => s.MarketTemplateId)
-                                .OrderBy(o => int.Parse(o))
-                                .ToList();
+                    FixtureTypeId = (int)FixtureType.Match,
+                    SportId = request.SportId
+                })).Result.MarketLookup
+                .Select(x => x.MarketTemplateId).OrderBy(x => int.Parse(x)).ToList();
 
-                            marketGroup.MarketTemplateIds = marketTemplateIds != null && marketTemplateIds.Any() ? string.Join(",", marketTemplateIds) : string.Empty;
-                        }
-                    }
+                var allMarketTemplateIds = marketTemplateIds.Any()
+                    ? string.Join(",", marketTemplateIds)
+                    : string.Empty;
+
+                var allMarketsGroup = request.MarketTemplateGroups
+                    .FirstOrDefault(x =>
+                        string.Equals(
+                            x.Name,
+                            "All Markets",
+                            StringComparison.OrdinalIgnoreCase));
+
+                if (allMarketsGroup != null)
+                {
+                    // Force correct values
+                    allMarketsGroup.SortOrder = 0;
+                    allMarketsGroup.MarketTemplateIds = allMarketTemplateIds;
+                }
+                else
+                {
+                    request.MarketTemplateGroups.Add(new ClientMarketTemplateGroupDTO
+                    {
+                        Name = "All Markets",
+                        SortOrder = 0,
+                        MarketTemplateIds = allMarketTemplateIds,
+                        IsActive = true
+                    });
                 }
 
                 var response = await GetHttpClient(region).PostAsync($"client/markettemplategroup/post", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));

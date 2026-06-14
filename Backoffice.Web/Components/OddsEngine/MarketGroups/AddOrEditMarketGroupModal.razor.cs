@@ -54,7 +54,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             IsPreLoader = true;
             await InvokeAsync(StateHasChanged);
 
-            IsMarketGroupNameError = MarketTemplateGroup == null || string.IsNullOrEmpty(MarketTemplateGroup.Name) ? true : false;
+            IsMarketGroupNameError = MarketTemplateGroup == null || string.IsNullOrEmpty(MarketTemplateGroup.Name) || MarketTemplateGroup.Name.Equals("All Markets", StringComparison.OrdinalIgnoreCase) ? true : false;
 
             if (IsMarketGroupNameError)
                 return;
