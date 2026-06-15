@@ -27,44 +27,11 @@ namespace Backoffice.API.Controllers.Backoffice
     public class ConfigController : ControllerBase
     {
         private readonly IBackofficeRepository _backofficeRepository;
-        private readonly IMaintenanceRepository _maintenanceRepository;
         private readonly ActivitySource _activitySource;
-        public ConfigController(IBackofficeRepository backofficeRepository, IMaintenanceRepository maintenanceRepository, Instrumentation instrumentation)
+        public ConfigController(IBackofficeRepository backofficeRepository, Instrumentation instrumentation)
         {
             _backofficeRepository = backofficeRepository;
-            _maintenanceRepository = maintenanceRepository;
             _activitySource = instrumentation.ActivitySource;
-        }
-
-        [HttpGet("maintenance")]
-        public async Task<IActionResult> GetMaintenanceV2()
-        {
-            var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
-
-            var result = await _maintenanceRepository.GetMaintenanceV2(clientCodes);
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-        [HttpPost("maintenance")]
-        public async Task<IActionResult> SetMaintenanceV2([FromBody] SetMaintenanceRequest request)
-        {
-            var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
-
-            var result = await _maintenanceRepository.SetMaintenanceV2(request, clientCodes);
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
         }
 
         [HttpGet("template/{id}")]
