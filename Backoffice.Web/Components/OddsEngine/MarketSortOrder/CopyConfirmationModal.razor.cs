@@ -68,6 +68,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                 ModalService.Cancel();
                 await Modal.OnSaveClickCallback.InvokeAsync();
             }
+            else
+            {
+                ModalService.Cancel();
+                await _alertToastService.SetToast(response.Message ?? _translationState.GetValue("Copy failed. Please try again."));
+            }
         }
 
         #endregion
