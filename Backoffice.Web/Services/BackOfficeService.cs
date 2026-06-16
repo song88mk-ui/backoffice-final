@@ -12,7 +12,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-
+// 
 namespace Backoffice.Web.Services
 {
     public class BackofficeService : BaseService, IBackofficeService
