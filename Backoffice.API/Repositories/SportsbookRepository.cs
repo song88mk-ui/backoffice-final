@@ -937,9 +937,6 @@ namespace Backoffice.API.Repositories
 
                 using (var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    // Delete destination records first and flush to DB before inserting.
-                    // This avoids EF Core change tracker conflicts when source and destination
-                    // share the same composite key values (MarketTemplateId / group Id).
                     existingClientMarketTemplateOrder = await _sportsbookContext.ClientMarketTemplateOrder.Where(x => x.ClientId == request.CopyToClientId && x.SportId == request.CopyToSportId).ToListAsync();
                     if (existingClientMarketTemplateOrder.Any())
                     {
