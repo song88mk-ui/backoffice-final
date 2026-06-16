@@ -1,8 +1,6 @@
-﻿using Backoffice.Shared.Models;
-using Backoffice.Web.Models;
+﻿using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Serilog;
 using SportModel = Backoffice.Web.Models.SportModel;
 
 namespace Backoffice.Web.Components.SBC.TopFixtures
@@ -39,7 +37,10 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 SportsTree = new SportsTreeModel();
                 SortFilter = "1";
 
-                SportsTree = (await BackofficeService.GetSportstreeByClientId(ClientId)).Result;
+                var sportstreeResponse = await BackofficeService.GetSportstreeByClientId(ClientId);
+
+                SportsTree = sportstreeResponse?.Result ?? new SportsTreeModel();
+                SportsTree.Sports ??= new List<SportModel>();
 
                 var model = new EditTopFixturesModel
                 {
@@ -49,13 +50,11 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                     SelectedLeague = SelectedLeague,
                     SelectedGameFilter = SelectedGameFilter
                 };
+
                 await OnInitCallback.InvokeAsync(model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
             }
         }
 

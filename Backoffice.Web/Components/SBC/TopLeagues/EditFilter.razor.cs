@@ -33,18 +33,22 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             ErrorMessage = string.Empty;
             try
             {
-                SportsTree = (await BackofficeService.GetSportstreeByClientId(ClientId)).Result;
-                if (SportsTree != null)
-                    SelectedSport = SportsTree.Sports.FirstOrDefault(s => s.SportId == SportId);
+                var sportstreeResponse = await BackofficeService.GetSportstreeByClientId(ClientId);
+
+                SportsTree = sportstreeResponse?.Result ?? new SportsTreeModel();
+                SportsTree.Sports ??= new List<SportModel>();
+
+                SelectedSport = SportsTree.Sports.FirstOrDefault(s => s.SportId == SportId);
 
                 var model = new EditTopLeaguesModel
                 {
-                    Sports = SportsTree.Sports ?? new List<SportModel>(),
+                    Sports = SportsTree.Sports,
                     SelectedSport = SelectedSport,
                     SelectedSegment = SelectedSegment,
                     SelectedLeague = SelectedLeague
-                };   
-                await OnInitCallback.InvokeAsync(model);         
+                };
+
+                await OnInitCallback.InvokeAsync(model);
             }
             catch (Exception ex)
             {
