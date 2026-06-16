@@ -1,4 +1,5 @@
-﻿using Backoffice.Web.Models;
+﻿using Backoffice.Shared.Models;
+using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using SportModel = Backoffice.Web.Models.SportModel;
