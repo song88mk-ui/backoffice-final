@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
@@ -36,13 +37,15 @@ namespace Backoffice.API.Repositories
         private readonly IConfiguration _configuration;
         private readonly IPlatformRepository _platformRepository;
         private readonly IBackofficeActivityLogRepository _activityLogRepository;
+        private readonly IRabbitMqRepository _rabbitMqRepository;
         private readonly IMemCache _memCache;
 
-        public SportsbookRepository(SportsbookContext sportsbookContext, IConfiguration configuration, IPlatformRepository platformRepository, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache)
+        public SportsbookRepository(SportsbookContext sportsbookContext, IConfiguration configuration, IPlatformRepository platformRepository, IBackofficeActivityLogRepository activityLogRepository, IRabbitMqRepository rabbitMqRepository, IMemCache memCache)
         {
             _sportsbookContext = sportsbookContext;
             _configuration = configuration;
             _platformRepository = platformRepository;
+            _rabbitMqRepository = rabbitMqRepository;
             _activityLogRepository = activityLogRepository;
             _memCache = memCache;
 
@@ -243,7 +246,23 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).PostAsync($"client/markettemplategroup/post", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
+                {
+                    await _rabbitMqRepository.Publish(new MessageRequest
+                    {
+                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                        {
+                            CacheType = CacheType.MarketSortOrder,
+                            ClientId = request.ClientId,
+                            ClientCode = string.Empty,
+                            CacheKey = string.Empty
+                        }),
+                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                        MessageType = "OnMarketSortOrderChange",
+                        RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
+                    }, region);
+
                     return JsonSerializer.Deserialize<BaseResponse<ClientPostMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
@@ -274,7 +293,23 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).PostAsync($"client/markettemplategroup/delete", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
+                {
+                    await _rabbitMqRepository.Publish(new MessageRequest
+                    {
+                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                        {
+                            CacheType = CacheType.MarketSortOrder,
+                            ClientId = request.ClientId,
+                            ClientCode = string.Empty,
+                            CacheKey = string.Empty
+                        }),
+                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                        MessageType = "OnMarketSortOrderChange",
+                        RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
+                    }, region);
+
                     return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
@@ -305,7 +340,22 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).PostAsync($"client/markettemplategroup/copy", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
+                {
+                    await _rabbitMqRepository.Publish(new MessageRequest
+                    {
+                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                        {
+                            CacheType = CacheType.MarketSortOrder,
+                            ClientId = request.CopyToClientId,
+                            ClientCode = string.Empty,
+                            CacheKey = string.Empty
+                        }),
+                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                        MessageType = "OnMarketSortOrderChange",
+                        RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
+                    }, region);
                     return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
@@ -562,17 +612,20 @@ namespace Backoffice.API.Repositories
                 //    scope.Complete();
                 //}
 
-                await Publish(new MessageRequest
+                await _rabbitMqRepository.Publish(new MessageRequest
                 {
                     Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
                     {
+                        CacheType = CacheType.SportSortOrder,
+                        ClientId = Guid.NewGuid(),
                         ClientCode = request.ClientCode,
-                        CacheType = CacheType.SportSortOrder
+                        CacheKey = string.Empty
                     }),
                     CorrelationId = Guid.NewGuid().ToString().ToUpper(),
                     MessageType = "OnSportSortOrderChange",
                     RoutingKey = $"r.oe.cachesync.onsportsortorderchange"
-                }, "HK");
+                });
+
             }
             catch (Exception ex)
             {
@@ -886,18 +939,20 @@ namespace Backoffice.API.Repositories
 
                 if (response.IsSuccessStatusCode)
                 {
-                    await Publish(new MessageRequest
+                    await _rabbitMqRepository.Publish(new MessageRequest
                     {
                         Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
                         {
+                            CacheType = CacheType.MarketSortOrder,
                             ClientId = request.ClientId,
                             ClientCode = request.ClientCode,
-                            CacheType = CacheType.MarketSortOrder
+                            CacheKey = string.Empty
                         }),
                         CorrelationId = Guid.NewGuid().ToString().ToUpper(),
                         MessageType = "OnMarketSortOrderChange",
                         RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
-                    }, "HK");
+                    });
+
                     return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 }
                 else
@@ -1006,17 +1061,19 @@ namespace Backoffice.API.Repositories
                 //});
                 await _sportsbookContext.SaveChangesAsync();
 
-                await Publish(new MessageRequest
+                await _rabbitMqRepository.Publish(new MessageRequest
                 {
                     Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
                     {
+                        CacheType = CacheType.MarketSortOrder,
                         ClientId = request.CopyToClientId,
-                        CacheType = CacheType.MarketSortOrder
+                        ClientCode = string.Empty,
+                        CacheKey = string.Empty
                     }),
                     CorrelationId = Guid.NewGuid().ToString().ToUpper(),
                     MessageType = "OnMarketSortOrderChange",
                     RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
-                }, "HK");
+                });
 
                 return new BaseResponse<bool>
                 {
@@ -1182,37 +1239,6 @@ namespace Backoffice.API.Repositories
         #endregion
 
 
-        public async Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region)
-        {
-            try
-            {
-                var response = await GetHttpClient(region).PostAsync($"publish", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<MessageResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<MessageResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
         private HttpClient GetHttpClient(string langCode = "")
         {
             var uri = GetBaseUrl("");

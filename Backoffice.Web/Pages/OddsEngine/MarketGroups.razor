@@ -76,12 +76,24 @@
                                             }
                                         </td>
                                         <td class="text-center">
-                                            <a class="link-edit me-2">
-                                                <button class="fa fa-edit" @onclick="async () => await OnEditClickedEvent(MarketTemplateGroup.MarketTemplateGroupId)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
-                                            </a>
-                                            <a class="link-delete me-2">
-                                                <button class="fa fa-trash" @onclick="async () => await OnDeleteClickedEvent(MarketTemplateGroup)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
-                                            </a>
+                                            @if (!MarketTemplateGroup.Name.Equals("All Markets", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <a class="link-edit me-2">
+                                                    <button class="fa fa-edit" @onclick="async () => await OnEditClickedEvent(MarketTemplateGroup.MarketTemplateGroupId)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
+                                                </a>
+                                                <a class="link-delete me-2">
+                                                    <button class="fa fa-trash" @onclick="async () => await OnDeleteClickedEvent(MarketTemplateGroup)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a class="link-edit me-2">
+                                                    <button class="fa fa-edit" disabled></button>
+                                                </a>
+                                                <a class="link-delete me-2">
+                                                    <button class="fa fa-trash" disabled></button>
+                                                </a>
+                                            }
                                         </td>
                                         <td class="text-center actions">
                                             <a href="javascript:void(0);" class="drag-handle">
