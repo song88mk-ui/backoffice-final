@@ -141,7 +141,8 @@
                                             }
                                             @for (int rowCount = startCount; rowCount < category.SubCategories.Count(); rowCount++)
                                             {
-                                                if (category.SubCategories[rowCount].ColPosition != "LEFT")
+                                                var claims = category.SubCategories[rowCount].Claims;
+                                                if (claims.Any() && category.SubCategories[rowCount].ColPosition != "LEFT")
                                                 {
                                                     <div class="category mb-3">
                                                         <div class="category-title fw-bold mb-1">@_translationState.GetValue(category.SubCategories[rowCount].SubCategoryName)</div>
@@ -150,16 +151,15 @@
                                                         {
                                                             for (int ctr = 0; ctr < @category.SubCategories[rowCount].Claims.Count; ctr++)
                                                             {
-                                                                var claim = @category.SubCategories[rowCount].Claims[ctr];
+                                                                var claim = @claims[ctr];
 
                                                                 <PermissionRow Claim="@claim" IsAdmin="_isAdmin" Permissions="@Permissions" IsSubUser="@IsSubUser" />
                                                             }
                                                         }
                                                         else
                                                         {
-                                                            var claim = @category.SubCategories[rowCount].Claims[0];
+                                                            var claim = claims.FirstOrDefault();
                                                             var groups = @category.SubCategories[rowCount].Groups;
-
                                                             <PermissionRow Claim="@claim" Groups="@groups" IsAdmin="_isAdmin" Permissions="@Permissions" IsSubUser="@IsSubUser" />
                                                         }
                                                     </div>
