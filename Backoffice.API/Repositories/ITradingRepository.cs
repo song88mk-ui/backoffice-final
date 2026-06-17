@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Data.Trading.SQLEntities;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using System;
@@ -11,7 +12,7 @@ namespace Backoffice.API.Repositories
     {
 
         #region Client
-        Task<BaseResponse<List<ClientInformationModel>>> GetClientList(string region);
+        //Task<BaseResponse<List<ClientInformationModel>>> GetClientList(string region);
         Task<BaseResponse<ConfigModel>> GetClientConfig(ClientConfigRequest request, string region);
         Task<BaseResponse<ConfigModel>> GetClientConfigv2(ClientConfigRequestv2 request, string region);
         Task<BaseResponse<ClientConfigResponse>> AddOrUpdateConfig(ConfigSettingsModel request, string region);

@@ -22,6 +22,7 @@ namespace Backoffice.API.Repositories
     public class MaintenanceRepository : IMaintenanceRepository
     {
         private readonly ITradingRepository _tradingRepository;
+        private readonly IPlatformRepository _platformRepository;
 
         private HttpClient _maintenanceHttpClient;
         private readonly bool _isStaging;
@@ -33,12 +34,13 @@ namespace Backoffice.API.Repositories
         private readonly string _maintenanceConfigJsonTest;
 
 
-        public MaintenanceRepository(HttpClient httpClient, IConfiguration configuration, ITradingRepository tradingRepository,
+        public MaintenanceRepository(HttpClient httpClient, IConfiguration configuration, ITradingRepository tradingRepository, IPlatformRepository platformRepository,
                 Instrumentation instrumentation, ILogger<MaintenanceRepository> logger)
         {
             _isStaging = bool.Parse(configuration["IsStaging"]);
 
             _tradingRepository = tradingRepository;
+            _platformRepository = platformRepository;
             _activitySource = instrumentation.ActivitySource;
             _logger = logger;
 
@@ -56,9 +58,8 @@ namespace Backoffice.API.Repositories
                 activity?.SetTag("client.codes", clientCodes.Join(","));
                 try
                 {
-                    var clientResponse = await _tradingRepository.GetClientList("");
-
-                    if (clientResponse?.Result == null)
+                    var clientResponse = (await _platformRepository.GetClients("HK"));
+                    if (clientResponse == null)
                     {
                         activity?.SetStatus(ActivityStatusCode.Error, clientResponse.StatusCode.ToString());
                         return new BaseResponse<MaintenanceResponse>()

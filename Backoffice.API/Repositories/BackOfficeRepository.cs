@@ -1827,7 +1827,7 @@ namespace Backoffice.API.Repositories
                 var clientConfigs = new List<ConfigClientModel>();
                 var isCompleteClient = false;
 
-                var clientList = GetTradingClientInformation();
+                var clientList = (await _platformRepository.GetClients("HK")).Result;
                 var allClientsCount = clientList.Count;
                 var metaData = payload?.MetaData;
 
@@ -1835,7 +1835,7 @@ namespace Backoffice.API.Repositories
                 {
                     if (clientCodes.FirstOrDefault().ToUpper() != "ALL")
                     {
-                        clientList = new List<ClientInformationModel>();
+                        clientList = new List<PlatformClientResponse>();
                     }
                 }
                 else
@@ -2314,10 +2314,10 @@ namespace Backoffice.API.Repositories
         {
             return _backofficeContext.ClientInformation.AsNoTracking().ToList() ?? new List<ClientInformation>();
         }
-        private List<ClientInformationModel> GetTradingClientInformation()
-        {
-            return _tradingRepository.GetClientList("").Result?.Result ?? new List<ClientInformationModel>();
-        }
+        //private List<ClientInformationModel> GetTradingClientInformation()
+        //{
+        //    return _tradingRepository.GetClientList("").Result?.Result ?? new List<ClientInformationModel>();
+        //}
         private long InsertClientRecord(ClientInformation client)
         {
             _backofficeContext.ClientInformation.Add(client);
@@ -2481,7 +2481,8 @@ namespace Backoffice.API.Repositories
                 var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
                 var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
 
-                result = (leagueLookup.Count * GetTradingClientInformation().Count) - assignedLeagues;
+                var clientList = (await _platformRepository.GetClients("HK")).Result;
+                result = (leagueLookup.Count * clientList.Count) - assignedLeagues;
             }
 
             return result;
@@ -2498,8 +2499,9 @@ namespace Backoffice.API.Repositories
             var leagueCount = query.Count();
             var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup("");
 
+            var clientList = (await _platformRepository.GetClients("HK")).Result;
             if (leagueLookupResponse.StatusCode == StatusCode.Success)
-                result = (leagueLookupResponse.Result.LeagueLookup.Count * GetTradingClientInformation().Count) - leagueCount;
+                result = (leagueLookupResponse.Result.LeagueLookup.Count * clientList.Count) - leagueCount;
 
             return result;
         }

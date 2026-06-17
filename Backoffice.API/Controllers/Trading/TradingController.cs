@@ -354,28 +354,28 @@ namespace Backoffice.API.Controllers.Trading
 
         #region Client
         [HttpGet("client")]
-        public async Task<IActionResult> GetClientList()
-        {
-            using (var activity = _activitySource.StartActivity("api/trading/client"))
-            {
-                activity?.SetTag("clientCodes", HttpContext.Items["ClientCodes"]?.ToString());
-                var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
-                var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
+        //public async Task<IActionResult> GetClientList()
+        //{
+        //    using (var activity = _activitySource.StartActivity("api/trading/client"))
+        //    {
+        //        activity?.SetTag("clientCodes", HttpContext.Items["ClientCodes"]?.ToString());
+        //        var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+        //        var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
                 
-                var result = await _tradingRepository.GetClientList(region);
+        //        var result = await _tradingRepository.GetClientList(region);
 
-                switch (result.StatusCode)
-                {
-                    case Shared.Enums.StatusCode.Success:
-                        if (clientCodes.FirstOrDefault() != "ALL")
-                            result.Result = result.Result.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+        //        switch (result.StatusCode)
+        //        {
+        //            case Shared.Enums.StatusCode.Success:
+        //                if (clientCodes.FirstOrDefault() != "ALL")
+        //                    result.Result = result.Result.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
 
-                        return Ok(result);
-                    default:
-                        return BadRequest(result);
-                }
-            }
-        }
+        //                return Ok(result);
+        //            default:
+        //                return BadRequest(result);
+        //        }
+        //    }
+        //}
         [HttpPost("client/config/all")]
         public async Task<IActionResult> GetClientConfig([FromBody] ClientConfigRequest request)
         {
