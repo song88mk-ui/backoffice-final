@@ -801,22 +801,20 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var response = await GetHttpClient(region).GetAsync($"v1/client/topfixtures/sportstree?clientRefId={clientId}");
+                var url = $"v1/client/topfixtures/sportstree?clientRefId={clientId}";
+                var response = await GetHttpClient(region).GetAsync(url);
+                var content = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
-                    return JsonConvert.DeserializeObject<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync());
+                    return JsonConvert.DeserializeObject<BaseResponse<SportsTreeResponse>>(content);
                 else
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonConvert.DeserializeObject<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync());
-                    else
-                    {
-                        return new BaseResponse<SportsTreeResponse>
+                    return JsonConvert.DeserializeObject<BaseResponse<SportsTreeResponse>>(content)
+                        ?? new BaseResponse<SportsTreeResponse>
                         {
                             StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                            Message = $"Error ({response.ReasonPhrase})"
                         };
-                    }
                 }
             }
             catch (Exception ex)
