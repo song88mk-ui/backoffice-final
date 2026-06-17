@@ -187,6 +187,14 @@ namespace Backoffice.Web.Shared
                     .ToList();
             }
 
+            if (page != null && (!page.Contains("sportsbook-translations", StringComparison.OrdinalIgnoreCase) 
+                                        && !page.Contains("translations", StringComparison.OrdinalIgnoreCase)))
+            {
+                menus = menus
+                    .Where(m => m.Id != "sub-menu-translations")
+                    .ToList();
+            }
+
             return menus;
         }
 
