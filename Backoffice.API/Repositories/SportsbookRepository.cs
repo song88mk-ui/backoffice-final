@@ -988,7 +988,6 @@ namespace Backoffice.API.Repositories
                 var newClientMarketTemplateOrder = new List<ClientMarketTemplateOrder>();
 
                 var existingClientMarketTemplateGroup = new List<ClientMarketTemplateGroup>();
-                var newClientMarketTemplateGroup = new List<ClientMarketTemplateGroup>();
 
                 using (var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
                 {
@@ -997,6 +996,14 @@ namespace Backoffice.API.Repositories
                     {
                         _sportsbookContext.ClientMarketTemplateOrder.RemoveRange(existingClientMarketTemplateOrder);
                     }
+
+                    existingClientMarketTemplateGroup = await _sportsbookContext.ClientMarketTemplateGroup.Where(x => x.ClientId == request.CopyToClientId && x.SportId == request.CopyToSportId && x.FixtureStatusId == request.CopyToFixtureStatusId).ToListAsync();
+                    if (existingClientMarketTemplateGroup.Any())
+                    {
+                        _sportsbookContext.ClientMarketTemplateGroup.RemoveRange(existingClientMarketTemplateGroup);
+                    }
+
+                    await _sportsbookContext.SaveChangesAsync();
 
                     var sourceClientMarketTemplateOrder = await _sportsbookContext.ClientMarketTemplateOrder.AsNoTracking().Where(x => x.ClientId == request.CopyFromClientId && x.SportId == request.CopyFromSportId).ToListAsync();
                     if (sourceClientMarketTemplateOrder.Any())
@@ -1011,30 +1018,17 @@ namespace Backoffice.API.Repositories
                     }
                     await _sportsbookContext.AddRangeAsync(newClientMarketTemplateOrder);
 
-                    existingClientMarketTemplateGroup = await _sportsbookContext.ClientMarketTemplateGroup.Where(x => x.ClientId == request.CopyToClientId && x.SportId == request.CopyToSportId && x.FixtureStatusId == request.CopyToFixtureStatusId).ToListAsync();
-                    if (existingClientMarketTemplateGroup.Any())
-                    {
-                        _sportsbookContext.ClientMarketTemplateGroup.RemoveRange(existingClientMarketTemplateGroup);
-                    }
-
                     var sourceClientMarketTemplateGroup = await _sportsbookContext.ClientMarketTemplateGroup.AsNoTracking().Where(x => x.ClientId == request.CopyFromClientId && x.SportId == request.CopyFromSportId && x.FixtureStatusId == request.CopyFromFixtureStatusId).ToListAsync();
-                    if (sourceClientMarketTemplateGroup.Any())
-                    {
-                        newClientMarketTemplateGroup = sourceClientMarketTemplateGroup.Select(x => new ClientMarketTemplateGroup()
-                        {
-                            ClientId = request.CopyToClientId,
-                            SportId = request.CopyToSportId,
-                            FixtureStatusId = request.CopyToFixtureStatusId,
-                            Id = x.Id,
-                            Name = x.Name,
-                            SortOrder = x.SortOrder,
-                            IsActive = x.IsActive,
-                            MarketTemplates = x.MarketTemplates
-                        }).ToList();
-                    }
-                    await _sportsbookContext.AddRangeAsync(newClientMarketTemplateGroup);
 
-                    await _sportsbookContext.SaveChangesAsync();
+                    foreach (var group in sourceClientMarketTemplateGroup)
+                    {
+                        await _sportsbookContext.Database.ExecuteSqlRawAsync(
+                            @"INSERT INTO ClientMarketTemplateGroup (ClientId, SportId, FixtureStatusId, Name, SortOrder, IsActive, MarketTemplates)
+                              VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6})",
+                            request.CopyToClientId, request.CopyToSportId, request.CopyToFixtureStatusId,
+                            group.Name, group.SortOrder, group.IsActive, (object?)group.MarketTemplates ?? DBNull.Value);
+                    }
+
                     scope.Complete();
                 }
 
@@ -1059,7 +1053,6 @@ namespace Backoffice.API.Repositories
                 //    UserId = request.UserId,
                 //    TimeStamp = DateTime.UtcNow,
                 //});
-                await _sportsbookContext.SaveChangesAsync();
 
                 await _rabbitMqRepository.Publish(new MessageRequest
                 {

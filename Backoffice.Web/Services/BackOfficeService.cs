@@ -993,15 +993,28 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsTreeModel>>
-                (await _httpClient.GetStreamAsync($"sportsbook/settings/topfixtures/sportstree?clientId={clientId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                var response = await _httpClient.GetAsync($"sportsbook/settings/topfixtures/sportstree?clientId={clientId}");
+                var body = await response.Content.ReadAsStringAsync();
 
-                return result ?? new BaseResponse<SportsTreeModel>
+                if (response.IsSuccessStatusCode)
                 {
-                    StatusCode = StatusCode.Success,
-                    Message = $"{StatusCode.Success}",
-                    Result = new SportsTreeModel()
-                };
+                    var result = JsonSerializer.Deserialize<BaseResponse<SportsTreeModel>>(body, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return result ?? new BaseResponse<SportsTreeModel>
+                    {
+                        StatusCode = StatusCode.Success,
+                        Message = $"{StatusCode.Success}",
+                        Result = new SportsTreeModel()
+                    };
+                }
+                else
+                {
+                    return JsonSerializer.Deserialize<BaseResponse<SportsTreeModel>>(body, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<SportsTreeModel>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"Error ({response.ReasonPhrase})"
+                        };
+                }
             }
             catch (Exception ex)
             {
