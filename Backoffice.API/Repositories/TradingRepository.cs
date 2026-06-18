@@ -38,13 +38,14 @@ namespace Backoffice.API.Repositories
 
         private readonly TradingContext _tradingContext;
 
-        public TradingRepository(TradingContext tradingContext, IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache, ILogger<TradingRepository> logger)
+        public TradingRepository(TradingContext tradingContext, IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache, ILogger<TradingRepository> logger, IRabbitMqRepository rabbitMqRepository)
         {
             _tradingContext = tradingContext;
             _configuration = configuration;
             _activityLogRepository = activityLogRepository;
             _memCache = memCache;
             _logger = logger;
+            _rabbitMqRepository = rabbitMqRepository;
 
             if (_db == null)
             {
