@@ -1252,7 +1252,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"AddOrUpdateManualMarketSettlement: {ex.Message}-{ex.InnerException.Message}");
+                _logger.LogError($"AddOrUpdateManualMarketSettlement: {ex.Message}-{ex.InnerException?.Message}");
 
                 return new BaseResponse<ManualMarketSettlementResponse>
                 {
@@ -1343,7 +1343,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"GetManualMarketSettlementDetails: {ex.Message}-{ex.InnerException.Message}");
+                _logger.LogError($"GetManualMarketSettlementDetails: {ex.Message}-{ex.InnerException?.Message}");
 
                 return new BaseResponse<ManualMarketSettlementDetailsResponse>
                 {
@@ -1459,7 +1459,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Publish: {ex.Message}-{ex.InnerException.Message}");
+                _logger.LogError($"Publish: {ex.Message}-{ex.InnerException?.Message}");
 
                 return new BaseResponse<MessageResponse>
                 {
