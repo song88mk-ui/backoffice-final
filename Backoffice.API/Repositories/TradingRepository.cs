@@ -8,6 +8,7 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using System;
@@ -29,6 +30,7 @@ namespace Backoffice.API.Repositories
         private readonly IBackofficeActivityLogRepository _activityLogRepository;
         private readonly IMemCache _memCache;
         private readonly IRabbitMqRepository _rabbitMqRepository;
+        private readonly ILogger<TradingRepository> _logger;
 
         private static IMongoCollection<Fixture> fixtureCollection;
         private static IMongoCollection<Market> marketCollection;
@@ -36,13 +38,13 @@ namespace Backoffice.API.Repositories
 
         private readonly TradingContext _tradingContext;
 
-        public TradingRepository(TradingContext tradingContext, IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache)
+        public TradingRepository(TradingContext tradingContext, IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache, ILogger<TradingRepository> logger)
         {
             _tradingContext = tradingContext;
             _configuration = configuration;
             _activityLogRepository = activityLogRepository;
             _memCache = memCache;
-
+            _logger = logger;
 
             if (_db == null)
             {
@@ -1250,6 +1252,8 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError($"AddOrUpdateManualMarketSettlement: {ex.Message}-{ex.InnerException.Message}");
+
                 return new BaseResponse<ManualMarketSettlementResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -1339,6 +1343,8 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError($"GetManualMarketSettlementDetails: {ex.Message}-{ex.InnerException.Message}");
+
                 return new BaseResponse<ManualMarketSettlementDetailsResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -1453,6 +1459,8 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Publish: {ex.Message}-{ex.InnerException.Message}");
+
                 return new BaseResponse<MessageResponse>
                 {
                     StatusCode = StatusCode.Error,
