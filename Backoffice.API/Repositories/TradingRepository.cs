@@ -1113,6 +1113,21 @@ namespace Backoffice.API.Repositories
         {
             try
             {
+                if (request == null || request.Count == 0)
+                {
+                    _logger.LogWarning("AddOrUpdateManualMarketSettlement: Request body is null or empty. UserId: {UserId}", userId);
+                    return new BaseResponse<ManualMarketSettlementResponse>
+                    {
+                        StatusCode = StatusCode.Success,
+                        Message = StatusCode.Success.ToString(),
+                        Result = new ManualMarketSettlementResponse()
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Request cannot be empty",
+                        }
+                    };
+                }
+
                 var timeStamp = DateTime.UtcNow;
                 var activityLogs = new OnActivityLogListMessage();
                 var statuses = new List<BetStatus> { BetStatus.Won, BetStatus.Lost, BetStatus.HalfLost, BetStatus.HalfWon, BetStatus.Void };
@@ -1252,7 +1267,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"AddOrUpdateManualMarketSettlement: {ex.Message}-{ex.InnerException?.Message}");
+                _logger.LogError("AddOrUpdateManualMarketSettlement: {Message} | UserId: {UserId} | InnerException: {InnerMessage} | StackTrace: {StackTrace} | Payload: {Payload}", ex.Message, userId, ex.InnerException?.Message, ex.StackTrace, JsonSerializer.Serialize(request));
 
                 return new BaseResponse<ManualMarketSettlementResponse>
                 {

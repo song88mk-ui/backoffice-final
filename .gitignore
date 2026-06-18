@@ -7,3 +7,7 @@
 **/PublishProfiles/**
 **/Logs
 **/.config/dotnet-tools.json
+.claude/
+AGENTS.md
+CLAUDE.md
+docs/
