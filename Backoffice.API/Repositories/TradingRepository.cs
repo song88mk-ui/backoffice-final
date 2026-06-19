@@ -1131,6 +1131,7 @@ namespace Backoffice.API.Repositories
 
                 var timeStamp = DateTime.UtcNow;
                 var activityLogs = new OnActivityLogListMessage();
+                var auditRecords = new List<ManualMarketSettlementAudit>();
                 var statuses = new List<BetStatus> { BetStatus.Won, BetStatus.Lost, BetStatus.HalfLost, BetStatus.HalfWon, BetStatus.Void };
 
                 // validate duplicate bets
@@ -1237,6 +1238,8 @@ namespace Backoffice.API.Repositories
                         ToStatusName = item.SelectionStatus.ToString()
                     };
 
+                    auditRecords.Add(manualSettlementRequestAudit);
+
                     activityLogs.OnActivityLogMessages.Add(new OnActivityLogMessage()
                     {
                         Page = Page.OE_Administration_ManualSettlement.ToString().Replace("_", "."),
@@ -1247,6 +1250,10 @@ namespace Backoffice.API.Repositories
                         UserId = userId
                     });
                 }
+
+                await _tradingContext.ManualMarketSettlementAudit.AddRangeAsync(auditRecords);
+                await _tradingContext.SaveChangesAsync();
+
                 await _rabbitMqRepository.Publish(new MessageRequest()
                 {
                     CorrelationId = Guid.NewGuid().ToString(),

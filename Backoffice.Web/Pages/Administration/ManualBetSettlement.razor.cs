@@ -154,13 +154,13 @@ namespace Backoffice.Web.Pages.Administration
                 MetaData = MetaData
             });
 
-            if (response.Result.ActivityLogs.Any())
+            if (response.Result?.ActivityLogs?.Any() ?? false)
             {
                 IsExportDisabled = false;
             }
 
-            ActivityLogs = response.Result.ActivityLogs.ToList();
-            MetaData = response.Result.MetaData;
+            ActivityLogs = response.Result?.ActivityLogs?.ToList() ?? new List<ActivityLogModel>();
+            MetaData = response.Result?.MetaData ?? MetaData;
 
             IsPreloader = false;
 
@@ -168,6 +168,8 @@ namespace Backoffice.Web.Pages.Administration
 
         private string BuildEventDetails(BetSelectionDetails betSelectionDetails, string oddsFormat)
         {
+            if (betSelectionDetails == null) return string.Empty;
+
             StringBuilder builder = new StringBuilder();
 
             builder.Append($"<span class=\"segment-league d-block\">{betSelectionDetails.LeagueName}</span>");

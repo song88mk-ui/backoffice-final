@@ -289,7 +289,8 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<ActivityLogResponse>
                 {
                     StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = new ActivityLogResponse { ActivityLogs = new List<ActivityLogModel>() }
                 };
             }
         }
