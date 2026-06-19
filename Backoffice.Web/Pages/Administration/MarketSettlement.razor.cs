@@ -61,6 +61,7 @@ namespace Backoffice.Web.Pages.Administration
             };
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await GetContent();
         }
 
         public async Task GetContent()

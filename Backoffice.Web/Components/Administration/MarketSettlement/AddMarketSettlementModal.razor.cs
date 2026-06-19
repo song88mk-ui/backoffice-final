@@ -452,29 +452,29 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
             if (response.StatusCode == StatusCode.Success)
             {
+                foreach (var fixture in fixtureList)
+                {
+                    var settlementPayload = new OnBetSettlementMessage
+                    {
+                        SportId = fixture.Item2,
+                        ProviderFixtureId = fixture.Item3,
+                        FixtureSpecifier = fixture.Item4,
+                        HomeScore = string.Empty,
+                        AwayScore = string.Empty,
+                        Selections = fixture.Item5,
+                    };
+
+                    await TradingService.Publish(new MessageRequest()
+                    {
+                        CorrelationId = Guid.NewGuid().ToString(),
+                        MessageType = "OnBetSettlement",
+                        RoutingKey = "r.uof.onbetsettlement",
+                        Payload = JsonSerializer.Serialize(settlementPayload)
+                    });
+                }
+
                 if (fixtureList.Any())
                 {
-                    foreach (var fixture in fixtureList)
-                    {
-                        var payload = new OnBetSettlementMessage
-                        {
-                            SportId = fixture.Item2,
-                            ProviderFixtureId = fixture.Item3,
-                            FixtureSpecifier = fixture.Item4,
-                            HomeScore = string.Empty,
-                            AwayScore = string.Empty,
-                            Selections = fixture.Item5,
-                        };
-
-                        await TradingService.Publish(new MessageRequest()
-                        {
-                            CorrelationId = Guid.NewGuid().ToString(),
-                            MessageType = "OnBetSettlement",
-                            RoutingKey = $"r.uof.onbetsettlement",
-                            Payload = JsonSerializer.Serialize(payload)
-                        });
-                    }
-
                     await BackofficeService.AddActivityLogList(ActivityLogs);
                 }
 
