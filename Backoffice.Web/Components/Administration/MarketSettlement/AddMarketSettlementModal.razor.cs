@@ -75,8 +75,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                     BetIds = new List<string> { betId.ToString() }
                 };
                 //var betSelections = (await TradingService.GetBetSelectionDetails(betRequest)).Result;
-                var betSelections = (await BackofficeService.GetManualBetDetails(betRequest)).Result.Bets.FirstOrDefault();
-                if (betSelections.Selections != null && betSelections.Selections.Any())
+                var betSelections = (await BackofficeService.GetManualBetDetails(betRequest)).Result?.Bets?.FirstOrDefault();
+                if (betSelections?.Selections != null && betSelections.Selections.Any())
                 {
                     foreach (var selection in betSelections.Selections.OrderBy(s => s.FixtureName).ThenBy(s => s.MarketId))
                     {
