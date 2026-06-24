@@ -1,39 +1,45 @@
-﻿using Backoffice.Shared.Data.Backoffice.Entities;
-using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Data.Backoffice;
+using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.OutgoingEngineMessages;
 using System;
-using System.Text.Json;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Backoffice.API.Repositories
 {
     public class BackofficeActivityLogRepository : IBackofficeActivityLogRepository
     {
-        private readonly IRabbitMqRepository _rabbitMqRepository;
-        public BackofficeActivityLogRepository(IRabbitMqRepository rabbitMqRepository)
+        private readonly BackofficeContext _backofficeContext;
+        public BackofficeActivityLogRepository(BackofficeContext backofficeContext)
         {
-            _rabbitMqRepository = rabbitMqRepository;
+            _backofficeContext = backofficeContext;
         }
+
         public async Task ProcessActivityLog(OnActivityLogMessage activityLog, string region = "HK")
         {
-            await _rabbitMqRepository.Publish(new MessageRequest()
+            await ProcessActivityLog(new OnActivityLogListMessage
             {
-                CorrelationId = Guid.NewGuid().ToString(),
-                MessageType = "LogActivityList",
-                RoutingKey = $"r.bo.util.logs",
-                Payload = JsonSerializer.Serialize(activityLog)
+                OnActivityLogMessages = new List<OnActivityLogMessage> { activityLog }
             }, region);
         }
 
         public async Task ProcessActivityLog(OnActivityLogListMessage activityLogs, string region = "HK")
         {
-            await _rabbitMqRepository.Publish(new MessageRequest()
+            var logs = activityLogs.OnActivityLogMessages.Select(item => new ActivityLog
             {
-                CorrelationId = Guid.NewGuid().ToString(),
-                MessageType = "LogActivityList",
-                RoutingKey = $"r.bo.util.logs",
-                Payload = JsonSerializer.Serialize(activityLogs)
-            }, region);
+                Page = item.Page,
+                Payload = item.Payload,
+                Activity = item.Activity,
+                From = item.From,
+                To = item.To,
+                UserId = item.UserId,
+                UserName = item.UserName,
+                TimeStamp = item.TimeStamp == DateTime.MinValue ? DateTime.UtcNow : item.TimeStamp
+            }).ToList();
+
+            _backofficeContext.ActivityLog.AddRange(logs);
+            await _backofficeContext.SaveChangesAsync();
         }
     }
 }

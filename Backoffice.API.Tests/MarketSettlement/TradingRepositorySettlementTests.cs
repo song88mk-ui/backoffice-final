@@ -1,11 +1,10 @@
 using Backoffice.API.Repositories;
-using Backoffice.Shared.Data.Trading;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -22,14 +21,6 @@ namespace Backoffice.API.Tests.MarketSettlement
         // ---------------------------------------------------------------
         // Helpers
         // ---------------------------------------------------------------
-
-        private static TradingContext BuildInMemoryContext(string dbName)
-        {
-            var opts = new DbContextOptionsBuilder<TradingContext>()
-                .UseInMemoryDatabase(dbName)
-                .Options;
-            return new TradingContext(opts);
-        }
 
         private static IConfiguration BuildConfig()
         {
@@ -77,12 +68,11 @@ namespace Backoffice.API.Tests.MarketSettlement
             };
         }
 
-        private TradingRepository BuildSut(TradingContext ctx, IRabbitMqRepository rabbitMq)
+        private static TradingRepository BuildSut(IRabbitMqRepository rabbitMq, IBackofficeActivityLogRepository activityLog = null)
         {
             return new TradingRepository(
-                ctx,
                 BuildConfig(),
-                new Mock<IBackofficeActivityLogRepository>().Object,
+                activityLog ?? new Mock<IBackofficeActivityLogRepository>().Object,
                 new Mock<IMemCache>().Object,
                 NullLogger<TradingRepository>.Instance,
                 rabbitMq);
@@ -110,7 +100,7 @@ namespace Backoffice.API.Tests.MarketSettlement
                 .Callback<MessageRequest, string>((req, _) => published.Add(req))
                 .ReturnsAsync(new BaseResponse<MessageResponse> { StatusCode = StatusCode.Success });
 
-            var sut = BuildSut(BuildInMemoryContext("test_one_per_fixture"), rabbitMock.Object);
+            var sut = BuildSut(rabbitMock.Object);
 
             // Act
             var result = await sut.AddOrUpdateManualMarketSettlement(requests, "tester", "HK");
@@ -119,23 +109,22 @@ namespace Backoffice.API.Tests.MarketSettlement
             Assert.Equal(StatusCode.Success, result.StatusCode);
             Assert.Equal(StatusCode.Success, result.Result.StatusCode);
 
-            // One activity-log publish + two OnBetSettlement publishes
-            Assert.Equal(3, published.Count);
+            // The activity log is now written directly (not published), so the broker only
+            // sees the two OnBetSettlement messages — one per distinct provider fixture.
+            Assert.Equal(2, published.Count);
+            Assert.All(published, p => Assert.Equal("OnBetSettlement", p.MessageType));
+            Assert.All(published, p => Assert.Equal("r.uof.onbetsettlement", p.RoutingKey));
 
-            var settlements = published.Where(p => p.MessageType == "OnBetSettlement").ToList();
-            Assert.Equal(2, settlements.Count);
-            Assert.All(settlements, s => Assert.Equal("r.uof.onbetsettlement", s.RoutingKey));
-
-            var pf1 = settlements
+            var pf1 = published
                 .Select(s => JsonSerializer.Deserialize<OnBetSettlementMessage>(s.Payload, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }))
                 .Single(m => m.ProviderFixtureId == "pf1");
 
-            var pf2 = settlements
+            var pf2 = published
                 .Select(s => JsonSerializer.Deserialize<OnBetSettlementMessage>(s.Payload, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }))
                 .Single(m => m.ProviderFixtureId == "pf2");
 
             Assert.Equal(2, pf1.Selections.Count);
-            Assert.Equal(1, pf2.Selections.Count);
+            Assert.Single(pf2.Selections);
             Assert.Equal(10, pf1.SportId);
         }
 
@@ -159,7 +148,7 @@ namespace Backoffice.API.Tests.MarketSettlement
                 .Callback<MessageRequest, string>((req, _) => published.Add(req))
                 .ReturnsAsync(new BaseResponse<MessageResponse> { StatusCode = StatusCode.Success });
 
-            var sut = BuildSut(BuildInMemoryContext("test_result_mapping"), rabbitMock.Object);
+            var sut = BuildSut(rabbitMock.Object);
 
             await sut.AddOrUpdateManualMarketSettlement(requests, "tester", "HK");
 
@@ -190,7 +179,7 @@ namespace Backoffice.API.Tests.MarketSettlement
                 .Callback<MessageRequest, string>((req, _) => published.Add(req))
                 .ReturnsAsync(new BaseResponse<MessageResponse> { StatusCode = StatusCode.Success });
 
-            var sut = BuildSut(BuildInMemoryContext("test_void_factor"), rabbitMock.Object);
+            var sut = BuildSut(rabbitMock.Object);
 
             await sut.AddOrUpdateManualMarketSettlement(requests, "tester", "HK");
 
@@ -208,7 +197,8 @@ namespace Backoffice.API.Tests.MarketSettlement
         public async Task ReturnsErrorAndPublishesNothingForEmptyRequest()
         {
             var rabbitMock = new Mock<IRabbitMqRepository>();
-            var sut = BuildSut(BuildInMemoryContext("test_empty"), rabbitMock.Object);
+            var activityMock = new Mock<IBackofficeActivityLogRepository>();
+            var sut = BuildSut(rabbitMock.Object, activityMock.Object);
 
             var result = await sut.AddOrUpdateManualMarketSettlement(
                 new List<ManualMarketSettlementRequest>(), "tester", "HK");
@@ -216,6 +206,7 @@ namespace Backoffice.API.Tests.MarketSettlement
             Assert.Equal(StatusCode.Success, result.StatusCode);       // outer envelope is always Success
             Assert.Equal(StatusCode.Error, result.Result.StatusCode);  // inner status signals the validation failure
             rabbitMock.Verify(r => r.Publish(It.IsAny<MessageRequest>(), It.IsAny<string>()), Times.Never);
+            activityMock.Verify(a => a.ProcessActivityLog(It.IsAny<OnActivityLogListMessage>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -228,36 +219,57 @@ namespace Backoffice.API.Tests.MarketSettlement
             };
 
             var rabbitMock = new Mock<IRabbitMqRepository>();
-            var sut = BuildSut(BuildInMemoryContext("test_duplicate"), rabbitMock.Object);
+            var activityMock = new Mock<IBackofficeActivityLogRepository>();
+            var sut = BuildSut(rabbitMock.Object, activityMock.Object);
 
             var result = await sut.AddOrUpdateManualMarketSettlement(requests, "tester", "HK");
 
             Assert.Equal(StatusCode.Success, result.StatusCode);
             Assert.Equal(StatusCode.Error, result.Result.StatusCode);
             rabbitMock.Verify(r => r.Publish(It.IsAny<MessageRequest>(), It.IsAny<string>()), Times.Never);
+            activityMock.Verify(a => a.ProcessActivityLog(It.IsAny<OnActivityLogListMessage>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task ActivityLogPublishedToCorrectRoutingKey()
+        public async Task ActivityLogWrittenViaRepositoryWithPageMatchingHistoryRead()
         {
+            // The history list and Excel export read activity logs keyed by the page's
+            // AdminPermission name. The settlement write must use the SAME key, otherwise
+            // the row is invisible to the list. Verify the repository is invoked with it.
             var requests = new List<ManualMarketSettlementRequest>
             {
                 MakeRequest("pf1", "1", "101", "1001", BetStatus.Won),
+                MakeRequest("pf2", "2", "201", "2001", BetStatus.Lost),
             };
 
-            var published = new List<MessageRequest>();
             var rabbitMock = new Mock<IRabbitMqRepository>();
             rabbitMock
                 .Setup(r => r.Publish(It.IsAny<MessageRequest>(), It.IsAny<string>()))
-                .Callback<MessageRequest, string>((req, _) => published.Add(req))
                 .ReturnsAsync(new BaseResponse<MessageResponse> { StatusCode = StatusCode.Success });
 
-            var sut = BuildSut(BuildInMemoryContext("test_activity_log"), rabbitMock.Object);
+            OnActivityLogListMessage captured = null;
+            var activityMock = new Mock<IBackofficeActivityLogRepository>();
+            activityMock
+                .Setup(a => a.ProcessActivityLog(It.IsAny<OnActivityLogListMessage>(), It.IsAny<string>()))
+                .Callback<OnActivityLogListMessage, string>((m, _) => captured = m)
+                .Returns(Task.CompletedTask);
+
+            var sut = BuildSut(rabbitMock.Object, activityMock.Object);
 
             await sut.AddOrUpdateManualMarketSettlement(requests, "tester", "HK");
 
-            var activityLog = published.Single(p => p.MessageType == "LogActivityList");
-            Assert.Equal("r.oe.util.logs", activityLog.RoutingKey);
+            var expectedPage = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", ".");
+
+            // Written once, directly through the repository (not via the broker).
+            activityMock.Verify(a => a.ProcessActivityLog(It.IsAny<OnActivityLogListMessage>(), It.IsAny<string>()), Times.Once);
+            Assert.NotNull(captured);
+            Assert.Equal(2, captured.OnActivityLogMessages.Count);
+            Assert.All(captured.OnActivityLogMessages, m => Assert.Equal(expectedPage, m.Page));
+            Assert.All(captured.OnActivityLogMessages, m => Assert.Equal("tester", m.UserId));
+            Assert.All(captured.OnActivityLogMessages, m => Assert.Equal(Activity.ManualSettlement.ToString(), m.Activity));
+
+            // No activity-log message should be published to the broker anymore.
+            rabbitMock.Verify(r => r.Publish(It.Is<MessageRequest>(m => m.MessageType == "LogActivityList"), It.IsAny<string>()), Times.Never);
         }
     }
 }
