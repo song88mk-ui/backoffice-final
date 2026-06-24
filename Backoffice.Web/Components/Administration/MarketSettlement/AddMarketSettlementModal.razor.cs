@@ -374,73 +374,14 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
             IsPreLoader = true;
             await InvokeAsync(StateHasChanged);
 
-            var ActivityLogs = new ActivityLogListRequest();
-            foreach (var item in request)
-            {
-                var ActivityLog = new ActivityLogModel()
-                {
-                    Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace('_', '.'),
-                    Activity = Activity.ManualSettlement.ToString(),
-                    Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
-                    From = "-",
-                    To = JsonSerializer.Serialize(new ManualMarketSettlementAuditModel()
-                    {
-                        SportId = item.SportId,
-                        SportName = item.SportName,
-                        SegmentId = item.SegmentId,
-                        SegmentName = item.SegmentName,
-                        LeagueId = item.LeagueId,
-                        LeagueName = item.LeagueName,
-                        FixtureId = Convert.ToInt64(item.FixtureId),
-                        FixtureName = item.FixtureName,
-                        FixtureTypeId = item.FixtureTypeId,
-                        FixtureTypeName = item.FixtureTypeName,
-                        MarketTemplateId = item.MarketTemplateId,
-                        MarketId = Convert.ToInt64(item.MarketId),
-                        MarketName = item.MarketName,
-                        SelectionTemplateId = item.SelectionTemplateId,
-                        SelectionId = Convert.ToInt64(item.SelectionId),
-                        SelectionName = item.SelectionName,
-                        FixtureStatusId = item.FixtureStatusId,
-                        FixtureStatusName = item.FixtureStatusName,
-                        Line = item.Line,
-                        Odds = item.Odds,
-                        ProviderFixtureId = item.ProviderFixtureId,
-                        FixtureSpecifier = item.FixtureSpecifier,
-                        MarketSpecifier = item.MarketSpecifier,
-                        SelectionSpecifier = item.SelectionSpecifier,
-                        FixtureStartDate = item.FixtureStartDate,
-                        SettlementScore = item.SettlementScore,
-                        Probability = item.Probability,
-                        WonProbability = item.WonProbability,
-                        LostProbability = item.LostProbability,
-                        VoidProbability = item.VoidProbability,
-                        HalfWonProbability = item.HalfWonProbability,
-                        HalfLostProbability = item.HalfLostProbability,
-                        CorrelationId = item.CorrelationId,
-                        DeadHeatFactor = item.DeadHeatFactor,
-                        ManualSettledBy = item.ManualSettledBy,
-                        TimeStamp = DateTime.UtcNow,
-                        Reason = item.Reason,
-                        ToStatusId = (int)item.SelectionStatus,
-                        ToStatusName = item.SelectionStatus.ToString()
-                    }),
-                    UserId = _userState.Model.Id,
-                    UserName = _userState.Model.Name,
-                    TimeStamp = DateTime.UtcNow
-                };
-
-                ActivityLogs.ActivityLogs.Add(ActivityLog);
-            }
-
+            // Activity logging for manual market settlements is owned server-side by
+            // TradingRepository.AddOrUpdateManualMarketSettlement (written before the
+            // OnBetSettlement publish, so it survives post-save failures). Logging here
+            // as well would produce duplicate history rows.
             var response = (await TradingService.AddOrUpdateManualMarketSettlement(request, _userState.Model.Id)).Result;
 
             if (response.StatusCode == StatusCode.Success)
             {
-                if (request.Any())
-                {
-                    await BackofficeService.AddActivityLogList(ActivityLogs);
-                }
 
                 IsPreLoader = false;
                 AlertModel = new AlertModel()

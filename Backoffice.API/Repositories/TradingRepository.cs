@@ -36,11 +36,8 @@ namespace Backoffice.API.Repositories
         private static IMongoCollection<Market> marketCollection;
         private static IMongoCollection<Selection> selectionCollection;
 
-        private readonly TradingContext _tradingContext;
-
-        public TradingRepository(TradingContext tradingContext, IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache, ILogger<TradingRepository> logger, IRabbitMqRepository rabbitMqRepository)
+        public TradingRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache, ILogger<TradingRepository> logger, IRabbitMqRepository rabbitMqRepository)
         {
-            _tradingContext = tradingContext;
             _configuration = configuration;
             _activityLogRepository = activityLogRepository;
             _memCache = memCache;
@@ -1131,7 +1128,6 @@ namespace Backoffice.API.Repositories
 
                 var timeStamp = DateTime.UtcNow;
                 var activityLogs = new OnActivityLogListMessage();
-                var auditRecords = new List<ManualMarketSettlementAudit>();
                 var statuses = new List<BetStatus> { BetStatus.Won, BetStatus.Lost, BetStatus.HalfLost, BetStatus.HalfWon, BetStatus.Void };
 
                 // validate duplicate bets
@@ -1238,11 +1234,9 @@ namespace Backoffice.API.Repositories
                         ToStatusName = item.SelectionStatus.ToString()
                     };
 
-                    auditRecords.Add(manualSettlementRequestAudit);
-
                     activityLogs.OnActivityLogMessages.Add(new OnActivityLogMessage()
                     {
-                        Page = Page.OE_Administration_ManualSettlement.ToString().Replace("_", "."),
+                        Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
                         Payload = $"{manualSettlementRequestAudit.SportId}.{manualSettlementRequestAudit.SegmentId}.{manualSettlementRequestAudit.LeagueId}.{manualSettlementRequestAudit.FixtureId}",
                         Activity = Activity.ManualSettlement.ToString(),
                         From = "-",
@@ -1251,16 +1245,7 @@ namespace Backoffice.API.Repositories
                     });
                 }
 
-                await _tradingContext.ManualMarketSettlementAudit.AddRangeAsync(auditRecords);
-                await _tradingContext.SaveChangesAsync();
-
-                await _rabbitMqRepository.Publish(new MessageRequest()
-                {
-                    CorrelationId = Guid.NewGuid().ToString(),
-                    MessageType = "LogActivityList",
-                    RoutingKey = $"r.oe.util.logs",
-                    Payload = JsonSerializer.Serialize(activityLogs)
-                });
+                await _activityLogRepository.ProcessActivityLog(activityLogs);
 
                 foreach (var fixtureGroup in request.GroupBy(r => r.ProviderFixtureId))
                 {
