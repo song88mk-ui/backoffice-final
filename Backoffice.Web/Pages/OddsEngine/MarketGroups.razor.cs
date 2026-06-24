@@ -1,4 +1,4 @@
-﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -34,6 +34,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isDelete = false;
         private bool _isUpdate = false;
         private int _tempUpdateGroupId = -1;
+        private bool _pendingAdd = false;
 
         #endregion
 
@@ -66,11 +67,28 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
 
+            _modalService.OnClose += OnModalClosed;
+
             await PageState.AuthenticateAccessEvent.InvokeAsync();
+        }
+
+        private async void OnModalClosed(ModalResult result)
+        {
+            if (_pendingAdd)
+            {
+                _pendingAdd = false;
+                await InvokeAsync(async () =>
+                {
+                    await OnInit();
+                    StateHasChanged();
+                });
+            }
         }
 
         public async Task OnAddClickedEvent()
         {
+            _pendingAdd = true;
+
             var marketTemplateGroup = new ClientMarketTemplateGroupDTO
             {
                 FixtureStatusId = MarketGroupModel.FixtureStatusId
@@ -98,6 +116,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnEditClickedEvent(int marketTemplateGroupId)
         {
+            _pendingAdd = false;
             var marketTemplateGroup = MarketGroupModel.MarketTemplateGroups.Where(x => x.MarketTemplateGroupId == marketTemplateGroupId).FirstOrDefault();
             var parameters = new ModalParameters();
             _isUpdate = true;
@@ -117,6 +136,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnDeleteClickedEvent(ClientMarketTemplateGroupDTO marketTemplateGroup)
         {
+            _pendingAdd = false;
             var parameters = new ModalParameters();
             _isDelete = true;
 
@@ -236,8 +256,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             else
             {
                 MarketGroupModel.IsUpdate = false;
-
-                await OnInit();
             }
 
             _isDelete = false;
@@ -336,6 +354,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async ValueTask DisposeAsync()
         {
+            _modalService.OnClose -= OnModalClosed;
+
             if (DataReference is not null)
                 await DataReference.DisposeAsync();
 
