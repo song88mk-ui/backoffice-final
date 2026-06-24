@@ -115,32 +115,27 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                var activityLogs = new List<ActivityLog>();
+                foreach (var activity in request.ActivityLogs)
                 {
-                    var activityLogs = new List<ActivityLog>();
-                    foreach (var activity in request.ActivityLogs)
+                    activity.TimeStamp = activity.TimeStamp == DateTime.MinValue ? DateTime.UtcNow : activity.TimeStamp;
+
+                    activityLogs.Add(new ActivityLog
                     {
-                        activity.TimeStamp = activity.TimeStamp == DateTime.MinValue ? DateTime.UtcNow : activity.TimeStamp;
-
-                        activityLogs.Add(new ActivityLog
-                        {
-                            Page = activity.Page,
-                            Payload = activity.Payload,
-                            From = activity.From,
-                            To = activity.To,
-                            Activity = activity.Activity,
-                            UserId = activity.UserId,
-                            UserName = activity.UserName,
-                            TimeStamp = activity.TimeStamp
-                        });
-                    }
-
-                    _backofficeContext.ActivityLog.AddRange(activityLogs);
-
-                    await _backofficeContext.SaveChangesAsync();
-
-                    scope.Complete();
+                        Page = activity.Page,
+                        Payload = activity.Payload,
+                        From = activity.From,
+                        To = activity.To,
+                        Activity = activity.Activity,
+                        UserId = activity.UserId,
+                        UserName = activity.UserName,
+                        TimeStamp = activity.TimeStamp
+                    });
                 }
+
+                _backofficeContext.ActivityLog.AddRange(activityLogs);
+
+                await _backofficeContext.SaveChangesAsync();
 
                 return new BaseResponse<bool>
                 {
@@ -154,7 +149,7 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
-                    Message = StatusCode.Error.ToString(),
+                    Message = ex.Message,
                     Result = false
                 };
             }

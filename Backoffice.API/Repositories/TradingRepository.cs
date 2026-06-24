@@ -1262,6 +1262,36 @@ namespace Backoffice.API.Repositories
                     Payload = JsonSerializer.Serialize(activityLogs)
                 });
 
+                foreach (var fixtureGroup in request.GroupBy(r => r.ProviderFixtureId))
+                {
+                    var first = fixtureGroup.First();
+                    var settlementMessage = new OnBetSettlementMessage
+                    {
+                        SportId = first.SportId,
+                        ProviderFixtureId = first.ProviderFixtureId,
+                        FixtureSpecifier = first.FixtureSpecifier,
+                        HomeScore = string.Empty,
+                        AwayScore = string.Empty,
+                        Selections = fixtureGroup.Select(r => new SelectionSettlementMessage
+                        {
+                            MarketTemplateId = r.MarketTemplateId,
+                            SelectionTemplateId = r.SelectionTemplateId,
+                            MarketSpecifier = r.MarketSpecifier,
+                            Result = r.SelectionStatus == BetStatus.Won || r.SelectionStatus == BetStatus.HalfWon,
+                            VoidFactor = GetVoidFactor(r.SelectionStatus),
+                            DeadHeatFactor = r.DeadHeatFactor,
+                        }).ToList()
+                    };
+
+                    await _rabbitMqRepository.Publish(new MessageRequest()
+                    {
+                        CorrelationId = Guid.NewGuid().ToString(),
+                        MessageType = "OnBetSettlement",
+                        RoutingKey = "r.uof.onbetsettlement",
+                        Payload = JsonSerializer.Serialize(settlementMessage)
+                    });
+                }
+
                 return new BaseResponse<ManualMarketSettlementResponse>
                 {
                     StatusCode = StatusCode.Success,
@@ -2523,6 +2553,13 @@ namespace Backoffice.API.Repositories
             }
 
             return result;
+        }
+
+        private static VoidFactor GetVoidFactor(BetStatus status)
+        {
+            if (status == BetStatus.Void) return VoidFactor.One;
+            if (status == BetStatus.HalfWon || status == BetStatus.HalfLost) return VoidFactor.Half;
+            return VoidFactor.Zero;
         }
         #endregion
     }
