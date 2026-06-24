@@ -82,9 +82,9 @@ namespace Backoffice.Web.Pages.Administration
                 _liveClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == false).Select(c => c.ClientName).ToList();
                 _underMaintenanceClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == true).Select(c => c.ClientName).ToList();
 
-
                 _isAllClient = (_underMaintenanceClients.Any() && !_liveClients.Any()) || (!_underMaintenanceClients.Any() && _liveClients.Any());
                 _isDropDownDisabled = _underMaintenanceClients.Any();
+                _isAllClientMode = _isAllClient;
 
                 HandleChangeMode(_isAllClientMode);
                 _initialStatusIsAllClient = _isAllClientMode;
@@ -108,7 +108,7 @@ namespace Backoffice.Web.Pages.Administration
                 if (value != _clienHasChange)
                     _clienHasChange = value;
 
-                hasChange = (_clienHasChange || _isDropDownDisabled) && _isMaintenance != _initialMaintenanceIsOn && _clients.Any(c => c.IsChecked);
+                hasChange = ((_clienHasChange || _isDropDownDisabled) || _isMaintenance != _initialMaintenanceIsOn) && _clients.Any(c => c.IsChecked);
             }
             else
             {
@@ -139,6 +139,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 _maintenanceModeAllClientsCss = "";
                 _maintenanceModeSpecificClientsCss = "active";
+                _isDropDownDisabled = false;
 
                 _isMaintenance = _clients.Any(c => c.IsMaintenanceEnabled);
                 _initialMaintenanceIsOn = _isMaintenance;

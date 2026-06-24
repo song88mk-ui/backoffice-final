@@ -18,6 +18,7 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
         private List<string> _initialClients = new();
         private bool _hasChange;
         private bool _isDisabled;
+        private bool _isDropdownOpen = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -45,7 +46,17 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
         private bool ParameterChanged() => Clients != null && !_activeClients.SequenceEqual(Clients.Where(c => c.IsChecked).ToList()) || _isDisabled != Disabled;
         private void HandleEditListClick()
         {
-            //_selectionCss = " bg-white";
+            if (Disabled)
+                return;
+
+            _isDropdownOpen = !_isDropdownOpen;
+            _shouldRender = true;
+        }
+
+        private void CloseDropdown()
+        {
+            _isDropdownOpen = false;
+            _shouldRender = true;
         }
 
         public async Task HandleSearchInput()
