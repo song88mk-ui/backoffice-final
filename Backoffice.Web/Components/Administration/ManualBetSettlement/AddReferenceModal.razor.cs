@@ -89,12 +89,14 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
                 await InvokeAsync(StateHasChanged);
 
-                var response = (await BackofficeService.GetManualBetDetails(new ManualBetDetailsRequest()
+                var apiResponse = await BackofficeService.GetManualBetDetails(new ManualBetDetailsRequest()
                 {
                     BetIds = new List<string> { betIdString }
-                })).Result;
+                });
 
-                if (response.Bets.Any())
+                var response = apiResponse?.Result;
+
+                if (response?.Bets?.Any() == true)
                 {
                     bet = JsonSerializer.Deserialize<ManualBetDetails>(JsonSerializer.Serialize(response.Bets.FirstOrDefault()));
 
@@ -134,30 +136,36 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
             {
                 case BetStatus.Won:
                     {
+                        bet.NewBetStatusId = e.Value.ToString();
                         bet.NewBetStatusName = BetStatus.Won.ToString();
                         break;
                     }
                 case BetStatus.Lost:
                     {
+                        bet.NewBetStatusId = e.Value.ToString();
                         bet.NewBetStatusName = BetStatus.Lost.ToString();
                         break;
                     }
                 case BetStatus.HalfWon:
                     {
+                        bet.NewBetStatusId = e.Value.ToString();
                         bet.NewBetStatusName = BetStatus.HalfWon.ToString();
                         break;
                     }
                 case BetStatus.HalfLost:
                     {
+                        bet.NewBetStatusId = e.Value.ToString();
                         bet.NewBetStatusName = BetStatus.HalfLost.ToString();
                         break;
                     }
                 case BetStatus.Void:
                     {
+                        bet.NewBetStatusId = e.Value.ToString();
                         bet.NewBetStatusName = BetStatus.Void.ToString();
                         break;
                     }
                 default:
+                    bet.NewBetStatusId = "0";
                     IsSettleDisabled = true;
                     break;
             }
