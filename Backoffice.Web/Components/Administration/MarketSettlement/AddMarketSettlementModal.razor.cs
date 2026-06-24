@@ -302,8 +302,6 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         public async Task OnMarketSettlement()
         {
             var request = new List<ManualMarketSettlementRequest>();
-            var selectionPayload = new List<SelectionSettlementMessage>();
-            var fixtureList = new List<Tuple<string, int, string, string, List<SelectionSettlementMessage>>>();
 
             var wonCount = AddMarketSettlement.AddMarketSettlementSelections.Count(c => c.ToStatus == (int)BetStatus.Won);
             var deadHeat = 1m;
@@ -325,9 +323,6 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
                     return;
                 }
-
-                if (!fixtureList.Any(f => f.Item1 == row.FixtureId))
-                    fixtureList.Add(new Tuple<string, int, string, string, List<SelectionSettlementMessage>>(row.FixtureId, row.SportId, row.ProviderFixtureId, row.FixtureSpecifier, new List<SelectionSettlementMessage>()));
 
                 var marketSpecifier = row.MarketSpecifier;
                 if (string.IsNullOrEmpty(row.MarketSpecifier) && row.SelectionSpecifier.Contains("?"))
@@ -374,16 +369,6 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                     ManualSettledBy = _userState.Model.Name,
                 });
 
-                var fixture = fixtureList.Where(f => f.Item1 == row.FixtureId).FirstOrDefault();
-                fixture.Item5.Add(new SelectionSettlementMessage
-                {
-                    MarketTemplateId = row.MarketTemplateId,
-                    SelectionTemplateId = row.SelectionTemplateId,
-                    MarketSpecifier = marketSpecifier,
-                    Result = GetResult((BetStatus)row.ToStatus),
-                    VoidFactor = GetVoidFactor((BetStatus)row.ToStatus),
-                    DeadHeatFactor = deadHeat,
-                });
             }
 
             IsPreLoader = true;
@@ -452,28 +437,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
             if (response.StatusCode == StatusCode.Success)
             {
-                foreach (var fixture in fixtureList)
-                {
-                    var settlementPayload = new OnBetSettlementMessage
-                    {
-                        SportId = fixture.Item2,
-                        ProviderFixtureId = fixture.Item3,
-                        FixtureSpecifier = fixture.Item4,
-                        HomeScore = string.Empty,
-                        AwayScore = string.Empty,
-                        Selections = fixture.Item5,
-                    };
-
-                    await TradingService.Publish(new MessageRequest()
-                    {
-                        CorrelationId = Guid.NewGuid().ToString(),
-                        MessageType = "OnBetSettlement",
-                        RoutingKey = "r.uof.onbetsettlement",
-                        Payload = JsonSerializer.Serialize(settlementPayload)
-                    });
-                }
-
-                if (fixtureList.Any())
+                if (request.Any())
                 {
                     await BackofficeService.AddActivityLogList(ActivityLogs);
                 }
