@@ -1237,10 +1237,12 @@ namespace Backoffice.API.Repositories
                     activityLogs.OnActivityLogMessages.Add(new OnActivityLogMessage()
                     {
                         Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
-                        Payload = $"{manualSettlementRequestAudit.SportId}.{manualSettlementRequestAudit.SegmentId}.{manualSettlementRequestAudit.LeagueId}.{manualSettlementRequestAudit.FixtureId}",
+                        // Payload (nvarchar(max)) holds the full settlement detail the history grid renders.
+                        // From/To carry the main change values; To is the resulting selection status.
+                        Payload = JsonSerializer.Serialize(manualSettlementRequestAudit),
                         Activity = Activity.ManualSettlement.ToString(),
                         From = "-",
-                        To = JsonSerializer.Serialize(manualSettlementRequestAudit),
+                        To = manualSettlementRequestAudit.ToStatusName,
                         UserId = userId
                     });
                 }

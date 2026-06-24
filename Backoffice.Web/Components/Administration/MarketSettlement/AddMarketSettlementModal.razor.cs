@@ -380,7 +380,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
             // as well would produce duplicate history rows.
             var response = (await TradingService.AddOrUpdateManualMarketSettlement(request, _userState.Model.Id)).Result;
 
-            if (response.StatusCode == StatusCode.Success)
+            if (response != null && response.StatusCode == StatusCode.Success)
             {
 
                 IsPreLoader = false;

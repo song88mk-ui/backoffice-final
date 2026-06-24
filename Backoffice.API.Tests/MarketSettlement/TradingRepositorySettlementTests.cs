@@ -268,6 +268,13 @@ namespace Backoffice.API.Tests.MarketSettlement
             Assert.All(captured.OnActivityLogMessages, m => Assert.Equal("tester", m.UserId));
             Assert.All(captured.OnActivityLogMessages, m => Assert.Equal(Activity.ManualSettlement.ToString(), m.Activity));
 
+            // The full detail blob is stored in Payload (nvarchar(max)), NOT To (nvarchar(255)).
+            Assert.All(captured.OnActivityLogMessages, m => Assert.Contains("Match Winner", m.Payload));
+            Assert.All(captured.OnActivityLogMessages, m => Assert.Contains("\"SportId\":10", m.Payload));
+            // To carries the resulting selection status (a short "main" value).
+            Assert.Contains(captured.OnActivityLogMessages, m => m.To == BetStatus.Won.ToString());
+            Assert.Contains(captured.OnActivityLogMessages, m => m.To == BetStatus.Lost.ToString());
+
             // No activity-log message should be published to the broker anymore.
             rabbitMock.Verify(r => r.Publish(It.Is<MessageRequest>(m => m.MessageType == "LogActivityList"), It.IsAny<string>()), Times.Never);
         }
