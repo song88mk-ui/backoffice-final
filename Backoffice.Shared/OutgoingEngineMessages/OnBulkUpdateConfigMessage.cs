@@ -1,7 +1,6 @@
-﻿using Backoffice.Shared.Models;
-using System;
+﻿using Backoffice.Shared.Data.Trading.SQLEntities;
+using Backoffice.Shared.Models;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Backoffice.Shared.OutgoingEngineMessages
 {

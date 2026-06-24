@@ -235,7 +235,8 @@ namespace Backoffice.Utility.Repository
                 var result = GetActivityLogs(new ActivityLogRequest()
                 {
                     Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
-                    Payload = BuildPayload(request.SportId, request.SegmentId, request.LeagueId, request.FixtureId),
+                    // Detail blob now lives in Payload; fetch all for the page/date range and filter below.
+                    Payload = "%",
                     DateFrom = request.FromDate.ToUniversalTime(),
                     DateTo = request.ToDate.ToUniversalTime(),
                     MetaData = null
@@ -259,9 +260,15 @@ namespace Backoffice.Utility.Repository
                 foreach (var log in result.ActivityLogs)
                 {
 
-                    var manual = JsonSerializer.Deserialize<ManualMarketSettlementRequest>(log.To);
+                    var manual = JsonSerializer.Deserialize<ManualMarketSettlementRequest>(log.Payload);
                     if (manual != null)
                     {
+                        // Payload now holds the detail blob; apply the fixture filters client-side.
+                        if (!string.IsNullOrEmpty(request.SportId) && request.SportId != "0" && manual.SportId.ToString() != request.SportId) continue;
+                        if (!string.IsNullOrEmpty(request.SegmentId) && request.SegmentId != "0" && manual.SegmentId.ToString() != request.SegmentId) continue;
+                        if (!string.IsNullOrEmpty(request.LeagueId) && request.LeagueId != "0" && manual.LeagueId.ToString() != request.LeagueId) continue;
+                        if (!string.IsNullOrEmpty(request.FixtureId) && request.FixtureId != "0" && manual.FixtureId != request.FixtureId) continue;
+
                         var eventDetails = $"{manual.LeagueName}\n{manual.FixtureName}\n{manual.FixtureStartDate.ToLocalTime().ToString("yyyy/MM/dd hh:mm:ss tt")}\n{manual.MarketName}";
                         var dateSettled = $"{log.TimeStamp.ToLocalTime().ToString("MM/dd/yyyy hh:mm:ss tt")}";
 

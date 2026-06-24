@@ -61,21 +61,20 @@ namespace Backoffice.Web.Pages.Administration
             };
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await GetContent();
         }
 
         public async Task GetContent()
         {
             IsPreLoader = true;
 
-            var filterSportsId = ModalFilterModel.SportId == 0 ? "%" : ModalFilterModel.SportId.ToString();
-            var filterSegmentId = ModalFilterModel.SegmentId == 0 ? "%%" : ModalFilterModel.SegmentId.ToString();
-            var filterLeagueId = ModalFilterModel.LeagueId == 0 ? "%%" : ModalFilterModel.LeagueId.ToString();
-            var filterFixtureId = string.IsNullOrEmpty(ModalFilterModel.FixtureId) ? "%" : ModalFilterModel.FixtureId;
-
+            // The full settlement detail is stored in the activity log's Payload column
+            // (nvarchar(max)); fetch all entries for the page/date range and apply the
+            // fixture/market/selection filters client-side against the deserialized record.
             var response = (await BackofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
-                Payload = $"{filterSportsId}.{filterSegmentId}.{filterLeagueId}.{filterFixtureId}",
+                Payload = "%",
                 MetaData = MetaData,
                 DateFrom = ModalFilterModel.FromDate,
                 DateTo = ModalFilterModel.ToDate
@@ -88,17 +87,18 @@ namespace Backoffice.Web.Pages.Administration
                 MetaData = response.MetaData;
                 foreach (var item in response.ActivityLogs)
                 {
-                    result.Add(JsonConvert.DeserializeObject<ManualMarketSettlementAuditModel>(item.To));
+                    result.Add(JsonConvert.DeserializeObject<ManualMarketSettlementAuditModel>(item.Payload));
                 }
             }
 
-            var marketIds = string.IsNullOrEmpty(ModalFilterModel.MarketId) ? new List<long>() : ModalFilterModel.MarketId.Split(",").Select(s => Convert.ToInt64(s)).ToList();
-            var selectionIds = string.IsNullOrEmpty(ModalFilterModel.SelectionId) ? new List<long>() : ModalFilterModel.SelectionId.Split(",").Select(s => Convert.ToInt64(s)).ToList();
-
-            ManualMarketSettlements = result.Where(x => (ModalFilterModel.ToStatus == 0 || x.ToStatusId == ModalFilterModel.ToStatus)
+            ManualMarketSettlements = result.Where(x => (ModalFilterModel.SportId == 0 || x.SportId == ModalFilterModel.SportId)
+                                        && (ModalFilterModel.SegmentId == 0 || x.SegmentId == ModalFilterModel.SegmentId)
+                                        && (ModalFilterModel.LeagueId == 0 || x.LeagueId == ModalFilterModel.LeagueId)
+                                        && (string.IsNullOrEmpty(ModalFilterModel.FixtureId) || x.FixtureId.ToString() == ModalFilterModel.FixtureId)
+                                        && (ModalFilterModel.ToStatus == 0 || x.ToStatusId == ModalFilterModel.ToStatus)
                                         && (string.IsNullOrEmpty(ModalFilterModel.MarketId) || x.MarketId.ToString() == ModalFilterModel.MarketId)
                                         && (string.IsNullOrEmpty(ModalFilterModel.SelectionId) || x.SelectionId.ToString() == ModalFilterModel.SelectionId)
-                                        && (string.IsNullOrEmpty(ModalFilterModel.SettledBy) || x.ManualSettledBy.ToUpper().Contains(ModalFilterModel.SettledBy.ToUpper()))).ToList();
+                                        && (string.IsNullOrEmpty(ModalFilterModel.SettledBy) || (x.ManualSettledBy ?? string.Empty).ToUpper().Contains(ModalFilterModel.SettledBy.ToUpper()))).ToList();
 
             IsPreLoader = false;
         }

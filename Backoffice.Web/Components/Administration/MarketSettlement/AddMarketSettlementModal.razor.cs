@@ -75,8 +75,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                     BetIds = new List<string> { betId.ToString() }
                 };
                 //var betSelections = (await TradingService.GetBetSelectionDetails(betRequest)).Result;
-                var betSelections = (await BackofficeService.GetManualBetDetails(betRequest)).Result.Bets.FirstOrDefault();
-                if (betSelections.Selections != null && betSelections.Selections.Any())
+                var betSelections = (await BackofficeService.GetManualBetDetails(betRequest)).Result?.Bets?.FirstOrDefault();
+                if (betSelections?.Selections != null && betSelections.Selections.Any())
                 {
                     foreach (var selection in betSelections.Selections.OrderBy(s => s.FixtureName).ThenBy(s => s.MarketId))
                     {
@@ -302,8 +302,6 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         public async Task OnMarketSettlement()
         {
             var request = new List<ManualMarketSettlementRequest>();
-            var selectionPayload = new List<SelectionSettlementMessage>();
-            var fixtureList = new List<Tuple<string, int, string, string, List<SelectionSettlementMessage>>>();
 
             var wonCount = AddMarketSettlement.AddMarketSettlementSelections.Count(c => c.ToStatus == (int)BetStatus.Won);
             var deadHeat = 1m;
@@ -325,9 +323,6 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
                     return;
                 }
-
-                if (!fixtureList.Any(f => f.Item1 == row.FixtureId))
-                    fixtureList.Add(new Tuple<string, int, string, string, List<SelectionSettlementMessage>>(row.FixtureId, row.SportId, row.ProviderFixtureId, row.FixtureSpecifier, new List<SelectionSettlementMessage>()));
 
                 var marketSpecifier = row.MarketSpecifier;
                 if (string.IsNullOrEmpty(row.MarketSpecifier) && row.SelectionSpecifier.Contains("?"))
@@ -374,109 +369,19 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                     ManualSettledBy = _userState.Model.Name,
                 });
 
-                var fixture = fixtureList.Where(f => f.Item1 == row.FixtureId).FirstOrDefault();
-                fixture.Item5.Add(new SelectionSettlementMessage
-                {
-                    MarketTemplateId = row.MarketTemplateId,
-                    SelectionTemplateId = row.SelectionTemplateId,
-                    MarketSpecifier = marketSpecifier,
-                    Result = GetResult((BetStatus)row.ToStatus),
-                    VoidFactor = GetVoidFactor((BetStatus)row.ToStatus),
-                    DeadHeatFactor = deadHeat,
-                });
             }
 
             IsPreLoader = true;
             await InvokeAsync(StateHasChanged);
 
-            var ActivityLogs = new ActivityLogListRequest();
-            foreach (var item in request)
-            {
-                var ActivityLog = new ActivityLogModel()
-                {
-                    Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace('_', '.'),
-                    Activity = Activity.ManualSettlement.ToString(),
-                    Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
-                    From = "-",
-                    To = JsonSerializer.Serialize(new ManualMarketSettlementAuditModel()
-                    {
-                        SportId = item.SportId,
-                        SportName = item.SportName,
-                        SegmentId = item.SegmentId,
-                        SegmentName = item.SegmentName,
-                        LeagueId = item.LeagueId,
-                        LeagueName = item.LeagueName,
-                        FixtureId = Convert.ToInt64(item.FixtureId),
-                        FixtureName = item.FixtureName,
-                        FixtureTypeId = item.FixtureTypeId,
-                        FixtureTypeName = item.FixtureTypeName,
-                        MarketTemplateId = item.MarketTemplateId,
-                        MarketId = Convert.ToInt64(item.MarketId),
-                        MarketName = item.MarketName,
-                        SelectionTemplateId = item.SelectionTemplateId,
-                        SelectionId = Convert.ToInt64(item.SelectionId),
-                        SelectionName = item.SelectionName,
-                        FixtureStatusId = item.FixtureStatusId,
-                        FixtureStatusName = item.FixtureStatusName,
-                        Line = item.Line,
-                        Odds = item.Odds,
-                        ProviderFixtureId = item.ProviderFixtureId,
-                        FixtureSpecifier = item.FixtureSpecifier,
-                        MarketSpecifier = item.MarketSpecifier,
-                        SelectionSpecifier = item.SelectionSpecifier,
-                        FixtureStartDate = item.FixtureStartDate,
-                        SettlementScore = item.SettlementScore,
-                        Probability = item.Probability,
-                        WonProbability = item.WonProbability,
-                        LostProbability = item.LostProbability,
-                        VoidProbability = item.VoidProbability,
-                        HalfWonProbability = item.HalfWonProbability,
-                        HalfLostProbability = item.HalfLostProbability,
-                        CorrelationId = item.CorrelationId,
-                        DeadHeatFactor = item.DeadHeatFactor,
-                        ManualSettledBy = item.ManualSettledBy,
-                        TimeStamp = DateTime.UtcNow,
-                        Reason = item.Reason,
-                        ToStatusId = (int)item.SelectionStatus,
-                        ToStatusName = item.SelectionStatus.ToString()
-                    }),
-                    UserId = _userState.Model.Id,
-                    UserName = _userState.Model.Name,
-                    TimeStamp = DateTime.UtcNow
-                };
-
-                ActivityLogs.ActivityLogs.Add(ActivityLog);
-            }
-
+            // Activity logging for manual market settlements is owned server-side by
+            // TradingRepository.AddOrUpdateManualMarketSettlement (written before the
+            // OnBetSettlement publish, so it survives post-save failures). Logging here
+            // as well would produce duplicate history rows.
             var response = (await TradingService.AddOrUpdateManualMarketSettlement(request, _userState.Model.Id)).Result;
 
-            if (response.StatusCode == StatusCode.Success)
+            if (response != null && response.StatusCode == StatusCode.Success)
             {
-                if (fixtureList.Any())
-                {
-                    foreach (var fixture in fixtureList)
-                    {
-                        var payload = new OnBetSettlementMessage
-                        {
-                            SportId = fixture.Item2,
-                            ProviderFixtureId = fixture.Item3,
-                            FixtureSpecifier = fixture.Item4,
-                            HomeScore = string.Empty,
-                            AwayScore = string.Empty,
-                            Selections = fixture.Item5,
-                        };
-
-                        await TradingService.Publish(new MessageRequest()
-                        {
-                            CorrelationId = Guid.NewGuid().ToString(),
-                            MessageType = "OnBetSettlement",
-                            RoutingKey = $"r.uof.onbetsettlement",
-                            Payload = JsonSerializer.Serialize(payload)
-                        });
-                    }
-
-                    await BackofficeService.AddActivityLogList(ActivityLogs);
-                }
 
                 IsPreLoader = false;
                 AlertModel = new AlertModel()

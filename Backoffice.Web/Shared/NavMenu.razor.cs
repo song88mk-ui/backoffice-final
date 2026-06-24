@@ -157,33 +157,45 @@ namespace Backoffice.Web.Shared
 
             if (_navMenus == null)
             {
-                _navMenus = new NavMenuModel()
-                {
-                    Menus = NavMenuParameter?.NavMenus?.Menus?.Select(x => new MenuModel()
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        IconName = x.IconName,
-                        Url = x.Url,
-                        SubMenus = x.SubMenus
-                    }).ToList() ?? new List<MenuModel>()
-                };
+                _navMenus = new NavMenuModel() { Menus = BuildNavMenus(page) };
             }
 
             if (!_navMenus.Equals(NavMenuParameter?.NavMenus))
             {
-                _navMenus = new NavMenuModel()
-                {
-                    Menus = NavMenuParameter?.NavMenus?.Menus?.Select(x => new MenuModel()
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        IconName = x.IconName,
-                        Url = x.Url,
-                        SubMenus = x.SubMenus
-                    }).ToList() ?? new List<MenuModel>()
-                };
+                _navMenus = new NavMenuModel() { Menus = BuildNavMenus(page) };
             }
+        }
+
+        private List<MenuModel> BuildNavMenus(string page)
+        {
+            var menus = NavMenuParameter?.NavMenus?.Menus?.Select(x => new MenuModel()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                IconName = x.IconName,
+                Url = x.Url,
+                SubMenus = x.SubMenus
+            }).ToList() ?? new List<MenuModel>();
+
+            if (page != null && (page.Contains("sportsbook-translations", StringComparison.OrdinalIgnoreCase) 
+                                        || page.Contains("translations", StringComparison.OrdinalIgnoreCase)))
+            {
+                menus = menus
+                    .Where(m => m.Id == "sub-menu-translations"
+                                || string.Equals(m.Url, "/dashboard", StringComparison.OrdinalIgnoreCase)
+                                || string.Equals(m.Url, "admin/dashboard", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            if (page != null && (!page.Contains("sportsbook-translations", StringComparison.OrdinalIgnoreCase) 
+                                        && !page.Contains("translations", StringComparison.OrdinalIgnoreCase)))
+            {
+                menus = menus
+                    .Where(m => m.Id != "sub-menu-translations")
+                    .ToList();
+            }
+
+            return menus;
         }
 
         private async Task HandleSportClick(SportClickCallbackModel selectedSport)

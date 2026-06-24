@@ -115,32 +115,27 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                var activityLogs = new List<ActivityLog>();
+                foreach (var activity in request.ActivityLogs)
                 {
-                    var activityLogs = new List<ActivityLog>();
-                    foreach (var activity in request.ActivityLogs)
+                    activity.TimeStamp = activity.TimeStamp == DateTime.MinValue ? DateTime.UtcNow : activity.TimeStamp;
+
+                    activityLogs.Add(new ActivityLog
                     {
-                        activity.TimeStamp = activity.TimeStamp == DateTime.MinValue ? DateTime.UtcNow : activity.TimeStamp;
-
-                        activityLogs.Add(new ActivityLog
-                        {
-                            Page = activity.Page,
-                            Payload = activity.Payload,
-                            From = activity.From,
-                            To = activity.To,
-                            Activity = activity.Activity,
-                            UserId = activity.UserId,
-                            UserName = activity.UserName,
-                            TimeStamp = activity.TimeStamp
-                        });
-                    }
-
-                    _backofficeContext.ActivityLog.AddRange(activityLogs);
-
-                    await _backofficeContext.SaveChangesAsync();
-
-                    scope.Complete();
+                        Page = activity.Page,
+                        Payload = activity.Payload,
+                        From = activity.From,
+                        To = activity.To,
+                        Activity = activity.Activity,
+                        UserId = activity.UserId,
+                        UserName = activity.UserName,
+                        TimeStamp = activity.TimeStamp
+                    });
                 }
+
+                _backofficeContext.ActivityLog.AddRange(activityLogs);
+
+                await _backofficeContext.SaveChangesAsync();
 
                 return new BaseResponse<bool>
                 {
@@ -154,7 +149,7 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
-                    Message = StatusCode.Error.ToString(),
+                    Message = ex.Message,
                     Result = false
                 };
             }
@@ -289,7 +284,8 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<ActivityLogResponse>
                 {
                     StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = new ActivityLogResponse { ActivityLogs = new List<ActivityLogModel>() }
                 };
             }
         }
@@ -1827,7 +1823,7 @@ namespace Backoffice.API.Repositories
                 var clientConfigs = new List<ConfigClientModel>();
                 var isCompleteClient = false;
 
-                var clientList = GetTradingClientInformation();
+                var clientList = (await _platformRepository.GetClients("HK")).Result;
                 var allClientsCount = clientList.Count;
                 var metaData = payload?.MetaData;
 
@@ -1835,7 +1831,7 @@ namespace Backoffice.API.Repositories
                 {
                     if (clientCodes.FirstOrDefault().ToUpper() != "ALL")
                     {
-                        clientList = new List<ClientInformationModel>();
+                        clientList = new List<PlatformClientResponse>();
                     }
                 }
                 else
@@ -2314,10 +2310,10 @@ namespace Backoffice.API.Repositories
         {
             return _backofficeContext.ClientInformation.AsNoTracking().ToList() ?? new List<ClientInformation>();
         }
-        private List<ClientInformationModel> GetTradingClientInformation()
-        {
-            return _tradingRepository.GetClientList("").Result?.Result ?? new List<ClientInformationModel>();
-        }
+        //private List<ClientInformationModel> GetTradingClientInformation()
+        //{
+        //    return _tradingRepository.GetClientList("").Result?.Result ?? new List<ClientInformationModel>();
+        //}
         private long InsertClientRecord(ClientInformation client)
         {
             _backofficeContext.ClientInformation.Add(client);
@@ -2481,7 +2477,8 @@ namespace Backoffice.API.Repositories
                 var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
                 var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
 
-                result = (leagueLookup.Count * GetTradingClientInformation().Count) - assignedLeagues;
+                var clientList = (await _platformRepository.GetClients("HK")).Result;
+                result = (leagueLookup.Count * clientList.Count) - assignedLeagues;
             }
 
             return result;
@@ -2498,8 +2495,9 @@ namespace Backoffice.API.Repositories
             var leagueCount = query.Count();
             var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup("");
 
+            var clientList = (await _platformRepository.GetClients("HK")).Result;
             if (leagueLookupResponse.StatusCode == StatusCode.Success)
-                result = (leagueLookupResponse.Result.LeagueLookup.Count * GetTradingClientInformation().Count) - leagueCount;
+                result = (leagueLookupResponse.Result.LeagueLookup.Count * clientList.Count) - leagueCount;
 
             return result;
         }

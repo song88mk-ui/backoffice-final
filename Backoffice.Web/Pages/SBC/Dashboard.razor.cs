@@ -66,6 +66,9 @@ namespace Backoffice.Web.Pages.SBC
                 SortBy = (ClientSorting)0
             };
             var response = await BackofficeService.GetClientList(request);
+            if (response.StatusCode != StatusCode.Success || response.Result?.Clients == null)
+                return new List<string>();
+
             return response.Result.Clients.Select(c => c.ClientCode).ToList();
         }
 

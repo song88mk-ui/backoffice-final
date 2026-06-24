@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Data.Trading.SQLEntities;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineMessages;

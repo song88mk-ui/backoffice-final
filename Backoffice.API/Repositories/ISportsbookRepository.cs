@@ -39,7 +39,6 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<List<ClientLeagueOrderListResponse>>> GetClientLeagueOrderList(ClientLeagueOrderListRequest request);
         Task<BaseResponse<List<TierLeagueOrder>>> GetTierLeagueOrderList();
         #endregion
-        Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region);
 
     }
 }
