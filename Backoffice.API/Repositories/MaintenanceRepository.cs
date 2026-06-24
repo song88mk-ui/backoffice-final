@@ -21,7 +21,7 @@ namespace Backoffice.API.Repositories
 {
     public class MaintenanceRepository : IMaintenanceRepository
     {
-        private readonly ITradingRepository _tradingRepository;
+        private readonly IPlatformRepository _platformRepository;
 
         private HttpClient _maintenanceHttpClient;
         private readonly bool _isStaging;
@@ -33,12 +33,12 @@ namespace Backoffice.API.Repositories
         private readonly string _maintenanceConfigJsonTest;
 
 
-        public MaintenanceRepository(HttpClient httpClient, IConfiguration configuration, ITradingRepository tradingRepository,
+        public MaintenanceRepository(HttpClient httpClient, IConfiguration configuration, IPlatformRepository platformRepository,
                 Instrumentation instrumentation, ILogger<MaintenanceRepository> logger)
         {
             _isStaging = bool.Parse(configuration["IsStaging"]);
 
-            _tradingRepository = tradingRepository;
+            _platformRepository = platformRepository;
             _activitySource = instrumentation.ActivitySource;
             _logger = logger;
 
@@ -53,10 +53,14 @@ namespace Backoffice.API.Repositories
         {
             using (var activity = _activitySource.StartActivity("get.maintenance.v2"))
             {
-                activity?.SetTag("client.codes", clientCodes.Join(","));
+                activity?.SetTag("client.codes", clientCodes?.Join(","));
                 try
                 {
-                    var clientResponse = await _tradingRepository.GetClientList("");
+                    _logger.LogInformation($"[GetMaintenanceV2] clientCodes={clientCodes?.Join(",") ?? "NULL"}");
+
+                    var clientResponse = await _platformRepository.GetClients("HK");
+
+                    _logger.LogInformation($"[GetMaintenanceV2] GetClients — StatusCode={clientResponse?.StatusCode}, Count={clientResponse?.Result?.Count ?? -1}");
 
                     if (clientResponse?.Result == null)
                     {
@@ -70,12 +74,13 @@ namespace Backoffice.API.Repositories
 
                     var clientReference = clientResponse.Result;
 
-                    if (clientCodes.Count > 1)
+                    if (clientCodes?.Count > 1)
                         clientReference = clientReference.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+
+                    _logger.LogInformation($"[GetMaintenanceV2] clientReference count after filter={clientReference?.Count ?? -1}");
 
                     if (clientReference == null)
                     {
-
                         activity?.SetStatus(ActivityStatusCode.Error, clientResponse.StatusCode.ToString());
                         return new BaseResponse<MaintenanceResponse>()
                         {
@@ -90,6 +95,8 @@ namespace Backoffice.API.Repositories
                     {
                         var configs = new List<ExternalMaintenanceConfig>();
 
+                        _logger.LogInformation($"[GetMaintenanceV2] Processing app={app}");
+
                         if (app.Equals("bl", StringComparison.OrdinalIgnoreCase))
                         {
                             var tempConfigs = new List<ExternalMaintenanceConfig>();
@@ -100,6 +107,8 @@ namespace Backoffice.API.Repositories
                                 tempConfigs = JsonSerializer.Deserialize<List<ExternalMaintenanceConfig>>(text);
                             }
 
+                            _logger.LogInformation($"[GetMaintenanceV2] bl file configs count={tempConfigs?.Count ?? -1}");
+
                             if (tempConfigs != null && tempConfigs.Any())
                                 configs.AddRange(tempConfigs);
                         }
@@ -109,6 +118,8 @@ namespace Backoffice.API.Repositories
                             {
                                 var response = await _maintenanceHttpClient.GetAsync($"/v1.0/invoke/{app.ToLower()}/method/maintenance");
                                 var content = await response.Content.ReadAsStringAsync();
+
+                                _logger.LogInformation($"[GetMaintenanceV2] Dapr app={app} status={response.StatusCode}");
 
                                 if (response.StatusCode != System.Net.HttpStatusCode.OK)
                                 {
@@ -124,9 +135,11 @@ namespace Backoffice.API.Repositories
                             }
                             catch (Exception e)
                             {
-                                _logger.LogError($"error on dapr invoke: {e.Message}");
+                                _logger.LogError($"[GetMaintenanceV2] Dapr error app={app}: {e.Message}");
                             }
                         }
+
+                        _logger.LogInformation($"[GetMaintenanceV2] app={app} configs count={configs?.Count ?? -1}");
 
                         if (configs != null && configs.Any())
                         {
@@ -149,6 +162,26 @@ namespace Backoffice.API.Repositories
                             }
                         }
                     }
+
+                    // If no app returned any config entries, seed from Platform clients
+                    // so the dropdown is populated for first-time setup
+                    if (!clientsConfig.Any() && clientReference.Any())
+                    {
+                        foreach (var client in clientReference)
+                        {
+                            clientsConfig.Add(new MaintenanceConfigModel()
+                            {
+                                ClientId = client.ClientId.ToString(),
+                                IsMaintenance = false,
+                                Site = string.Empty,
+                                ClientCode = client.ClientCode,
+                                ClientName = client.ClientName,
+                                App = "BL"
+                            });
+                        }
+                    }
+
+                    _logger.LogInformation($"[GetMaintenanceV2] final clientsConfig count={clientsConfig.Count}");
                     activity?.SetStatus(ActivityStatusCode.Ok);
                     return new BaseResponse<MaintenanceResponse>()
                     {
@@ -177,7 +210,7 @@ namespace Backoffice.API.Repositories
         {
             using (var activity = _activitySource.StartActivity("set.maintenance.v2"))
             {
-                activity?.SetTag("client.codes", clientCodes.Join(","));
+                activity?.SetTag("client.codes", clientCodes?.Join(","));
                 try
                 {
                     var requestClientIds = request?.ClientIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToUpper()).ToList() ?? new List<string>();
@@ -198,8 +231,8 @@ namespace Backoffice.API.Repositories
                         };
                     }
 
-                    var appGroups = referenceClients.Where(c => (requestClientIds.Count() == 1 && requestClientIds.FirstOrDefault().ToUpper() == "ALL")
-                                                    || (requestClientIds.Any(ci => (ci.Contains(":") && ci.Contains($"{c.App}:{c.ClientId}", StringComparison.OrdinalIgnoreCase)) || ci == c.ClientId)))
+                    var appGroups = referenceClients.Where(c => (requestClientIds.Count() == 1 && requestClientIds.FirstOrDefault() == "ALL")
+                                                    || (requestClientIds.Any(ci => (ci.Contains(":") && ci.Contains($"{c.App}:{c.ClientId}", StringComparison.OrdinalIgnoreCase)) || ci.Equals(c.ClientId, StringComparison.OrdinalIgnoreCase))))
                                                     .GroupBy(c => c.App).ToList();
 
                     foreach (var appGroup in appGroups)
@@ -225,10 +258,11 @@ namespace Backoffice.API.Repositories
                             }
                             else
                             {
+                                // Default all to false — only the selected clients get request.IsMaintenance
                                 configs = referenceClients.Where(c => c.App.Equals("bl", StringComparison.OrdinalIgnoreCase)).Select(c => new ExternalMaintenanceConfig()
                                 {
                                     ClientId = c.ClientId,
-                                    IsMaintenance = c.IsMaintenance,
+                                    IsMaintenance = false,
                                     Site = c.Site
                                 }).ToList();
 
