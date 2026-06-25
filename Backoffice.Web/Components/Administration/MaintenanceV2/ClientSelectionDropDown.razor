@@ -1,12 +1,18 @@
-﻿<div class="dropdown p-0@(Disabled ? " disabled" : "")">
-    <div class="client-list-container d-flex gap-2 border border-2 p-2 align-items-center mt-3 btn w-100 @_selectionCss" type="button" id="client-dropdown" disabled="@Disabled" data-bs-toggle="dropdown" aria-expanded="false" @onclick="HandleEditListClick">
+<div class="dropdown p-0@(Disabled ? " disabled" : "")">
+    @if (_isDropdownOpen)
+    {
+        <div class="dropdown-backdrop" @onclick="CloseDropdown"></div>
+    }
+    <div class="client-list-container d-flex gap-2 border border-2 p-2 align-items-center mt-3 btn w-100 @_selectionCss @(_isDropdownOpen ? "dropdown-open" : "")"
+         type="button" id="client-dropdown"
+         @onclick="HandleEditListClick">
         @if (_activeClients?.Any() ?? false)
         {
             foreach (var client in _activeClients)
             {
                 <div class="client-item border border-dark rounded-pill bg-dark text-white p-1">
                     <p>@client.Name</p>
-                    <span @onclick="e => HandleRemoveClientClick(client.Value)">
+                    <span @onclick="e => HandleRemoveClientClick(client.Value)" @onclick:stopPropagation="true">
                         <i class="fa fa-times-circle"></i>
                     </span>
                 </div>
@@ -19,7 +25,7 @@
     </div>
     @if (Clients != null && Clients.Any())
     {
-        <ul class="dropdown-menu w-100 pt-0">
+        <ul class="dropdown-menu w-100 pt-0 @(_isDropdownOpen ? "show" : "")">
             <li>
                 <div class="input-group">
                     <span class="input-group-text">
