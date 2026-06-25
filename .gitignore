@@ -11,3 +11,6 @@
 AGENTS.md
 CLAUDE.md
 docs/
+# Local-only secrets for ad-hoc API access (see docs/16_BoApiAccess.md). Never commit real credentials.
+.env
+.env.*.local
