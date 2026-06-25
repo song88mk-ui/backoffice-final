@@ -1,11 +1,10 @@
 <div class="dropdown p-0@(Disabled ? " disabled" : "")">
     @if (_isDropdownOpen)
     {
-        <div style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:999;" @onclick="CloseDropdown"></div>
+        <div class="dropdown-backdrop" @onclick="CloseDropdown"></div>
     }
-    <div class="client-list-container d-flex gap-2 border border-2 p-2 align-items-center mt-3 btn w-100 @_selectionCss"
+    <div class="client-list-container d-flex gap-2 border border-2 p-2 align-items-center mt-3 btn w-100 @_selectionCss @(_isDropdownOpen ? "dropdown-open" : "")"
          type="button" id="client-dropdown"
-         style="@(_isDropdownOpen ? "position:relative;z-index:1000;" : "")"
          @onclick="HandleEditListClick">
         @if (_activeClients?.Any() ?? false)
         {
