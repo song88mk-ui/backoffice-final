@@ -15,6 +15,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<MaintenanceResponse>> GetMaintenanceV2();
         Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
+        Task<BaseResponse<ActivityLogResponse>> GetMarketSettlementActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<MessageResponse>> AddActivityLog(ActivityLogModel request);
         Task<BaseResponse<MessageResponse>> AddActivityLogList(ActivityLogListRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request, string region);

@@ -209,6 +209,59 @@ namespace Backoffice.Web.Services
                 };
             }
         }
+        // Market Settlement history: same shape as GetActivityLogs, but posts to the trading route
+        // (gated on Admin.Settlements.MarketSettlement) rather than api/config/activitylog/list,
+        // which requires the unrelated SBC.OE.Config permission.
+        public async Task<BaseResponse<ActivityLogResponse>> GetMarketSettlementActivityLogs(ActivityLogRequest request)
+        {
+            try
+            {
+                if (request != null)
+                {
+                    if (request.DateFrom == DateTime.MinValue)
+                        request.DateFrom = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(-1);
+                    if (request.DateTo == DateTime.MinValue)
+                        request.DateTo = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(1).AddTicks(-1);
+
+                    request.DateFrom = request.DateFrom.ToUniversalTime();
+                    request.DateTo = request.DateTo.ToUniversalTime();
+                }
+
+                var response = await _httpClient.PostAsync($"api/trading/manual/marketsettlement/history", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ActivityLogResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ActivityLogResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<ActivityLogResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<ActivityLogResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = new ActivityLogResponse
+                    {
+                        ActivityLogs = new List<ActivityLogModel>()
+                    }
+                };
+            }
+        }
         public async Task<BaseResponse<MessageResponse>> AddActivityLog(ActivityLogModel request)
         {
             try

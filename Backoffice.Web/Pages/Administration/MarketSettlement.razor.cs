@@ -71,7 +71,7 @@ namespace Backoffice.Web.Pages.Administration
             // The full settlement detail is stored in the activity log's Payload column
             // (nvarchar(max)); fetch all entries for the page/date range and apply the
             // fixture/market/selection filters client-side against the deserialized record.
-            var response = (await BackofficeService.GetActivityLogs(new ActivityLogRequest
+            var response = (await BackofficeService.GetMarketSettlementActivityLogs(new ActivityLogRequest
             {
                 Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
                 Payload = "%",

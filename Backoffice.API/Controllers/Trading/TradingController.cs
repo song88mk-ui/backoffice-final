@@ -20,13 +20,15 @@ namespace Backoffice.API.Controllers.Trading
     public class TradingController : ControllerBase
     {
         private ITradingRepository _tradingRepository { get; set; }
+        private readonly IBackofficeRepository _backofficeRepository;
         private readonly ActivitySource _activitySource;
 
         #region Ctor
 
-        public TradingController(ITradingRepository tradingRepository, Instrumentation instrumentation)
+        public TradingController(ITradingRepository tradingRepository, IBackofficeRepository backofficeRepository, Instrumentation instrumentation)
         {
             _tradingRepository = tradingRepository;
+            _backofficeRepository = backofficeRepository;
             _activitySource = instrumentation.ActivitySource;
         }
 
@@ -706,6 +708,24 @@ namespace Backoffice.API.Controllers.Trading
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.AddOrUpdateManualMarketSettlement(request, userId, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        // Market Settlement history reuses the shared GetActivityLogs logic, but is exposed here
+        // (gated on Admin.Settlements.MarketSettlement) instead of via api/config/activitylog/list,
+        // which is locked behind the unrelated SBC.OE.Config permission.
+        [HttpPost("manual/marketsettlement/history")]
+        [Authorize("Admin.Settlements.MarketSettlement", (int)Shared.Enums.Access.View)]
+        public async Task<IActionResult> GetMarketSettlementActivityLogs([FromBody] ActivityLogRequest request)
+        {
+            var result = await _backofficeRepository.GetActivityLogs(request);
 
             switch (result.StatusCode)
             {
