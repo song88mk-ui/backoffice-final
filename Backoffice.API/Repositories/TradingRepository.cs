@@ -1264,6 +1264,12 @@ namespace Backoffice.API.Repositories
                             MarketTemplateId = r.MarketTemplateId,
                             SelectionTemplateId = r.SelectionTemplateId,
                             MarketSpecifier = r.MarketSpecifier,
+                            // SelectionSpecifier is required: OE.Sportsbook.Service matches the Mongo
+                            // Selection on (PrFiId, MaTeId, SeTeId, SeSp). Multiple lines of the same
+                            // market (e.g. Under 2.50/3.50/4.50) share MaTeId+SeTeId and differ ONLY by
+                            // SeSp, so omitting it made the filter match nothing and the settlement was
+                            // silently dropped (bet never settled). [GM-543]
+                            SelectionSpecifier = r.SelectionSpecifier,
                             Result = r.SelectionStatus == BetStatus.Won || r.SelectionStatus == BetStatus.HalfWon,
                             VoidFactor = GetVoidFactor(r.SelectionStatus),
                             DeadHeatFactor = r.DeadHeatFactor,
