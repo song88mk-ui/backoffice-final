@@ -40,7 +40,8 @@ namespace Backoffice.API.Tests.MarketSettlement
             BetStatus status,
             string marketTemplateId = "mt1",
             string selectionTemplateId = "st1",
-            string marketSpecifier = "")
+            string marketSpecifier = "",
+            string selectionSpecifier = "ss1")
         {
             return new ManualMarketSettlementRequest
             {
@@ -52,6 +53,7 @@ namespace Backoffice.API.Tests.MarketSettlement
                 MarketTemplateId = marketTemplateId,
                 SelectionTemplateId = selectionTemplateId,
                 MarketSpecifier = marketSpecifier,
+                SelectionSpecifier = selectionSpecifier,
                 FixtureSpecifier = "",
                 Reason = "test settlement",
                 SportId = 10,
@@ -191,6 +193,41 @@ namespace Backoffice.API.Tests.MarketSettlement
             Assert.Equal(VoidFactor.Zero, msg.Selections.Single(s => s.SelectionTemplateId == "st_lost").VoidFactor);
             Assert.Equal(VoidFactor.Half, msg.Selections.Single(s => s.SelectionTemplateId == "st_halflost").VoidFactor);
             Assert.Equal(VoidFactor.One,  msg.Selections.Single(s => s.SelectionTemplateId == "st_void").VoidFactor);
+        }
+
+        // GM-543: SelectionSpecifier must survive onto the published OnBetSettlement message.
+        // OE.Sportsbook.Service matches the Mongo Selection on (PrFiId, MaTeId, SeTeId, SeSp);
+        // lines of the same market share MaTeId+SeTeId and differ only by SeSp. If SelectionSpecifier
+        // is dropped, the filter degenerates to { SeSp: null }, matches nothing, and the bet is never
+        // settled (while the activity-log history row is still written).
+        [Fact]
+        public async Task MapsSelectionSpecifierToPublishedMessage()
+        {
+            var requests = new List<ManualMarketSettlementRequest>
+            {
+                MakeRequest("pf1", "1", "101", "1001", BetStatus.Won,  "mt_ou", "st_under", selectionSpecifier: "bg:1:under250"),
+                MakeRequest("pf1", "1", "102", "1002", BetStatus.Lost, "mt_ou", "st_under", selectionSpecifier: "bg:1:under450"),
+            };
+
+            var published = new List<MessageRequest>();
+            var rabbitMock = new Mock<IRabbitMqRepository>();
+            rabbitMock
+                .Setup(r => r.Publish(It.IsAny<MessageRequest>(), It.IsAny<string>()))
+                .Callback<MessageRequest, string>((req, _) => published.Add(req))
+                .ReturnsAsync(new BaseResponse<MessageResponse> { StatusCode = StatusCode.Success });
+
+            var sut = BuildSut(rabbitMock.Object);
+
+            await sut.AddOrUpdateManualMarketSettlement(requests, "tester", "HK");
+
+            var payload = published.Single(p => p.MessageType == "OnBetSettlement").Payload;
+            var msg = JsonSerializer.Deserialize<OnBetSettlementMessage>(payload, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            // Both lines share MaTeId+SeTeId; only SeSp tells them apart — it must be present and distinct.
+            Assert.Equal(2, msg.Selections.Count);
+            Assert.All(msg.Selections, s => Assert.False(string.IsNullOrEmpty(s.SelectionSpecifier)));
+            Assert.Contains(msg.Selections, s => s.SelectionSpecifier == "bg:1:under250");
+            Assert.Contains(msg.Selections, s => s.SelectionSpecifier == "bg:1:under450");
         }
 
         [Fact]
