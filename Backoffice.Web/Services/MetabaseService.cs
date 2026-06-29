@@ -1,5 +1,6 @@
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using Backoffice.Shared.Enums;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Backoffice.Web.Services;
@@ -38,4 +39,11 @@ public class MetabaseService
         var token = new JwtSecurityToken(new JwtHeader(credentials), payload);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public static string ToLocale(LanguageCode langCode) => langCode switch
+    {
+        LanguageCode.ZH => "zh-CN",
+        LanguageCode.KO => "ko",
+        _ => "en"
+    };
 }

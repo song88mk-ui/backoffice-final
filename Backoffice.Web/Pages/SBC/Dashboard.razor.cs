@@ -23,6 +23,7 @@ namespace Backoffice.Web.Pages.SBC
         private bool _isPreLoader = true;
         private bool _hasAccess = false;
         private bool _metabaseInitialized = false;
+        private string _currentLocale;
         private string _parametersJson;
         private List<string> _clientCodes { get; set; } = new List<string>();
 
@@ -46,13 +47,22 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            var locale = MetabaseService.ToLocale(_translationState.ActiveLanguageCode);
+
             if (!_metabaseInitialized)
             {
                 _metabaseInitialized = true;
+                _currentLocale = locale;
                 await JS.InvokeVoidAsync("initMetabaseDashboard",
                     "/api/metabase/sso-token",
-                    MetabaseService.SiteUrl
+                    MetabaseService.SiteUrl,
+                    locale
                 );
+            }
+            else if (locale != _currentLocale)
+            {
+                _currentLocale = locale;
+                await JS.InvokeVoidAsync("updateMetabaseLocale", locale);
             }
         }
 
