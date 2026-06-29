@@ -1,11 +1,10 @@
-window.initMetabaseDashboard = async (providerUri, instanceUrl, locale) => {
+window.initMetabaseDashboard = async (providerUri, instanceUrl) => {
     if (!document.querySelector('script[data-metabase-embed]')) {
         window.defineMetabaseConfig = (config) => { window.metabaseConfig = config; };
 
         window.defineMetabaseConfig({
             jwtProviderUri: providerUri,
             instanceUrl: instanceUrl,
-            locale: locale,
         });
         await new Promise((resolve, reject) => {
             const script = document.createElement('script');
@@ -16,17 +15,4 @@ window.initMetabaseDashboard = async (providerUri, instanceUrl, locale) => {
             document.head.appendChild(script);
         });
     }
-};
-
-window.updateMetabaseLocale = (locale) => {
-    if (!window.metabaseConfig || window.metabaseConfig.locale === locale) return;
-
-    window.defineMetabaseConfig({ ...window.metabaseConfig, locale });
-
-    document.querySelectorAll('metabase-dashboard').forEach((el) => {
-        const parent = el.parentNode;
-        const next = el.nextSibling;
-        parent.removeChild(el);
-        parent.insertBefore(el, next);
-    });
 };
