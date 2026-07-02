@@ -308,7 +308,7 @@ namespace Backoffice.API.Repositories
                 var topLeagues = new List<OrderedClientTopLeague>();
                 var sortOrder = 1;
 
-                foreach (var league in request.TopLeagues)
+                foreach (var league in request.TopLeagues.OrderBy(l => l.SortOrder))
                 {
                     topLeagues.Add(new OrderedClientTopLeague()
                     {
