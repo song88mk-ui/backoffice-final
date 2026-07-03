@@ -10,27 +10,29 @@ namespace Backoffice.Web.Pages.SBC
         [CascadingParameter] public CustomModal Modal { get; set; }
 
         private string TranslationKey { get; set; } = string.Empty;
-        private Func<Task> OnDeleteCallback { get; set; }
+        private Func<Task<bool>> OnDeleteCallback { get; set; }
 
         protected override void OnInitialized()
         {
             TranslationKey = ModalParameters.TryGet<string>("TranslationKey") ?? string.Empty;
-            OnDeleteCallback = ModalParameters.TryGet<Func<Task>>("OnDeleteCallback");
+            OnDeleteCallback = ModalParameters.TryGet<Func<Task<bool>>>("OnDeleteCallback");
         }
 
         private async Task ConfirmDelete()
         {
             if (OnDeleteCallback != null)
             {
-                await OnDeleteCallback.Invoke();
+                var success = await OnDeleteCallback.Invoke();
+                if (success)
+                {
+                    _modalService.Close();
+                }
             }
-
-            // Modal.Close(ModalResult.Ok(TranslationKey));
         }
 
         private void CancelDelete()
         {
-            // Modal.Cancel();
+            _modalService.Cancel();
         }
     }
 }

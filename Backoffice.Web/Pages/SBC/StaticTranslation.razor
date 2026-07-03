@@ -16,6 +16,12 @@
                         <PageHeader PageHeaderModel="_pageHeaderModel" />
                     </div>
                     <div class="col-md-12">
+                        @if (!string.IsNullOrEmpty(_errorMessage))
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @_errorMessage
+                            </div>
+                        }
                         @if (Translations != null)
                         {
                              <div class="row mb-3">
@@ -82,7 +88,7 @@
                                                     <td>@translation.Value</td>
                                                     <td class="d-flex">
                                                         <img @onclick="() => OnEditTranslation(translation)" src="icons/svg/icon-edit.svg" alt="edit Icon">
-                                                        @* <img @onclick="() => OnDeleteTranslation(translation)" src="icons/svg/icon-delete.svg" alt="delete Icon"> *@
+                                                        <img @onclick="() => OnDeleteTranslation(translation)" src="icons/svg/icon-delete.svg" alt="delete Icon">
                                                     </td>
                                                 </tr>
                                             }

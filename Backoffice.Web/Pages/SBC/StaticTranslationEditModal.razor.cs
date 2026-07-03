@@ -12,29 +12,31 @@ namespace Backoffice.Web.Pages.SBC
         private string TranslationKey { get; set; } = string.Empty;
         private string TranslationValue { get; set; } = string.Empty;
         private bool IsNew { get; set; }
-        private Func<string, string, Task> OnSaveCallback { get; set; }
+        private Func<string, string, Task<bool>> OnSaveCallback { get; set; }
 
         protected override void OnInitialized()
         {
             TranslationKey = ModalParameters.TryGet<string>("TranslationKey") ?? string.Empty;
             TranslationValue = ModalParameters.TryGet<string>("TranslationValue") ?? string.Empty;
             IsNew = ModalParameters.TryGet<bool>("IsNew");
-            OnSaveCallback = ModalParameters.TryGet<Func<string, string, Task>>("OnSaveCallback");
+            OnSaveCallback = ModalParameters.TryGet<Func<string, string, Task<bool>>>("OnSaveCallback");
         }
 
         private async Task SaveEdit()
         {
             if (OnSaveCallback != null && !string.IsNullOrWhiteSpace(TranslationKey))
             {
-                await OnSaveCallback.Invoke(TranslationKey, TranslationValue);
+                var success = await OnSaveCallback.Invoke(TranslationKey, TranslationValue);
+                if (success)
+                {
+                    _modalService.Close();
+                }
             }
-
-            // Modal.Close(ModalResult.Ok(TranslationValue));
         }
 
         private void CancelEdit()
         {
-            // Modal.Cancel();
+            _modalService.Cancel();
         }
     }
 }

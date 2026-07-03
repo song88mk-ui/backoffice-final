@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
 using Backoffice.Web.Pages.Base;
 using Backoffice.Web.Services;
@@ -26,6 +27,7 @@ namespace Backoffice.Web.Pages.SBC
         };
 
         private Dictionary<string, string> Translations { get; set; } = new Dictionary<string, string>();
+        private string _errorMessage;
 
         private string _searchText = string.Empty;
         private string SearchText
@@ -84,18 +86,27 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnInitializedAsync()
         {
-            var response = await BackofficeService.GetStaticTranslationSportsbook("EN");
+            BackofficeService.Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", ".");
+
+            await LoadTranslations(SelectedLanguageCode);
+            await base.OnInitializedAsync();
+        }
+
+        private async Task LoadTranslations(string languageCode)
+        {
+            var response = await BackofficeService.GetSportsbookTranslations(languageCode);
             if (response != null && response.StatusCode == StatusCode.Success && response.Result != null)
             {
                 Translations = response.Result.ToDictionary(t => t.Name, t => t.Value);
+                _errorMessage = null;
             }
             else
             {
                 Translations = new Dictionary<string, string>();
+                _errorMessage = response?.Message ?? "Failed to load translations.";
             }
 
             ResetPagination();
-            await base.OnInitializedAsync();
         }
 
         private async Task OnLanguageChanged(ChangeEventArgs e)
@@ -103,17 +114,7 @@ namespace Backoffice.Web.Pages.SBC
             if (e.Value != null)
             {
                 SelectedLanguageCode = e.Value?.ToString() ?? SelectedLanguageCode;
-                var response = await BackofficeService.GetStaticTranslationSportsbook(SelectedLanguageCode);
-                if (response != null && response.StatusCode == StatusCode.Success && response.Result != null)
-                {
-                    Translations = response.Result.ToDictionary(t => t.Name, t => t.Value);
-                }
-                else
-                {
-                    Translations = new Dictionary<string, string>();
-                }
-
-                ResetPagination();
+                await LoadTranslations(SelectedLanguageCode);
             }
         }
 
@@ -123,7 +124,7 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("TranslationKey", string.Empty);
             parameters.Add("TranslationValue", string.Empty);
             parameters.Add("IsNew", true);
-            parameters.Add("OnSaveCallback", (Func<string, string, Task>)(async (key, newValue) => await SaveTranslationValue(key, newValue)));
+            parameters.Add("OnSaveCallback", (Func<string, string, Task<bool>>)(async (key, newValue) => await SaveTranslationValue(key, newValue)));
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
 
@@ -137,7 +138,7 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("TranslationKey", translation.Key);
             parameters.Add("TranslationValue", translation.Value);
             parameters.Add("IsNew", false);
-            parameters.Add("OnSaveCallback", (Func<string, string, Task>)(async (key, newValue) => await SaveTranslationValue(key, newValue)));
+            parameters.Add("OnSaveCallback", (Func<string, string, Task<bool>>)(async (key, newValue) => await SaveTranslationValue(key, newValue)));
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
 
@@ -149,7 +150,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             var parameters = new ModalParameters();
             parameters.Add("TranslationKey", translation.Key);
-            parameters.Add("OnDeleteCallback", (Func<Task>)(async () => await DeleteTranslationValue(translation.Key)));
+            parameters.Add("OnDeleteCallback", (Func<Task<bool>>)(async () => await DeleteTranslationValue(translation.Key)));
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
 
@@ -157,26 +158,63 @@ namespace Backoffice.Web.Pages.SBC
             ModalService.Open<StaticTranslationDeleteModal>("Delete Translation", parameters, options);
         }
 
-        private Task SaveTranslationValue(string key, string newValue)
+        private async Task<bool> SaveTranslationValue(string key, string newValue)
         {
             if (string.IsNullOrWhiteSpace(key))
             {
-                return Task.CompletedTask;
+                return false;
             }
 
-            Translations[key] = newValue;
-            return InvokeAsync(StateHasChanged);
+            var response = await BackofficeService.AddOrUpdateSportsbookTranslation(new AddOrUpdateSportsbookTranslationRequest
+            {
+                LanguageCode = SelectedLanguageCode,
+                Name = key,
+                Value = newValue
+            });
+
+            var success = response != null && response.StatusCode == StatusCode.Success;
+
+            if (success)
+            {
+                Translations[key] = newValue;
+                _errorMessage = null;
+            }
+            else
+            {
+                _errorMessage = response?.Message ?? "Failed to save translation.";
+            }
+
+            await InvokeAsync(StateHasChanged);
+            return success;
         }
 
-        private Task DeleteTranslationValue(string key)
+        private async Task<bool> DeleteTranslationValue(string key)
         {
-            if (Translations.ContainsKey(key))
+            var response = await BackofficeService.DeleteSportsbookTranslation(new DeleteSportsbookTranslationRequest
             {
-                Translations.Remove(key);
-                EnsureValidCurrentPage();
+                LanguageCode = SelectedLanguageCode,
+                Name = key
+            });
+
+            var success = response != null && response.StatusCode == StatusCode.Success;
+
+            if (success)
+            {
+                if (Translations.ContainsKey(key))
+                {
+                    Translations.Remove(key);
+                    EnsureValidCurrentPage();
+                }
+
+                _errorMessage = null;
+            }
+            else
+            {
+                _errorMessage = response?.Message ?? "Failed to delete translation.";
             }
 
-            return InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
+            return success;
         }
 
         private void ResetPagination()

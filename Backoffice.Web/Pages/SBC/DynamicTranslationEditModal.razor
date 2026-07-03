@@ -1,0 +1,21 @@
+<div class="p-4">
+    <div class="mb-3">
+        <label class="form-label">String ID</label>
+        <input class="form-control" @bind="StringId" @bind:event="oninput" readonly="@(!IsNew)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Source Text (EN)</label>
+        <textarea class="form-control" rows="3" @bind="SourceText" @bind:event="oninput"></textarea>
+    </div>
+    @if (ShowTranslationField)
+    {
+        <div class="mb-3">
+            <label class="form-label">Translation (@SelectedLanguageCode)</label>
+            <textarea class="form-control" rows="3" @bind="TargetText" @bind:event="oninput"></textarea>
+        </div>
+    }
+    <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary me-2" @onclick="CancelEdit">Cancel</button>
+        <button type="button" class="btn btn-primary" @onclick="SaveEdit" disabled="@(string.IsNullOrWhiteSpace(StringId) || string.IsNullOrWhiteSpace(SourceText))">Save</button>
+    </div>
+</div>

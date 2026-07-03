@@ -2581,6 +2581,383 @@ namespace Backoffice.API.Repositories
                 Result = result
             };
         }
+
+        public async Task<BaseResponse<List<SportsbookTranslationResponse>>> GetSportsbookTranslations(string languageCode)
+        {
+            try
+            {
+                var translations = await _translationContext.SportsbookStatic
+                    .AsNoTracking()
+                    .Where(t => t.LanguageCode == languageCode)
+                    .Select(t => new SportsbookTranslationResponse
+                    {
+                        LanguageCode = t.LanguageCode,
+                        Name = t.Name,
+                        Value = t.Value
+                    })
+                    .ToListAsync();
+
+                return new BaseResponse<List<SportsbookTranslationResponse>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = translations
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<SportsbookTranslationResponse>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> AddOrUpdateSportsbookTranslation(AddOrUpdateSportsbookTranslationRequest request, RequesterInfo requesterInfo)
+        {
+            try
+            {
+                var existing = await _translationContext.SportsbookStatic
+                    .FirstOrDefaultAsync(t => t.LanguageCode == request.LanguageCode && t.Name == request.Name);
+
+                var activity = new ActivityLogModel
+                {
+                    Page = requesterInfo.Page,
+                    UserId = requesterInfo.UserId,
+                    UserName = requesterInfo.UserName,
+                    Payload = $"{request.LanguageCode}.{request.Name}",
+                    TimeStamp = DateTime.UtcNow
+                };
+
+                if (existing != null)
+                {
+                    activity.Activity = Activity.Update.ToString();
+                    activity.From = existing.Value;
+                    activity.To = request.Value;
+
+                    existing.Value = request.Value;
+                    _translationContext.SportsbookStatic.Update(existing);
+                }
+                else
+                {
+                    activity.Activity = Activity.Create.ToString();
+                    activity.From = "-";
+                    activity.To = request.Value;
+
+                    _translationContext.SportsbookStatic.Add(new SportsbookStatic
+                    {
+                        LanguageCode = request.LanguageCode,
+                        Name = request.Name,
+                        Value = request.Value
+                    });
+                }
+
+                await _translationContext.SaveChangesAsync();
+                await AddActivityLog(activity);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message,
+                    Result = false
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> DeleteSportsbookTranslation(DeleteSportsbookTranslationRequest request, RequesterInfo requesterInfo)
+        {
+            try
+            {
+                var existing = await _translationContext.SportsbookStatic
+                    .FirstOrDefaultAsync(t => t.LanguageCode == request.LanguageCode && t.Name == request.Name);
+
+                if (existing == null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = "Translation not found",
+                        Result = false
+                    };
+                }
+
+                _translationContext.SportsbookStatic.Remove(existing);
+                await _translationContext.SaveChangesAsync();
+
+                await AddActivityLog(new ActivityLogModel
+                {
+                    Page = requesterInfo.Page,
+                    UserId = requesterInfo.UserId,
+                    UserName = requesterInfo.UserName,
+                    Activity = Activity.Delete.ToString(),
+                    Payload = $"{request.LanguageCode}.{request.Name}",
+                    From = existing.Value,
+                    To = "-",
+                    TimeStamp = DateTime.UtcNow
+                });
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message,
+                    Result = false
+                };
+            }
+        }
+
+        public async Task<BaseResponse<SportsbookGlossaryListResponse>> GetSportsbookGlossary(GetSportsbookGlossaryRequest request)
+        {
+            try
+            {
+                var metaData = request.MetaData ?? new MetaData();
+                var targetLanguage = string.IsNullOrWhiteSpace(request.TargetLanguage) ? "EN" : request.TargetLanguage.ToUpper();
+
+                var query = _translationContext.SportsbookGlossary.AsNoTracking().AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(request.SearchText))
+                {
+                    query = query.Where(g => g.StringId.Contains(request.SearchText) || g.SourceText.Contains(request.SearchText));
+                }
+
+                metaData.TotalCount = await query.CountAsync();
+                metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
+
+                var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
+
+                var page = await query
+                    .OrderBy(g => g.StringId)
+                    .Skip(skip)
+                    .Take(metaData.PageSize)
+                    .ToListAsync();
+
+                var stringIds = page.Select(g => g.StringId).ToList();
+
+                var translationsByStringId = targetLanguage == "EN"
+                    ? new Dictionary<string, string>()
+                    : await _translationContext.TranslationCache2
+                        .AsNoTracking()
+                        .Where(t => stringIds.Contains(t.StringId) && t.TargetLanguage == targetLanguage)
+                        .ToDictionaryAsync(t => t.StringId, t => t.TargetText);
+
+                var glossary = page.Select(g => new SportsbookGlossaryResponse
+                {
+                    Id = g.Id,
+                    StringId = g.StringId,
+                    SourceText = g.SourceText,
+                    Processed = g.Processed,
+                    HasBetPlacement = g.HasBetPlacement,
+                    UpdatedAt = g.UpdatedAt,
+                    TargetLanguage = targetLanguage,
+                    TargetText = targetLanguage == "EN" ? g.SourceText : translationsByStringId.GetValueOrDefault(g.StringId)
+                }).ToList();
+
+                return new BaseResponse<SportsbookGlossaryListResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new SportsbookGlossaryListResponse { Glossary = glossary, MetaData = metaData }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<SportsbookGlossaryListResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> AddOrUpdateSportsbookGlossary(AddOrUpdateSportsbookGlossaryRequest request, RequesterInfo requesterInfo)
+        {
+            try
+            {
+                var activity = new ActivityLogModel
+                {
+                    Page = requesterInfo.Page,
+                    UserId = requesterInfo.UserId,
+                    UserName = requesterInfo.UserName,
+                    TimeStamp = DateTime.UtcNow
+                };
+
+                if (request.Id.HasValue && request.Id.Value > 0)
+                {
+                    var existing = await _translationContext.SportsbookGlossary.FirstOrDefaultAsync(g => g.Id == request.Id.Value);
+                    if (existing == null)
+                    {
+                        return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "Glossary entry not found.", Result = false };
+                    }
+
+                    activity.Activity = Activity.Update.ToString();
+                    activity.Payload = existing.StringId;
+                    activity.From = existing.SourceText;
+                    activity.To = request.SourceText;
+
+                    // Processed/GlossaryVersion intentionally left untouched here -- the external
+                    // bet-genius pipeline re-reads SOURCE_TEXT/SOURCE_HASH and decides for itself
+                    // whether to re-translate (mirrors TranslationRepository.BulkUpsertTemplate).
+                    existing.SourceText = request.SourceText;
+                    existing.UpdatedAt = DateTime.UtcNow;
+                    _translationContext.SportsbookGlossary.Update(existing);
+                }
+                else
+                {
+                    var duplicate = await _translationContext.SportsbookGlossary.AnyAsync(g => g.StringId == request.StringId);
+                    if (duplicate)
+                    {
+                        return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "That String ID already exists.", Result = false };
+                    }
+
+                    activity.Activity = Activity.Create.ToString();
+                    activity.Payload = request.StringId;
+                    activity.From = "-";
+                    activity.To = request.SourceText;
+
+                    _translationContext.SportsbookGlossary.Add(new SportsbookGlossary
+                    {
+                        StringId = request.StringId,
+                        SourceLanguageId = "EN",
+                        SourceText = request.SourceText,
+                        GlossaryVersion = 1,
+                        CreatedAt = DateTime.UtcNow,
+                        Processed = false,
+                        HasBetPlacement = false
+                    });
+                }
+
+                await _translationContext.SaveChangesAsync();
+                await AddActivityLog(activity);
+
+                return new BaseResponse<bool> { StatusCode = StatusCode.Success, Message = StatusCode.Success.ToString(), Result = true };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = ex.Message, Result = false };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> DeleteSportsbookGlossary(DeleteSportsbookGlossaryRequest request, RequesterInfo requesterInfo)
+        {
+            try
+            {
+                var existing = await _translationContext.SportsbookGlossary.FirstOrDefaultAsync(g => g.Id == request.Id);
+                if (existing == null)
+                {
+                    return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "Glossary entry not found.", Result = false };
+                }
+
+                if (existing.HasBetPlacement)
+                {
+                    return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "This entry has an active bet placement and cannot be deleted.", Result = false };
+                }
+
+                var translations = await _translationContext.TranslationCache2.Where(t => t.StringId == existing.StringId).ToListAsync();
+                if (translations.Any())
+                {
+                    _translationContext.TranslationCache2.RemoveRange(translations);
+                }
+
+                _translationContext.SportsbookGlossary.Remove(existing);
+                await _translationContext.SaveChangesAsync();
+
+                await AddActivityLog(new ActivityLogModel
+                {
+                    Page = requesterInfo.Page,
+                    UserId = requesterInfo.UserId,
+                    UserName = requesterInfo.UserName,
+                    Activity = Activity.Delete.ToString(),
+                    Payload = existing.StringId,
+                    From = existing.SourceText,
+                    To = "-",
+                    TimeStamp = DateTime.UtcNow
+                });
+
+                return new BaseResponse<bool> { StatusCode = StatusCode.Success, Message = StatusCode.Success.ToString(), Result = true };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = ex.Message, Result = false };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> AddOrUpdateGlossaryTranslation(AddOrUpdateGlossaryTranslationRequest request, RequesterInfo requesterInfo)
+        {
+            try
+            {
+                var glossary = await _translationContext.SportsbookGlossary.FirstOrDefaultAsync(g => g.StringId == request.StringId);
+                if (glossary == null)
+                {
+                    return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "Glossary entry not found for the given String ID.", Result = false };
+                }
+
+                var targetLanguage = request.TargetLanguage.ToUpper();
+                var existing = await _translationContext.TranslationCache2
+                    .FirstOrDefaultAsync(t => t.StringId == request.StringId && t.TargetLanguage == targetLanguage);
+
+                var activity = new ActivityLogModel
+                {
+                    Page = requesterInfo.Page,
+                    UserId = requesterInfo.UserId,
+                    UserName = requesterInfo.UserName,
+                    Payload = $"{request.StringId}.{targetLanguage}",
+                    To = request.TargetText,
+                    TimeStamp = DateTime.UtcNow
+                };
+
+                if (existing != null)
+                {
+                    activity.Activity = Activity.Update.ToString();
+                    activity.From = existing.TargetText;
+
+                    existing.TargetText = request.TargetText;
+                    existing.UpdatedAt = DateTime.UtcNow;
+                    existing.GlossaryVersion = glossary.GlossaryVersion;
+                    _translationContext.TranslationCache2.Update(existing);
+                }
+                else
+                {
+                    activity.Activity = Activity.Create.ToString();
+                    activity.From = "-";
+
+                    _translationContext.TranslationCache2.Add(new TranslationCache2
+                    {
+                        StringId = request.StringId,
+                        TargetLanguage = targetLanguage,
+                        TargetText = request.TargetText,
+                        GlossaryVersion = glossary.GlossaryVersion,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                }
+
+                await _translationContext.SaveChangesAsync();
+                await AddActivityLog(activity);
+
+                return new BaseResponse<bool> { StatusCode = StatusCode.Success, Message = StatusCode.Success.ToString(), Result = true };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = ex.Message, Result = false };
+            }
+        }
         #endregion
 
         #region Private Methods

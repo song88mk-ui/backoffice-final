@@ -363,6 +363,159 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
+        [HttpGet("sportsbook/translations")]
+        public async Task<IActionResult> GetSportsbookTranslations([FromQuery] string languageCode = "EN")
+        {
+            var result = await _backofficeRepository.GetSportsbookTranslations(languageCode);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("sportsbook/translations")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        public async Task<IActionResult> AddOrUpdateSportsbookTranslation([FromBody] AddOrUpdateSportsbookTranslationRequest request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var userName = HttpContext.Items["UserName"]?.ToString();
+
+            var requester = new RequesterInfo()
+            {
+                UserId = userId,
+                UserName = userName,
+                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
+            };
+
+            var result = await _backofficeRepository.AddOrUpdateSportsbookTranslation(request, requester);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("sportsbook/translations/delete")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        public async Task<IActionResult> DeleteSportsbookTranslation([FromBody] DeleteSportsbookTranslationRequest request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var userName = HttpContext.Items["UserName"]?.ToString();
+
+            var requester = new RequesterInfo()
+            {
+                UserId = userId,
+                UserName = userName,
+                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
+            };
+
+            var result = await _backofficeRepository.DeleteSportsbookTranslation(request, requester);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("sportsbook/glossary/list")]
+        public async Task<IActionResult> GetSportsbookGlossary([FromBody] GetSportsbookGlossaryRequest request)
+        {
+            var result = await _backofficeRepository.GetSportsbookGlossary(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("sportsbook/glossary")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        public async Task<IActionResult> AddOrUpdateSportsbookGlossary([FromBody] AddOrUpdateSportsbookGlossaryRequest request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var userName = HttpContext.Items["UserName"]?.ToString();
+
+            var requester = new RequesterInfo()
+            {
+                UserId = userId,
+                UserName = userName,
+                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
+            };
+
+            var result = await _backofficeRepository.AddOrUpdateSportsbookGlossary(request, requester);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("sportsbook/glossary/delete")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        public async Task<IActionResult> DeleteSportsbookGlossary([FromBody] DeleteSportsbookGlossaryRequest request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var userName = HttpContext.Items["UserName"]?.ToString();
+
+            var requester = new RequesterInfo()
+            {
+                UserId = userId,
+                UserName = userName,
+                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
+            };
+
+            var result = await _backofficeRepository.DeleteSportsbookGlossary(request, requester);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("sportsbook/glossary/translation")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        public async Task<IActionResult> AddOrUpdateGlossaryTranslation([FromBody] AddOrUpdateGlossaryTranslationRequest request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var userName = HttpContext.Items["UserName"]?.ToString();
+
+            var requester = new RequesterInfo()
+            {
+                UserId = userId,
+                UserName = userName,
+                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
+            };
+
+            var result = await _backofficeRepository.AddOrUpdateGlossaryTranslation(request, requester);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         #endregion
     }
 }
