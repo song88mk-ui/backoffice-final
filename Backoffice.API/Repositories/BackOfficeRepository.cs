@@ -2731,7 +2731,7 @@ namespace Backoffice.API.Repositories
                 var metaData = request.MetaData ?? new MetaData();
                 var targetLanguage = string.IsNullOrWhiteSpace(request.TargetLanguage) ? "EN" : request.TargetLanguage.ToUpper();
 
-                var query = _translationContext.SportsbookGlossary.AsNoTracking().AsQueryable();
+                var query = _translationContext.TranslationCache2.AsNoTracking().AsQueryable();
 
                 if (!string.IsNullOrWhiteSpace(request.SearchText))
                 {
@@ -2749,25 +2749,16 @@ namespace Backoffice.API.Repositories
                     .Take(metaData.PageSize)
                     .ToListAsync();
 
-                var stringIds = page.Select(g => g.StringId).ToList();
-
-                var translationsByStringId = targetLanguage == "EN"
-                    ? new Dictionary<string, string>()
-                    : await _translationContext.TranslationCache2
-                        .AsNoTracking()
-                        .Where(t => stringIds.Contains(t.StringId) && t.TargetLanguage == targetLanguage)
-                        .ToDictionaryAsync(t => t.StringId, t => t.TargetText);
-
                 var glossary = page.Select(g => new SportsbookGlossaryResponse
                 {
                     Id = g.Id,
                     StringId = g.StringId,
+                    SourceLanguage = g.SourceLanguage,
                     SourceText = g.SourceText,
-                    Processed = g.Processed,
                     HasBetPlacement = g.HasBetPlacement,
                     UpdatedAt = g.UpdatedAt,
                     TargetLanguage = targetLanguage,
-                    TargetText = targetLanguage == "EN" ? g.SourceText : translationsByStringId.GetValueOrDefault(g.StringId)
+                    TargetText = targetLanguage == "EN" ? g.SourceText : GetTargetText(g, targetLanguage)
                 }).ToList();
 
                 return new BaseResponse<SportsbookGlossaryListResponse>
@@ -2791,6 +2782,12 @@ namespace Backoffice.API.Repositories
         {
             try
             {
+                var targetLanguage = string.IsNullOrWhiteSpace(request.TargetLanguage) ? null : request.TargetLanguage.ToUpper();
+                if (targetLanguage != null && targetLanguage != "EN" && !IsSupportedTargetLanguage(targetLanguage))
+                {
+                    return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = $"Unsupported target language '{request.TargetLanguage}'.", Result = false };
+                }
+
                 var activity = new ActivityLogModel
                 {
                     Page = requesterInfo.Page,
@@ -2801,7 +2798,7 @@ namespace Backoffice.API.Repositories
 
                 if (request.Id.HasValue && request.Id.Value > 0)
                 {
-                    var existing = await _translationContext.SportsbookGlossary.FirstOrDefaultAsync(g => g.Id == request.Id.Value);
+                    var existing = await _translationContext.TranslationCache2.FirstOrDefaultAsync(g => g.Id == request.Id.Value);
                     if (existing == null)
                     {
                         return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "Glossary entry not found.", Result = false };
@@ -2812,16 +2809,19 @@ namespace Backoffice.API.Repositories
                     activity.From = existing.SourceText;
                     activity.To = request.SourceText;
 
-                    // Processed/GlossaryVersion intentionally left untouched here -- the external
-                    // bet-genius pipeline re-reads SOURCE_TEXT/SOURCE_HASH and decides for itself
-                    // whether to re-translate (mirrors TranslationRepository.BulkUpsertTemplate).
                     existing.SourceText = request.SourceText;
                     existing.UpdatedAt = DateTime.UtcNow;
-                    _translationContext.SportsbookGlossary.Update(existing);
+
+                    if (targetLanguage != null && targetLanguage != "EN")
+                    {
+                        SetTargetText(existing, targetLanguage, request.TargetText ?? string.Empty);
+                    }
+
+                    _translationContext.TranslationCache2.Update(existing);
                 }
                 else
                 {
-                    var duplicate = await _translationContext.SportsbookGlossary.AnyAsync(g => g.StringId == request.StringId);
+                    var duplicate = await _translationContext.TranslationCache2.AnyAsync(g => g.StringId == request.StringId);
                     if (duplicate)
                     {
                         return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "That String ID already exists.", Result = false };
@@ -2832,16 +2832,25 @@ namespace Backoffice.API.Repositories
                     activity.From = "-";
                     activity.To = request.SourceText;
 
-                    _translationContext.SportsbookGlossary.Add(new SportsbookGlossary
+                    var entity = new TranslationCache2
                     {
                         StringId = request.StringId,
-                        SourceLanguageId = "EN",
+                        SourceLanguage = string.IsNullOrWhiteSpace(request.SourceLanguage) ? "EN" : request.SourceLanguage.ToUpper(),
                         SourceText = request.SourceText,
+                        TargetTextZh = string.Empty,
+                        TargetTextEs = string.Empty,
+                        TargetTextFr = string.Empty,
+                        HasBetPlacement = false,
                         GlossaryVersion = 1,
-                        CreatedAt = DateTime.UtcNow,
-                        Processed = false,
-                        HasBetPlacement = false
-                    });
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    if (targetLanguage != null && targetLanguage != "EN")
+                    {
+                        SetTargetText(entity, targetLanguage, request.TargetText ?? string.Empty);
+                    }
+
+                    _translationContext.TranslationCache2.Add(entity);
                 }
 
                 await _translationContext.SaveChangesAsync();
@@ -2859,7 +2868,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var existing = await _translationContext.SportsbookGlossary.FirstOrDefaultAsync(g => g.Id == request.Id);
+                var existing = await _translationContext.TranslationCache2.FirstOrDefaultAsync(g => g.Id == request.Id);
                 if (existing == null)
                 {
                     return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "Glossary entry not found.", Result = false };
@@ -2870,13 +2879,7 @@ namespace Backoffice.API.Repositories
                     return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "This entry has an active bet placement and cannot be deleted.", Result = false };
                 }
 
-                var translations = await _translationContext.TranslationCache2.Where(t => t.StringId == existing.StringId).ToListAsync();
-                if (translations.Any())
-                {
-                    _translationContext.TranslationCache2.RemoveRange(translations);
-                }
-
-                _translationContext.SportsbookGlossary.Remove(existing);
+                _translationContext.TranslationCache2.Remove(existing);
                 await _translationContext.SaveChangesAsync();
 
                 await AddActivityLog(new ActivityLogModel
@@ -2898,69 +2901,30 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = ex.Message, Result = false };
             }
         }
-
-        public async Task<BaseResponse<bool>> AddOrUpdateGlossaryTranslation(AddOrUpdateGlossaryTranslationRequest request, RequesterInfo requesterInfo)
-        {
-            try
-            {
-                var glossary = await _translationContext.SportsbookGlossary.FirstOrDefaultAsync(g => g.StringId == request.StringId);
-                if (glossary == null)
-                {
-                    return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "Glossary entry not found for the given String ID.", Result = false };
-                }
-
-                var targetLanguage = request.TargetLanguage.ToUpper();
-                var existing = await _translationContext.TranslationCache2
-                    .FirstOrDefaultAsync(t => t.StringId == request.StringId && t.TargetLanguage == targetLanguage);
-
-                var activity = new ActivityLogModel
-                {
-                    Page = requesterInfo.Page,
-                    UserId = requesterInfo.UserId,
-                    UserName = requesterInfo.UserName,
-                    Payload = $"{request.StringId}.{targetLanguage}",
-                    To = request.TargetText,
-                    TimeStamp = DateTime.UtcNow
-                };
-
-                if (existing != null)
-                {
-                    activity.Activity = Activity.Update.ToString();
-                    activity.From = existing.TargetText;
-
-                    existing.TargetText = request.TargetText;
-                    existing.UpdatedAt = DateTime.UtcNow;
-                    existing.GlossaryVersion = glossary.GlossaryVersion;
-                    _translationContext.TranslationCache2.Update(existing);
-                }
-                else
-                {
-                    activity.Activity = Activity.Create.ToString();
-                    activity.From = "-";
-
-                    _translationContext.TranslationCache2.Add(new TranslationCache2
-                    {
-                        StringId = request.StringId,
-                        TargetLanguage = targetLanguage,
-                        TargetText = request.TargetText,
-                        GlossaryVersion = glossary.GlossaryVersion,
-                        CreatedAt = DateTime.UtcNow
-                    });
-                }
-
-                await _translationContext.SaveChangesAsync();
-                await AddActivityLog(activity);
-
-                return new BaseResponse<bool> { StatusCode = StatusCode.Success, Message = StatusCode.Success.ToString(), Result = true };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = ex.Message, Result = false };
-            }
-        }
         #endregion
 
         #region Private Methods
+
+        private static bool IsSupportedTargetLanguage(string targetLanguage) =>
+            targetLanguage == "ZH" || targetLanguage == "ES" || targetLanguage == "FR";
+
+        private static string GetTargetText(TranslationCache2 entity, string targetLanguage) => targetLanguage switch
+        {
+            "ZH" => entity.TargetTextZh,
+            "ES" => entity.TargetTextEs,
+            "FR" => entity.TargetTextFr,
+            _ => null
+        };
+
+        private static void SetTargetText(TranslationCache2 entity, string targetLanguage, string value)
+        {
+            switch (targetLanguage)
+            {
+                case "ZH": entity.TargetTextZh = value; break;
+                case "ES": entity.TargetTextEs = value; break;
+                case "FR": entity.TargetTextFr = value; break;
+            }
+        }
 
         private static string GetMessageType(CacheType cacheType)
         {

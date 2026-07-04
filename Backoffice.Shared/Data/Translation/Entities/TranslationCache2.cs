@@ -18,11 +18,32 @@ namespace Backoffice.Shared.Data.Translation.Entities
 
         [Required]
         [MaxLength(10)]
-        [Column("TARGET_LANGUAGE")]
-        public string TargetLanguage { get; set; }
+        [Column("SOURCE_LANGUAGE")]
+        public string SourceLanguage { get; set; }
 
-        [Column("TARGET_TEXT")]
-        public string TargetText { get; set; }
+        [Required]
+        [MaxLength(1000)]
+        [Column("SOURCE_TEXT")]
+        public string SourceText { get; set; }
+
+        [Required]
+        [MaxLength(1000)]
+        [Column("TARGET_TEXT_ZH")]
+        public string TargetTextZh { get; set; }
+
+        [Required]
+        [MaxLength(1000)]
+        [Column("TARGET_TEXT_ES")]
+        public string TargetTextEs { get; set; }
+
+        [Required]
+        [MaxLength(1000)]
+        [Column("TARGET_TEXT_FR")]
+        public string TargetTextFr { get; set; }
+
+        [Required]
+        [Column("HAS_BET_PLACEMENT")]
+        public bool HasBetPlacement { get; set; }
 
         [Column("CREATED_AT")]
         public DateTime? CreatedAt { get; set; }

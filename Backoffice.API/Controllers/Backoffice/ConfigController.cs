@@ -491,31 +491,6 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
-        [HttpPost("sportsbook/glossary/translation")]
-        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
-        public async Task<IActionResult> AddOrUpdateGlossaryTranslation([FromBody] AddOrUpdateGlossaryTranslationRequest request)
-        {
-            var userId = HttpContext.Items["UserId"]?.ToString();
-            var userName = HttpContext.Items["UserName"]?.ToString();
-
-            var requester = new RequesterInfo()
-            {
-                UserId = userId,
-                UserName = userName,
-                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
-            };
-
-            var result = await _backofficeRepository.AddOrUpdateGlossaryTranslation(request, requester);
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-
         #endregion
     }
 }

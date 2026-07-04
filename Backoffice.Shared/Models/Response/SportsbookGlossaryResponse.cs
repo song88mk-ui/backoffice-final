@@ -7,8 +7,8 @@ namespace Backoffice.Shared.Models.Response
     {
         public long Id { get; set; }
         public string StringId { get; set; }
+        public string SourceLanguage { get; set; }
         public string SourceText { get; set; }
-        public bool Processed { get; set; }
         public bool HasBetPlacement { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public string TargetLanguage { get; set; }

@@ -16,7 +16,7 @@ namespace Backoffice.Web.Pages.SBC
         private bool IsNew { get; set; }
         private Func<string, string, string, Task<bool>> OnSaveCallback { get; set; }
 
-        private bool ShowTranslationField => !IsNew && SelectedLanguageCode != "EN";
+        private bool ShowTranslationField => SelectedLanguageCode != "EN";
 
         protected override void OnInitialized()
         {

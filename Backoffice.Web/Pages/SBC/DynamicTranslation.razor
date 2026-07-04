@@ -28,8 +28,9 @@
                                 <label for="languageSelect" class="form-label">Language</label>
                                 <select id="languageSelect" class="form-select" value="@SelectedLanguageCode" @onchange="OnLanguageChanged">
                                     <option value="EN">English (EN)</option>
-                                    <option value="JA">Japanese (JA)</option>
-                                    <option value="BR">Portuguese (BR)</option>
+                                    <option value="ZH">Chinese (ZH)</option>
+                                    <option value="ES">Spanish (ES)</option>
+                                    <option value="FR">French (FR)</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
@@ -73,7 +74,6 @@
                                             <th>String ID</th>
                                             <th>Source Text (EN)</th>
                                             <th>Translation (@SelectedLanguageCode)</th>
-                                            <th>Processed</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -84,7 +84,6 @@
                                                 <td>@entry.StringId</td>
                                                 <td>@entry.SourceText</td>
                                                 <td>@entry.TargetText</td>
-                                                <td>@(entry.Processed ? "Yes" : "No")</td>
                                                 <td class="d-flex">
                                                     <img @onclick="() => OnEditGlossary(entry)" src="icons/svg/icon-edit.svg" alt="edit Icon">
                                                     <img @onclick="() => OnDeleteGlossary(entry)" src="icons/svg/icon-delete.svg" alt="delete Icon">

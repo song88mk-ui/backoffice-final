@@ -166,7 +166,10 @@ namespace Backoffice.Web.Pages.SBC
             {
                 Id = id,
                 StringId = stringId,
-                SourceText = sourceText
+                SourceLanguage = "EN",
+                SourceText = sourceText,
+                TargetLanguage = SelectedLanguageCode,
+                TargetText = targetText
             });
 
             if (response == null || response.StatusCode != StatusCode.Success)
@@ -174,23 +177,6 @@ namespace Backoffice.Web.Pages.SBC
                 _errorMessage = response?.Message ?? "Failed to save glossary entry.";
                 await InvokeAsync(StateHasChanged);
                 return false;
-            }
-
-            if (SelectedLanguageCode != "EN")
-            {
-                var translationResponse = await BackofficeService.AddOrUpdateGlossaryTranslation(new AddOrUpdateGlossaryTranslationRequest
-                {
-                    StringId = stringId,
-                    TargetLanguage = SelectedLanguageCode,
-                    TargetText = targetText
-                });
-
-                if (translationResponse == null || translationResponse.StatusCode != StatusCode.Success)
-                {
-                    _errorMessage = translationResponse?.Message ?? "Failed to save translation.";
-                    await InvokeAsync(StateHasChanged);
-                    return false;
-                }
             }
 
             _errorMessage = null;
