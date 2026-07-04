@@ -69,4 +69,9 @@ namespace Backoffice.Shared.Enums
         SBC_OE_PriceBoost_Settings,
         SBC_OE_Mapping
     }
+    public enum TranslationsPermission
+    {
+        Translations_Static,
+        Translations_Dynamic
+    }
 }

@@ -67,7 +67,7 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnInitializedAsync()
         {
-            BackofficeService.Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", ".");
+            BackofficeService.Page = TranslationsPermission.Translations_Dynamic.ToString().Replace("_", ".");
 
             await LoadGlossary(resetPage: true);
             await base.OnInitializedAsync();

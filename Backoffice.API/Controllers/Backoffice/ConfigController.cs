@@ -364,6 +364,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpGet("sportsbook/translations")]
+        [Authorize("Translations.Static", ((int)Access.View))]
         public async Task<IActionResult> GetSportsbookTranslations([FromQuery] string languageCode = "EN")
         {
             var result = await _backofficeRepository.GetSportsbookTranslations(languageCode);
@@ -378,7 +379,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpPost("sportsbook/translations")]
-        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        [Authorize("Translations.Static", ((int)Access.Edit))]
         public async Task<IActionResult> AddOrUpdateSportsbookTranslation([FromBody] AddOrUpdateSportsbookTranslationRequest request)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -403,7 +404,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpPost("sportsbook/translations/delete")]
-        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        [Authorize("Translations.Static", ((int)Access.Edit))]
         public async Task<IActionResult> DeleteSportsbookTranslation([FromBody] DeleteSportsbookTranslationRequest request)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -428,6 +429,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpPost("sportsbook/glossary/list")]
+        [Authorize("Translations.Dynamic", ((int)Access.View))]
         public async Task<IActionResult> GetSportsbookGlossary([FromBody] GetSportsbookGlossaryRequest request)
         {
             var result = await _backofficeRepository.GetSportsbookGlossary(request);
@@ -442,7 +444,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpPost("sportsbook/glossary")]
-        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        [Authorize("Translations.Dynamic", ((int)Access.Edit))]
         public async Task<IActionResult> AddOrUpdateSportsbookGlossary([FromBody] AddOrUpdateSportsbookGlossaryRequest request)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -467,7 +469,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpPost("sportsbook/glossary/delete")]
-        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        [Authorize("Translations.Dynamic", ((int)Access.Edit))]
         public async Task<IActionResult> DeleteSportsbookGlossary([FromBody] DeleteSportsbookGlossaryRequest request)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
