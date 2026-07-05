@@ -2842,7 +2842,8 @@ namespace Backoffice.API.Repositories
                         TargetTextFr = string.Empty,
                         HasBetPlacement = false,
                         GlossaryVersion = 1,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
                     };
 
                     if (targetLanguage != null && targetLanguage != "EN")

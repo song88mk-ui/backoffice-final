@@ -263,6 +263,8 @@ namespace Backoffice.API.Tests.Translation
             Assert.Equal("足球", row.TargetTextZh);
             Assert.Equal(string.Empty, row.TargetTextEs);
             Assert.Equal(string.Empty, row.TargetTextFr);
+            Assert.NotNull(row.CreatedAt);
+            Assert.NotNull(row.UpdatedAt);
         }
 
         [Fact]
