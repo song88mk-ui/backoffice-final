@@ -54,6 +54,11 @@ GO
 --   1. In Backoffice.Web: Administration -> Manage User Groups -> (relevant role,
 --      e.g. Super Admin) -> Translations -> Translation Management -> check
 --      "Static Translation" / "Dynamic Translation" -> Save.
+--      NOTE: the Translations section only appears in that modal once the
+--      backoffice-final code that requests categories=0,1,2,4 from the Auth
+--      permission/list endpoint is deployed (Backoffice.API
+--      AuthenticationRepository.GetPermissionList) -- Auth's endpoint defaults
+--      to categories 0,1,2 and silently omits category 4 otherwise.
 --   2. Log out and back in (JWT claims are fixed at login time; no live refresh
 --      exists for an already-active session).
 --   3. Only then deploy/rely on the backoffice-final code that checks these

@@ -201,30 +201,43 @@ namespace Backoffice.Web.Shared
 
                 if (!NavMenus.Menus.Any(m => m.Id == "sub-menu-translations"))
                 {
-                    NavMenus.Menus.Add(new MenuModel
+                    var translationSubMenus = new List<MenuModel>();
+
+                    var staticTranslationClaim = UserState?.Model.Claims?.FirstOrDefault(c => c.Type == TranslationsPermission.Translations_Static.ToString().Replace("_", "."));
+                    if (staticTranslationClaim != null && staticTranslationClaim.Value != "0")
                     {
-                        Id = "sub-menu-translations",
-                        Name = "Translation",
-                        IconName = "translations",
-                        Url = "#sub-menu-translations",
-                        SubMenus = new List<MenuModel>
+                        translationSubMenus.Add(new MenuModel
                         {
-                            new MenuModel
-                            {
-                                Id = "menu-static-translation",
-                                Name = "Static Translation",
-                                IconName = "translations",
-                                Url = "translations/static"
-                            },
-                            new MenuModel
-                            {
-                                Id = "menu-dynamic-translation",
-                                Name = "Dynamic Translation",
-                                IconName = "translations",
-                                Url = "translations/dynamic"
-                            }
-                        }
-                    });
+                            Id = "menu-static-translation",
+                            Name = "Static Translation",
+                            IconName = "translations",
+                            Url = "translations/static"
+                        });
+                    }
+
+                    var dynamicTranslationClaim = UserState?.Model.Claims?.FirstOrDefault(c => c.Type == TranslationsPermission.Translations_Dynamic.ToString().Replace("_", "."));
+                    if (dynamicTranslationClaim != null && dynamicTranslationClaim.Value != "0")
+                    {
+                        translationSubMenus.Add(new MenuModel
+                        {
+                            Id = "menu-dynamic-translation",
+                            Name = "Dynamic Translation",
+                            IconName = "translations",
+                            Url = "translations/dynamic"
+                        });
+                    }
+
+                    if (translationSubMenus.Any())
+                    {
+                        NavMenus.Menus.Add(new MenuModel
+                        {
+                            Id = "sub-menu-translations",
+                            Name = "Translation",
+                            IconName = "translations",
+                            Url = "#sub-menu-translations",
+                            SubMenus = translationSubMenus
+                        });
+                    }
                 }
 
                 NavMenuParameter = new NavMenuParameter()

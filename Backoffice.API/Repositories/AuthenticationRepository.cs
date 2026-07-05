@@ -340,7 +340,10 @@ namespace Backoffice.API.Repositories
                 if (!_httpClient.DefaultRequestHeaders.Contains("x-version"))
                     _httpClient.DefaultRequestHeaders.Add("x-version", _boVersion);
 
-                var response = await _httpClient.GetAsync($"v1/api/user/permission/list?isSubUserOnly={isSubUserOnly}");
+                // Auth defaults to categories 0,1,2 (Admin/SBC/PMS) when the param is omitted,
+                // which silently drops the Translations category (4) from Manage User Groups.
+                var categories = string.Join(",", new[] { (int)PermissionCategory.Admin, (int)PermissionCategory.SBC, (int)PermissionCategory.PMS, (int)PermissionCategory.Translations });
+                var response = await _httpClient.GetAsync($"v1/api/user/permission/list?isSubUserOnly={isSubUserOnly}&categories={categories}");
 
                 if (response.IsSuccessStatusCode)
                 {

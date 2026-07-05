@@ -78,6 +78,15 @@ namespace Backoffice.Web.Extensions
                 options.AddPolicy("admin-maintenance", policy => policy.RequireClaim($"{AdminPermission.Admin_Maintenance.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
 
                 #endregion
+
+                #region TRANSLATIONS
+
+                options.AddPolicy("translations-static", policy => policy.RequireClaim($"{TranslationsPermission.Translations_Static.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
+                options.AddPolicy("translations-static-canedit", policy => policy.RequireClaim($"{TranslationsPermission.Translations_Static.ToString().Replace('_', '.')}", $"{(int)Access.Edit}"));
+                options.AddPolicy("translations-dynamic", policy => policy.RequireClaim($"{TranslationsPermission.Translations_Dynamic.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
+                options.AddPolicy("translations-dynamic-canedit", policy => policy.RequireClaim($"{TranslationsPermission.Translations_Dynamic.ToString().Replace('_', '.')}", $"{(int)Access.Edit}"));
+
+                #endregion
             });
             builder.Services.AddAuthorizationCore();
 

@@ -7,7 +7,7 @@
 
 @page "/translations/static"
 
-<AuthorizeView>
+<AuthorizeView Policy="translations-static">
     <Authorized>
         <div class="row">
             <div class="main-content col-md-12 mb-4 pb-3">
@@ -66,7 +66,9 @@
                                     <i class="fa fa-file-excel-o me-1"></i>
                                     Export to Excel
                                 </button>
-                                <button class="add-translation-btn" @onclick="OnAddTranslation">Add Translation</button>
+                                <AuthorizeView Policy="translations-static-canedit" Context="canEdit">
+                                    <button class="add-translation-btn" @onclick="OnAddTranslation">Add Translation</button>
+                                </AuthorizeView>
                             </div>
 
                             @if (FilteredTranslations.Any())
@@ -87,8 +89,10 @@
                                                     <td>@translation.Key</td>
                                                     <td>@translation.Value</td>
                                                     <td class="d-flex">
-                                                        <img @onclick="() => OnEditTranslation(translation)" src="icons/svg/icon-edit.svg" alt="edit Icon">
-                                                        <img @onclick="() => OnDeleteTranslation(translation)" src="icons/svg/icon-trash.svg" alt="delete Icon">
+                                                        <AuthorizeView Policy="translations-static-canedit" Context="canEdit">
+                                                            <img @onclick="() => OnEditTranslation(translation)" src="icons/svg/icon-edit.svg" alt="edit Icon">
+                                                            <img @onclick="() => OnDeleteTranslation(translation)" src="icons/svg/icon-trash.svg" alt="delete Icon">
+                                                        </AuthorizeView>
                                                     </td>
                                                 </tr>
                                             }

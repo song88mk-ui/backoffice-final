@@ -56,6 +56,10 @@
                                 {
                                     <label>@_translationState.GetValue("Sportsbook Clients details")</label>
                                 }
+                                else if (category.CategoryId == (int)PermissionCategory.Translations)
+                                {
+                                    <label>Manage Sportsbook Static and Dynamic Translation entries</label>
+                                }
                             </div>
                         </div>
                         @if (category.CategoryId == SelectedCategoryId)
