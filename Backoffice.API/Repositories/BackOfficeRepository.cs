@@ -2796,6 +2796,8 @@ namespace Backoffice.API.Repositories
                     TimeStamp = DateTime.UtcNow
                 };
 
+                var translationChanges = new List<TranslationChangeItem>();
+
                 if (request.Id.HasValue && request.Id.Value > 0)
                 {
                     var existing = await _translationContext.TranslationCache2.FirstOrDefaultAsync(g => g.Id == request.Id.Value);
@@ -2815,6 +2817,12 @@ namespace Backoffice.API.Repositories
                     if (targetLanguage != null && targetLanguage != "EN")
                     {
                         SetTargetText(existing, targetLanguage, request.TargetText ?? string.Empty);
+                        translationChanges.Add(new TranslationChangeItem
+                        {
+                            StId = existing.StringId,
+                            LaCo = targetLanguage,
+                            Tx = request.TargetText ?? string.Empty
+                        });
                     }
 
                     _translationContext.TranslationCache2.Update(existing);
@@ -2849,6 +2857,12 @@ namespace Backoffice.API.Repositories
                     if (targetLanguage != null && targetLanguage != "EN")
                     {
                         SetTargetText(entity, targetLanguage, request.TargetText ?? string.Empty);
+                        translationChanges.Add(new TranslationChangeItem
+                        {
+                            StId = request.StringId,
+                            LaCo = targetLanguage,
+                            Tx = request.TargetText ?? string.Empty
+                        });
                     }
 
                     _translationContext.TranslationCache2.Add(entity);
@@ -2856,6 +2870,7 @@ namespace Backoffice.API.Repositories
 
                 await _translationContext.SaveChangesAsync();
                 await AddActivityLog(activity);
+                await PublishTranslationChange(translationChanges);
 
                 return new BaseResponse<bool> { StatusCode = StatusCode.Success, Message = StatusCode.Success.ToString(), Result = true };
             }
@@ -2880,6 +2895,14 @@ namespace Backoffice.API.Repositories
                     return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "This entry has an active bet placement and cannot be deleted.", Result = false };
                 }
 
+                var translationChanges = new List<TranslationChangeItem>();
+                if (!string.IsNullOrEmpty(existing.TargetTextZh))
+                    translationChanges.Add(new TranslationChangeItem { StId = existing.StringId, LaCo = "ZH", Tx = string.Empty });
+                if (!string.IsNullOrEmpty(existing.TargetTextEs))
+                    translationChanges.Add(new TranslationChangeItem { StId = existing.StringId, LaCo = "ES", Tx = string.Empty });
+                if (!string.IsNullOrEmpty(existing.TargetTextFr))
+                    translationChanges.Add(new TranslationChangeItem { StId = existing.StringId, LaCo = "FR", Tx = string.Empty });
+
                 _translationContext.TranslationCache2.Remove(existing);
                 await _translationContext.SaveChangesAsync();
 
@@ -2894,6 +2917,8 @@ namespace Backoffice.API.Repositories
                     To = "-",
                     TimeStamp = DateTime.UtcNow
                 });
+
+                await PublishTranslationChange(translationChanges);
 
                 return new BaseResponse<bool> { StatusCode = StatusCode.Success, Message = StatusCode.Success.ToString(), Result = true };
             }
@@ -2925,6 +2950,25 @@ namespace Backoffice.API.Repositories
                 case "ES": entity.TargetTextEs = value; break;
                 case "FR": entity.TargetTextFr = value; break;
             }
+        }
+
+        // Emits the changed (StringId, TargetLanguage, Text) deltas after a glossary write so
+        // Platform.CacheSync.Service purges the Sportsbook.API translation cache per key and
+        // relays them to the OddsEngine (r.oe.ontranslationchange). Publish failures are caught
+        // inside RabbitMqRepository.Publish and returned as an Error response, so a broker outage
+        // cannot fail the glossary save that has already committed.
+        private async Task PublishTranslationChange(List<TranslationChangeItem> translationChanges)
+        {
+            if (translationChanges == null || translationChanges.Count == 0)
+                return;
+
+            await _rabbitMqRepository.Publish(new MessageRequest
+            {
+                CorrelationId = Guid.NewGuid().ToString(),
+                MessageType = "OnTranslationChange",
+                RoutingKey = "r.oe.cachesync.ontranslationchange",
+                Payload = JsonSerializer.Serialize(new OnTranslationChangeMessage { Tr = translationChanges })
+            });
         }
 
         private static string GetMessageType(CacheType cacheType)
