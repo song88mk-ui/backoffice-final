@@ -10,6 +10,7 @@ namespace Backoffice.Shared.Models.Response
         public string SourceLanguage { get; set; }
         public string SourceText { get; set; }
         public bool HasBetPlacement { get; set; }
+        public bool Processed { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public string TargetLanguage { get; set; }
         public string TargetText { get; set; }

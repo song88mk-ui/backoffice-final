@@ -137,6 +137,33 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
+        // Sets TranslationCache2.PROCESSED — the external translation pipeline's worklist flag
+        // (false = queued for the pipeline's next pass, true = handled/skipped).
+        [HttpPost("sportsbook/glossary/processed")]
+        [Authorize("Translations.Dynamic", ((int)Access.Edit))]
+        public async Task<IActionResult> SetSportsbookGlossaryProcessed([FromBody] SetSportsbookGlossaryProcessedRequest request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var userName = HttpContext.Items["UserName"]?.ToString();
+
+            var requester = new RequesterInfo()
+            {
+                UserId = userId,
+                UserName = userName,
+                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
+            };
+
+            var result = await _backofficeRepository.SetSportsbookGlossaryProcessed(request, requester);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpPost("sportsbook/glossary/delete")]
         [Authorize("Translations.Dynamic", ((int)Access.Edit))]
         public async Task<IActionResult> DeleteSportsbookGlossary([FromBody] DeleteSportsbookGlossaryRequest request)

@@ -184,6 +184,29 @@ namespace Backoffice.Web.Pages.SBC
             return true;
         }
 
+        private async Task OnProcessedChanged(SportsbookGlossaryResponse entry, ChangeEventArgs e)
+        {
+            var processed = e.Value is bool value && value;
+
+            var response = await BackofficeService.SetSportsbookGlossaryProcessed(new SetSportsbookGlossaryProcessedRequest
+            {
+                Id = entry.Id,
+                Processed = processed
+            });
+
+            if (response == null || response.StatusCode != StatusCode.Success)
+            {
+                _errorMessage = response?.Message ?? "Failed to update the Processed flag.";
+            }
+            else
+            {
+                _errorMessage = null;
+                entry.Processed = processed;
+            }
+
+            await LoadGlossary(resetPage: false);
+        }
+
         private async Task<bool> DeleteGlossary(long id)
         {
             var response = await BackofficeService.DeleteSportsbookGlossary(new DeleteSportsbookGlossaryRequest { Id = id });

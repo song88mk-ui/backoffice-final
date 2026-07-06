@@ -2759,6 +2759,7 @@ namespace Backoffice.API.Repositories
                     SourceLanguage = g.SourceLanguage,
                     SourceText = g.SourceText,
                     HasBetPlacement = g.HasBetPlacement,
+                    Processed = g.Processed,
                     UpdatedAt = g.UpdatedAt,
                     TargetLanguage = targetLanguage,
                     TargetText = targetLanguage == "EN" ? g.SourceText : GetTargetText(g, targetLanguage)
@@ -2852,7 +2853,9 @@ namespace Backoffice.API.Repositories
                         TargetTextEs = string.Empty,
                         TargetTextFr = string.Empty,
                         HasBetPlacement = false,
-                        GlossaryVersion = 1,
+                        // New rows start on the external pipeline's worklist (PROCESSED = 0),
+                        // matching the table default — the pipeline flips it to 1 once handled.
+                        Processed = false,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     };
@@ -2874,6 +2877,46 @@ namespace Backoffice.API.Repositories
                 await _translationContext.SaveChangesAsync();
                 await AddActivityLog(activity);
                 await PublishTranslationChange(translationChanges);
+
+                return new BaseResponse<bool> { StatusCode = StatusCode.Success, Message = StatusCode.Success.ToString(), Result = true };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = ex.Message, Result = false };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> SetSportsbookGlossaryProcessed(SetSportsbookGlossaryProcessedRequest request, RequesterInfo requesterInfo)
+        {
+            try
+            {
+                var existing = await _translationContext.TranslationCache2.FirstOrDefaultAsync(g => g.Id == request.Id);
+                if (existing == null)
+                {
+                    return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "Glossary entry not found.", Result = false };
+                }
+
+                if (existing.Processed == request.Processed)
+                {
+                    return new BaseResponse<bool> { StatusCode = StatusCode.Success, Message = StatusCode.Success.ToString(), Result = true };
+                }
+
+                var previous = existing.Processed;
+                existing.Processed = request.Processed;
+                _translationContext.TranslationCache2.Update(existing);
+                await _translationContext.SaveChangesAsync();
+
+                await AddActivityLog(new ActivityLogModel
+                {
+                    Page = requesterInfo.Page,
+                    UserId = requesterInfo.UserId,
+                    UserName = requesterInfo.UserName,
+                    Activity = Activity.Update.ToString(),
+                    Payload = $"{existing.StringId}.Processed",
+                    From = previous.ToString(),
+                    To = request.Processed.ToString(),
+                    TimeStamp = DateTime.UtcNow
+                });
 
                 return new BaseResponse<bool> { StatusCode = StatusCode.Success, Message = StatusCode.Success.ToString(), Result = true };
             }

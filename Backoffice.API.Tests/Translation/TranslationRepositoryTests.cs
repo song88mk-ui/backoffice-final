@@ -174,7 +174,7 @@ namespace Backoffice.API.Tests.Translation
         // (TranslationCache2 table, backs the Dynamic Translation screen)
         // ---------------------------------------------------------------
 
-        private static TranslationCache2 MakeGlossaryRow(string stringId, string sourceText, string zh = "", string es = "", string fr = "", bool hasBetPlacement = false) =>
+        private static TranslationCache2 MakeGlossaryRow(string stringId, string sourceText, string zh = "", string es = "", string fr = "", bool hasBetPlacement = false, bool processed = false) =>
             new TranslationCache2
             {
                 StringId = stringId,
@@ -184,7 +184,7 @@ namespace Backoffice.API.Tests.Translation
                 TargetTextEs = es,
                 TargetTextFr = fr,
                 HasBetPlacement = hasBetPlacement,
-                GlossaryVersion = 1
+                Processed = processed
             };
 
         [Fact]
@@ -263,6 +263,7 @@ namespace Backoffice.API.Tests.Translation
             Assert.Equal("足球", row.TargetTextZh);
             Assert.Equal(string.Empty, row.TargetTextEs);
             Assert.Equal(string.Empty, row.TargetTextFr);
+            Assert.False(row.Processed); // new rows start on the external pipeline's worklist
             Assert.NotNull(row.CreatedAt);
             Assert.NotNull(row.UpdatedAt);
         }
@@ -399,6 +400,82 @@ namespace Backoffice.API.Tests.Translation
 
             using var verify = BuildTranslationContext(dbName);
             Assert.Single(verify.TranslationCache2); // still present -- delete was blocked
+        }
+
+        [Fact]
+        public async Task SetSportsbookGlossaryProcessed_UpdatesFlag_AndLogsActivity()
+        {
+            var dbName = nameof(SetSportsbookGlossaryProcessed_UpdatesFlag_AndLogsActivity);
+            long id;
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                var entity = MakeGlossaryRow("SpId:1", "Soccer", processed: false);
+                seed.TranslationCache2.Add(entity);
+                await seed.SaveChangesAsync();
+                id = entity.Id;
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.SetSportsbookGlossaryProcessed(
+                new SetSportsbookGlossaryProcessedRequest { Id = id, Processed = true },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+
+            using var verify = BuildTranslationContext(dbName);
+            Assert.True(verify.TranslationCache2.Single(t => t.Id == id).Processed);
+
+            using var verifyBackoffice = BuildBackofficeContext(dbName);
+            var activity = Assert.Single(verifyBackoffice.ActivityLog);
+            Assert.Equal(Activity.Update.ToString(), activity.Activity);
+            Assert.Equal("SpId:1.Processed", activity.Payload);
+            Assert.Equal(bool.FalseString, activity.From);
+            Assert.Equal(bool.TrueString, activity.To);
+        }
+
+        [Fact]
+        public async Task SetSportsbookGlossaryProcessed_NoOpWithoutActivityLog_WhenFlagUnchanged()
+        {
+            var dbName = nameof(SetSportsbookGlossaryProcessed_NoOpWithoutActivityLog_WhenFlagUnchanged);
+            long id;
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                var entity = MakeGlossaryRow("SpId:1", "Soccer", processed: true);
+                seed.TranslationCache2.Add(entity);
+                await seed.SaveChangesAsync();
+                id = entity.Id;
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.SetSportsbookGlossaryProcessed(
+                new SetSportsbookGlossaryProcessedRequest { Id = id, Processed = true },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+
+            using var verifyBackoffice = BuildBackofficeContext(dbName);
+            Assert.Empty(verifyBackoffice.ActivityLog);
+        }
+
+        [Fact]
+        public async Task SetSportsbookGlossaryProcessed_ReturnsError_WhenIdNotFound()
+        {
+            var dbName = nameof(SetSportsbookGlossaryProcessed_ReturnsError_WhenIdNotFound);
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.SetSportsbookGlossaryProcessed(
+                new SetSportsbookGlossaryProcessedRequest { Id = 999, Processed = false },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Error, result.StatusCode);
         }
 
         [Fact]

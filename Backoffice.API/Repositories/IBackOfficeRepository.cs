@@ -55,6 +55,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<bool>> DeleteSportsbookTranslation(DeleteSportsbookTranslationRequest request, RequesterInfo requesterInfo);
         Task<BaseResponse<SportsbookGlossaryListResponse>> GetSportsbookGlossary(GetSportsbookGlossaryRequest request);
         Task<BaseResponse<bool>> AddOrUpdateSportsbookGlossary(AddOrUpdateSportsbookGlossaryRequest request, RequesterInfo requesterInfo);
+        Task<BaseResponse<bool>> SetSportsbookGlossaryProcessed(SetSportsbookGlossaryProcessedRequest request, RequesterInfo requesterInfo);
         Task<BaseResponse<bool>> DeleteSportsbookGlossary(DeleteSportsbookGlossaryRequest request, RequesterInfo requesterInfo);
         #endregion
     }

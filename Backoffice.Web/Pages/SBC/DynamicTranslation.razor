@@ -76,6 +76,7 @@
                                             <th>String ID</th>
                                             <th>Source Text (EN)</th>
                                             <th>Translation (@SelectedLanguageCode)</th>
+                                            <th title="Translation pipeline worklist flag: unticked = queued for the external translation script's next pass, ticked = handled (the script skips it)">Processed</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -86,6 +87,16 @@
                                                 <td>@entry.StringId</td>
                                                 <td>@entry.SourceText</td>
                                                 <td>@entry.TargetText</td>
+                                                <td>
+                                                    <AuthorizeView Policy="translations-dynamic-canedit" Context="canEditProcessed">
+                                                        <Authorized>
+                                                            <input type="checkbox" checked="@entry.Processed" @onchange="(e) => OnProcessedChanged(entry, e)" title="Untick to queue this term for the external translation script; tick to mark it handled" />
+                                                        </Authorized>
+                                                        <NotAuthorized>
+                                                            @(entry.Processed ? "Yes" : "No")
+                                                        </NotAuthorized>
+                                                    </AuthorizeView>
+                                                </td>
                                                 <td class="d-flex">
                                                     <AuthorizeView Policy="translations-dynamic-canedit" Context="canEdit">
                                                         <img @onclick="() => OnEditGlossary(entry)" src="icons/svg/icon-edit.svg" alt="edit Icon">

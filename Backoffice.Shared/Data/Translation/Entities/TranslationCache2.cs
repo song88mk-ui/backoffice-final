@@ -22,22 +22,22 @@ namespace Backoffice.Shared.Data.Translation.Entities
         public string SourceLanguage { get; set; }
 
         [Required]
-        [MaxLength(1000)]
+        [MaxLength(250)]
         [Column("SOURCE_TEXT")]
         public string SourceText { get; set; }
 
         [Required]
-        [MaxLength(1000)]
+        [MaxLength(250)]
         [Column("TARGET_TEXT_ZH")]
         public string TargetTextZh { get; set; }
 
         [Required]
-        [MaxLength(1000)]
+        [MaxLength(250)]
         [Column("TARGET_TEXT_ES")]
         public string TargetTextEs { get; set; }
 
         [Required]
-        [MaxLength(1000)]
+        [MaxLength(250)]
         [Column("TARGET_TEXT_FR")]
         public string TargetTextFr { get; set; }
 
@@ -48,8 +48,13 @@ namespace Backoffice.Shared.Data.Translation.Entities
         [Column("CREATED_AT")]
         public DateTime? CreatedAt { get; set; }
 
-        [Column("GLOSSARY_VERSION")]
-        public int? GlossaryVersion { get; set; }
+        // The external translation pipeline's worklist flag: 0 = row needs a pipeline (DeepL)
+        // pass, 1 = handled (set by the pipeline; reset to 0 by OE.Translation.Service on a
+        // genuine source-name change). Replaces the retired GLOSSARY_VERSION column — schema
+        // authority is odds-engine-2 OE.Shared\Data\Translation\Scripts\TranslationCache2.sql.
+        [Required]
+        [Column("PROCESSED")]
+        public bool Processed { get; set; }
 
         [Column("UPDATED_AT")]
         public DateTime? UpdatedAt { get; set; }
