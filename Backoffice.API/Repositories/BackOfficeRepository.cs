@@ -2655,6 +2655,7 @@ namespace Backoffice.API.Repositories
 
                 await _translationContext.SaveChangesAsync();
                 await AddActivityLog(activity);
+                await PublishStaticTranslationChange(request.LanguageCode);
 
                 return new BaseResponse<bool>
                 {
@@ -2705,6 +2706,8 @@ namespace Backoffice.API.Repositories
                     To = "-",
                     TimeStamp = DateTime.UtcNow
                 });
+
+                await PublishStaticTranslationChange(request.LanguageCode);
 
                 return new BaseResponse<bool>
                 {
@@ -2971,6 +2974,26 @@ namespace Backoffice.API.Repositories
             });
         }
 
+        // Tells Platform.Sportsbook.API (via Platform.CacheSync.Service) to drop its
+        // SportsbookStatic caches ("tr" + every "tr-{LANG}") so an edited UI label is served on
+        // the next page load instead of waiting out the 24h TTL. The purge always clears every
+        // language because EN rows are merged into all per-language results; CacheKey carries the
+        // edited language code for traceability only.
+        private async Task PublishStaticTranslationChange(string languageCode)
+        {
+            await _rabbitMqRepository.Publish(new MessageRequest
+            {
+                CorrelationId = Guid.NewGuid().ToString(),
+                MessageType = "OnStaticTranslationChange",
+                RoutingKey = "r.oe.cachesync.onstatictranslationchange",
+                Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                {
+                    CacheType = CacheType.StaticTranslation,
+                    CacheKey = languageCode ?? string.Empty
+                })
+            });
+        }
+
         private static string GetMessageType(CacheType cacheType)
         {
             return cacheType switch
@@ -2982,6 +3005,7 @@ namespace Backoffice.API.Repositories
                 CacheType.ParlayBonus => "OnParlayBonusChange",
                 CacheType.Client => "OnClientChange",
                 CacheType.DynamicTranslation => "OnDynamicTranslationChange",
+                CacheType.StaticTranslation => "OnStaticTranslationChange",
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(cacheType),
                     cacheType,
