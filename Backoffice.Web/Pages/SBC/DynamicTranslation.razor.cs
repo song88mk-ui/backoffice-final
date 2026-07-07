@@ -184,10 +184,22 @@ namespace Backoffice.Web.Pages.SBC
             return true;
         }
 
-        private async Task OnProcessedChanged(SportsbookGlossaryResponse entry, ChangeEventArgs e)
+        private void OnToggleProcessed(SportsbookGlossaryResponse entry)
         {
-            var processed = e.Value is bool value && value;
+            var parameters = new ModalParameters();
+            parameters.Add("StringId", entry.StringId);
+            parameters.Add("Processed", entry.Processed);
+            parameters.Add("OnConfirmCallback", (Func<Task<bool>>)(() => SetProcessed(entry, !entry.Processed)));
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-md");
 
+            var options = new ModalOptions();
+            ModalService.Open<DynamicTranslationProcessedModal>(
+                entry.Processed ? "Re-queue for Translation" : "Mark as Processed", parameters, options);
+        }
+
+        private async Task<bool> SetProcessed(SportsbookGlossaryResponse entry, bool processed)
+        {
             var response = await BackofficeService.SetSportsbookGlossaryProcessed(new SetSportsbookGlossaryProcessedRequest
             {
                 Id = entry.Id,
@@ -197,14 +209,13 @@ namespace Backoffice.Web.Pages.SBC
             if (response == null || response.StatusCode != StatusCode.Success)
             {
                 _errorMessage = response?.Message ?? "Failed to update the Processed flag.";
-            }
-            else
-            {
-                _errorMessage = null;
-                entry.Processed = processed;
+                await InvokeAsync(StateHasChanged);
+                return false;
             }
 
+            _errorMessage = null;
             await LoadGlossary(resetPage: false);
+            return true;
         }
 
         private async Task<bool> DeleteGlossary(long id)

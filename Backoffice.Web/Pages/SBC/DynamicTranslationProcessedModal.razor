@@ -1,0 +1,23 @@
+<div class="p-4">
+    @if (Processed)
+    {
+        <p>Re-queue <strong>@StringId</strong> for translation?</p>
+        <p class="text-muted small mb-3">
+            This clears the Processed flag and puts the term back on the external translation
+            script's worklist. The script will re-translate it on its next pass and may overwrite
+            the current translations.
+        </p>
+    }
+    else
+    {
+        <p>Mark <strong>@StringId</strong> as processed?</p>
+        <p class="text-muted small mb-3">
+            The external translation script will skip this term from now on. Use this after
+            entering translations manually so the script does not overwrite them.
+        </p>
+    }
+    <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary me-2" @onclick="Cancel">Cancel</button>
+        <button type="button" class="btn btn-primary" @onclick="Confirm">@(Processed ? "Re-queue" : "Mark Processed")</button>
+    </div>
+</div>

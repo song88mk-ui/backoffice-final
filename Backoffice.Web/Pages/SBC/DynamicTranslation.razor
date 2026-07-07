@@ -61,7 +61,11 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-end mb-3 gap-2">
+                        <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+                            <div class="text-muted small">
+                                <span class="badge bg-warning text-dark">Pending</span> queued for the external translation script's next pass
+                                <span class="badge bg-success ms-3">Processed</span> handled &mdash; the script skips it (e.g. translated manually)
+                            </div>
                             <AuthorizeView Policy="translations-dynamic-canedit" Context="canEdit">
                                 <button class="add-translation-btn" @onclick="OnAddGlossary">Add Glossary Term</button>
                             </AuthorizeView>
@@ -88,17 +92,18 @@
                                                 <td>@entry.SourceText</td>
                                                 <td>@entry.TargetText</td>
                                                 <td>
-                                                    <AuthorizeView Policy="translations-dynamic-canedit" Context="canEditProcessed">
-                                                        <Authorized>
-                                                            <input type="checkbox" checked="@entry.Processed" @onchange="(e) => OnProcessedChanged(entry, e)" title="Untick to queue this term for the external translation script; tick to mark it handled" />
-                                                        </Authorized>
-                                                        <NotAuthorized>
-                                                            @(entry.Processed ? "Yes" : "No")
-                                                        </NotAuthorized>
-                                                    </AuthorizeView>
+                                                    @if (entry.Processed)
+                                                    {
+                                                        <span class="badge bg-success" title="Handled — the external translation script skips this term">Processed</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-warning text-dark" title="Queued — the external translation script picks this term up on its next pass">Pending</span>
+                                                    }
                                                 </td>
                                                 <td class="d-flex">
                                                     <AuthorizeView Policy="translations-dynamic-canedit" Context="canEdit">
+                                                        <img @onclick="() => OnToggleProcessed(entry)" src="icons/svg/icon-update.svg" alt="toggle processed Icon" title="@(entry.Processed ? "Re-queue for translation" : "Mark as processed")">
                                                         <img @onclick="() => OnEditGlossary(entry)" src="icons/svg/icon-edit.svg" alt="edit Icon">
                                                         <img @onclick="() => OnDeleteGlossary(entry)" src="icons/svg/icon-trash.svg" alt="delete Icon">
                                                     </AuthorizeView>
