@@ -61,14 +61,15 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
-                            <div class="text-muted small">
-                                <span class="badge bg-warning text-dark">Pending</span> queued for the external translation script's next pass
-                                <span class="badge bg-success ms-3">Processed</span> handled &mdash; the script skips it (e.g. translated manually)
-                            </div>
+                        <div class="d-flex justify-content-end mb-2 gap-2">
                             <AuthorizeView Policy="translations-dynamic-canedit" Context="canEdit">
                                 <button class="add-translation-btn" @onclick="OnAddGlossary">Add Glossary Term</button>
                             </AuthorizeView>
+                        </div>
+
+                        <div class="text-muted small mb-2">
+                            <span class="badge bg-warning text-dark">Pending</span> queued for the external translation script's next pass
+                            <span class="badge bg-success ms-3">Processed</span> handled &mdash; the script skips it (e.g. translated manually)
                         </div>
 
                         @if (Glossary.Any())
