@@ -37,22 +37,7 @@ jobs:
             image: backoffice-bo-web
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Check Affected files
-        id: app-changes
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62
-        with:
-          files: |
-            ${{ matrix.app.path }}/**
-            Backoffice.Shared/**
-            .github/workflows/**
-
-      - name: Changes Check
-        id: proceed
-        if: steps.app-changes.outputs.any_changed == 'true'
-        run: |
-          echo "proceed=true" >> $GITHUB_OUTPUT
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Set environment
         id: env
@@ -65,14 +50,10 @@ jobs:
             echo "environment=prd" >> $GITHUB_OUTPUT
             echo "aws_account_id=525375333516" >> $GITHUB_OUTPUT
             echo "aws_region=ap-east-1" >> $GITHUB_OUTPUT
-          else
-            echo "environment=dev" >> $GITHUB_OUTPUT
-            echo "aws_account_id=418541840646" >> $GITHUB_OUTPUT
-            echo "aws_region=ap-south-1" >> $GITHUB_OUTPUT
           fi
 
       - name: Docker meta
-        if: steps.proceed.outputs.proceed == 'true' || github.event_name == 'release'
+        if: github.event_name == 'release'
         id: meta
         uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5
         with:
@@ -84,12 +65,11 @@ jobs:
             type=semver,pattern={{version}}
 
       - name: Setup Docker Buildx
-        if: steps.proceed.outputs.proceed == 'true' || github.event_name == 'release'
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
       - name: Configure AWS credentials
-        if: steps.proceed.outputs.proceed == 'true' || github.event_name == 'release'
-        uses: aws-actions/configure-aws-credentials@v5
+        if: github.event_name == 'release'
+        uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b # v6
         with:
           aws-region: ${{ steps.env.outputs.aws_region }}
           role-to-assume: arn:aws:iam::${{ steps.env.outputs.aws_account_id }}:role/github-oidc-ecr-push-role
@@ -97,13 +77,22 @@ jobs:
           role-session-name: GitHubActions
 
       - name: Login to Amazon ECR
-        if: steps.proceed.outputs.proceed == 'true' || github.event_name == 'release'
+        if: github.event_name == 'release'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Build
+        if: github.event_name != 'release'
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          file: ${{ matrix.app.path }}/Dockerfile
+          push: false
+          tags: image:latest
+          build-args: NUGET_PASSWORD=${{ secrets.NUGET_PASSWORD }}
+
       - name: Build & Push
-        if: steps.proceed.outputs.proceed == 'true' || github.event_name == 'release'
-        uses: docker/build-push-action@v6
+        if: github.event_name == 'release'
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           file: ${{ matrix.app.path }}/Dockerfile
           push: true
@@ -112,5 +101,5 @@ jobs:
           build-args: NUGET_PASSWORD=${{ secrets.NUGET_PASSWORD }}
 
       - name: Logout to Amazon ECR
-        if: always()
+        if: github.event_name == 'release'
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
