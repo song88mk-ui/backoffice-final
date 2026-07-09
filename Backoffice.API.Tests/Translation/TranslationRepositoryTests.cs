@@ -9,6 +9,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -487,6 +488,285 @@ namespace Backoffice.API.Tests.Translation
             var sut = BuildSut(backofficeCtx, translationCtx);
 
             var result = await sut.DeleteSportsbookGlossary(new DeleteSportsbookGlossaryRequest { Id = 999 }, MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Error, result.StatusCode);
+        }
+
+        // ---------------------------------------------------------------
+        // ExportSportsbookGlossary / ImportSportsbookGlossary
+        // (CSV export/upload-template round trip for the Dynamic Translation screen)
+        // ---------------------------------------------------------------
+
+        [Fact]
+        public async Task ExportSportsbookGlossary_ReturnsAllRowsWithAllLanguageColumns()
+        {
+            var dbName = nameof(ExportSportsbookGlossary_ReturnsAllRowsWithAllLanguageColumns);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:2", "Basketball", es: "Baloncesto"));
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Soccer", zh: "足球", es: "Fútbol", fr: "Football"));
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ExportSportsbookGlossary(null);
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(2, result.Result.Count);
+            Assert.Equal("SpId:1", result.Result[0].StringId); // ordered by StringId
+            Assert.Equal("足球", result.Result[0].TargetTextZh);
+            Assert.Equal("Fútbol", result.Result[0].TargetTextEs);
+            Assert.Equal("Football", result.Result[0].TargetTextFr);
+            Assert.Equal("SpId:2", result.Result[1].StringId);
+        }
+
+        [Fact]
+        public async Task ExportSportsbookGlossary_FiltersBySearchText()
+        {
+            var dbName = nameof(ExportSportsbookGlossary_FiltersBySearchText);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Soccer"));
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:2", "Basketball"));
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ExportSportsbookGlossary("Soccer");
+
+            var row = Assert.Single(result.Result);
+            Assert.Equal("SpId:1", row.StringId);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookGlossary_CreatesNewRow_WhenStringIdNotFound()
+        {
+            var dbName = nameof(ImportSportsbookGlossary_CreatesNewRow_WhenStringIdNotFound);
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookGlossary(
+                new ImportSportsbookGlossaryRequest
+                {
+                    Rows = new List<ImportSportsbookGlossaryRow>
+                    {
+                        new ImportSportsbookGlossaryRow { StringId = "SpId:1", SourceText = "Soccer", TargetTextZh = "足球" }
+                    }
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(1, result.Result.CreatedCount);
+            Assert.Equal(0, result.Result.UpdatedCount);
+
+            using var verify = BuildTranslationContext(dbName);
+            var row = Assert.Single(verify.TranslationCache2);
+            Assert.Equal("Soccer", row.SourceText);
+            Assert.Equal("足球", row.TargetTextZh);
+            Assert.Equal(string.Empty, row.TargetTextEs);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookGlossary_SkipsNewRow_WhenSourceTextMissing()
+        {
+            var dbName = nameof(ImportSportsbookGlossary_SkipsNewRow_WhenSourceTextMissing);
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookGlossary(
+                new ImportSportsbookGlossaryRequest
+                {
+                    Rows = new List<ImportSportsbookGlossaryRow>
+                    {
+                        new ImportSportsbookGlossaryRow { StringId = "SpId:1", SourceText = "", TargetTextZh = "足球" }
+                    }
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(0, result.Result.CreatedCount);
+            Assert.Equal(1, result.Result.SkippedCount);
+            Assert.Contains("SpId:1", Assert.Single(result.Result.RowMessages));
+
+            using var verify = BuildTranslationContext(dbName);
+            Assert.Empty(verify.TranslationCache2);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookGlossary_UpdatesExistingRow_WhenValueDiffersFromSourceAndCurrent()
+        {
+            var dbName = nameof(ImportSportsbookGlossary_UpdatesExistingRow_WhenValueDiffersFromSourceAndCurrent);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Soccer"));
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookGlossary(
+                new ImportSportsbookGlossaryRequest
+                {
+                    Rows = new List<ImportSportsbookGlossaryRow>
+                    {
+                        new ImportSportsbookGlossaryRow { StringId = "SpId:1", SourceText = "Soccer", TargetTextZh = "足球" }
+                    }
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(1, result.Result.UpdatedCount);
+
+            using var verify = BuildTranslationContext(dbName);
+            Assert.Equal("足球", verify.TranslationCache2.Single().TargetTextZh);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookGlossary_SkipsUpdate_WhenValueEqualsSourceText()
+        {
+            var dbName = nameof(ImportSportsbookGlossary_SkipsUpdate_WhenValueEqualsSourceText);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Soccer"));
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookGlossary(
+                new ImportSportsbookGlossaryRequest
+                {
+                    // Untranslated placeholder equal to the EN source text -- should be skipped.
+                    Rows = new List<ImportSportsbookGlossaryRow>
+                    {
+                        new ImportSportsbookGlossaryRow { StringId = "SpId:1", SourceText = "Soccer", TargetTextZh = "Soccer" }
+                    }
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(1, result.Result.UnchangedCount);
+            Assert.Equal(0, result.Result.UpdatedCount);
+
+            using var verify = BuildTranslationContext(dbName);
+            Assert.Equal(string.Empty, verify.TranslationCache2.Single().TargetTextZh);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookGlossary_IsIdempotent_ReimportingSameValuesProducesNoChangesOrActivityLogs()
+        {
+            var dbName = nameof(ImportSportsbookGlossary_IsIdempotent_ReimportingSameValuesProducesNoChangesOrActivityLogs);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Soccer", zh: "足球"));
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var request = new ImportSportsbookGlossaryRequest
+            {
+                Rows = new List<ImportSportsbookGlossaryRow>
+                {
+                    new ImportSportsbookGlossaryRow { StringId = "SpId:1", SourceText = "Soccer", TargetTextZh = "足球" }
+                }
+            };
+
+            var result = await sut.ImportSportsbookGlossary(request, MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(0, result.Result.CreatedCount);
+            Assert.Equal(0, result.Result.UpdatedCount);
+            Assert.Equal(1, result.Result.UnchangedCount);
+
+            using var verifyBackoffice = BuildBackofficeContext(dbName);
+            Assert.Empty(verifyBackoffice.ActivityLog); // re-uploading identical data must not spam the activity log
+        }
+
+        [Fact]
+        public async Task ImportSportsbookGlossary_LeavesTranslationUnchanged_WhenCellIsBlank()
+        {
+            var dbName = nameof(ImportSportsbookGlossary_LeavesTranslationUnchanged_WhenCellIsBlank);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Soccer", zh: "足球"));
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookGlossary(
+                new ImportSportsbookGlossaryRequest
+                {
+                    Rows = new List<ImportSportsbookGlossaryRow>
+                    {
+                        // ZH left blank in the file, ES newly populated.
+                        new ImportSportsbookGlossaryRow { StringId = "SpId:1", SourceText = "Soccer", TargetTextZh = "", TargetTextEs = "Fútbol" }
+                    }
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(1, result.Result.UpdatedCount);
+
+            using var verify = BuildTranslationContext(dbName);
+            var row = verify.TranslationCache2.Single();
+            Assert.Equal("足球", row.TargetTextZh); // untouched by the blank cell
+            Assert.Equal("Fútbol", row.TargetTextEs);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookGlossary_SkipsDuplicateStringId_WithinSameFile()
+        {
+            var dbName = nameof(ImportSportsbookGlossary_SkipsDuplicateStringId_WithinSameFile);
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookGlossary(
+                new ImportSportsbookGlossaryRequest
+                {
+                    Rows = new List<ImportSportsbookGlossaryRow>
+                    {
+                        new ImportSportsbookGlossaryRow { StringId = "SpId:1", SourceText = "Soccer", TargetTextZh = "足球" },
+                        new ImportSportsbookGlossaryRow { StringId = "SpId:1", SourceText = "Soccer", TargetTextZh = "Different" }
+                    }
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(1, result.Result.CreatedCount);
+            Assert.Equal(1, result.Result.SkippedCount);
+
+            using var verify = BuildTranslationContext(dbName);
+            Assert.Equal("足球", verify.TranslationCache2.Single().TargetTextZh); // first row wins
+        }
+
+        [Fact]
+        public async Task ImportSportsbookGlossary_ReturnsValidationError_WhenNoRows()
+        {
+            var dbName = nameof(ImportSportsbookGlossary_ReturnsValidationError_WhenNoRows);
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookGlossary(new ImportSportsbookGlossaryRequest(), MakeRequester("Translations.Dynamic"));
 
             Assert.Equal(StatusCode.Error, result.StatusCode);
         }

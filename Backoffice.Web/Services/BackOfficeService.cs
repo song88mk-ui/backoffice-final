@@ -1929,6 +1929,71 @@ namespace Backoffice.Web.Services
             }
         }
 
+        public async Task<BaseResponse<List<SportsbookGlossaryExportRow>>> ExportSportsbookGlossary(string searchText)
+        {
+            try
+            {
+                var query = string.IsNullOrWhiteSpace(searchText) ? string.Empty : $"?searchText={Uri.EscapeDataString(searchText)}";
+                var response = await _httpClient.GetAsync($"api/translation/sportsbook/glossary/export{query}");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<List<SportsbookGlossaryExportRow>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<List<SportsbookGlossaryExportRow>>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<List<SportsbookGlossaryExportRow>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<List<SportsbookGlossaryExportRow>>();
+                    else
+                    {
+                        return new BaseResponse<List<SportsbookGlossaryExportRow>>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<SportsbookGlossaryExportRow>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ImportSportsbookGlossaryResponse>> ImportSportsbookGlossary(ImportSportsbookGlossaryRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"api/translation/sportsbook/glossary/import", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ImportSportsbookGlossaryResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<ImportSportsbookGlossaryResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ImportSportsbookGlossaryResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<ImportSportsbookGlossaryResponse>();
+                    else
+                    {
+                        return new BaseResponse<ImportSportsbookGlossaryResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ImportSportsbookGlossaryResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId)
         {
             try

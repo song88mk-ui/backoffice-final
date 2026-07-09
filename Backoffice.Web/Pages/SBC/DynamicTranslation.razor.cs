@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
@@ -10,6 +12,8 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Pages.Base;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -26,6 +30,11 @@ namespace Backoffice.Web.Pages.SBC
 
         private List<SportsbookGlossaryResponse> Glossary { get; set; } = new List<SportsbookGlossaryResponse>();
         private string _errorMessage;
+
+        private bool _isExporting;
+        private string _importResultMessage;
+        private bool _importHasErrors;
+        private List<string> _importRowMessages = new List<string>();
 
         private string _searchText = string.Empty;
         private string SearchText
@@ -232,6 +241,81 @@ namespace Backoffice.Web.Pages.SBC
             _errorMessage = null;
             await LoadGlossary(resetPage: false);
             return true;
+        }
+
+        private async Task OnExportToExcel()
+        {
+            _isExporting = true;
+            await InvokeAsync(StateHasChanged);
+
+            try
+            {
+                var response = await BackofficeService.ExportSportsbookGlossary(SearchText);
+
+                if (response == null || response.StatusCode != StatusCode.Success || response.Result == null)
+                {
+                    _errorMessage = response?.Message ?? "Failed to export the glossary.";
+                    await InvokeAsync(StateHasChanged);
+                    return;
+                }
+
+                _errorMessage = null;
+                var csvText = GlossaryCsvHelper.BuildCsv(response.Result);
+                var fileName = $"DynamicTranslations-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";
+
+                await _jsRuntime.InvokeVoidAsync("downloadFileFromText", fileName, csvText, "text/csv");
+            }
+            finally
+            {
+                _isExporting = false;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
+        private async Task OnImportFileSelected(InputFileChangeEventArgs e)
+        {
+            _importResultMessage = null;
+            _importRowMessages = new List<string>();
+            _importHasErrors = false;
+
+            var file = e.File;
+            if (file == null)
+            {
+                return;
+            }
+
+            string csvText;
+            using (var stream = file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024))
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
+            {
+                csvText = await reader.ReadToEndAsync();
+            }
+
+            var (success, parseError, rows) = GlossaryCsvHelper.ParseCsv(csvText);
+            if (!success)
+            {
+                _importHasErrors = true;
+                _importResultMessage = parseError;
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            var response = await BackofficeService.ImportSportsbookGlossary(new ImportSportsbookGlossaryRequest { Rows = rows });
+
+            if (response == null || response.StatusCode != StatusCode.Success || response.Result == null)
+            {
+                _importHasErrors = true;
+                _importResultMessage = response?.Message ?? "Failed to import the glossary file.";
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            var summary = response.Result;
+            _importHasErrors = summary.SkippedCount > 0;
+            _importResultMessage = $"Import complete: {summary.CreatedCount} created, {summary.UpdatedCount} updated, {summary.UnchangedCount} unchanged, {summary.SkippedCount} skipped.";
+            _importRowMessages = summary.RowMessages ?? new List<string>();
+
+            await LoadGlossary(resetPage: false);
         }
 
         private async Task PreviousPage()

@@ -188,5 +188,50 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
+
+        // Returns every glossary row as JSON (no pagination) -- Backoffice.Web builds the
+        // downloadable CSV from this, the same way Static Translation's CSV export already
+        // works entirely client-side.
+        [HttpGet("sportsbook/glossary/export")]
+        [Authorize("Translations.Dynamic", ((int)Access.View))]
+        public async Task<IActionResult> ExportSportsbookGlossary([FromQuery] string searchText = null)
+        {
+            var result = await _backofficeRepository.ExportSportsbookGlossary(searchText);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        // Accepts glossary rows already parsed (and header-validated) client-side from the
+        // uploaded export/template file -- this endpoint only ever deals with structured data.
+        [HttpPost("sportsbook/glossary/import")]
+        [Authorize("Translations.Dynamic", ((int)Access.Edit))]
+        public async Task<IActionResult> ImportSportsbookGlossary([FromBody] ImportSportsbookGlossaryRequest request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var userName = HttpContext.Items["UserName"]?.ToString();
+
+            var requester = new RequesterInfo()
+            {
+                UserId = userId,
+                UserName = userName,
+                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
+            };
+
+            var result = await _backofficeRepository.ImportSportsbookGlossary(request, requester);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
     }
 }

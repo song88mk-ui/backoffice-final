@@ -62,14 +62,43 @@
                         </div>
 
                         <div class="d-flex justify-content-end mb-2 gap-2">
+                            <button class="btn btn-secondary" @onclick="OnExportToExcel" disabled="@_isExporting">
+                                <i class="fa fa-file-excel-o me-1"></i>
+                                Export to Excel
+                            </button>
                             <AuthorizeView Policy="translations-dynamic-canedit" Context="canEdit">
+                                <InputFile OnChange="OnImportFileSelected" id="glossaryImportInput" style="display:none" accept=".csv" />
+                                <label for="glossaryImportInput" class="btn btn-secondary mb-0" style="cursor:pointer;">
+                                    <i class="fa fa-upload me-1"></i>
+                                    Upload Excel
+                                </label>
                                 <button class="add-translation-btn" @onclick="OnAddGlossary">Add Glossary Term</button>
                             </AuthorizeView>
                         </div>
 
+                        @if (!string.IsNullOrEmpty(_importResultMessage))
+                        {
+                            <div class="alert @(_importHasErrors ? "alert-warning" : "alert-success")" role="alert">
+                                @_importResultMessage
+                                @if (_importRowMessages.Any())
+                                {
+                                    <ul class="mb-0">
+                                        @foreach (var rowMessage in _importRowMessages)
+                                        {
+                                            <li>@rowMessage</li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        }
+
                         <div class="text-muted small mb-2">
                             <span class="badge bg-warning text-dark">Pending</span> queued for the external translation script's next pass
                             <span class="badge bg-success ms-3">Processed</span> handled &mdash; the script skips it (e.g. translated manually)
+                        </div>
+                        <div class="text-muted small mb-2">
+                            Export to Excel downloads a CSV of every glossary term (StringId, EN, ZH, ES, FR). Edit the ZH/ES/FR columns and use Upload Excel to re-import &mdash;
+                            a cell equal to the EN column is treated as not-yet-translated and skipped, and a blank cell leaves the existing translation untouched.
                         </div>
 
                         @if (Glossary.Any())

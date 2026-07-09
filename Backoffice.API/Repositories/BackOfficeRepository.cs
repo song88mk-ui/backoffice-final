@@ -2976,6 +2976,163 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = ex.Message, Result = false };
             }
         }
+
+        // Returns every glossary row (no pagination) so the Web layer can build a full CSV
+        // export/upload-template client-side, the same way Static Translation's CSV export
+        // already works — this endpoint hands back data, not a formatted file.
+        public async Task<BaseResponse<List<SportsbookGlossaryExportRow>>> ExportSportsbookGlossary(string searchText)
+        {
+            try
+            {
+                var query = _translationContext.TranslationCache2.AsNoTracking().AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(searchText))
+                {
+                    query = query.Where(g => g.StringId.Contains(searchText) || g.SourceText.Contains(searchText));
+                }
+
+                var rows = await query
+                    .OrderBy(g => g.StringId)
+                    .Select(g => new SportsbookGlossaryExportRow
+                    {
+                        StringId = g.StringId,
+                        SourceText = g.SourceText,
+                        TargetTextZh = g.TargetTextZh,
+                        TargetTextEs = g.TargetTextEs,
+                        TargetTextFr = g.TargetTextFr
+                    })
+                    .ToListAsync();
+
+                return new BaseResponse<List<SportsbookGlossaryExportRow>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = rows
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<SportsbookGlossaryExportRow>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        // Upserts glossary rows parsed from an uploaded export/template file (parsing happens
+        // in Backoffice.Web; this only ever sees structured rows). Idempotent by design: a
+        // target-language cell is skipped (no write, no activity log, no publish) when it's
+        // blank (leave the existing translation untouched), equal to SourceText (treated as
+        // "not yet translated"), or equal to the value already stored -- so re-uploading the
+        // same file twice is a no-op the second time.
+        public async Task<BaseResponse<ImportSportsbookGlossaryResponse>> ImportSportsbookGlossary(ImportSportsbookGlossaryRequest request, RequesterInfo requesterInfo)
+        {
+            try
+            {
+                if (request?.Rows == null || request.Rows.Count == 0)
+                {
+                    return new BaseResponse<ImportSportsbookGlossaryResponse> { StatusCode = StatusCode.Error, Message = "The uploaded file has no data rows." };
+                }
+
+                var existingByStringId = (await _translationContext.TranslationCache2.ToListAsync())
+                    .ToDictionary(g => g.StringId, StringComparer.OrdinalIgnoreCase);
+
+                var result = new ImportSportsbookGlossaryResponse();
+                var translationChanges = new List<TranslationChangeItem>();
+                var activityLogs = new List<ActivityLogModel>();
+                var seenStringIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                for (var i = 0; i < request.Rows.Count; i++)
+                {
+                    var row = request.Rows[i];
+                    var rowNumber = i + 2; // +1 for 1-based, +1 because row 1 is the header in the source file
+                    var stringId = row.StringId?.Trim();
+
+                    if (string.IsNullOrWhiteSpace(stringId))
+                    {
+                        continue;
+                    }
+
+                    if (!seenStringIds.Add(stringId))
+                    {
+                        result.SkippedCount++;
+                        result.RowMessages.Add($"Row {rowNumber}: duplicate String ID '{stringId}' already processed earlier in this file — skipped.");
+                        continue;
+                    }
+
+                    var uploadedSourceText = row.SourceText?.Trim() ?? string.Empty;
+
+                    if (existingByStringId.TryGetValue(stringId, out var existing))
+                    {
+                        var changed = ApplyGlossaryTargetLanguageUpserts(existing, existing.SourceText, row.TargetTextZh, row.TargetTextEs, row.TargetTextFr, translationChanges);
+                        if (changed)
+                        {
+                            existing.UpdatedAt = DateTime.UtcNow;
+                            _translationContext.TranslationCache2.Update(existing);
+                            activityLogs.Add(BuildGlossaryActivityLog(requesterInfo, Activity.Update, stringId, "(bulk import)", "(bulk import)"));
+                            result.UpdatedCount++;
+                        }
+                        else
+                        {
+                            result.UnchangedCount++;
+                        }
+                    }
+                    else
+                    {
+                        if (string.IsNullOrWhiteSpace(uploadedSourceText))
+                        {
+                            result.SkippedCount++;
+                            result.RowMessages.Add($"Row {rowNumber}: EN is required to create new String ID '{stringId}' — skipped.");
+                            continue;
+                        }
+
+                        var entity = new TranslationCache2
+                        {
+                            StringId = stringId,
+                            SourceLanguage = "EN",
+                            SourceText = uploadedSourceText,
+                            TargetTextZh = string.Empty,
+                            TargetTextEs = string.Empty,
+                            TargetTextFr = string.Empty,
+                            HasBetPlacement = false,
+                            Processed = false,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow
+                        };
+
+                        ApplyGlossaryTargetLanguageUpserts(entity, uploadedSourceText, row.TargetTextZh, row.TargetTextEs, row.TargetTextFr, translationChanges);
+                        _translationContext.TranslationCache2.Add(entity);
+                        existingByStringId[stringId] = entity;
+                        activityLogs.Add(BuildGlossaryActivityLog(requesterInfo, Activity.Create, stringId, "-", uploadedSourceText));
+                        result.CreatedCount++;
+                    }
+                }
+
+                if (result.CreatedCount > 0 || result.UpdatedCount > 0)
+                {
+                    await _translationContext.SaveChangesAsync();
+                }
+
+                if (activityLogs.Count > 0)
+                {
+                    await AddActivityLogList(new ActivityLogListRequest { ActivityLogs = activityLogs });
+                }
+
+                await PublishTranslationChange(translationChanges);
+
+                return new BaseResponse<ImportSportsbookGlossaryResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ImportSportsbookGlossaryResponse> { StatusCode = StatusCode.Error, Message = ex.Message };
+            }
+        }
         #endregion
 
         #region Private Methods
@@ -3000,6 +3157,52 @@ namespace Backoffice.API.Repositories
                 case "FR": entity.TargetTextFr = value; break;
             }
         }
+
+        // Applies the "not equal to source_text" upsert rule to all three target-language
+        // columns for one glossary row. Returns true if any column actually changed.
+        private static bool ApplyGlossaryTargetLanguageUpserts(TranslationCache2 entity, string sourceText, string zh, string es, string fr, List<TranslationChangeItem> translationChanges)
+        {
+            var changedZh = TryUpsertGlossaryTargetLanguage(entity.StringId, "ZH", entity.TargetTextZh, zh, sourceText, v => entity.TargetTextZh = v, translationChanges);
+            var changedEs = TryUpsertGlossaryTargetLanguage(entity.StringId, "ES", entity.TargetTextEs, es, sourceText, v => entity.TargetTextEs = v, translationChanges);
+            var changedFr = TryUpsertGlossaryTargetLanguage(entity.StringId, "FR", entity.TargetTextFr, fr, sourceText, v => entity.TargetTextFr = v, translationChanges);
+            return changedZh || changedEs || changedFr;
+        }
+
+        private static bool TryUpsertGlossaryTargetLanguage(string stringId, string languageCode, string currentValue, string uploadedRaw, string sourceText, Action<string> setter, List<TranslationChangeItem> translationChanges)
+        {
+            if (string.IsNullOrWhiteSpace(uploadedRaw))
+            {
+                return false; // blank cell => leave the existing translation untouched
+            }
+
+            var uploaded = uploadedRaw.Trim();
+
+            if (string.Equals(uploaded, sourceText?.Trim(), StringComparison.Ordinal))
+            {
+                return false; // matches source text => treat as not-yet-translated, skip
+            }
+
+            if (string.Equals(uploaded, currentValue?.Trim(), StringComparison.Ordinal))
+            {
+                return false; // already the stored value => idempotent no-op
+            }
+
+            setter(uploaded);
+            translationChanges.Add(new TranslationChangeItem { StId = stringId, LaCo = languageCode, Tx = uploaded });
+            return true;
+        }
+
+        private static ActivityLogModel BuildGlossaryActivityLog(RequesterInfo requesterInfo, Activity activity, string stringId, string from, string to) => new ActivityLogModel
+        {
+            Page = requesterInfo.Page,
+            UserId = requesterInfo.UserId,
+            UserName = requesterInfo.UserName,
+            Activity = activity.ToString(),
+            Payload = stringId,
+            From = from,
+            To = to,
+            TimeStamp = DateTime.UtcNow
+        };
 
         // Emits the changed (StringId, TargetLanguage, Text) deltas after a glossary write so
         // Platform.CacheSync.Service purges the Sportsbook.API translation cache per key and
