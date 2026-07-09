@@ -177,7 +177,7 @@ namespace Backoffice.Web.Shared
                 SubMenus = x.SubMenus
             }).ToList() ?? new List<MenuModel>();
 
-            if (page != null && (page.Contains("sportsbook-translations", StringComparison.OrdinalIgnoreCase) 
+            if (page != null && (page.Contains("sportsbook-translations", StringComparison.OrdinalIgnoreCase)
                                         || page.Contains("translations", StringComparison.OrdinalIgnoreCase)))
             {
                 menus = menus
@@ -185,6 +185,11 @@ namespace Backoffice.Web.Shared
                                 || string.Equals(m.Url, "/dashboard", StringComparison.OrdinalIgnoreCase)
                                 || string.Equals(m.Url, "admin/dashboard", StringComparison.OrdinalIgnoreCase))
                     .ToList();
+
+                foreach (var dashboardMenu in menus.Where(m => m.Id != "sub-menu-translations"))
+                {
+                    dashboardMenu.Url = "/sportsbook-translations";
+                }
             }
 
             if (page != null && (!page.Contains("sportsbook-translations", StringComparison.OrdinalIgnoreCase) 
