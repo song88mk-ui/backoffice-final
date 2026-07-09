@@ -76,7 +76,7 @@
                             </div>
                         </div>
                     }
-                    @if (true)
+                    @if (UserClaims.Any(c => c.Type.Contains(nameof(PermissionCategory.Translations) + ".")))
                     {
                         <div class="access-item m-2 d-flex flex-column justify-content-between rounded-2">
                             <div class="top-row mx-2 pt-5">
