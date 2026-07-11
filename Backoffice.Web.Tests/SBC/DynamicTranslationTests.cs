@@ -105,18 +105,21 @@ namespace Backoffice.Web.Tests.SBC
         }
 
         [Fact]
-        public void Render_HighlightsRow_AndShowsMissingPlaceholder_WhenTargetEqualsSource()
+        public void Render_HighlightsTranslationCell_AndShowsMissingPlaceholder_WhenTargetEqualsSource_WithoutTintingActionsColumn()
         {
             var cut = RenderComponent<DynamicTranslation>();
             cut.Find("#languageSelect").Change("ZH"); // missing-placeholder logic only applies to non-EN target languages
 
             var rows = cut.FindAll("tbody tr");
             var missingRow = Assert.Single(rows, r => r.TextContent.Contains("SpId:2"));
-            Assert.Contains("table-warning", missingRow.ClassName);
+            var missingCells = missingRow.QuerySelectorAll("td");
+            Assert.DoesNotContain("table-warning", missingCells[0].ClassName); // StringId cell stays untinted
+            Assert.Contains("table-warning", missingCells[2].ClassName); // only the Translation cell is highlighted
+            Assert.DoesNotContain("table-warning", missingCells[4].ClassName); // actions column (icons) stays untinted
             Assert.Contains("missing", missingRow.TextContent);
 
             var translatedRow = Assert.Single(rows, r => r.TextContent.Contains("SpId:1"));
-            Assert.DoesNotContain("table-warning", translatedRow.ClassName);
+            Assert.DoesNotContain("table-warning", translatedRow.QuerySelectorAll("td")[2].ClassName);
         }
 
         [Fact]

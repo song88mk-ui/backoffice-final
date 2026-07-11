@@ -106,9 +106,9 @@
                                         <tbody>
                                             @foreach (var translation in PagedTranslations)
                                             {
-                                                <tr class="@(string.IsNullOrWhiteSpace(translation.Value) ? "table-warning" : "")">
+                                                <tr>
                                                     <td>@translation.Key</td>
-                                                    <td>
+                                                    <td class="@(string.IsNullOrWhiteSpace(translation.Value) ? "table-warning" : "")">
                                                         @if (string.IsNullOrWhiteSpace(translation.Value))
                                                         {
                                                             <em class="text-muted">— missing —</em>

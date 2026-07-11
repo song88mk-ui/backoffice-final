@@ -2589,16 +2589,29 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var translations = await _translationContext.SportsbookStatic
+                // A key can be missing a row for this language entirely (never created), not just
+                // have a blank Value -- return every known key (from any language) so the UI can
+                // show/filter those gaps too, not only rows that already exist for this language.
+                var allNames = await _translationContext.SportsbookStatic
+                    .AsNoTracking()
+                    .Select(t => t.Name)
+                    .Distinct()
+                    .ToListAsync();
+
+                var languageRows = await _translationContext.SportsbookStatic
                     .AsNoTracking()
                     .Where(t => t.LanguageCode == languageCode)
-                    .Select(t => new SportsbookTranslationResponse
-                    {
-                        LanguageCode = t.LanguageCode,
-                        Name = t.Name,
-                        Value = t.Value
-                    })
                     .ToListAsync();
+                var languageValues = languageRows.ToDictionary(t => t.Name, t => t.Value);
+
+                var translations = allNames
+                    .Select(name => new SportsbookTranslationResponse
+                    {
+                        LanguageCode = languageCode,
+                        Name = name,
+                        Value = languageValues.TryGetValue(name, out var value) ? value : string.Empty
+                    })
+                    .ToList();
 
                 return new BaseResponse<List<SportsbookTranslationResponse>>
                 {

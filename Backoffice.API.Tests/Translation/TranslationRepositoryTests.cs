@@ -59,9 +59,9 @@ namespace Backoffice.API.Tests.Translation
         // ---------------------------------------------------------------
 
         [Fact]
-        public async Task GetSportsbookTranslations_ReturnsOnlyRowsForRequestedLanguage()
+        public async Task GetSportsbookTranslations_ReturnsRequestedLanguageValues_ForKeysThatExist()
         {
-            var dbName = nameof(GetSportsbookTranslations_ReturnsOnlyRowsForRequestedLanguage);
+            var dbName = nameof(GetSportsbookTranslations_ReturnsRequestedLanguageValues_ForKeysThatExist);
             using (var seed = BuildTranslationContext(dbName))
             {
                 seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "EN", Name = "1st_half", Value = "1st Half" });
@@ -79,6 +79,34 @@ namespace Backoffice.API.Tests.Translation
             var row = Assert.Single(result.Result);
             Assert.Equal("EN", row.LanguageCode);
             Assert.Equal("1st Half", row.Value);
+        }
+
+        // A key can have a row in one language but no row at all for another (never created) --
+        // the UI's "Show only untranslated" filter needs a placeholder entry for it, or that gap
+        // is invisible: it never appears in the per-language dictionary the page builds.
+        [Fact]
+        public async Task GetSportsbookTranslations_ReturnsEmptyPlaceholder_ForKeyMissingRequestedLanguageRow()
+        {
+            var dbName = nameof(GetSportsbookTranslations_ReturnsEmptyPlaceholder_ForKeyMissingRequestedLanguageRow);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "EN", Name = "1st_half", Value = "1st Half" });
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "ZH", Name = "1st_half", Value = "上半场" });
+                // "accept" has an EN row but no ZH row at all.
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "EN", Name = "accept", Value = "Accept" });
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.GetSportsbookTranslations("ZH");
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(2, result.Result.Count); // both known keys are present, not just the ones with a ZH row
+            Assert.Equal("上半场", result.Result.Single(r => r.Name == "1st_half").Value);
+            Assert.Equal(string.Empty, result.Result.Single(r => r.Name == "accept").Value);
         }
 
         [Fact]

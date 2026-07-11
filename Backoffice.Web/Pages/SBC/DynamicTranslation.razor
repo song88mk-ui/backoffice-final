@@ -138,10 +138,10 @@
                                         {
                                             var isUntranslated = SelectedLanguageCode != "EN" &&
                                                 (string.IsNullOrWhiteSpace(entry.TargetText) || entry.TargetText == entry.SourceText);
-                                            <tr class="@(isUntranslated ? "table-warning" : "")">
+                                            <tr>
                                                 <td>@entry.StringId</td>
                                                 <td>@entry.SourceText</td>
-                                                <td>
+                                                <td class="@(isUntranslated ? "table-warning" : "")">
                                                     @if (isUntranslated)
                                                     {
                                                         <em class="text-muted">— missing —</em>

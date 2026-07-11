@@ -96,13 +96,15 @@ namespace Backoffice.Web.Tests.SBC
         }
 
         [Fact]
-        public void Render_HighlightsRow_AndShowsMissingPlaceholder_ForBlankValue()
+        public void Render_HighlightsValueCell_AndShowsMissingPlaceholder_ForBlankValue_WithoutTintingOtherCells()
         {
             var cut = RenderComponent<StaticTranslation>();
 
             var rows = cut.FindAll("tbody tr");
             var missingRow = Assert.Single(rows, r => r.TextContent.Contains("key2"));
-            Assert.Contains("table-warning", missingRow.ClassName);
+            var cells = missingRow.QuerySelectorAll("td");
+            Assert.DoesNotContain("table-warning", cells[0].ClassName); // Key cell stays untinted
+            Assert.Contains("table-warning", cells[1].ClassName); // only the Value cell is highlighted
             Assert.Contains("missing", missingRow.TextContent);
         }
 
