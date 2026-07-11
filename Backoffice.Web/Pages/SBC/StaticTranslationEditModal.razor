@@ -1,7 +1,11 @@
 <div class="p-4">
     <div class="mb-3">
         <label class="form-label">Translation Key</label>
-        <input class="form-control" @bind="TranslationKey" @bind:event="oninput" readonly="@(!IsNew)" />
+        <input class="form-control" @bind="TranslationKey" @bind:event="oninput" disabled="@(!IsNew)" />
+        @if (!IsNew)
+        {
+            <small class="text-muted">Key cannot be changed after creation.</small>
+        }
     </div>
     <div class="mb-3">
         <label class="form-label">Translation Value</label>

@@ -2617,6 +2617,45 @@ namespace Backoffice.API.Repositories
             }
         }
 
+        public async Task<BaseResponse<TranslationStatsResponse>> GetSportsbookTranslationStats()
+        {
+            try
+            {
+                var allRows = await _translationContext.SportsbookStatic
+                    .AsNoTracking()
+                    .Select(t => new { t.LanguageCode, t.Name, t.Value })
+                    .ToListAsync();
+
+                var totalKeys = allRows.Select(t => t.Name).Distinct().Count();
+
+                var languages = allRows
+                    .GroupBy(t => t.LanguageCode)
+                    .Select(g => new LanguageTranslationStat
+                    {
+                        LanguageCode = g.Key,
+                        TotalCount = totalKeys,
+                        TranslatedCount = g.Count(t => !string.IsNullOrEmpty(t.Value))
+                    })
+                    .OrderBy(s => s.LanguageCode)
+                    .ToList();
+
+                return new BaseResponse<TranslationStatsResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new TranslationStatsResponse { Languages = languages }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<TranslationStatsResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message
+                };
+            }
+        }
+
         public async Task<BaseResponse<bool>> AddOrUpdateSportsbookTranslation(AddOrUpdateSportsbookTranslationRequest request, RequesterInfo requesterInfo)
         {
             try
@@ -2744,6 +2783,16 @@ namespace Backoffice.API.Repositories
                     query = query.Where(g => g.StringId.Contains(request.SearchText) || g.SourceText.Contains(request.SearchText));
                 }
 
+                if (request.UntranslatedOnly && targetLanguage != "EN")
+                {
+                    switch (targetLanguage)
+                    {
+                        case "ZH": query = query.Where(g => string.IsNullOrEmpty(g.TargetTextZh) || g.TargetTextZh == g.SourceText); break;
+                        case "ES": query = query.Where(g => string.IsNullOrEmpty(g.TargetTextEs) || g.TargetTextEs == g.SourceText); break;
+                        case "FR": query = query.Where(g => string.IsNullOrEmpty(g.TargetTextFr) || g.TargetTextFr == g.SourceText); break;
+                    }
+                }
+
                 metaData.TotalCount = await query.CountAsync();
                 metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
 
@@ -2778,6 +2827,44 @@ namespace Backoffice.API.Repositories
             catch (Exception ex)
             {
                 return new BaseResponse<SportsbookGlossaryListResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<BaseResponse<TranslationStatsResponse>> GetSportsbookGlossaryStats()
+        {
+            try
+            {
+                var totalCount = await _translationContext.TranslationCache2.CountAsync();
+
+                var zhTranslated = await _translationContext.TranslationCache2
+                    .CountAsync(g => !string.IsNullOrEmpty(g.TargetTextZh) && g.TargetTextZh != g.SourceText);
+                var esTranslated = await _translationContext.TranslationCache2
+                    .CountAsync(g => !string.IsNullOrEmpty(g.TargetTextEs) && g.TargetTextEs != g.SourceText);
+                var frTranslated = await _translationContext.TranslationCache2
+                    .CountAsync(g => !string.IsNullOrEmpty(g.TargetTextFr) && g.TargetTextFr != g.SourceText);
+
+                return new BaseResponse<TranslationStatsResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new TranslationStatsResponse
+                    {
+                        Languages = new List<LanguageTranslationStat>
+                        {
+                            new LanguageTranslationStat { LanguageCode = "ZH", TotalCount = totalCount, TranslatedCount = zhTranslated },
+                            new LanguageTranslationStat { LanguageCode = "ES", TotalCount = totalCount, TranslatedCount = esTranslated },
+                            new LanguageTranslationStat { LanguageCode = "FR", TotalCount = totalCount, TranslatedCount = frTranslated }
+                        }
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<TranslationStatsResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = ex.Message

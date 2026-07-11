@@ -58,9 +58,11 @@ namespace Backoffice.Web.Services
         #region ConfigTemplate
         Task<BaseResponse<TranslationResponse>> GetTranslation(LanguageCode langCode);
         Task<BaseResponse<List<SportsbookTranslationResponse>>> GetSportsbookTranslations(string languageCode);
+        Task<BaseResponse<TranslationStatsResponse>> GetSportsbookTranslationStats();
         Task<BaseResponse<bool>> AddOrUpdateSportsbookTranslation(AddOrUpdateSportsbookTranslationRequest request);
         Task<BaseResponse<bool>> DeleteSportsbookTranslation(DeleteSportsbookTranslationRequest request);
         Task<BaseResponse<SportsbookGlossaryListResponse>> GetSportsbookGlossary(GetSportsbookGlossaryRequest request);
+        Task<BaseResponse<TranslationStatsResponse>> GetSportsbookGlossaryStats();
         Task<BaseResponse<bool>> AddOrUpdateSportsbookGlossary(AddOrUpdateSportsbookGlossaryRequest request);
         Task<BaseResponse<bool>> SetSportsbookGlossaryProcessed(SetSportsbookGlossaryProcessedRequest request);
         Task<BaseResponse<bool>> DeleteSportsbookGlossary(DeleteSportsbookGlossaryRequest request);

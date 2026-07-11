@@ -47,6 +47,21 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
+        [HttpGet("sportsbook/translations/stats")]
+        [Authorize("Translations.Static", ((int)Access.View))]
+        public async Task<IActionResult> GetSportsbookTranslationStats()
+        {
+            var result = await _backofficeRepository.GetSportsbookTranslationStats();
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpPost("sportsbook/translations")]
         [Authorize("Translations.Static", ((int)Access.Edit))]
         public async Task<IActionResult> AddOrUpdateSportsbookTranslation([FromBody] AddOrUpdateSportsbookTranslationRequest request)
@@ -102,6 +117,21 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> GetSportsbookGlossary([FromBody] GetSportsbookGlossaryRequest request)
         {
             var result = await _backofficeRepository.GetSportsbookGlossary(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("sportsbook/glossary/stats")]
+        [Authorize("Translations.Dynamic", ((int)Access.View))]
+        public async Task<IActionResult> GetSportsbookGlossaryStats()
+        {
+            var result = await _backofficeRepository.GetSportsbookGlossaryStats();
 
             switch (result.StatusCode)
             {

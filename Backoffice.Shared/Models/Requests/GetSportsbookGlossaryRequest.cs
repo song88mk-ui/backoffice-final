@@ -5,5 +5,6 @@ namespace Backoffice.Shared.Models.Requests
         public string SearchText { get; set; }
         public string TargetLanguage { get; set; }
         public MetaData MetaData { get; set; }
+        public bool UntranslatedOnly { get; set; }
     }
 }

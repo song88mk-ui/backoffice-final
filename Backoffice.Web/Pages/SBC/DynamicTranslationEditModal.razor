@@ -1,7 +1,11 @@
 <div class="p-4">
     <div class="mb-3">
         <label class="form-label">String ID</label>
-        <input class="form-control" @bind="StringId" @bind:event="oninput" readonly="@(!IsNew)" />
+        <input class="form-control" @bind="StringId" @bind:event="oninput" disabled="@(!IsNew)" />
+        @if (!IsNew)
+        {
+            <small class="text-muted">String ID cannot be changed after creation.</small>
+        }
     </div>
     <div class="mb-3">
         <label class="form-label">Source Text (EN)</label>

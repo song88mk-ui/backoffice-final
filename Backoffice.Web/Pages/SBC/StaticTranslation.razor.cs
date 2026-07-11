@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Pages.Base;
 using Backoffice.Web.Services;
@@ -29,6 +30,8 @@ namespace Backoffice.Web.Pages.SBC
         private Dictionary<string, string> Translations { get; set; } = new Dictionary<string, string>();
         private string _errorMessage;
 
+        private List<LanguageTranslationStat> _stats = new List<LanguageTranslationStat>();
+
         private string _searchText = string.Empty;
         private string SearchText
         {
@@ -38,6 +41,20 @@ namespace Backoffice.Web.Pages.SBC
                 if (_searchText != value)
                 {
                     _searchText = value;
+                    ResetPagination();
+                }
+            }
+        }
+
+        private bool _showOnlyUntranslated;
+        private bool ShowOnlyUntranslated
+        {
+            get => _showOnlyUntranslated;
+            set
+            {
+                if (_showOnlyUntranslated != value)
+                {
+                    _showOnlyUntranslated = value;
                     ResetPagination();
                 }
             }
@@ -71,13 +88,28 @@ namespace Backoffice.Web.Pages.SBC
             }
         }
 
-        private IEnumerable<KeyValuePair<string, string>> FilteredTranslations =>
-            Translations == null
-                ? Enumerable.Empty<KeyValuePair<string, string>>()
-                : string.IsNullOrWhiteSpace(SearchText)
-                    ? Translations
+        private IEnumerable<KeyValuePair<string, string>> FilteredTranslations
+        {
+            get
+            {
+                if (Translations == null)
+                {
+                    return Enumerable.Empty<KeyValuePair<string, string>>();
+                }
+
+                var result = string.IsNullOrWhiteSpace(SearchText)
+                    ? Translations.AsEnumerable()
                     : Translations.Where(t => t.Key.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                                               t.Value.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+
+                if (ShowOnlyUntranslated)
+                {
+                    result = result.Where(t => string.IsNullOrWhiteSpace(t.Value));
+                }
+
+                return result;
+            }
+        }
 
         private IEnumerable<KeyValuePair<string, string>> PagedTranslations =>
             FilteredTranslations
@@ -89,7 +121,16 @@ namespace Backoffice.Web.Pages.SBC
             BackofficeService.Page = TranslationsPermission.Translations_Static.ToString().Replace("_", ".");
 
             await LoadTranslations(SelectedLanguageCode);
+            await LoadStats();
             await base.OnInitializedAsync();
+        }
+
+        private async Task LoadStats()
+        {
+            var response = await BackofficeService.GetSportsbookTranslationStats();
+            _stats = response != null && response.StatusCode == StatusCode.Success && response.Result != null
+                ? response.Result.Languages
+                : new List<LanguageTranslationStat>();
         }
 
         private async Task LoadTranslations(string languageCode)
@@ -178,6 +219,7 @@ namespace Backoffice.Web.Pages.SBC
             {
                 Translations[key] = newValue;
                 _errorMessage = null;
+                await LoadStats();
             }
             else
             {
@@ -207,6 +249,7 @@ namespace Backoffice.Web.Pages.SBC
                 }
 
                 _errorMessage = null;
+                await LoadStats();
             }
             else
             {

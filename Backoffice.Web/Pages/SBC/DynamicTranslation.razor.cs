@@ -31,6 +31,8 @@ namespace Backoffice.Web.Pages.SBC
         private List<SportsbookGlossaryResponse> Glossary { get; set; } = new List<SportsbookGlossaryResponse>();
         private string _errorMessage;
 
+        private List<LanguageTranslationStat> _stats = new List<LanguageTranslationStat>();
+
         private bool _isExporting;
         private string _importResultMessage;
         private bool _importHasErrors;
@@ -45,6 +47,20 @@ namespace Backoffice.Web.Pages.SBC
                 if (_searchText != value)
                 {
                     _searchText = value;
+                    _ = LoadGlossary(resetPage: true);
+                }
+            }
+        }
+
+        private bool _showOnlyUntranslated;
+        private bool ShowOnlyUntranslated
+        {
+            get => _showOnlyUntranslated;
+            set
+            {
+                if (_showOnlyUntranslated != value)
+                {
+                    _showOnlyUntranslated = value;
                     _ = LoadGlossary(resetPage: true);
                 }
             }
@@ -79,7 +95,16 @@ namespace Backoffice.Web.Pages.SBC
             BackofficeService.Page = TranslationsPermission.Translations_Dynamic.ToString().Replace("_", ".");
 
             await LoadGlossary(resetPage: true);
+            await LoadStats();
             await base.OnInitializedAsync();
+        }
+
+        private async Task LoadStats()
+        {
+            var response = await BackofficeService.GetSportsbookGlossaryStats();
+            _stats = response != null && response.StatusCode == StatusCode.Success && response.Result != null
+                ? response.Result.Languages
+                : new List<LanguageTranslationStat>();
         }
 
         private async Task LoadGlossary(bool resetPage)
@@ -93,7 +118,8 @@ namespace Backoffice.Web.Pages.SBC
             {
                 SearchText = SearchText,
                 TargetLanguage = SelectedLanguageCode,
-                MetaData = MetaData
+                MetaData = MetaData,
+                UntranslatedOnly = ShowOnlyUntranslated && SelectedLanguageCode != "EN"
             });
 
             if (response != null && response.StatusCode == StatusCode.Success && response.Result != null)
@@ -190,6 +216,7 @@ namespace Backoffice.Web.Pages.SBC
 
             _errorMessage = null;
             await LoadGlossary(resetPage: false);
+            await LoadStats();
             return true;
         }
 
@@ -240,6 +267,7 @@ namespace Backoffice.Web.Pages.SBC
 
             _errorMessage = null;
             await LoadGlossary(resetPage: false);
+            await LoadStats();
             return true;
         }
 
@@ -316,6 +344,7 @@ namespace Backoffice.Web.Pages.SBC
             _importRowMessages = summary.RowMessages ?? new List<string>();
 
             await LoadGlossary(resetPage: false);
+            await LoadStats();
         }
 
         private async Task PreviousPage()

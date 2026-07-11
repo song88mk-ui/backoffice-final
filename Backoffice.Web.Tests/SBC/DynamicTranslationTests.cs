@@ -1,0 +1,145 @@
+using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Pages.SBC;
+using Backoffice.Web.Services;
+using Backoffice.Web.States;
+using Bunit;
+using Bunit.TestDoubles;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using Xunit;
+
+namespace Backoffice.Web.Tests.SBC
+{
+    // Component tests for the Dynamic Translation page: the translated/untranslated legend and
+    // the server-side "Show only untranslated" filter added on top of the existing glossary grid.
+    public class DynamicTranslationTests : TestContext
+    {
+        private readonly Mock<IBackofficeService> _backofficeService = new();
+        private GetSportsbookGlossaryRequest? _lastRequest;
+
+        public DynamicTranslationTests()
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?> { ["API:HubAPI"] = "http://localhost/hub" })
+                .Build();
+
+            var translationService = new Mock<ITranslationService>();
+            translationService
+                .Setup(s => s.GetTranslationsAsync(It.IsAny<LanguageCode>()))
+                .ReturnsAsync(new Dictionary<string, string>());
+            var translationState = new TranslationState(translationService.Object);
+
+            Services.AddSingleton<IConfiguration>(configuration);
+            // CustomModal (rendered at the bottom of the page) casts IModalService to the
+            // concrete ModalService and subscribes to its events, so a bare Moq proxy won't do.
+            Services.AddSingleton<IModalService>(new ModalService(translationState));
+            Services.AddSingleton(new Mock<IPreRenderService>().Object);
+            Services.AddSingleton(new Mock<ITradingService>().Object);
+            Services.AddSingleton(new Mock<IProviderMappingService>().Object);
+            Services.AddSingleton(_backofficeService.Object);
+            Services.AddSingleton(new Mock<IAuthenticationService>().Object);
+            Services.AddSingleton(new Mock<ITableauService>().Object);
+            Services.AddSingleton(new Mock<ICommonService>().Object);
+            Services.AddSingleton(translationState);
+            Services.AddSingleton<UserState>();
+            Services.AddSingleton<AlertToastService>();
+            Services.AddSingleton<HubService>();
+            Services.AddSingleton(sp => new PageState(
+                new Mock<IAuthenticationService>().Object,
+                sp.GetRequiredService<NavigationManager>()));
+
+            var authContext = this.AddTestAuthorization();
+            authContext.SetAuthorized("test-user");
+            authContext.SetPolicies("translations-dynamic", "translations-dynamic-canedit");
+
+            JSInterop.Setup<string>("getCookie", _ => true).SetResult("EN");
+
+            _backofficeService
+                .Setup(s => s.GetSportsbookGlossary(It.IsAny<GetSportsbookGlossaryRequest>()))
+                .Callback<GetSportsbookGlossaryRequest>(r => _lastRequest = r)
+                .ReturnsAsync(new BaseResponse<SportsbookGlossaryListResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new SportsbookGlossaryListResponse
+                    {
+                        Glossary = new List<SportsbookGlossaryResponse>
+                        {
+                            new SportsbookGlossaryResponse { Id = 1, StringId = "SpId:1", SourceText = "Soccer", TargetText = "足球", TargetLanguage = "ZH" },
+                            new SportsbookGlossaryResponse { Id = 2, StringId = "SpId:2", SourceText = "Tennis", TargetText = "Tennis", TargetLanguage = "ZH" }
+                        },
+                        MetaData = new MetaData { CurrentPage = 1, PageSize = 10, TotalCount = 2, TotalPages = 1 }
+                    }
+                });
+
+            _backofficeService
+                .Setup(s => s.GetSportsbookGlossaryStats())
+                .ReturnsAsync(new BaseResponse<TranslationStatsResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new TranslationStatsResponse
+                    {
+                        Languages = new List<LanguageTranslationStat>
+                        {
+                            new LanguageTranslationStat { LanguageCode = "ZH", TotalCount = 2, TranslatedCount = 1 },
+                            new LanguageTranslationStat { LanguageCode = "ES", TotalCount = 2, TranslatedCount = 2 },
+                            new LanguageTranslationStat { LanguageCode = "FR", TotalCount = 2, TranslatedCount = 2 }
+                        }
+                    }
+                });
+        }
+
+        [Fact]
+        public void Render_ShowsLegendBadge_ForEachTargetLanguage_WithTranslatedCounts()
+        {
+            var cut = RenderComponent<DynamicTranslation>();
+
+            var badges = cut.FindAll("span.badge");
+            Assert.Contains(badges, b => b.TextContent.Contains("ZH") && b.TextContent.Contains("1/2"));
+            Assert.Contains(badges, b => b.TextContent.Contains("ES") && b.TextContent.Contains("2/2"));
+            Assert.Contains(badges, b => b.TextContent.Contains("FR") && b.TextContent.Contains("2/2"));
+        }
+
+        [Fact]
+        public void Render_HighlightsRow_AndShowsMissingPlaceholder_WhenTargetEqualsSource()
+        {
+            var cut = RenderComponent<DynamicTranslation>();
+            cut.Find("#languageSelect").Change("ZH"); // missing-placeholder logic only applies to non-EN target languages
+
+            var rows = cut.FindAll("tbody tr");
+            var missingRow = Assert.Single(rows, r => r.TextContent.Contains("SpId:2"));
+            Assert.Contains("table-warning", missingRow.ClassName);
+            Assert.Contains("missing", missingRow.TextContent);
+
+            var translatedRow = Assert.Single(rows, r => r.TextContent.Contains("SpId:1"));
+            Assert.DoesNotContain("table-warning", translatedRow.ClassName);
+        }
+
+        [Fact]
+        public void ShowOnlyUntranslated_SendsUntranslatedOnlyFlag_ToTheApi()
+        {
+            var cut = RenderComponent<DynamicTranslation>();
+            cut.Find("#languageSelect").Change("ZH"); // the flag is only meaningful once a target language is selected
+
+            cut.Find("#showOnlyUntranslated").Change(true);
+
+            Assert.NotNull(_lastRequest);
+            Assert.True(_lastRequest!.UntranslatedOnly);
+        }
+
+        [Fact]
+        public void ShowOnlyUntranslated_CheckboxIsDisabled_ForEnglish()
+        {
+            var cut = RenderComponent<DynamicTranslation>();
+
+            cut.Find("#languageSelect").Change("EN");
+
+            var checkbox = cut.Find("#showOnlyUntranslated");
+            Assert.True(checkbox.HasAttribute("disabled"));
+        }
+    }
+}
