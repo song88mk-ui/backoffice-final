@@ -305,6 +305,54 @@ namespace Backoffice.API.Tests.Translation
             Assert.Equal("足球", row.TargetTextZh); // untouched
         }
 
+        // The same English text can legitimately appear under multiple STRING_IDs (a duplicate/
+        // legacy row, or two different real-world entities that happen to share a name) -- editing
+        // one should propagate to every OTHER row with the identical SourceText, scoped to the same
+        // STRING_ID prefix so a team-name edit (Te:) can never bleed into an unrelated market
+        // template row (MaTe:) that coincidentally has the same text.
+        [Fact]
+        public async Task AddOrUpdateSportsbookGlossary_UpdatingOneRow_CascadesToOtherRowsWithIdenticalSourceTextAndSamePrefixOnly()
+        {
+            var dbName = nameof(AddOrUpdateSportsbookGlossary_UpdatingOneRow_CascadesToOtherRowsWithIdenticalSourceTextAndSamePrefixOnly);
+            long editedId;
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                var edited = MakeGlossaryRow("Te:1", "Werewolves CC", zh: "旧翻译");
+                var sameKindSibling = MakeGlossaryRow("Te:2", "Werewolves CC", zh: "另一个旧翻译");
+                var differentKindSibling = MakeGlossaryRow("MaTe:9", "Werewolves CC", zh: "无关文本");
+                seed.TranslationCache2.AddRange(edited, sameKindSibling, differentKindSibling);
+                await seed.SaveChangesAsync();
+                editedId = edited.Id;
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.AddOrUpdateSportsbookGlossary(
+                new AddOrUpdateSportsbookGlossaryRequest
+                {
+                    Id = editedId,
+                    StringId = "Te:1",
+                    SourceText = "Werewolves CC",
+                    TargetLanguage = "ZH",
+                    TargetText = "狼人 CC"
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+
+            using var verify = BuildTranslationContext(dbName);
+            var editedRow = verify.TranslationCache2.Single(t => t.StringId == "Te:1");
+            var sameKindRow = verify.TranslationCache2.Single(t => t.StringId == "Te:2");
+            var differentKindRow = verify.TranslationCache2.Single(t => t.StringId == "MaTe:9");
+
+            Assert.Equal("狼人 CC", editedRow.TargetTextZh);
+            Assert.Equal("狼人 CC", sameKindRow.TargetTextZh); // cascaded: same prefix, same source text
+            Assert.True(sameKindRow.Processed);
+            Assert.Equal("无关文本", differentKindRow.TargetTextZh); // untouched: different STRING_ID prefix
+        }
+
         [Fact]
         public async Task AddOrUpdateSportsbookGlossary_RejectsDuplicateStringId_OnCreate()
         {

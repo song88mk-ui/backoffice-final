@@ -2804,6 +2804,7 @@ namespace Backoffice.API.Repositories
                 };
 
                 var translationChanges = new List<TranslationChangeItem>();
+                string editedStringId;
 
                 if (request.Id.HasValue && request.Id.Value > 0)
                 {
@@ -2812,6 +2813,8 @@ namespace Backoffice.API.Repositories
                     {
                         return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "Glossary entry not found.", Result = false };
                     }
+
+                    editedStringId = existing.StringId;
 
                     activity.Activity = Activity.Update.ToString();
                     activity.Payload = existing.StringId;
@@ -2841,6 +2844,8 @@ namespace Backoffice.API.Repositories
                     {
                         return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "That String ID already exists.", Result = false };
                     }
+
+                    editedStringId = request.StringId;
 
                     activity.Activity = Activity.Create.ToString();
                     activity.Payload = request.StringId;
@@ -2877,8 +2882,23 @@ namespace Backoffice.API.Repositories
                     _translationContext.TranslationCache2.Add(entity);
                 }
 
+                var siblingActivityLogs = new List<ActivityLogModel>();
+
+                if (targetLanguage != null && targetLanguage != "EN")
+                {
+                    await CascadeToSiblingGlossaryRowsAsync(
+                        editedStringId, request.SourceText, targetLanguage, request.TargetText ?? string.Empty,
+                        translationChanges, requesterInfo, siblingActivityLogs);
+                }
+
                 await _translationContext.SaveChangesAsync();
                 await AddActivityLog(activity);
+
+                if (siblingActivityLogs.Count > 0)
+                {
+                    await AddActivityLogList(new ActivityLogListRequest { ActivityLogs = siblingActivityLogs });
+                }
+
                 await PublishTranslationChange(translationChanges);
 
                 return new BaseResponse<bool> { StatusCode = StatusCode.Success, Message = StatusCode.Success.ToString(), Result = true };
@@ -2887,6 +2907,54 @@ namespace Backoffice.API.Repositories
             {
                 return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = ex.Message, Result = false };
             }
+        }
+
+        // A glossary edit only ever updates the ONE StringId being edited, but the same English
+        // source text can legitimately appear under other StringIds too (a duplicate/legacy row,
+        // or two different real-world entities that just happen to share an English name). This
+        // propagates the SAME target-language text to every OTHER row with an identical
+        // SourceText, scoped to the SAME StringId prefix (Te:/Co:/MaTe:/...) so a team-name edit
+        // can never bleed into an unrelated market-template row that coincidentally has the same
+        // text — the two are different kinds of entity even when the text matches. Each cascaded
+        // row is logged individually (siblingActivityLogs) so a translator can see it happened.
+        private async Task<int> CascadeToSiblingGlossaryRowsAsync(
+            string editedStringId, string sourceText, string targetLanguage, string targetText,
+            List<TranslationChangeItem> translationChanges, RequesterInfo requesterInfo, List<ActivityLogModel> activityLogs)
+        {
+            if (string.IsNullOrWhiteSpace(sourceText) || string.IsNullOrWhiteSpace(editedStringId))
+                return 0;
+
+            var separatorIndex = editedStringId.IndexOf(':');
+
+            if (separatorIndex <= 0)
+                return 0; // no recognizable "Prefix:Id" shape -- nothing to safely scope a cascade to
+
+            var prefix = editedStringId.Substring(0, separatorIndex + 1); // includes the ':'
+
+            var siblings = await _translationContext.TranslationCache2
+                .Where(g => g.SourceText == sourceText && g.StringId != editedStringId)
+                .ToListAsync();
+
+            var updatedCount = 0;
+
+            foreach (var sibling in siblings.Where(g => g.StringId.StartsWith(prefix, StringComparison.Ordinal)))
+            {
+                var previous = GetTargetText(sibling, targetLanguage) ?? string.Empty;
+
+                if (string.Equals(previous.Trim(), targetText.Trim(), StringComparison.Ordinal))
+                    continue; // already the same value -- idempotent no-op, nothing to log or publish
+
+                SetTargetText(sibling, targetLanguage, targetText);
+                sibling.Processed = true;
+                sibling.UpdatedAt = DateTime.UtcNow;
+                _translationContext.TranslationCache2.Update(sibling);
+
+                translationChanges.Add(new TranslationChangeItem { StId = sibling.StringId, LaCo = targetLanguage, Tx = targetText });
+                activityLogs.Add(BuildGlossaryActivityLog(requesterInfo, Activity.Update, sibling.StringId, previous, targetText));
+                updatedCount++;
+            }
+
+            return updatedCount;
         }
 
         public async Task<BaseResponse<bool>> SetSportsbookGlossaryProcessed(SetSportsbookGlossaryProcessedRequest request, RequesterInfo requesterInfo)
