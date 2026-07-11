@@ -84,3 +84,11 @@
     align-items: center;
     gap: 10px;
 }
+
+/* The shared resend-settlement.svg icon (also used on Administration/ResendSettlement) is a
+   light gray (#9aa0ab) by design, which reads as "disabled" next to the solid-black edit/trash
+   icons here. Darken it for this page only -- the shared SVG file itself is left untouched so
+   its appearance elsewhere is unaffected. */
+.toggle-processed-icon {
+    filter: brightness(0.5) saturate(0);
+}

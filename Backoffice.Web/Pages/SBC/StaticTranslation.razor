@@ -118,10 +118,12 @@
                                                             @translation.Value
                                                         }
                                                     </td>
-                                                    <td class="d-flex">
+                                                    <td>
                                                         <AuthorizeView Policy="translations-static-canedit" Context="canEdit">
-                                                            <img @onclick="() => OnEditTranslation(translation)" src="icons/svg/icon-edit.svg" alt="edit Icon">
-                                                            <img @onclick="() => OnDeleteTranslation(translation)" src="icons/svg/icon-trash.svg" alt="delete Icon">
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <img @onclick="() => OnEditTranslation(translation)" src="icons/svg/icon-edit.svg" alt="edit Icon">
+                                                                <img @onclick="() => OnDeleteTranslation(translation)" src="icons/svg/icon-trash.svg" alt="delete Icon">
+                                                            </div>
                                                         </AuthorizeView>
                                                     </td>
                                                 </tr>

@@ -161,15 +161,18 @@
                                                         <span class="badge bg-warning text-dark" title="Queued — the external translation script picks this term up on its next pass">Pending</span>
                                                     }
                                                 </td>
-                                                <td class="d-flex align-items-center gap-2">
+                                                <td>
                                                     <AuthorizeView Policy="translations-dynamic-canedit" Context="canEdit">
-                                                        <img @onclick="() => OnToggleProcessed(entry)"
-                                                             src="@(entry.Processed ? "icons/svg/resend-settlement.svg" : "icons/svg/icon-check.svg")"
-                                                             style="width:18px;height:18px;object-fit:contain;"
-                                                             alt="toggle processed Icon"
-                                                             title="@(entry.Processed ? "Re-queue for translation" : "Mark as processed")">
-                                                        <img @onclick="() => OnEditGlossary(entry)" src="icons/svg/icon-edit.svg" alt="edit Icon">
-                                                        <img @onclick="() => OnDeleteGlossary(entry)" src="icons/svg/icon-trash.svg" alt="delete Icon">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <img @onclick="() => OnToggleProcessed(entry)"
+                                                                 class="@(entry.Processed ? "toggle-processed-icon" : "")"
+                                                                 src="@(entry.Processed ? "icons/svg/resend-settlement.svg" : "icons/svg/icon-check.svg")"
+                                                                 style="width:18px;height:18px;object-fit:contain;"
+                                                                 alt="toggle processed Icon"
+                                                                 title="@(entry.Processed ? "Re-queue for translation" : "Mark as processed")">
+                                                            <img @onclick="() => OnEditGlossary(entry)" src="icons/svg/icon-edit.svg" alt="edit Icon">
+                                                            <img @onclick="() => OnDeleteGlossary(entry)" src="icons/svg/icon-trash.svg" alt="delete Icon">
+                                                        </div>
                                                     </AuthorizeView>
                                                 </td>
                                             </tr>
