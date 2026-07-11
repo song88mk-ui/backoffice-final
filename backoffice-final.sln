@@ -24,6 +24,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backoffice.WebSocket.Servic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backoffice.Web.Tests", "Backoffice.Web.Tests\Backoffice.Web.Tests.csproj", "{BA66637C-1B17-4875-BC45-740A03BF4850}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backoffice.API.Tests", "Backoffice.API.Tests\Backoffice.API.Tests.csproj", "{6FB4F4FF-519F-49DB-A43C-A0D936957108}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{BA66637C-1B17-4875-BC45-740A03BF4850}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA66637C-1B17-4875-BC45-740A03BF4850}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA66637C-1B17-4875-BC45-740A03BF4850}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FB4F4FF-519F-49DB-A43C-A0D936957108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FB4F4FF-519F-49DB-A43C-A0D936957108}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FB4F4FF-519F-49DB-A43C-A0D936957108}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FB4F4FF-519F-49DB-A43C-A0D936957108}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
