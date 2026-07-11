@@ -306,20 +306,20 @@ namespace Backoffice.API.Tests.Translation
         }
 
         // The same English text can legitimately appear under multiple STRING_IDs (a duplicate/
-        // legacy row, or two different real-world entities that happen to share a name) -- editing
-        // one should propagate to every OTHER row with the identical SourceText, scoped to the same
-        // STRING_ID prefix so a team-name edit (Te:) can never bleed into an unrelated market
-        // template row (MaTe:) that coincidentally has the same text.
+        // legacy row, or two different real-world entities that happen to share a name -- e.g. live
+        // data shows "Argentina" as both a SegId: segment and several Te: team rows, which should
+        // all share one translation) -- editing one propagates to every OTHER row with the
+        // identical SourceText, regardless of STRING_ID prefix.
         [Fact]
-        public async Task AddOrUpdateSportsbookGlossary_UpdatingOneRow_CascadesToOtherRowsWithIdenticalSourceTextAndSamePrefixOnly()
+        public async Task AddOrUpdateSportsbookGlossary_UpdatingOneRow_CascadesToEveryOtherRowWithIdenticalSourceText()
         {
-            var dbName = nameof(AddOrUpdateSportsbookGlossary_UpdatingOneRow_CascadesToOtherRowsWithIdenticalSourceTextAndSamePrefixOnly);
+            var dbName = nameof(AddOrUpdateSportsbookGlossary_UpdatingOneRow_CascadesToEveryOtherRowWithIdenticalSourceText);
             long editedId;
             using (var seed = BuildTranslationContext(dbName))
             {
-                var edited = MakeGlossaryRow("Te:1", "Werewolves CC", zh: "旧翻译");
-                var sameKindSibling = MakeGlossaryRow("Te:2", "Werewolves CC", zh: "另一个旧翻译");
-                var differentKindSibling = MakeGlossaryRow("MaTe:9", "Werewolves CC", zh: "无关文本");
+                var edited = MakeGlossaryRow("Te:1", "Argentina", zh: "旧翻译");
+                var sameKindSibling = MakeGlossaryRow("Te:2", "Argentina", zh: "另一个旧翻译");
+                var differentKindSibling = MakeGlossaryRow("SegId:122", "Argentina", zh: "旧翻译3");
                 seed.TranslationCache2.AddRange(edited, sameKindSibling, differentKindSibling);
                 await seed.SaveChangesAsync();
                 editedId = edited.Id;
@@ -334,9 +334,9 @@ namespace Backoffice.API.Tests.Translation
                 {
                     Id = editedId,
                     StringId = "Te:1",
-                    SourceText = "Werewolves CC",
+                    SourceText = "Argentina",
                     TargetLanguage = "ZH",
-                    TargetText = "狼人 CC"
+                    TargetText = "阿根廷"
                 },
                 MakeRequester("Translations.Dynamic"));
 
@@ -345,12 +345,13 @@ namespace Backoffice.API.Tests.Translation
             using var verify = BuildTranslationContext(dbName);
             var editedRow = verify.TranslationCache2.Single(t => t.StringId == "Te:1");
             var sameKindRow = verify.TranslationCache2.Single(t => t.StringId == "Te:2");
-            var differentKindRow = verify.TranslationCache2.Single(t => t.StringId == "MaTe:9");
+            var differentKindRow = verify.TranslationCache2.Single(t => t.StringId == "SegId:122");
 
-            Assert.Equal("狼人 CC", editedRow.TargetTextZh);
-            Assert.Equal("狼人 CC", sameKindRow.TargetTextZh); // cascaded: same prefix, same source text
+            Assert.Equal("阿根廷", editedRow.TargetTextZh);
+            Assert.Equal("阿根廷", sameKindRow.TargetTextZh); // cascaded: same prefix, same source text
             Assert.True(sameKindRow.Processed);
-            Assert.Equal("无关文本", differentKindRow.TargetTextZh); // untouched: different STRING_ID prefix
+            Assert.Equal("阿根廷", differentKindRow.TargetTextZh); // cascaded too: different prefix, same source text
+            Assert.True(differentKindRow.Processed);
         }
 
         [Fact]

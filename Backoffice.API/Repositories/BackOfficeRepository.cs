@@ -2911,12 +2911,13 @@ namespace Backoffice.API.Repositories
 
         // A glossary edit only ever updates the ONE StringId being edited, but the same English
         // source text can legitimately appear under other StringIds too (a duplicate/legacy row,
-        // or two different real-world entities that just happen to share an English name). This
-        // propagates the SAME target-language text to every OTHER row with an identical
-        // SourceText, scoped to the SAME StringId prefix (Te:/Co:/MaTe:/...) so a team-name edit
-        // can never bleed into an unrelated market-template row that coincidentally has the same
-        // text — the two are different kinds of entity even when the text matches. Each cascaded
-        // row is logged individually (siblingActivityLogs) so a translator can see it happened.
+        // or two different real-world entities that just happen to share an English name — verified
+        // live 2026-07: the only cross-prefix collision in TranslationCache2 today is SegId:/Te:
+        // both named after the same country, e.g. "Argentina" as both a segment and several team
+        // rows, which genuinely should share one translation). This propagates the SAME
+        // target-language text to every OTHER row with an identical SourceText, regardless of
+        // STRING_ID prefix. Each cascaded row is logged individually (siblingActivityLogs) so a
+        // translator can see it happened.
         private async Task<int> CascadeToSiblingGlossaryRowsAsync(
             string editedStringId, string sourceText, string targetLanguage, string targetText,
             List<TranslationChangeItem> translationChanges, RequesterInfo requesterInfo, List<ActivityLogModel> activityLogs)
@@ -2924,20 +2925,13 @@ namespace Backoffice.API.Repositories
             if (string.IsNullOrWhiteSpace(sourceText) || string.IsNullOrWhiteSpace(editedStringId))
                 return 0;
 
-            var separatorIndex = editedStringId.IndexOf(':');
-
-            if (separatorIndex <= 0)
-                return 0; // no recognizable "Prefix:Id" shape -- nothing to safely scope a cascade to
-
-            var prefix = editedStringId.Substring(0, separatorIndex + 1); // includes the ':'
-
             var siblings = await _translationContext.TranslationCache2
                 .Where(g => g.SourceText == sourceText && g.StringId != editedStringId)
                 .ToListAsync();
 
             var updatedCount = 0;
 
-            foreach (var sibling in siblings.Where(g => g.StringId.StartsWith(prefix, StringComparison.Ordinal)))
+            foreach (var sibling in siblings)
             {
                 var previous = GetTargetText(sibling, targetLanguage) ?? string.Empty;
 
