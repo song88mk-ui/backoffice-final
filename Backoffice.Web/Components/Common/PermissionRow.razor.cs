@@ -25,11 +25,6 @@ namespace Backoffice.Web.Components.Common
             if (IsAdmin && Claim.ClaimType == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", "."))
                 Claim.ClaimValue = "0";
 
-
-            var permission = Permissions.FirstOrDefault(p => p.ClaimType == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", "."));
-            if(permission != null)
-                permission.ClaimValue = "0";
-
             return base.OnParametersSetAsync();
         }
 
