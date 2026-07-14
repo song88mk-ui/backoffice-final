@@ -3,6 +3,7 @@
 @using Backoffice.Web.Components.Common
 @using Backoffice.Web.Shared
 @using Backoffice.Shared.Enums
+@using Backoffice.Shared.Utilities
 @using Microsoft.AspNetCore.Components.Authorization
 
 @page "/translations/dynamic"
@@ -137,6 +138,7 @@
                                         @foreach (var entry in Glossary)
                                         {
                                             var isUntranslated = SelectedLanguageCode != "EN" &&
+                                                TranslationTextHelper.RequiresTranslation(entry.SourceText) &&
                                                 (string.IsNullOrWhiteSpace(entry.TargetText) || entry.TargetText == entry.SourceText);
                                             <tr>
                                                 <td>@entry.StringId</td>
@@ -148,7 +150,8 @@
                                                     }
                                                     else
                                                     {
-                                                        @entry.TargetText
+                                                        @* Letterless terms (e.g. "5+") need no translation; show the source when the target cell is empty. *@
+                                                        @(string.IsNullOrWhiteSpace(entry.TargetText) ? entry.SourceText : entry.TargetText)
                                                     }
                                                 </td>
                                                 <td>

@@ -79,6 +79,18 @@ Deliberately mirrors, rather than upgrades, Static Translation's existing "Expor
 
 ---
 
+## Sportsbook Dynamic Translation — Letterless Terms Are Never "Untranslated"
+
+**Date noted:** July 14, 2026
+
+**Issue:** "untranslated" was defined as *target cell blank or equal to the EN source*. Glossary terms whose `SourceText` contains no letters (`5+`, `4`, `0-1`, …) read the same in every language, so they could never leave that state — they permanently polluted the "Show only untranslated" filter, the yellow "— missing —" highlight, and the per-language `translated/total` stat badges (which could therefore never reach 100%).
+
+**Resolved:** a term now counts as untranslated only if its `SourceText` contains at least one letter (a–z/A–Z). Applied consistently in three places: the `UntranslatedOnly` filter and the stats counts in `BackOfficeRepository` (`GetSportsbookGlossary`/`GetSportsbookGlossaryStats`), and the row highlight in `DynamicTranslation.razor` (a letterless row shows its source text instead of "— missing —"). The UI-side rule lives in `Backoffice.Shared/Utilities/TranslationTextHelper.RequiresTranslation`; the query side is a hand-built expression (`BackOfficeRepository.SourceTextRequiresTranslation`) because `char.IsLetter`/regex don't translate on EF Core 3.1 and `LIKE '%[A-Za-z]%'` ranges are SQL Server-only (the InMemory provider used by the tests treats them as literals) — it compiles to `SourceText IS NOT NULL AND (LOWER(SourceText) LIKE CHARINDEX 'a' OR … 'z')`. Export/import semantics and the external updater script are untouched: a letterless row is only excluded from the *untranslated* views, never from the grid or the CSV.
+
+**Validation:** new repository tests (filter excludes letterless rows, unfiltered view still returns them, stats count them as translated) and a bUnit test (letterless row untinted, shows its value) — 46 API + 33 Web tests pass, solution builds with 0 errors.
+
+---
+
 ## Dedicated Translation Permission (replaces borrowed `SBC.OE.Config`)
 
 **Date noted:** July 4, 2026

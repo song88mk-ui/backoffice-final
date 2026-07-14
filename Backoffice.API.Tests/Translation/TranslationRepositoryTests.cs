@@ -971,5 +971,94 @@ namespace Backoffice.API.Tests.Translation
             Assert.Equal(StatusCode.Success, result.StatusCode);
             Assert.Equal(2, result.Result.MetaData.TotalCount); // EN has no target column to compare -- filter is a no-op
         }
+
+        [Fact]
+        public async Task GetSportsbookGlossary_UntranslatedOnly_ExcludesLetterlessSourceTexts()
+        {
+            var dbName = nameof(GetSportsbookGlossary_UntranslatedOnly_ExcludesLetterlessSourceTexts);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("SeTe:1", "5+", zh: ""));        // letterless, blank target -- needs no translation
+                seed.TranslationCache2.Add(MakeGlossaryRow("SeTe:2", "4", zh: "4"));        // letterless, target equals source -- needs no translation
+                seed.TranslationCache2.Add(MakeGlossaryRow("SeTe:3", "0-1", zh: ""));       // digits + symbol only -- needs no translation
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Over 2.5", zh: "")); // has letters -> genuinely untranslated
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:2", "Soccer", zh: "足球")); // has letters, translated
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.GetSportsbookGlossary(new GetSportsbookGlossaryRequest
+            {
+                TargetLanguage = "ZH",
+                UntranslatedOnly = true,
+                MetaData = new MetaData { CurrentPage = 1, PageSize = 10 }
+            });
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(1, result.Result.MetaData.TotalCount);
+            var only = Assert.Single(result.Result.Glossary);
+            Assert.Equal("SpId:1", only.StringId);
+        }
+
+        [Fact]
+        public async Task GetSportsbookGlossary_WithoutUntranslatedFilter_StillReturnsLetterlessRows()
+        {
+            var dbName = nameof(GetSportsbookGlossary_WithoutUntranslatedFilter_StillReturnsLetterlessRows);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("SeTe:1", "5+", zh: ""));
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Soccer", zh: "足球"));
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.GetSportsbookGlossary(new GetSportsbookGlossaryRequest
+            {
+                TargetLanguage = "ZH",
+                UntranslatedOnly = false,
+                MetaData = new MetaData { CurrentPage = 1, PageSize = 10 }
+            });
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(2, result.Result.MetaData.TotalCount); // letterless rows are only excluded from the untranslated view
+        }
+
+        [Fact]
+        public async Task GetSportsbookGlossaryStats_CountsLetterlessSourceTexts_AsTranslated()
+        {
+            var dbName = nameof(GetSportsbookGlossaryStats_CountsLetterlessSourceTexts_AsTranslated);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                // Letterless term, blank in every language -- reads the same everywhere.
+                seed.TranslationCache2.Add(MakeGlossaryRow("SeTe:1", "5+"));
+                // Lettered term, translated for ZH only.
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Soccer", zh: "足球"));
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.GetSportsbookGlossaryStats();
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+
+            var zh = result.Result.Languages.Single(l => l.LanguageCode == "ZH");
+            Assert.Equal(2, zh.TotalCount);
+            Assert.Equal(2, zh.TranslatedCount); // "5+" needs no translation, "Soccer" is translated
+
+            var es = result.Result.Languages.Single(l => l.LanguageCode == "ES");
+            Assert.Equal(1, es.TranslatedCount); // only "5+" -- "Soccer" is still blank for ES
+
+            var fr = result.Result.Languages.Single(l => l.LanguageCode == "FR");
+            Assert.Equal(1, fr.TranslatedCount); // same rule for FR
+        }
     }
 }
