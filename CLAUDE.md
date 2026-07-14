@@ -184,7 +184,8 @@ Large, mixed-purpose commits make bugs harder to isolate, rollbacks harder to sc
 - Large commits that touch multiple unrelated domains are prohibited.
 - If a task naturally spans multiple domains, split it into a commit sequence with a clear order and dependency chain documented in the PR.
 - Commit messages must state the domain and the intent: `[ClientConfig] Add per-league margin override support` not `Various fixes`.
-- **Always include the ticket number** in the commit message so the change is traceable to the work item it belongs to (e.g. `[BO-73] [ClientConfig] Add per-league margin override support`). If no ticket exists for the change, ask for one rather than committing without it.
+- **Mandatory format:** every commit message must start with the ticket number in brackets: `[{ticket-number}] {Message}` (e.g. `[BO-76] Fixed sub user auto disabling when editing sub user`). This is required on its own even when no separate domain tag is added. If no ticket exists for the change, ask for one rather than committing without it.
+- The ticket number can usually be inferred from the current branch name, which encodes it (e.g. `bugs/BO-76-Fixed-sub-user-auto-disabling` → `BO-76`).
 
 ### 13. Testing Gate (Forward-Looking)
 
