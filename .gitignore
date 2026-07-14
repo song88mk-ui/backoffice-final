@@ -7,10 +7,9 @@
 **/PublishProfiles/**
 **/Logs
 **/.config/dotnet-tools.json
-.claude/
-AGENTS.md
-CLAUDE.md
-docs/
+# Claude local-only files (settings.local.json holds machine-specific permissions; lock file is runtime state)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
 # Local-only secrets for ad-hoc API access (see docs/16_BoApiAccess.md). Never commit real credentials.
 .env
 .env.*.local
