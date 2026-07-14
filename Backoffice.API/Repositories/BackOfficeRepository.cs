@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Mail;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -2804,6 +2805,11 @@ namespace Backoffice.API.Repositories
                         case "ES": query = query.Where(g => string.IsNullOrEmpty(g.TargetTextEs) || g.TargetTextEs == g.SourceText); break;
                         case "FR": query = query.Where(g => string.IsNullOrEmpty(g.TargetTextFr) || g.TargetTextFr == g.SourceText); break;
                     }
+
+                    if (IsSupportedTargetLanguage(targetLanguage))
+                    {
+                        query = query.Where(SourceTextRequiresTranslation);
+                    }
                 }
 
                 metaData.TotalCount = await query.CountAsync();
@@ -2853,12 +2859,20 @@ namespace Backoffice.API.Repositories
             {
                 var totalCount = await _translationContext.TranslationCache2.CountAsync();
 
-                var zhTranslated = await _translationContext.TranslationCache2
-                    .CountAsync(g => !string.IsNullOrEmpty(g.TargetTextZh) && g.TargetTextZh != g.SourceText);
-                var esTranslated = await _translationContext.TranslationCache2
-                    .CountAsync(g => !string.IsNullOrEmpty(g.TargetTextEs) && g.TargetTextEs != g.SourceText);
-                var frTranslated = await _translationContext.TranslationCache2
-                    .CountAsync(g => !string.IsNullOrEmpty(g.TargetTextFr) && g.TargetTextFr != g.SourceText);
+                // Letterless source texts (e.g. "5+") read the same in every language, so an
+                // untranslated term is one that is blank/EN-equal AND actually requires translation.
+                var zhTranslated = totalCount - await _translationContext.TranslationCache2
+                    .Where(g => string.IsNullOrEmpty(g.TargetTextZh) || g.TargetTextZh == g.SourceText)
+                    .Where(SourceTextRequiresTranslation)
+                    .CountAsync();
+                var esTranslated = totalCount - await _translationContext.TranslationCache2
+                    .Where(g => string.IsNullOrEmpty(g.TargetTextEs) || g.TargetTextEs == g.SourceText)
+                    .Where(SourceTextRequiresTranslation)
+                    .CountAsync();
+                var frTranslated = totalCount - await _translationContext.TranslationCache2
+                    .Where(g => string.IsNullOrEmpty(g.TargetTextFr) || g.TargetTextFr == g.SourceText)
+                    .Where(SourceTextRequiresTranslation)
+                    .CountAsync();
 
                 return new BaseResponse<TranslationStatsResponse>
                 {
@@ -3301,6 +3315,29 @@ namespace Backoffice.API.Repositories
 
         private static bool IsSupportedTargetLanguage(string targetLanguage) =>
             targetLanguage == "ZH" || targetLanguage == "ES" || targetLanguage == "FR";
+
+        // Query-side equivalent of TranslationTextHelper.RequiresTranslation: char.IsLetter and
+        // regex do not translate on EF Core 3.1, and LIKE '[A-Za-z]' ranges are SQL Server-only
+        // (the InMemory provider treats them literally), so this builds
+        // "SourceText != null && (LOWER(SourceText) contains 'a' || ... || contains 'z')".
+        private static readonly Expression<Func<TranslationCache2, bool>> SourceTextRequiresTranslation = BuildSourceTextRequiresTranslation();
+
+        private static Expression<Func<TranslationCache2, bool>> BuildSourceTextRequiresTranslation()
+        {
+            var parameter = Expression.Parameter(typeof(TranslationCache2), "g");
+            var sourceText = Expression.Property(parameter, nameof(TranslationCache2.SourceText));
+            var lowered = Expression.Call(sourceText, nameof(string.ToLower), Type.EmptyTypes);
+
+            Expression containsAnyLetter = null;
+            for (var letter = 'a'; letter <= 'z'; letter++)
+            {
+                var contains = Expression.Call(lowered, nameof(string.Contains), Type.EmptyTypes, Expression.Constant(letter.ToString()));
+                containsAnyLetter = containsAnyLetter == null ? contains : (Expression)Expression.OrElse(containsAnyLetter, contains);
+            }
+
+            var notNull = Expression.NotEqual(sourceText, Expression.Constant(null, typeof(string)));
+            return Expression.Lambda<Func<TranslationCache2, bool>>(Expression.AndAlso(notNull, containsAnyLetter), parameter);
+        }
 
         private static string GetTargetText(TranslationCache2 entity, string targetLanguage) => targetLanguage switch
         {

@@ -70,9 +70,10 @@ namespace Backoffice.Web.Tests.SBC
                         Glossary = new List<SportsbookGlossaryResponse>
                         {
                             new SportsbookGlossaryResponse { Id = 1, StringId = "SpId:1", SourceText = "Soccer", TargetText = "足球", TargetLanguage = "ZH" },
-                            new SportsbookGlossaryResponse { Id = 2, StringId = "SpId:2", SourceText = "Tennis", TargetText = "Tennis", TargetLanguage = "ZH" }
+                            new SportsbookGlossaryResponse { Id = 2, StringId = "SpId:2", SourceText = "Tennis", TargetText = "Tennis", TargetLanguage = "ZH" },
+                            new SportsbookGlossaryResponse { Id = 3, StringId = "SeTe:3", SourceText = "5+", TargetText = "", TargetLanguage = "ZH" }
                         },
-                        MetaData = new MetaData { CurrentPage = 1, PageSize = 10, TotalCount = 2, TotalPages = 1 }
+                        MetaData = new MetaData { CurrentPage = 1, PageSize = 10, TotalCount = 3, TotalPages = 1 }
                     }
                 });
 
@@ -120,6 +121,20 @@ namespace Backoffice.Web.Tests.SBC
 
             var translatedRow = Assert.Single(rows, r => r.TextContent.Contains("SpId:1"));
             Assert.DoesNotContain("table-warning", translatedRow.QuerySelectorAll("td")[2].ClassName);
+        }
+
+        [Fact]
+        public void Render_DoesNotFlagLetterlessSourceText_AsUntranslated_AndShowsItsValue()
+        {
+            var cut = RenderComponent<DynamicTranslation>();
+            cut.Find("#languageSelect").Change("ZH");
+
+            var rows = cut.FindAll("tbody tr");
+            var numericRow = Assert.Single(rows, r => r.TextContent.Contains("SeTe:3"));
+            var cells = numericRow.QuerySelectorAll("td");
+            Assert.DoesNotContain("table-warning", cells[2].ClassName); // "5+" reads the same in every language
+            Assert.DoesNotContain("missing", numericRow.TextContent);
+            Assert.Equal("5+", cells[2].TextContent.Trim()); // blank target falls back to the source text
         }
 
         [Fact]
