@@ -622,6 +622,72 @@ namespace Backoffice.API.Tests.Translation
         }
 
         [Fact]
+        public async Task ExportSportsbookGlossary_UntranslatedOnly_ReturnsOnlyUntranslatedRowsForLanguage()
+        {
+            var dbName = nameof(ExportSportsbookGlossary_UntranslatedOnly_ReturnsOnlyUntranslatedRowsForLanguage);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Soccer", zh: "足球"));      // translated
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:2", "Basketball", zh: ""));      // blank target -> untranslated
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:3", "Tennis", zh: "Tennis"));    // target equals source -> untranslated
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:4", "Golf", zh: "", es: "Golf esp")); // untranslated for ZH even though ES is done
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ExportSportsbookGlossary(null, "ZH", untranslatedOnly: true);
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(new[] { "SpId:2", "SpId:3", "SpId:4" }, result.Result.Select(r => r.StringId).ToArray());
+        }
+
+        [Fact]
+        public async Task ExportSportsbookGlossary_UntranslatedOnly_ExcludesLetterlessSourceTexts()
+        {
+            var dbName = nameof(ExportSportsbookGlossary_UntranslatedOnly_ExcludesLetterlessSourceTexts);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("SeTe:1", "5+", zh: ""));        // letterless -- needs no translation
+                seed.TranslationCache2.Add(MakeGlossaryRow("SeTe:2", "0-1", zh: ""));       // digits + symbol only -- needs no translation
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Over 2.5", zh: "")); // has letters -> genuinely untranslated
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ExportSportsbookGlossary(null, "ZH", untranslatedOnly: true);
+
+            var row = Assert.Single(result.Result);
+            Assert.Equal("SpId:1", row.StringId);
+        }
+
+        [Fact]
+        public async Task ExportSportsbookGlossary_UntranslatedOnly_IgnoredForEnglish()
+        {
+            var dbName = nameof(ExportSportsbookGlossary_UntranslatedOnly_IgnoredForEnglish);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:1", "Soccer", zh: "足球"));
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:2", "Basketball", zh: ""));
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ExportSportsbookGlossary(null, "EN", untranslatedOnly: true);
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(2, result.Result.Count);
+        }
+
+        [Fact]
         public async Task ImportSportsbookGlossary_CreatesNewRow_WhenStringIdNotFound()
         {
             var dbName = nameof(ImportSportsbookGlossary_CreatesNewRow_WhenStringIdNotFound);

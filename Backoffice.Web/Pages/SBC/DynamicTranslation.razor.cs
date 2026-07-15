@@ -278,7 +278,10 @@ namespace Backoffice.Web.Pages.SBC
 
             try
             {
-                var response = await BackofficeService.ExportSportsbookGlossary(SearchText);
+                var response = await BackofficeService.ExportSportsbookGlossary(
+                    SearchText,
+                    SelectedLanguageCode,
+                    ShowOnlyUntranslated && SelectedLanguageCode != "EN");
 
                 if (response == null || response.StatusCode != StatusCode.Success || response.Result == null)
                 {

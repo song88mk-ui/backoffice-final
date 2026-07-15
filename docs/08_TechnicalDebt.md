@@ -77,6 +77,8 @@ Deliberately mirrors, rather than upgrades, Static Translation's existing "Expor
 
 **Validation:** `Backoffice.API.Tests/Translation/TranslationRepositoryTests.cs` covers create/update/skip/idempotent-reupload/blank-cell/duplicate-row cases against the repository (in-memory EF Core DB); `Backoffice.Web.Tests/Services/GlossaryCsvHelperTests.cs` covers the hand-rolled CSV parser against RFC4180 edge cases (embedded commas, quotes, newlines, BOM, mismatched header). All new and pre-existing tests pass (`dotnet test` on both projects); `Backoffice.API`, `Backoffice.Web`, and both test projects build with 0 errors. Not yet exercised against a live Staging database or through the browser — see Manual Verification note in the implementation summary.
 
+**Update (July 15, 2026, BO-82):** the export now honors the page's active filters instead of always returning the full list. `GET api/translation/sportsbook/glossary/export` gained two optional, backward-compatible query params (`targetLanguage`, `untranslatedOnly`) alongside the existing `searchText`; when `untranslatedOnly=true` and the language is ZH/ES/FR, rows are filtered with the exact same "untranslated" definition as the grid (target text blank or equal to source, letterless source texts excluded), via a shared `ApplyUntranslatedFilter` helper in `BackOfficeRepository`. The CSV shape is unchanged (all language columns are always present so the file still works as the import template); only the row set narrows. `DynamicTranslation.razor.cs` passes the selected language and the "show only untranslated" toggle to the export call, mirroring the grid request.
+
 ---
 
 ## Sportsbook Dynamic Translation — Letterless Terms Are Never "Untranslated"
