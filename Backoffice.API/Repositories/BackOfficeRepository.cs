@@ -2799,17 +2799,7 @@ namespace Backoffice.API.Repositories
 
                 if (request.UntranslatedOnly && targetLanguage != "EN")
                 {
-                    switch (targetLanguage)
-                    {
-                        case "ZH": query = query.Where(g => string.IsNullOrEmpty(g.TargetTextZh) || g.TargetTextZh == g.SourceText); break;
-                        case "ES": query = query.Where(g => string.IsNullOrEmpty(g.TargetTextEs) || g.TargetTextEs == g.SourceText); break;
-                        case "FR": query = query.Where(g => string.IsNullOrEmpty(g.TargetTextFr) || g.TargetTextFr == g.SourceText); break;
-                    }
-
-                    if (IsSupportedTargetLanguage(targetLanguage))
-                    {
-                        query = query.Where(SourceTextRequiresTranslation);
-                    }
+                    query = ApplyUntranslatedFilter(query, targetLanguage);
                 }
 
                 metaData.TotalCount = await query.CountAsync();
@@ -3156,7 +3146,10 @@ namespace Backoffice.API.Repositories
         // Returns every glossary row (no pagination) so the Web layer can build a full CSV
         // export/upload-template client-side, the same way Static Translation's CSV export
         // already works — this endpoint hands back data, not a formatted file.
-        public async Task<BaseResponse<List<SportsbookGlossaryExportRow>>> ExportSportsbookGlossary(string searchText)
+        // All three language columns are always returned (the file doubles as the import
+        // template); untranslatedOnly/targetLanguage only narrow which rows are included,
+        // using the same filter as the Dynamic Translation grid.
+        public async Task<BaseResponse<List<SportsbookGlossaryExportRow>>> ExportSportsbookGlossary(string searchText, string targetLanguage = null, bool untranslatedOnly = false)
         {
             try
             {
@@ -3165,6 +3158,12 @@ namespace Backoffice.API.Repositories
                 if (!string.IsNullOrWhiteSpace(searchText))
                 {
                     query = query.Where(g => g.StringId.Contains(searchText) || g.SourceText.Contains(searchText));
+                }
+
+                var normalizedTargetLanguage = string.IsNullOrWhiteSpace(targetLanguage) ? "EN" : targetLanguage.ToUpper();
+                if (untranslatedOnly && normalizedTargetLanguage != "EN")
+                {
+                    query = ApplyUntranslatedFilter(query, normalizedTargetLanguage);
                 }
 
                 var rows = await query
@@ -3315,6 +3314,26 @@ namespace Backoffice.API.Repositories
 
         private static bool IsSupportedTargetLanguage(string targetLanguage) =>
             targetLanguage == "ZH" || targetLanguage == "ES" || targetLanguage == "FR";
+
+        // Shared "untranslated" definition for the Dynamic Translation grid and its CSV
+        // export: target text missing or still equal to the source, excluding letterless
+        // source texts (numbers/punctuation only) that never need translating.
+        private static IQueryable<TranslationCache2> ApplyUntranslatedFilter(IQueryable<TranslationCache2> query, string targetLanguage)
+        {
+            switch (targetLanguage)
+            {
+                case "ZH": query = query.Where(g => string.IsNullOrEmpty(g.TargetTextZh) || g.TargetTextZh == g.SourceText); break;
+                case "ES": query = query.Where(g => string.IsNullOrEmpty(g.TargetTextEs) || g.TargetTextEs == g.SourceText); break;
+                case "FR": query = query.Where(g => string.IsNullOrEmpty(g.TargetTextFr) || g.TargetTextFr == g.SourceText); break;
+            }
+
+            if (IsSupportedTargetLanguage(targetLanguage))
+            {
+                query = query.Where(SourceTextRequiresTranslation);
+            }
+
+            return query;
+        }
 
         // Query-side equivalent of TranslationTextHelper.RequiresTranslation: char.IsLetter and
         // regex do not translate on EF Core 3.1, and LIKE '[A-Za-z]' ranges are SQL Server-only

@@ -224,9 +224,9 @@ namespace Backoffice.API.Controllers.Backoffice
         // works entirely client-side.
         [HttpGet("sportsbook/glossary/export")]
         [Authorize("Translations.Dynamic", ((int)Access.View))]
-        public async Task<IActionResult> ExportSportsbookGlossary([FromQuery] string searchText = null)
+        public async Task<IActionResult> ExportSportsbookGlossary([FromQuery] string searchText = null, [FromQuery] string targetLanguage = null, [FromQuery] bool untranslatedOnly = false)
         {
-            var result = await _backofficeRepository.ExportSportsbookGlossary(searchText);
+            var result = await _backofficeRepository.ExportSportsbookGlossary(searchText, targetLanguage, untranslatedOnly);
 
             switch (result.StatusCode)
             {
