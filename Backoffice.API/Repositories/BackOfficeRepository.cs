@@ -2783,6 +2783,66 @@ namespace Backoffice.API.Repositories
             }
         }
 
+        // Removes a static translation key across ALL languages in one call. The per-language
+        // DeleteSportsbookTranslation above stays for backward compatibility, but since the UI
+        // no longer offers an EN view, this is the only way to fully retire a key (previously
+        // that took one delete per language through the dropdown).
+        public async Task<BaseResponse<bool>> DeleteSportsbookTranslationKey(DeleteSportsbookTranslationKeyRequest request, RequesterInfo requesterInfo)
+        {
+            try
+            {
+                var rows = await _translationContext.SportsbookStatic
+                    .Where(t => t.Name == request.Name)
+                    .ToListAsync();
+
+                if (rows.Count == 0)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = "Translation key not found",
+                        Result = false
+                    };
+                }
+
+                _translationContext.SportsbookStatic.RemoveRange(rows);
+                await _translationContext.SaveChangesAsync();
+
+                await AddActivityLog(new ActivityLogModel
+                {
+                    Page = requesterInfo.Page,
+                    UserId = requesterInfo.UserId,
+                    UserName = requesterInfo.UserName,
+                    Activity = Activity.Delete.ToString(),
+                    Payload = request.Name,
+                    From = string.Join(", ", rows.Select(r => $"{r.LanguageCode}={r.Value}")),
+                    To = "-",
+                    TimeStamp = DateTime.UtcNow
+                });
+
+                foreach (var languageCode in rows.Select(r => r.LanguageCode).Distinct())
+                {
+                    await PublishStaticTranslationChange(languageCode);
+                }
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message,
+                    Result = false
+                };
+            }
+        }
+
         public async Task<BaseResponse<SportsbookGlossaryListResponse>> GetSportsbookGlossary(GetSportsbookGlossaryRequest request)
         {
             try

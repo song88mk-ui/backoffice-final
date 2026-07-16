@@ -61,6 +61,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<TranslationStatsResponse>> GetSportsbookTranslationStats();
         Task<BaseResponse<bool>> AddOrUpdateSportsbookTranslation(AddOrUpdateSportsbookTranslationRequest request);
         Task<BaseResponse<bool>> DeleteSportsbookTranslation(DeleteSportsbookTranslationRequest request);
+        Task<BaseResponse<bool>> DeleteSportsbookTranslationKey(DeleteSportsbookTranslationKeyRequest request);
         Task<BaseResponse<SportsbookGlossaryListResponse>> GetSportsbookGlossary(GetSportsbookGlossaryRequest request);
         Task<BaseResponse<TranslationStatsResponse>> GetSportsbookGlossaryStats();
         Task<BaseResponse<bool>> AddOrUpdateSportsbookGlossary(AddOrUpdateSportsbookGlossaryRequest request);

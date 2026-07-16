@@ -198,6 +198,55 @@ namespace Backoffice.API.Tests.Translation
             Assert.Equal(StatusCode.Error, result.StatusCode);
         }
 
+        [Fact]
+        public async Task DeleteSportsbookTranslationKey_RemovesRowsAcrossAllLanguages_AndLogsOnce()
+        {
+            var dbName = nameof(DeleteSportsbookTranslationKey_RemovesRowsAcrossAllLanguages_AndLogsOnce);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "EN", Name = "accept", Value = "Accept" });
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "ZH", Name = "accept", Value = "接受" });
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "JA", Name = "accept", Value = "承認" });
+                // A different key must survive the delete untouched.
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "EN", Name = "reject", Value = "Reject" });
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.DeleteSportsbookTranslationKey(
+                new DeleteSportsbookTranslationKeyRequest { Name = "accept" },
+                MakeRequester());
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+
+            using var verify = BuildTranslationContext(dbName);
+            var remaining = Assert.Single(verify.SportsbookStatic);
+            Assert.Equal("reject", remaining.Name);
+
+            using var verifyBackoffice = BuildBackofficeContext(dbName);
+            var activity = Assert.Single(verifyBackoffice.ActivityLog);
+            Assert.Equal(Activity.Delete.ToString(), activity.Activity);
+            Assert.Equal("accept", activity.Payload);
+        }
+
+        [Fact]
+        public async Task DeleteSportsbookTranslationKey_ReturnsError_WhenKeyNotFound()
+        {
+            var dbName = nameof(DeleteSportsbookTranslationKey_ReturnsError_WhenKeyNotFound);
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.DeleteSportsbookTranslationKey(
+                new DeleteSportsbookTranslationKeyRequest { Name = "does_not_exist" },
+                MakeRequester());
+
+            Assert.Equal(StatusCode.Error, result.StatusCode);
+        }
+
         // ---------------------------------------------------------------
         // GetSportsbookGlossary / AddOrUpdateSportsbookGlossary / DeleteSportsbookGlossary
         // (TranslationCache2 table, backs the Dynamic Translation screen)

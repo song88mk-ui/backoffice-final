@@ -112,6 +112,31 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
+        [HttpPost("sportsbook/translations/delete-key")]
+        [Authorize("Translations.Static", ((int)Access.Edit))]
+        public async Task<IActionResult> DeleteSportsbookTranslationKey([FromBody] DeleteSportsbookTranslationKeyRequest request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var userName = HttpContext.Items["UserName"]?.ToString();
+
+            var requester = new RequesterInfo()
+            {
+                UserId = userId,
+                UserName = userName,
+                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
+            };
+
+            var result = await _backofficeRepository.DeleteSportsbookTranslationKey(request, requester);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpPost("sportsbook/glossary/list")]
         [Authorize("Translations.Dynamic", ((int)Access.View))]
         public async Task<IActionResult> GetSportsbookGlossary([FromBody] GetSportsbookGlossaryRequest request)
