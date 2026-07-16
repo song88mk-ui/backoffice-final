@@ -27,7 +27,15 @@ namespace Backoffice.Web.Pages.SBC
             IconClass = "ico ico-translations"
         };
 
-        private Dictionary<string, string> Translations { get; set; } = new Dictionary<string, string>();
+        private class TranslationRow
+        {
+            public string Key { get; set; }
+            public string SourceText { get; set; }
+            public string TargetText { get; set; }
+        }
+
+        private Dictionary<string, string> SourceTranslations { get; set; } = new Dictionary<string, string>();
+        private Dictionary<string, string> TargetTranslations { get; set; } = new Dictionary<string, string>();
         private string _errorMessage;
 
         private List<LanguageTranslationStat> _stats = new List<LanguageTranslationStat>();
@@ -41,6 +49,20 @@ namespace Backoffice.Web.Pages.SBC
                 if (_searchText != value)
                 {
                     _searchText = value;
+                    ResetPagination();
+                }
+            }
+        }
+
+        private bool _exactMatch;
+        private bool ExactMatch
+        {
+            get => _exactMatch;
+            set
+            {
+                if (_exactMatch != value)
+                {
+                    _exactMatch = value;
                     ResetPagination();
                 }
             }
@@ -60,12 +82,12 @@ namespace Backoffice.Web.Pages.SBC
             }
         }
 
-        private string SelectedLanguageCode { get; set; } = "EN";
+        private string SelectedLanguageCode { get; set; } = "ZH";
 
         private int CurrentPage { get; set; } = 1;
         private int PageSize { get; set; } = 10;
 
-        private int TotalFilteredCount => FilteredTranslations.Count();
+        private int TotalFilteredCount => FilteredRows.Count();
         private int TotalPages => (int)Math.Ceiling(TotalFilteredCount / (double)PageSize);
 
         private IEnumerable<int> PageNumbers
@@ -88,31 +110,48 @@ namespace Backoffice.Web.Pages.SBC
             }
         }
 
-        private IEnumerable<KeyValuePair<string, string>> FilteredTranslations
+        // EN is the source language: rows join the EN dictionary (Source Text) with the
+        // selected language's dictionary (Translation) by key, mirroring the Dynamic
+        // Translation grid. GetSportsbookTranslations already returns every known key
+        // (blank value for gaps), so both dictionaries carry the same key set.
+        private IEnumerable<TranslationRow> Rows =>
+            SourceTranslations.Keys.Union(TargetTranslations.Keys)
+                .OrderBy(k => k)
+                .Select(k => new TranslationRow
+                {
+                    Key = k,
+                    SourceText = SourceTranslations.TryGetValue(k, out var source) ? source : string.Empty,
+                    TargetText = TargetTranslations.TryGetValue(k, out var target) ? target : string.Empty
+                });
+
+        private IEnumerable<TranslationRow> FilteredRows
         {
             get
             {
-                if (Translations == null)
-                {
-                    return Enumerable.Empty<KeyValuePair<string, string>>();
-                }
+                var result = Rows;
 
-                var result = string.IsNullOrWhiteSpace(SearchText)
-                    ? Translations.AsEnumerable()
-                    : Translations.Where(t => t.Key.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                                              t.Value.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+                if (!string.IsNullOrWhiteSpace(SearchText))
+                {
+                    result = ExactMatch
+                        ? result.Where(r => string.Equals(r.Key, SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                            string.Equals(r.SourceText, SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                            string.Equals(r.TargetText, SearchText, StringComparison.OrdinalIgnoreCase))
+                        : result.Where(r => r.Key.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                            r.SourceText.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                            r.TargetText.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+                }
 
                 if (ShowOnlyUntranslated)
                 {
-                    result = result.Where(t => string.IsNullOrWhiteSpace(t.Value));
+                    result = result.Where(r => string.IsNullOrWhiteSpace(r.TargetText));
                 }
 
                 return result;
             }
         }
 
-        private IEnumerable<KeyValuePair<string, string>> PagedTranslations =>
-            FilteredTranslations
+        private IEnumerable<TranslationRow> PagedRows =>
+            FilteredRows
                 .Skip((CurrentPage - 1) * PageSize)
                 .Take(PageSize);
 
@@ -129,22 +168,27 @@ namespace Backoffice.Web.Pages.SBC
         {
             var response = await BackofficeService.GetSportsbookTranslationStats();
             _stats = response != null && response.StatusCode == StatusCode.Success && response.Result != null
-                ? response.Result.Languages
+                ? response.Result.Languages.Where(l => !string.Equals(l.LanguageCode, "EN", StringComparison.OrdinalIgnoreCase)).ToList()
                 : new List<LanguageTranslationStat>();
         }
 
         private async Task LoadTranslations(string languageCode)
         {
-            var response = await BackofficeService.GetSportsbookTranslations(languageCode);
-            if (response != null && response.StatusCode == StatusCode.Success && response.Result != null)
+            var sourceResponse = await BackofficeService.GetSportsbookTranslations("EN");
+            var targetResponse = await BackofficeService.GetSportsbookTranslations(languageCode);
+
+            if (sourceResponse != null && sourceResponse.StatusCode == StatusCode.Success && sourceResponse.Result != null &&
+                targetResponse != null && targetResponse.StatusCode == StatusCode.Success && targetResponse.Result != null)
             {
-                Translations = response.Result.ToDictionary(t => t.Name, t => t.Value);
+                SourceTranslations = sourceResponse.Result.ToDictionary(t => t.Name, t => t.Value ?? string.Empty);
+                TargetTranslations = targetResponse.Result.ToDictionary(t => t.Name, t => t.Value ?? string.Empty);
                 _errorMessage = null;
             }
             else
             {
-                Translations = new Dictionary<string, string>();
-                _errorMessage = response?.Message ?? "Failed to load translations.";
+                SourceTranslations = new Dictionary<string, string>();
+                TargetTranslations = new Dictionary<string, string>();
+                _errorMessage = sourceResponse?.Message ?? targetResponse?.Message ?? "Failed to load translations.";
             }
 
             ResetPagination();
@@ -163,9 +207,11 @@ namespace Backoffice.Web.Pages.SBC
         {
             var parameters = new ModalParameters();
             parameters.Add("TranslationKey", string.Empty);
-            parameters.Add("TranslationValue", string.Empty);
+            parameters.Add("SourceText", string.Empty);
+            parameters.Add("TargetText", string.Empty);
+            parameters.Add("SelectedLanguageCode", SelectedLanguageCode);
             parameters.Add("IsNew", true);
-            parameters.Add("OnSaveCallback", (Func<string, string, Task<bool>>)(async (key, newValue) => await SaveTranslationValue(key, newValue)));
+            parameters.Add("OnSaveCallback", (Func<string, string, string, Task<bool>>)(async (key, sourceText, targetText) => await SaveTranslation(key, sourceText, targetText)));
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
 
@@ -173,13 +219,15 @@ namespace Backoffice.Web.Pages.SBC
             ModalService.Open<StaticTranslationEditModal>("Add Translation", parameters, options);
         }
 
-        private async Task OnEditTranslation(KeyValuePair<string, string> translation)
+        private async Task OnEditTranslation(TranslationRow row)
         {
             var parameters = new ModalParameters();
-            parameters.Add("TranslationKey", translation.Key);
-            parameters.Add("TranslationValue", translation.Value);
+            parameters.Add("TranslationKey", row.Key);
+            parameters.Add("SourceText", row.SourceText);
+            parameters.Add("TargetText", row.TargetText);
+            parameters.Add("SelectedLanguageCode", SelectedLanguageCode);
             parameters.Add("IsNew", false);
-            parameters.Add("OnSaveCallback", (Func<string, string, Task<bool>>)(async (key, newValue) => await SaveTranslationValue(key, newValue)));
+            parameters.Add("OnSaveCallback", (Func<string, string, string, Task<bool>>)(async (key, sourceText, targetText) => await SaveTranslation(key, sourceText, targetText)));
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
 
@@ -187,11 +235,11 @@ namespace Backoffice.Web.Pages.SBC
             ModalService.Open<StaticTranslationEditModal>("Edit Translation", parameters, options);
         }
 
-        private async Task OnDeleteTranslation(KeyValuePair<string, string> translation)
+        private async Task OnDeleteTranslation(TranslationRow row)
         {
             var parameters = new ModalParameters();
-            parameters.Add("TranslationKey", translation.Key);
-            parameters.Add("OnDeleteCallback", (Func<Task<bool>>)(async () => await DeleteTranslationValue(translation.Key)));
+            parameters.Add("TranslationKey", row.Key);
+            parameters.Add("OnDeleteCallback", (Func<Task<bool>>)(async () => await DeleteTranslationKey(row.Key)));
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
 
@@ -199,42 +247,73 @@ namespace Backoffice.Web.Pages.SBC
             ModalService.Open<StaticTranslationDeleteModal>("Delete Translation", parameters, options);
         }
 
-        private async Task<bool> SaveTranslationValue(string key, string newValue)
+        // Saves the EN source text and the selected language's translation, issuing one
+        // AddOrUpdate call per language that actually changed (values are compared against
+        // the loaded dictionaries, so an unchanged field costs no API call).
+        private async Task<bool> SaveTranslation(string key, string sourceText, string targetText)
         {
-            if (string.IsNullOrWhiteSpace(key))
+            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(sourceText))
             {
                 return false;
             }
 
-            var response = await BackofficeService.AddOrUpdateSportsbookTranslation(new AddOrUpdateSportsbookTranslationRequest
-            {
-                LanguageCode = SelectedLanguageCode,
-                Name = key,
-                Value = newValue
-            });
+            var newTarget = targetText ?? string.Empty;
+            var oldSource = SourceTranslations.TryGetValue(key, out var existingSource) ? existingSource : string.Empty;
+            var oldTarget = TargetTranslations.TryGetValue(key, out var existingTarget) ? existingTarget : string.Empty;
 
-            var success = response != null && response.StatusCode == StatusCode.Success;
-
-            if (success)
+            if (sourceText != oldSource)
             {
-                Translations[key] = newValue;
-                _errorMessage = null;
-                await LoadStats();
+                var response = await BackofficeService.AddOrUpdateSportsbookTranslation(new AddOrUpdateSportsbookTranslationRequest
+                {
+                    LanguageCode = "EN",
+                    Name = key,
+                    Value = sourceText
+                });
+
+                if (response == null || response.StatusCode != StatusCode.Success)
+                {
+                    _errorMessage = response?.Message ?? "Failed to save the source text.";
+                    await InvokeAsync(StateHasChanged);
+                    return false;
+                }
+
+                SourceTranslations[key] = sourceText;
             }
-            else
+
+            if (newTarget != oldTarget)
             {
-                _errorMessage = response?.Message ?? "Failed to save translation.";
+                var response = await BackofficeService.AddOrUpdateSportsbookTranslation(new AddOrUpdateSportsbookTranslationRequest
+                {
+                    LanguageCode = SelectedLanguageCode,
+                    Name = key,
+                    Value = newTarget
+                });
+
+                if (response == null || response.StatusCode != StatusCode.Success)
+                {
+                    _errorMessage = response?.Message ?? "Failed to save translation.";
+                    await InvokeAsync(StateHasChanged);
+                    return false;
+                }
+
+                TargetTranslations[key] = newTarget;
             }
 
+            if (!TargetTranslations.ContainsKey(key))
+            {
+                TargetTranslations[key] = string.Empty;
+            }
+
+            _errorMessage = null;
+            await LoadStats();
             await InvokeAsync(StateHasChanged);
-            return success;
+            return true;
         }
 
-        private async Task<bool> DeleteTranslationValue(string key)
+        private async Task<bool> DeleteTranslationKey(string key)
         {
-            var response = await BackofficeService.DeleteSportsbookTranslation(new DeleteSportsbookTranslationRequest
+            var response = await BackofficeService.DeleteSportsbookTranslationKey(new DeleteSportsbookTranslationKeyRequest
             {
-                LanguageCode = SelectedLanguageCode,
                 Name = key
             });
 
@@ -242,11 +321,9 @@ namespace Backoffice.Web.Pages.SBC
 
             if (success)
             {
-                if (Translations.ContainsKey(key))
-                {
-                    Translations.Remove(key);
-                    EnsureValidCurrentPage();
-                }
+                SourceTranslations.Remove(key);
+                TargetTranslations.Remove(key);
+                EnsureValidCurrentPage();
 
                 _errorMessage = null;
                 await LoadStats();
@@ -319,16 +396,16 @@ namespace Backoffice.Web.Pages.SBC
             }
         }
 
-        private bool CanExportToExcel => FilteredTranslations.Any();
+        private bool CanExportToExcel => FilteredRows.Any();
 
         private async Task OnExportToExcel()
         {
             var csvBuilder = new StringBuilder();
-            csvBuilder.AppendLine("Key,Value");
+            csvBuilder.AppendLine($"Key,EN,{SelectedLanguageCode}");
 
-            foreach (var translation in FilteredTranslations)
+            foreach (var row in FilteredRows)
             {
-                csvBuilder.AppendLine($"{EscapeCsv(translation.Key)},{EscapeCsv(translation.Value)}");
+                csvBuilder.AppendLine($"{EscapeCsv(row.Key)},{EscapeCsv(row.SourceText)},{EscapeCsv(row.TargetText)}");
             }
 
             var fileName = $"StaticTranslations-{SelectedLanguageCode}-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";

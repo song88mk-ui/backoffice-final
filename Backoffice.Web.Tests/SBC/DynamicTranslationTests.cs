@@ -150,14 +150,47 @@ namespace Backoffice.Web.Tests.SBC
         }
 
         [Fact]
-        public void ShowOnlyUntranslated_CheckboxIsDisabled_ForEnglish()
+        public void LanguageDropdown_HasNoEnglishOption_AndDefaultsToChinese()
         {
             var cut = RenderComponent<DynamicTranslation>();
 
-            cut.Find("#languageSelect").Change("EN");
+            var options = cut.FindAll("#languageSelect option");
+            Assert.DoesNotContain(options, o => o.GetAttribute("value") == "EN");
+            Assert.Equal("ZH", options[0].GetAttribute("value"));
+
+            Assert.NotNull(_lastRequest);
+            Assert.Equal("ZH", _lastRequest!.TargetLanguage);
+        }
+
+        [Fact]
+        public void ShowOnlyUntranslated_CheckboxIsAlwaysEnabled()
+        {
+            var cut = RenderComponent<DynamicTranslation>();
 
             var checkbox = cut.Find("#showOnlyUntranslated");
-            Assert.True(checkbox.HasAttribute("disabled"));
+            Assert.False(checkbox.HasAttribute("disabled"));
+        }
+
+        [Fact]
+        public void ExactMatch_SendsExactMatchFlag_AndResetsToFirstPage()
+        {
+            var cut = RenderComponent<DynamicTranslation>();
+
+            cut.Find("#exactMatch").Change(true);
+
+            Assert.NotNull(_lastRequest);
+            Assert.True(_lastRequest!.ExactMatch);
+            Assert.Equal(1, _lastRequest.MetaData.CurrentPage);
+        }
+
+        [Fact]
+        public void ExactMatch_DefaultsToFalse_OnInitialLoad()
+        {
+            var cut = RenderComponent<DynamicTranslation>();
+
+            Assert.NotNull(_lastRequest);
+            Assert.False(_lastRequest!.ExactMatch);
+            Assert.False(cut.Find("#exactMatch").HasAttribute("checked"));
         }
     }
 }

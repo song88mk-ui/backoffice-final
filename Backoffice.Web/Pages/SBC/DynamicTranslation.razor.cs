@@ -52,6 +52,20 @@ namespace Backoffice.Web.Pages.SBC
             }
         }
 
+        private bool _exactMatch;
+        private bool ExactMatch
+        {
+            get => _exactMatch;
+            set
+            {
+                if (_exactMatch != value)
+                {
+                    _exactMatch = value;
+                    _ = LoadGlossary(resetPage: true);
+                }
+            }
+        }
+
         private bool _showOnlyUntranslated;
         private bool ShowOnlyUntranslated
         {
@@ -66,7 +80,7 @@ namespace Backoffice.Web.Pages.SBC
             }
         }
 
-        private string SelectedLanguageCode { get; set; } = "EN";
+        private string SelectedLanguageCode { get; set; } = "ZH";
 
         private MetaData MetaData { get; set; } = new MetaData { CurrentPage = 1, PageSize = 10 };
 
@@ -117,9 +131,10 @@ namespace Backoffice.Web.Pages.SBC
             var response = await BackofficeService.GetSportsbookGlossary(new GetSportsbookGlossaryRequest
             {
                 SearchText = SearchText,
+                ExactMatch = ExactMatch,
                 TargetLanguage = SelectedLanguageCode,
                 MetaData = MetaData,
-                UntranslatedOnly = ShowOnlyUntranslated && SelectedLanguageCode != "EN"
+                UntranslatedOnly = ShowOnlyUntranslated
             });
 
             if (response != null && response.StatusCode == StatusCode.Success && response.Result != null)
@@ -167,7 +182,7 @@ namespace Backoffice.Web.Pages.SBC
             var parameters = new ModalParameters();
             parameters.Add("StringId", entry.StringId);
             parameters.Add("SourceText", entry.SourceText);
-            parameters.Add("TargetText", SelectedLanguageCode == "EN" ? string.Empty : entry.TargetText ?? string.Empty);
+            parameters.Add("TargetText", entry.TargetText ?? string.Empty);
             parameters.Add("SelectedLanguageCode", SelectedLanguageCode);
             parameters.Add("IsNew", false);
             parameters.Add("OnSaveCallback", (Func<string, string, string, Task<bool>>)((stringId, sourceText, targetText) => SaveGlossary(entry.Id, stringId, sourceText, targetText)));
@@ -281,7 +296,8 @@ namespace Backoffice.Web.Pages.SBC
                 var response = await BackofficeService.ExportSportsbookGlossary(
                     SearchText,
                     SelectedLanguageCode,
-                    ShowOnlyUntranslated && SelectedLanguageCode != "EN");
+                    ShowOnlyUntranslated,
+                    ExactMatch);
 
                 if (response == null || response.StatusCode != StatusCode.Success || response.Result == null)
                 {
