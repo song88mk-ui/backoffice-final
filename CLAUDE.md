@@ -1480,6 +1480,7 @@ All related service repos are **siblings** of `backoffice-final` in the same par
 | `../platform-final/` | Platform.Settlement.Service, Platform.Operator.Servicev2, Platform.Sportsbook.API, Platform.BetForwarder.Service, Platform.CashOutStake.Servicev2, Platform.Shared |
 | `../platform-web/` | Platform web frontend |
 | `../bet-genius/` | BetGenius integration |
+| `../webprops-api/` | Web Properties API (Go) — per-client feature flags/themes/layouts + maintenance flags, S3-backed. Consumed via `IWebPropsRepository` (`Backoffice.Web` "Feature Flags" page) |
 | `../argocd/` | Kubernetes / ArgoCD deployment configs |
 | `../Reference/` | **Frozen AI baseline snapshot. Do not use for cross-service comparison — use the live sibling repos instead.** |
 

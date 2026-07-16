@@ -209,6 +209,7 @@ AuthenticationStateProvider
 HttpClient (via AddHttpClient registrations)
   - IAuthenticationRepository (configured)
   - IMaintenanceRepository (configured)
+  - IWebPropsRepository (configured)
   - IRabbitMqRepository (configured)
   - IPlatformRepository (via IBackofficeActivityLogRepository)
   - ISportsbookRepository (via GetHttpClient)
@@ -340,6 +341,12 @@ services.AddHttpClient<IMaintenanceRepository, MaintenanceRepository>(client =>
     client.DefaultRequestHeaders.Add("x-api-key", "API:Maintenance:Security:ApiKey");
 });
 
+services.AddHttpClient<IWebPropsRepository, WebPropsRepository>(client =>
+{
+    client.BaseAddress = new Uri(Configuration["API:WebProps:Uri"]);
+    client.DefaultRequestHeaders.Add("x-api-key", Configuration["API:WebProps:Security:ApiKey"]);
+});
+
 services.AddHttpClient<IRabbitMqRepository, RabbitMqRepository>();
 ```
 
@@ -445,8 +452,11 @@ Backoffice.API
   │   ├─ Odds updates
   │   └─ Settlement data
   │
-  └─→ Maintenance API
-      └─ System operations
+  ├─→ Maintenance API
+  │   └─ System operations
+  │
+  └─→ webprops-api (sibling repo, ../webprops-api/)
+      └─ Per-client feature flags (GET/POST /api/v1/config/{clientId})
 ```
 
 ---

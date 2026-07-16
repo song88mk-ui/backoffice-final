@@ -1,0 +1,81 @@
+@inherits BasePage
+
+@page "/admin/feature-flags"
+
+<div class="row feature-flags me-3">
+    @if (_isPreloader)
+    {
+        <Preloader />
+    }
+    else
+    {
+        <div class="page-title my-3">
+            <div class="d-flex justify-content-between">
+                <div class="d-flex align-items-center">
+                    <h4 class="fw-bolder">
+                        @_translationState.GetValue(_title)
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="page-content m-3">
+            <div class="m-2">
+                <p class="fw-bold">Select Client</p>
+                <select class="form-select" @onchange="HandleClientSelected" disabled="@_isProcessing">
+                    <option value="">-- Select a client --</option>
+                    @foreach (var client in _clients)
+                    {
+                        <option value="@client.ClientCode" selected="@(client.ClientCode == _selectedClientCode)">@client.ClientName (@client.ClientCode)</option>
+                    }
+                </select>
+            </div>
+            @if (_clientFeatureFlags != null)
+            {
+                <div class="m-2 mt-4">
+                    <p class="fw-bold">Features</p>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <p>Betting Rules</p>
+                        <input class="form-check-input" type="checkbox" @bind="_clientFeatureFlags.Features.BettingRules" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <p>Dark Mode</p>
+                        <input class="form-check-input" type="checkbox" @bind="_clientFeatureFlags.Features.DarkMode" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <p>Language Options</p>
+                        <input class="form-check-input" type="checkbox" @bind="_clientFeatureFlags.Features.LanguageOptions" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <p>OG Auth</p>
+                        <input class="form-check-input" type="checkbox" @bind="_clientFeatureFlags.Features.OGAuth" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <p>Partial Cashout</p>
+                        <input class="form-check-input" type="checkbox" @bind="_clientFeatureFlags.Features.PartialCashout" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                    </div>
+                </div>
+                @if (_clientFeatureFlags.Features.GameTrackerProductNames.Any() || _clientFeatureFlags.Layout.Any())
+                {
+                    <div class="m-2 mt-4 read-only-section">
+                        <p class="fw-bold">Read-only (managed elsewhere)</p>
+                        @if (_clientFeatureFlags.Features.GameTrackerProductNames.Any())
+                        {
+                            <p>Game Tracker Product Names: @string.Join(", ", _clientFeatureFlags.Features.GameTrackerProductNames)</p>
+                        }
+                        @if (_clientFeatureFlags.Layout.Any())
+                        {
+                            <p>Layouts: @string.Join(", ", _clientFeatureFlags.Layout.Keys)</p>
+                        }
+                    </div>
+                }
+            }
+        </div>
+        @if (_hasChange)
+        {
+            <div>
+                <button class="btn btn-save" @onclick="HandleSaveClick" disabled="@_isProcessing">Save</button>
+                <button class="btn btn-cancel" @onclick="HandleCancelClick">Cancel</button>
+            </div>
+        }
+    }
+</div>
