@@ -1,5 +1,6 @@
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
@@ -65,6 +66,7 @@ namespace Backoffice.Web.Tests.SBC
                     StatusCode = StatusCode.Success,
                     Result = new List<SportsbookTranslationResponse>
                     {
+                        new SportsbookTranslationResponse { LanguageCode = "EN", Name = "key0", Value = "" },
                         new SportsbookTranslationResponse { LanguageCode = "EN", Name = "key1", Value = "Hello" },
                         new SportsbookTranslationResponse { LanguageCode = "EN", Name = "key11", Value = "Hello World" },
                         new SportsbookTranslationResponse { LanguageCode = "EN", Name = "key2", Value = "Greeting" }
@@ -78,6 +80,7 @@ namespace Backoffice.Web.Tests.SBC
                     StatusCode = StatusCode.Success,
                     Result = new List<SportsbookTranslationResponse>
                     {
+                        new SportsbookTranslationResponse { LanguageCode = "ZH", Name = "key0", Value = "" },
                         new SportsbookTranslationResponse { LanguageCode = "ZH", Name = "key1", Value = "你好" },
                         new SportsbookTranslationResponse { LanguageCode = "ZH", Name = "key11", Value = "" },
                         new SportsbookTranslationResponse { LanguageCode = "ZH", Name = "key2", Value = "" }
@@ -146,14 +149,79 @@ namespace Backoffice.Web.Tests.SBC
         {
             var cut = RenderComponent<StaticTranslation>();
 
-            Assert.Equal(3, cut.FindAll("tbody tr").Count);
+            Assert.Equal(4, cut.FindAll("tbody tr").Count);
 
             cut.Find("#showOnlyUntranslated").Change(true);
 
             var rows = cut.FindAll("tbody tr");
-            Assert.Equal(2, rows.Count);
+            Assert.Equal(3, rows.Count);
+            Assert.Contains(rows, r => r.TextContent.Contains("key0"));
             Assert.Contains(rows, r => r.TextContent.Contains("key11"));
             Assert.Contains(rows, r => r.TextContent.Contains("key2"));
+        }
+
+        [Fact]
+        public void Render_HighlightsBlankSourceTextCell_WithMissingPlaceholder()
+        {
+            var cut = RenderComponent<StaticTranslation>();
+
+            var rows = cut.FindAll("tbody tr");
+            var blankSourceRow = Assert.Single(rows, r => r.TextContent.Contains("key0"));
+            var cells = blankSourceRow.QuerySelectorAll("td");
+            Assert.Contains("table-warning", cells[1].ClassName); // Source Text cell is highlighted
+            Assert.Contains("missing", cells[1].TextContent);
+
+            var filledSourceRow = Assert.Single(rows, r => r.TextContent.Contains("key2"));
+            Assert.DoesNotContain("table-warning", filledSourceRow.QuerySelectorAll("td")[1].ClassName);
+        }
+
+        [Fact]
+        public void SearchLabel_DoesNotUseTheInvisibleWhiteLabelClass()
+        {
+            var cut = RenderComponent<StaticTranslation>();
+
+            var label = cut.Find("label[for=searchInput]");
+            Assert.DoesNotContain("white-label", label.ClassName);
+        }
+
+        [Fact]
+        public void SaveFromAddModal_JumpsToThePageContainingTheNewKey()
+        {
+            // 12 existing keys (page size 10) so the alphabetically-last new key lands on page 2.
+            var enRows = new List<SportsbookTranslationResponse>();
+            var zhRows = new List<SportsbookTranslationResponse>();
+            for (var i = 1; i <= 12; i++)
+            {
+                enRows.Add(new SportsbookTranslationResponse { LanguageCode = "EN", Name = $"a{i:D2}", Value = $"Text {i:D2}" });
+                zhRows.Add(new SportsbookTranslationResponse { LanguageCode = "ZH", Name = $"a{i:D2}", Value = $"文 {i:D2}" });
+            }
+
+            _backofficeService
+                .Setup(s => s.GetSportsbookTranslations("EN"))
+                .ReturnsAsync(new BaseResponse<List<SportsbookTranslationResponse>> { StatusCode = StatusCode.Success, Result = enRows });
+            _backofficeService
+                .Setup(s => s.GetSportsbookTranslations("ZH"))
+                .ReturnsAsync(new BaseResponse<List<SportsbookTranslationResponse>> { StatusCode = StatusCode.Success, Result = zhRows });
+            _backofficeService
+                .Setup(s => s.AddOrUpdateSportsbookTranslation(It.IsAny<AddOrUpdateSportsbookTranslationRequest>()))
+                .ReturnsAsync(new BaseResponse<bool> { StatusCode = StatusCode.Success, Result = true });
+
+            var cut = RenderComponent<StaticTranslation>();
+            Assert.DoesNotContain("zzz_key", cut.Markup);
+
+            cut.Find(".add-translation-btn").Click();
+
+            // The modal renders inline (CustomModal); scope selectors to its p-4 container.
+            cut.Find("div.p-4 input.form-control").Input("zzz_key");
+            cut.FindAll("div.p-4 textarea.form-control")[0].Input("Zzz Source");
+            cut.Find("div.p-4 button.btn-primary").Click();
+
+            _backofficeService.Verify(s => s.AddOrUpdateSportsbookTranslation(
+                It.Is<AddOrUpdateSportsbookTranslationRequest>(r => r.LanguageCode == "EN" && r.Name == "zzz_key" && r.Value == "Zzz Source")), Times.Once);
+
+            var rows = cut.FindAll("tbody tr");
+            Assert.Contains(rows, r => r.TextContent.Contains("zzz_key")); // visible without hunting pages
+            Assert.Contains("Page 2", cut.Markup);
         }
 
         [Fact]

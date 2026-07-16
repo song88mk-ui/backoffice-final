@@ -305,9 +305,22 @@ namespace Backoffice.Web.Pages.SBC
             }
 
             _errorMessage = null;
+            GoToKeyPage(key);
             await LoadStats();
             await InvokeAsync(StateHasChanged);
             return true;
+        }
+
+        // The grid is sorted by key and paginated, so a saved key usually lands on another
+        // page; jump there so the user sees the row they just saved. If the active filters
+        // exclude it (e.g. untranslated-only and the row is now translated), stay put.
+        private void GoToKeyPage(string key)
+        {
+            var index = FilteredRows.Select(r => r.Key).ToList().IndexOf(key);
+            if (index >= 0)
+            {
+                CurrentPage = (index / PageSize) + 1;
+            }
         }
 
         private async Task<bool> DeleteTranslationKey(string key)
