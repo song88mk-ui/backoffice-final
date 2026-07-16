@@ -1993,7 +1993,7 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<SportsbookGlossaryExportRow>>> ExportSportsbookGlossary(string searchText, string targetLanguage = null, bool untranslatedOnly = false)
+        public async Task<BaseResponse<List<SportsbookGlossaryExportRow>>> ExportSportsbookGlossary(string searchText, string targetLanguage = null, bool untranslatedOnly = false, bool exactMatch = false)
         {
             try
             {
@@ -2004,6 +2004,8 @@ namespace Backoffice.Web.Services
                     queryParams.Add($"targetLanguage={Uri.EscapeDataString(targetLanguage)}");
                 if (untranslatedOnly)
                     queryParams.Add("untranslatedOnly=true");
+                if (exactMatch)
+                    queryParams.Add("exactMatch=true");
 
                 var query = queryParams.Count == 0 ? string.Empty : $"?{string.Join("&", queryParams)}";
                 var response = await _httpClient.GetAsync($"api/translation/sportsbook/glossary/export{query}");

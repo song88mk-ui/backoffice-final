@@ -159,5 +159,27 @@ namespace Backoffice.Web.Tests.SBC
             var checkbox = cut.Find("#showOnlyUntranslated");
             Assert.True(checkbox.HasAttribute("disabled"));
         }
+
+        [Fact]
+        public void ExactMatch_SendsExactMatchFlag_AndResetsToFirstPage()
+        {
+            var cut = RenderComponent<DynamicTranslation>();
+
+            cut.Find("#exactMatch").Change(true);
+
+            Assert.NotNull(_lastRequest);
+            Assert.True(_lastRequest!.ExactMatch);
+            Assert.Equal(1, _lastRequest.MetaData.CurrentPage);
+        }
+
+        [Fact]
+        public void ExactMatch_DefaultsToFalse_OnInitialLoad()
+        {
+            var cut = RenderComponent<DynamicTranslation>();
+
+            Assert.NotNull(_lastRequest);
+            Assert.False(_lastRequest!.ExactMatch);
+            Assert.False(cut.Find("#exactMatch").HasAttribute("checked"));
+        }
     }
 }

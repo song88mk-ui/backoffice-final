@@ -268,6 +268,44 @@ namespace Backoffice.API.Tests.Translation
         }
 
         [Fact]
+        public async Task GetSportsbookGlossary_ExactMatch_ReturnsOnlyExactStringIdOrSourceTextMatches()
+        {
+            var dbName = nameof(GetSportsbookGlossary_ExactMatch_ReturnsOnlyExactStringIdOrSourceTextMatches);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("1", "Soccer"));
+                seed.TranslationCache2.Add(MakeGlossaryRow("11", "Basketball 1"));
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:2", "1"));
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var exact = await sut.GetSportsbookGlossary(new GetSportsbookGlossaryRequest
+            {
+                SearchText = "1",
+                ExactMatch = true,
+                MetaData = new MetaData { CurrentPage = 1, PageSize = 10 }
+            });
+
+            Assert.Equal(StatusCode.Success, exact.StatusCode);
+            Assert.Equal(2, exact.Result.Glossary.Count); // StringId == "1" and SourceText == "1"
+            Assert.Contains(exact.Result.Glossary, g => g.StringId == "1");
+            Assert.Contains(exact.Result.Glossary, g => g.StringId == "SpId:2");
+
+            var contains = await sut.GetSportsbookGlossary(new GetSportsbookGlossaryRequest
+            {
+                SearchText = "1",
+                ExactMatch = false,
+                MetaData = new MetaData { CurrentPage = 1, PageSize = 10 }
+            });
+
+            Assert.Equal(3, contains.Result.Glossary.Count); // contains mode still matches "11" and "Basketball 1"
+        }
+
+        [Fact]
         public async Task AddOrUpdateSportsbookGlossary_InsertsNewRow_LeavingOtherLanguageColumnsEmpty()
         {
             var dbName = nameof(AddOrUpdateSportsbookGlossary_InsertsNewRow_LeavingOtherLanguageColumnsEmpty);
@@ -619,6 +657,30 @@ namespace Backoffice.API.Tests.Translation
 
             var row = Assert.Single(result.Result);
             Assert.Equal("SpId:1", row.StringId);
+        }
+
+        [Fact]
+        public async Task ExportSportsbookGlossary_ExactMatch_FiltersExactly()
+        {
+            var dbName = nameof(ExportSportsbookGlossary_ExactMatch_FiltersExactly);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("1", "Soccer"));
+                seed.TranslationCache2.Add(MakeGlossaryRow("11", "Basketball 1"));
+                seed.TranslationCache2.Add(MakeGlossaryRow("SpId:2", "1"));
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ExportSportsbookGlossary("1", exactMatch: true);
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(2, result.Result.Count); // StringId == "1" and SourceText == "1"; "11" excluded
+            Assert.Equal("1", result.Result[0].StringId); // ordered by StringId
+            Assert.Equal("SpId:2", result.Result[1].StringId);
         }
 
         [Fact]

@@ -52,6 +52,20 @@ namespace Backoffice.Web.Pages.SBC
             }
         }
 
+        private bool _exactMatch;
+        private bool ExactMatch
+        {
+            get => _exactMatch;
+            set
+            {
+                if (_exactMatch != value)
+                {
+                    _exactMatch = value;
+                    _ = LoadGlossary(resetPage: true);
+                }
+            }
+        }
+
         private bool _showOnlyUntranslated;
         private bool ShowOnlyUntranslated
         {
@@ -117,6 +131,7 @@ namespace Backoffice.Web.Pages.SBC
             var response = await BackofficeService.GetSportsbookGlossary(new GetSportsbookGlossaryRequest
             {
                 SearchText = SearchText,
+                ExactMatch = ExactMatch,
                 TargetLanguage = SelectedLanguageCode,
                 MetaData = MetaData,
                 UntranslatedOnly = ShowOnlyUntranslated && SelectedLanguageCode != "EN"
@@ -281,7 +296,8 @@ namespace Backoffice.Web.Pages.SBC
                 var response = await BackofficeService.ExportSportsbookGlossary(
                     SearchText,
                     SelectedLanguageCode,
-                    ShowOnlyUntranslated && SelectedLanguageCode != "EN");
+                    ShowOnlyUntranslated && SelectedLanguageCode != "EN",
+                    ExactMatch);
 
                 if (response == null || response.StatusCode != StatusCode.Success || response.Result == null)
                 {

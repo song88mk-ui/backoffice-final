@@ -2794,7 +2794,9 @@ namespace Backoffice.API.Repositories
 
                 if (!string.IsNullOrWhiteSpace(request.SearchText))
                 {
-                    query = query.Where(g => g.StringId.Contains(request.SearchText) || g.SourceText.Contains(request.SearchText));
+                    query = request.ExactMatch
+                        ? query.Where(g => g.StringId == request.SearchText || g.SourceText == request.SearchText)
+                        : query.Where(g => g.StringId.Contains(request.SearchText) || g.SourceText.Contains(request.SearchText));
                 }
 
                 if (request.UntranslatedOnly && targetLanguage != "EN")
@@ -3149,7 +3151,7 @@ namespace Backoffice.API.Repositories
         // All three language columns are always returned (the file doubles as the import
         // template); untranslatedOnly/targetLanguage only narrow which rows are included,
         // using the same filter as the Dynamic Translation grid.
-        public async Task<BaseResponse<List<SportsbookGlossaryExportRow>>> ExportSportsbookGlossary(string searchText, string targetLanguage = null, bool untranslatedOnly = false)
+        public async Task<BaseResponse<List<SportsbookGlossaryExportRow>>> ExportSportsbookGlossary(string searchText, string targetLanguage = null, bool untranslatedOnly = false, bool exactMatch = false)
         {
             try
             {
@@ -3157,7 +3159,9 @@ namespace Backoffice.API.Repositories
 
                 if (!string.IsNullOrWhiteSpace(searchText))
                 {
-                    query = query.Where(g => g.StringId.Contains(searchText) || g.SourceText.Contains(searchText));
+                    query = exactMatch
+                        ? query.Where(g => g.StringId == searchText || g.SourceText == searchText)
+                        : query.Where(g => g.StringId.Contains(searchText) || g.SourceText.Contains(searchText));
                 }
 
                 var normalizedTargetLanguage = string.IsNullOrWhiteSpace(targetLanguage) ? "EN" : targetLanguage.ToUpper();
