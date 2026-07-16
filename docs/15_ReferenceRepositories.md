@@ -19,6 +19,7 @@ All related service repositories live as siblings alongside `backoffice-final` i
 ├── oddsfeed/              ← OddsFeed settlement service
 ├── platform-final/        ← Platform services (current, active)
 ├── platform-web/          ← Platform web frontend
+├── webprops-api/          ← Web Properties API (frontend feature flags, themes, layouts, maintenance)
 ├── argocd/                ← Deployment / infrastructure configs
 └── Reference/             ← Snapshot baseline taken before AI assistance (do not use for cross-service comparison)
 ```
@@ -40,6 +41,7 @@ All related service repositories live as siblings alongside `backoffice-final` i
 | `../platform-final/` | Platform — settlement, operator, sportsbook, wallet | Active |
 | `../platform-web/` | Platform web frontend | Active |
 | `../bet-genius/` | BetGenius integration | Active |
+| `../webprops-api/` | Web Properties API — per-client feature flags/themes/layouts/maintenance, Go, S3-backed | Active |
 | `../argocd/` | Kubernetes / ArgoCD deployment configs | Active |
 | `../Reference/` | Frozen AI baseline snapshot | Do not use |
 
@@ -91,6 +93,49 @@ All related service repositories live as siblings alongside `backoffice-final` i
 | `Platform.Sportsbook.API` | Sportsbook data API — **publishes** `OnBetSettlement` to `r.uof.onbetsettlement` |
 | `Platform.Shared` | Shared models: `OnUOFBetSettlement`, `OnBetSettlement`, enums |
 | `Platform.Job.Resettlement` | Resettlement scheduled job |
+
+---
+
+## Web Properties API (webprops-api)
+
+**Root:** `../webprops-api/` (Go 1.23, module `s88/wp`, chi router)
+
+Small Go HTTP API that serves per-client frontend configuration (feature flags, themes, layouts) and per-client maintenance flags to the Song88 frontend applications (platform-web, etc.). Storage is AWS S3 (bucket `song88-{env}-webprops`), with a shared in-process memory cache (TTL 86400s). Backoffice's own `Maintenance` / `MaintenanceV2` pages use a separate, legacy per-brand mechanism (Dapr-sidecar invoke per app, see `Backoffice.API/Repositories/MaintenanceRepository.cs`) and are unrelated to webprops-api's `/maintenance` endpoint despite the shared name.
+
+**Consumed by backoffice-final:** `Backoffice.API/Repositories/WebPropsRepository.cs` calls `GET/POST /api/v1/config/{clientId}` via an `IWebPropsRepository`, exposed through `WebPropsController` (`api/config/feature-flags/{clientCode}`, gated by the `Admin.FeatureFlags` claim) and surfaced in `Backoffice.Web`'s "Feature Flags" admin page (`Pages/Administration/FeatureFlags.razor`). The `/maintenance` endpoints are **not** consumed — see the callout above.
+
+| Endpoint | Auth | Purpose |
+|---|---|---|
+| `GET /api/v1/config/{clientId}` | none | Full client config (features, layout/theme options) |
+| `POST /api/v1/config/{clientId}` | `X-Api-Key` | Full-replace update of a client's config JSON |
+| `GET /api/v1/properties` | `X-Client-Id` header | Same config, read via header instead of path |
+| `GET /api/v1/maintenance` | `X-Api-Key` + `X-Layout` | List maintenance flags for a layout |
+| `POST /api/v1/maintenance` | `X-Api-Key` + `X-Layout` | Set maintenance flag for one/many/all clients in a layout |
+| `POST /api/v1/cache/flush` / `DELETE /api/v1/cache/flush/{clientId}` | `X-Api-Key` | Cache invalidation |
+
+Example config JSON (per client), from `../webprops-api/README.md`:
+
+```json
+{
+  "ClientCode": "G01",
+  "Features": {
+    "BettingRules": true,
+    "DarkMode": true,
+    "GameTrackerProductNames": ["song88-light", "song88-dark"],
+    "LanguageOptions": true,
+    "OGAuth": false,
+    "PartialCashout": true
+  },
+  "Layout": {
+    "AL": { "Themes": ["red", "gray", "blue", "orange-light", "orange-dark"] },
+    "EL2": { "Themes": ["red", "white"] }
+  }
+}
+```
+
+**Environments:** dev (public ingress at `platform-webprops.dev.song88.com`, ECR account 418541840646/ap-south-1), staging (`*-stg` release tag, account 172065883315/ap-south-1), production (`*-prd` release tag, account 525375333516/ap-east-1). ArgoCD app definitions: `../argocd/apps/platform/webprops-api/{dev,stg,prd}.yaml`.
+
+**Full reference:** `../webprops-api/.claude/skills/webprops-api/SKILL.md` (endpoint table, storage/cache internals, known gotchas, deploy pipeline).
 
 ---
 

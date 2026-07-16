@@ -20,6 +20,7 @@ namespace Backoffice.Web.Helpers
                 var c when c == AdminPermission.Admin_CancelBets.ToString().Replace('_', '.') => ("cancel-bets", "admin/cancel-bets"),
                 var c when c == AdminPermission.Admin_CancelBetsHistory.ToString().Replace('_', '.') => ("cancel-bet-history", "admin/cancel-bet-history"),
                 var c when c == AdminPermission.Admin_Maintenance.ToString().Replace('_', '.') => ("maintenance", "admin/maintenance"),
+                var c when c == AdminPermission.Admin_FeatureFlags.ToString().Replace('_', '.') => ("feature-flags", "admin/feature-flags"),
 
                 var c when c == SportsbookClientPermission.SBC_Dashboard.ToString().Replace('_', '.') => ("dashboard", "/dashboard"),
                 var c when c == SportsbookClientPermission.SBC_Reports_DrillDownReport.ToString().Replace('_', '.') => ("drill-down-report", "/drill-down-report"),

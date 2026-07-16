@@ -108,6 +108,11 @@ namespace Backoffice.API
                 client.BaseAddress = new Uri(Configuration["API:Maintenance:Uri"]);
                 client.DefaultRequestHeaders.Add("x-api-key", "API:Maintenance:Security:ApiKey");
             });
+            services.AddHttpClient<IWebPropsRepository, WebPropsRepository>(client =>
+            {
+                client.BaseAddress = new Uri(Configuration["API:WebProps:Uri"]);
+                client.DefaultRequestHeaders.Add("x-api-key", Configuration["API:WebProps:Security:ApiKey"]);
+            });
 
             services.AddScoped<IPlatformRepository, PlatformRepository>();
             services.AddScoped<ISportsbookRepository, SportsbookRepository>();

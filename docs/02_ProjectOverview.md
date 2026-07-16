@@ -75,6 +75,11 @@ Primary REST API gateway for all backoffice operations. Orchestrates data access
 7. **IMaintenanceRepository / MaintenanceRepository**
    - Maintenance API delegation (stub)
 
+7a. **IWebPropsRepository / WebPropsRepository**
+   - Delegates to the sibling `webprops-api` service (`../webprops-api/`) for per-client feature flags
+   - GET/POST `/api/v1/config/{clientId}` (full-replace POST; repository round-trips the JSON to preserve `Layout`/unmodeled fields)
+   - Backs the `Backoffice.Web` "Feature Flags" admin page (`Pages/Administration/FeatureFlags.razor`)
+
 8. **IBackofficeActivityLogRepository / BackofficeActivityLogRepository**
    - Activity logging to RabbitMQ
    - Audit trail publishing
@@ -124,6 +129,7 @@ Primary REST API gateway for all backoffice operations. Orchestrates data access
 - Authentication API - User authentication
 - Trading API - Odds and market settings
 - Maintenance API - System maintenance
+- webprops-api - Per-client feature flags (sibling repo, S3-backed, see `docs/15_ReferenceRepositories.md`)
 
 ### Message Publishing
 - All to RabbitMQ via IRabbitMqRepository

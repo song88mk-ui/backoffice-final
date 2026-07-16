@@ -14,6 +14,8 @@ namespace Backoffice.Web.Services
         event EventHandler<UnauthorizedEventArgs> Unauthorized;
         Task<BaseResponse<MaintenanceResponse>> GetMaintenanceV2();
         Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request);
+        Task<BaseResponse<ClientFeatureFlagsResponse>> GetClientFeatureFlags(string clientCode);
+        Task<BaseResponse<ClientFeatureFlagsResponse>> UpdateClientFeatureFlags(UpdateClientFeatureFlagsRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetMarketSettlementActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<MessageResponse>> AddActivityLog(ActivityLogModel request);
