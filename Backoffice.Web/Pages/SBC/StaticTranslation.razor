@@ -34,7 +34,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="searchInput" class="form-label white-label">Search Translations</label>
+                                    <label for="searchInput" class="form-label">Search Translations</label>
                                     <div class="input-group">
                                         <input id="searchInput" type="text" class="form-control" placeholder="Search by Key, Source Text or Translation" @bind-value="SearchText" @bind-value:event="oninput" />
                                         <span class="input-group-text bg-white border-start-0">
@@ -112,7 +112,16 @@
                                             {
                                                 <tr>
                                                     <td>@row.Key</td>
-                                                    <td>@row.SourceText</td>
+                                                    <td class="@(string.IsNullOrWhiteSpace(row.SourceText) ? "table-warning" : "")">
+                                                        @if (string.IsNullOrWhiteSpace(row.SourceText))
+                                                        {
+                                                            <em class="text-muted">— missing —</em>
+                                                        }
+                                                        else
+                                                        {
+                                                            @row.SourceText
+                                                        }
+                                                    </td>
                                                     <td class="@(string.IsNullOrWhiteSpace(row.TargetText) ? "table-warning" : "")">
                                                         @if (string.IsNullOrWhiteSpace(row.TargetText))
                                                         {
