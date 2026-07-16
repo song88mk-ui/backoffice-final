@@ -14,8 +14,9 @@ using Xunit;
 
 namespace Backoffice.Web.Tests.SBC
 {
-    // Component tests for the Static Translation page: the translated/untranslated legend and
-    // the "Show only untranslated" filter added on top of the existing key/value grid.
+    // Component tests for the Static Translation page after its restructure to mirror the
+    // Dynamic Translation grid: EN is the source column (not a dropdown option), the selected
+    // language fills the Translation column, and search supports contains/exact match.
     public class StaticTranslationTests : TestContext
     {
         private readonly Mock<IBackofficeService> _backofficeService = new();
@@ -58,14 +59,28 @@ namespace Backoffice.Web.Tests.SBC
             JSInterop.Setup<string>("getCookie", _ => true).SetResult("EN");
 
             _backofficeService
-                .Setup(s => s.GetSportsbookTranslations(It.IsAny<string>()))
+                .Setup(s => s.GetSportsbookTranslations("EN"))
                 .ReturnsAsync(new BaseResponse<List<SportsbookTranslationResponse>>
                 {
                     StatusCode = StatusCode.Success,
                     Result = new List<SportsbookTranslationResponse>
                     {
                         new SportsbookTranslationResponse { LanguageCode = "EN", Name = "key1", Value = "Hello" },
-                        new SportsbookTranslationResponse { LanguageCode = "EN", Name = "key2", Value = "" }
+                        new SportsbookTranslationResponse { LanguageCode = "EN", Name = "key11", Value = "Hello World" },
+                        new SportsbookTranslationResponse { LanguageCode = "EN", Name = "key2", Value = "Greeting" }
+                    }
+                });
+
+            _backofficeService
+                .Setup(s => s.GetSportsbookTranslations("ZH"))
+                .ReturnsAsync(new BaseResponse<List<SportsbookTranslationResponse>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new List<SportsbookTranslationResponse>
+                    {
+                        new SportsbookTranslationResponse { LanguageCode = "ZH", Name = "key1", Value = "你好" },
+                        new SportsbookTranslationResponse { LanguageCode = "ZH", Name = "key11", Value = "" },
+                        new SportsbookTranslationResponse { LanguageCode = "ZH", Name = "key2", Value = "" }
                     }
                 });
 
@@ -78,25 +93,38 @@ namespace Backoffice.Web.Tests.SBC
                     {
                         Languages = new List<LanguageTranslationStat>
                         {
-                            new LanguageTranslationStat { LanguageCode = "EN", TotalCount = 2, TranslatedCount = 2 },
-                            new LanguageTranslationStat { LanguageCode = "ZH", TotalCount = 2, TranslatedCount = 1 }
+                            new LanguageTranslationStat { LanguageCode = "EN", TotalCount = 3, TranslatedCount = 3 },
+                            new LanguageTranslationStat { LanguageCode = "ZH", TotalCount = 3, TranslatedCount = 1 }
                         }
                     }
                 });
         }
 
         [Fact]
-        public void Render_ShowsLegendBadge_ForEachLanguage_WithTranslatedCounts()
+        public void LanguageDropdown_HasNoEnglishOption_AndDefaultsToChinese()
+        {
+            var cut = RenderComponent<StaticTranslation>();
+
+            var options = cut.FindAll("#languageSelect option");
+            Assert.DoesNotContain(options, o => o.GetAttribute("value") == "EN");
+            Assert.Equal("ZH", options[0].GetAttribute("value"));
+
+            _backofficeService.Verify(s => s.GetSportsbookTranslations("EN"), Times.Once);
+            _backofficeService.Verify(s => s.GetSportsbookTranslations("ZH"), Times.Once);
+        }
+
+        [Fact]
+        public void Render_ShowsLegendBadge_ForTargetLanguages_ButNotForEnglish()
         {
             var cut = RenderComponent<StaticTranslation>();
 
             var badges = cut.FindAll("span.badge");
-            Assert.Contains(badges, b => b.TextContent.Contains("EN") && b.TextContent.Contains("2/2"));
-            Assert.Contains(badges, b => b.TextContent.Contains("ZH") && b.TextContent.Contains("1/2"));
+            Assert.Contains(badges, b => b.TextContent.Contains("ZH") && b.TextContent.Contains("1/3"));
+            Assert.DoesNotContain(badges, b => b.TextContent.Contains("EN"));
         }
 
         [Fact]
-        public void Render_HighlightsValueCell_AndShowsMissingPlaceholder_ForBlankValue_WithoutTintingOtherCells()
+        public void Render_ShowsSourceColumn_AndHighlightsOnlyMissingTranslationCell()
         {
             var cut = RenderComponent<StaticTranslation>();
 
@@ -104,22 +132,43 @@ namespace Backoffice.Web.Tests.SBC
             var missingRow = Assert.Single(rows, r => r.TextContent.Contains("key2"));
             var cells = missingRow.QuerySelectorAll("td");
             Assert.DoesNotContain("table-warning", cells[0].ClassName); // Key cell stays untinted
-            Assert.Contains("table-warning", cells[1].ClassName); // only the Value cell is highlighted
+            Assert.Equal("Greeting", cells[1].TextContent.Trim()); // EN source text is shown
+            Assert.DoesNotContain("table-warning", cells[1].ClassName); // source cell stays untinted
+            Assert.Contains("table-warning", cells[2].ClassName); // only the Translation cell is highlighted
             Assert.Contains("missing", missingRow.TextContent);
+
+            var translatedRow = Assert.Single(rows, r => r.TextContent.Contains("你好"));
+            Assert.DoesNotContain("table-warning", translatedRow.QuerySelectorAll("td")[2].ClassName);
         }
 
         [Fact]
-        public void ShowOnlyUntranslated_FiltersGridToBlankValuesOnly()
+        public void ShowOnlyUntranslated_FiltersGridToBlankTranslationsOnly()
         {
             var cut = RenderComponent<StaticTranslation>();
 
-            Assert.Equal(2, cut.FindAll("tbody tr").Count);
+            Assert.Equal(3, cut.FindAll("tbody tr").Count);
 
             cut.Find("#showOnlyUntranslated").Change(true);
 
             var rows = cut.FindAll("tbody tr");
-            var row = Assert.Single(rows);
-            Assert.Contains("key2", row.TextContent);
+            Assert.Equal(2, rows.Count);
+            Assert.Contains(rows, r => r.TextContent.Contains("key11"));
+            Assert.Contains(rows, r => r.TextContent.Contains("key2"));
+        }
+
+        [Fact]
+        public void ExactMatch_NarrowsSearchFromContainsToEquality()
+        {
+            var cut = RenderComponent<StaticTranslation>();
+
+            cut.Find("#searchInput").Input("key1");
+            Assert.Equal(2, cut.FindAll("tbody tr").Count); // contains: key1 and key11
+
+            cut.Find("#exactMatch").Change(true);
+
+            var row = Assert.Single(cut.FindAll("tbody tr"));
+            Assert.Contains("key1", row.TextContent);
+            Assert.DoesNotContain("key11", row.TextContent);
         }
     }
 }

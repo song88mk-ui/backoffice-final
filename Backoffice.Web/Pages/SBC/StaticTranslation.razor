@@ -22,13 +22,12 @@
                                 @_errorMessage
                             </div>
                         }
-                        @if (Translations != null)
+                        @if (SourceTranslations != null)
                         {
                              <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="languageSelect" class="form-label">Language</label>
                                     <select id="languageSelect" class="form-select" value="@SelectedLanguageCode" @onchange="OnLanguageChanged">
-                                        <option value="EN">English (EN)</option>
                                         <option value="ZH">Chinese (ZH)</option>
                                         <option value="JA">Japanese (JA)</option>
                                         <option value="BR">Portuguese (BR)</option>
@@ -37,10 +36,14 @@
                                 <div class="col-md-6">
                                     <label for="searchInput" class="form-label white-label">Search Translations</label>
                                     <div class="input-group">
-                                        <input id="searchInput" type="text" class="form-control" placeholder="Search" @bind-value="SearchText" @bind-value:event="oninput" />
+                                        <input id="searchInput" type="text" class="form-control" placeholder="Search by Key, Source Text or Translation" @bind-value="SearchText" @bind-value:event="oninput" />
                                         <span class="input-group-text bg-white border-start-0">
                                             <img src="icons/svg/icon-search.svg" alt="Search Icon" style="width:16px;height:16px;" />
                                         </span>
+                                    </div>
+                                    <div class="form-check mt-1">
+                                        <input type="checkbox" class="form-check-input" id="exactMatch" @bind="ExactMatch" />
+                                        <label class="form-check-label" for="exactMatch">Exact match</label>
                                     </div>
                                 </div>
                             </div>
@@ -92,37 +95,39 @@
                                 </div>
                             }
 
-                            @if (FilteredTranslations.Any())
+                            @if (FilteredRows.Any())
                             {
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead class="table-header">
                                             <tr>
                                                 <th>Key</th>
-                                                <th>Value</th>
+                                                <th>Source Text (EN)</th>
+                                                <th>Translation (@SelectedLanguageCode)</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (var translation in PagedTranslations)
+                                            @foreach (var row in PagedRows)
                                             {
                                                 <tr>
-                                                    <td>@translation.Key</td>
-                                                    <td class="@(string.IsNullOrWhiteSpace(translation.Value) ? "table-warning" : "")">
-                                                        @if (string.IsNullOrWhiteSpace(translation.Value))
+                                                    <td>@row.Key</td>
+                                                    <td>@row.SourceText</td>
+                                                    <td class="@(string.IsNullOrWhiteSpace(row.TargetText) ? "table-warning" : "")">
+                                                        @if (string.IsNullOrWhiteSpace(row.TargetText))
                                                         {
                                                             <em class="text-muted">— missing —</em>
                                                         }
                                                         else
                                                         {
-                                                            @translation.Value
+                                                            @row.TargetText
                                                         }
                                                     </td>
                                                     <td>
                                                         <AuthorizeView Policy="translations-static-canedit" Context="canEdit">
                                                             <div class="d-flex align-items-center gap-2">
-                                                                <img @onclick="() => OnEditTranslation(translation)" src="icons/svg/icon-edit.svg" alt="edit Icon">
-                                                                <img @onclick="() => OnDeleteTranslation(translation)" src="icons/svg/icon-trash.svg" alt="delete Icon">
+                                                                <img @onclick="() => OnEditTranslation(row)" src="icons/svg/icon-edit.svg" alt="edit Icon">
+                                                                <img @onclick="() => OnDeleteTranslation(row)" src="icons/svg/icon-trash.svg" alt="delete Icon">
                                                             </div>
                                                         </AuthorizeView>
                                                     </td>
@@ -133,7 +138,7 @@
                                 </div>
 
                                 <div class="pagination-container">
-                                    <span class="pagination-info">Showing @PagedTranslations.Count() of @TotalFilteredCount</span>
+                                    <span class="pagination-info">Showing @PagedRows.Count() of @TotalFilteredCount</span>
                                     <div class="d-flex align-items-center gap-1 flex-wrap justify-content-end">
                                         <button class="btn btn-sm pagination-label" @onclick="PreviousPage" disabled="@(CurrentPage <= 1)">@("<")</button>
                                         @if (TotalPages > 0)
