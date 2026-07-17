@@ -35,31 +35,37 @@
                     <div class="category-title fw-bold mb-3">Features</div>
                     <div class="d-flex">
                         <div class="w-50 noselect">
-                            <div class="form-switch mb-2">
+                            <div class="form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" role="switch" id="ff-betting-rules" @bind="_clientFeatureFlags.Features.BettingRules" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
                                 <label class="form-check-label" for="ff-betting-rules">Betting Rules</label>
+                                <div class="text-muted small">Shows the Betting Rules button in the site header.</div>
                             </div>
-                            <div class="form-switch mb-2">
+                            <div class="form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" role="switch" id="ff-dark-mode" @bind="_clientFeatureFlags.Features.DarkMode" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
                                 <label class="form-check-label" for="ff-dark-mode">Dark Mode</label>
+                                <div class="text-muted small">Enables the dark mode theme toggle for the client's site.</div>
                             </div>
-                            <div class="form-switch mb-2">
+                            <div class="form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" role="switch" id="ff-language-options" @bind="_clientFeatureFlags.Features.LanguageOptions" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
                                 <label class="form-check-label" for="ff-language-options">Language Options</label>
+                                <div class="text-muted small">Enables the language selector so players can switch the site's display language.</div>
                             </div>
                         </div>
                         <div class="w-50 noselect">
-                            <div class="form-switch mb-2">
+                            <div class="form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" role="switch" id="ff-og-auth" @bind="_clientFeatureFlags.Features.OGAuth" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
                                 <label class="form-check-label" for="ff-og-auth">OG Auth</label>
+                                <div class="text-muted small">Switches the site into Oriental Gaming (OG) mode: page title, bet ID formatting, and header/auth behavior for OG-integrated operators.</div>
                             </div>
-                            <div class="form-switch mb-2">
+                            <div class="form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" role="switch" id="ff-partial-cashout" @bind="_clientFeatureFlags.Features.PartialCashout" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
                                 <label class="form-check-label" for="ff-partial-cashout">Partial Cashout</label>
+                                <div class="text-muted small">Enables the partial cash-out button on eligible open bets.</div>
                             </div>
-                            <div class="form-switch mb-2">
+                            <div class="form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" role="switch" id="ff-bet-recommendation" @bind="_clientFeatureFlags.Features.BetRecommendation" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
                                 <label class="form-check-label" for="ff-bet-recommendation">Bet Recommendation</label>
+                                <div class="text-muted small">Backoffice-only for now - not yet read by platform-web, so this has no visible effect until that's wired up.</div>
                             </div>
                         </div>
                     </div>
