@@ -18,9 +18,9 @@ namespace Backoffice.Shared.Models.Response
         public bool OGAuth { get; set; }
         public bool PartialCashout { get; set; }
 
-        // Backoffice-only addition: not yet in webprops-api's real schema and not read by
-        // platform-web. Stored/round-tripped like the other flags, but has no downstream
-        // effect until platform-web is updated to gate BetRecommendation on it.
+        // webprops-api has no fixed schema (stores config as a generic JSON map), so this
+        // round-trips through S3 fine. It has no downstream effect until platform-web's own
+        // Features model and Index.razor are updated to read and gate on it.
         public bool BetRecommendation { get; set; }
     }
 
