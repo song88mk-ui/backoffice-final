@@ -1016,6 +1016,7 @@ namespace Backoffice.API.Repositories
                         }).ToList();
                     }
                     await _sportsbookContext.AddRangeAsync(newClientMarketTemplateOrder);
+                    await _sportsbookContext.SaveChangesAsync();
 
                     var sourceClientMarketTemplateGroup = await _sportsbookContext.ClientMarketTemplateGroup.AsNoTracking().Where(x => x.ClientId == request.CopyFromClientId && x.SportId == request.CopyFromSportId && x.FixtureStatusId == request.CopyFromFixtureStatusId).ToListAsync();
 
