@@ -420,9 +420,7 @@ namespace Backoffice.API.Repositories
 
                 using (var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    await _sportsbookContext.Database.ExecuteSqlRawAsync("DELETE FROM ClientLeagueOrder WHERE ClientId = {0}", client.ClientId);
-                    await _sportsbookContext.Database.ExecuteSqlRawAsync("DELETE FROM ClientSegmentOrder WHERE ClientId = {0}", client.ClientId);
-                    await _sportsbookContext.Database.ExecuteSqlRawAsync("DELETE FROM ClientSportOrder WHERE ClientId = {0}", client.ClientId);
+                    await _sportsbookContext.Database.ExecuteSqlRawAsync("EXEC DeleteClientSportSettings {0}", client.ClientId);
                     scope.Complete();
                 }
 
