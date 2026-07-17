@@ -34,6 +34,12 @@
             @if (_clientFeatureFlags != null)
             {
                 <div class="m-2 mt-4">
+                    @if (_isNewConfig)
+                    {
+                        <div class="alert alert-warning py-2 px-3 mb-3" role="alert">
+                            No existing configuration found for this client. Saving will create a new one.
+                        </div>
+                    }
                     <div class="category-title fw-bold mb-3">Features</div>
                     <div class="d-flex">
                         <div class="w-50 noselect">

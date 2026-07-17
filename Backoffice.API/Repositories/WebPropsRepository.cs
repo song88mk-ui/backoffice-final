@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -34,6 +35,15 @@ namespace Backoffice.API.Repositories
 
                 if (!response.IsSuccessStatusCode)
                 {
+                    if (IsClientConfigNotFound(response, content))
+                    {
+                        return new BaseResponse<ClientFeatureFlagsResponse>()
+                        {
+                            StatusCode = StatusCode.NotFound,
+                            Message = content
+                        };
+                    }
+
                     _logger.LogError($"[GetClientFeatureFlagsAsync] clientCode={clientCode} status={response.StatusCode} content={content}");
                     return new BaseResponse<ClientFeatureFlagsResponse>()
                     {
@@ -75,6 +85,20 @@ namespace Backoffice.API.Repositories
                 JObject configNode;
                 if (getResponse.IsSuccessStatusCode)
                     configNode = JObject.Parse(getContent);
+                else if (IsClientConfigNotFound(getResponse, getContent))
+                {
+                    // Confirmed absence (webprops-api's specific "no properties for client" 404),
+                    // not just any failed GET - safe to create a fresh config. Any other failure
+                    // (5xx, network error, a differently-shaped error body) still hard-fails below,
+                    // since we can't tell those apart from "client has an existing config we
+                    // couldn't read" and a full-replace POST would silently wipe it.
+                    _logger.LogWarning($"[UpdateClientFeatureFlagsAsync] no existing config for clientCode={request.ClientCode}, creating new");
+                    configNode = new JObject
+                    {
+                        ["ClientCode"] = request.ClientCode,
+                        ["Features"] = new JObject()
+                    };
+                }
                 else
                 {
                     _logger.LogError($"[UpdateClientFeatureFlagsAsync] fetch before update failed clientCode={request.ClientCode} status={getResponse.StatusCode} content={getContent}");
@@ -118,6 +142,28 @@ namespace Backoffice.API.Repositories
                     StatusCode = StatusCode.Error,
                     Message = ex.Message
                 };
+            }
+        }
+        #endregion
+
+        #region Utilities
+        // Narrowly matches webprops-api's specific "client has no config yet" response
+        // (get_config.go's only 404 path), rather than treating any non-2xx as absence -
+        // a 5xx/network failure must never be silently treated as "safe to create".
+        private static bool IsClientConfigNotFound(System.Net.Http.HttpResponseMessage response, string content)
+        {
+            if (response.StatusCode != HttpStatusCode.NotFound)
+                return false;
+
+            try
+            {
+                var error = JObject.Parse(content);
+                var message = error["message"]?.ToString() ?? string.Empty;
+                return message.Contains("no properties for client", StringComparison.OrdinalIgnoreCase);
+            }
+            catch
+            {
+                return false;
             }
         }
         #endregion

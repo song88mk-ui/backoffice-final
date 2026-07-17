@@ -169,7 +169,7 @@ namespace Backoffice.Web.Services
                     return JsonSerializer.Deserialize<BaseResponse<ClientFeatureFlagsResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.NotFound)
                         return JsonSerializer.Deserialize<BaseResponse<ClientFeatureFlagsResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
                     {

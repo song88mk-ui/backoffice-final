@@ -18,6 +18,7 @@ namespace Backoffice.Web.Pages.Administration
         private List<Client> _clients = new();
         private string _selectedClientCode;
         private ClientFeatureFlagsResponse _clientFeatureFlags;
+        private bool _isNewConfig;
 
         protected override async Task OnInitializedAsync()
         {
@@ -47,6 +48,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             _selectedClientCode = e.Value?.ToString();
             _clientFeatureFlags = null;
+            _isNewConfig = false;
             _hasChange = false;
 
             if (string.IsNullOrEmpty(_selectedClientCode))
@@ -57,9 +59,19 @@ namespace Backoffice.Web.Pages.Administration
 
             var response = await _backofficeService.GetClientFeatureFlags(_selectedClientCode);
 
-            _clientFeatureFlags = response.StatusCode == StatusCode.Success && response.Result != null
-                ? response.Result
-                : new ClientFeatureFlagsResponse() { ClientCode = _selectedClientCode };
+            if (response.StatusCode == StatusCode.Success && response.Result != null)
+            {
+                _clientFeatureFlags = response.Result;
+            }
+            else if (response.StatusCode == StatusCode.NotFound)
+            {
+                _clientFeatureFlags = new ClientFeatureFlagsResponse() { ClientCode = _selectedClientCode };
+                _isNewConfig = true;
+            }
+            else
+            {
+                await _alertToastService.SetToast("Error loading feature flags for this client");
+            }
 
             _isPreloader = false;
             StateHasChanged();
@@ -92,6 +104,7 @@ namespace Backoffice.Web.Pages.Administration
             if (response.StatusCode == StatusCode.Success)
             {
                 _clientFeatureFlags = response.Result;
+                _isNewConfig = false;
                 _hasChange = false;
                 await _alertToastService.SetToast("Feature Flags Saved");
             }
