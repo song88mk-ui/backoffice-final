@@ -68,7 +68,8 @@ namespace Backoffice.Shared.Enums
         SBC_OE_MarketSetting_Group,
         SBC_OE_PriceBoost_Manage,
         SBC_OE_PriceBoost_Settings,
-        SBC_OE_Mapping
+        SBC_OE_Mapping,
+        SBC_OE_MarketSetting_SelectorTemplates
     }
     public enum TranslationsPermission
     {
