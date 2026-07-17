@@ -196,6 +196,18 @@ The test suite does not yet exist in this repository. It will be implemented. In
 - When implementing new repository methods, write them in a way that accepts injected dependencies (no `new` inside methods) so unit tests can be added without structural changes later.
 - Document any code that is intentionally difficult to test (e.g. legacy static MongoDB init) in `docs/08_TechnicalDebt.md` so it is tracked for remediation.
 
+### 14. SQL Script Idempotency
+
+Every SQL script written or changed (data fixes, seed/permission inserts, hand-run migrations, flyway migrations) **must be idempotent**: running it multiple times must produce the same end state as running it once.
+
+- Guard `INSERT` with `NOT EXISTS` (or `MERGE`).
+- Guard schema changes with `IF NOT EXISTS` / `OBJECT_ID(...) IS NULL` checks.
+- Write `UPDATE`/`DELETE` so re-execution changes nothing further (target-state, not incremental).
+- State in the script's header comment that it is idempotent.
+- Non-idempotent scripts are prohibited; if true one-shot semantics are unavoidable, the script must detect the already-applied state and no-op with a clear message.
+
+This rule applies in all sibling repositories as well (`../platform-final`, `../odds-engine-2`, `../bet-genius`, `../platform-web`, `../webprops-api`, `../infrastructure` flyway migrations, etc.).
+
 ---
 
 ## Testing Requirements (Mandatory)
