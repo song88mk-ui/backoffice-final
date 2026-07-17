@@ -27,7 +27,8 @@
                     <option value="">-- Select a client --</option>
                     @foreach (var client in _clients)
                     {
-                        <option value="@client.ClientCode" selected="@(client.ClientCode == _selectedClientCode)">@client.ClientName (@client.ClientCode)</option>
+                        var clientGuid = client.ClientId.ToString().ToUpper();
+                        <option value="@clientGuid" selected="@(clientGuid == _selectedClientGuid)">@client.ClientName (@client.ClientCode)</option>
                     }
                 </select>
             </div>

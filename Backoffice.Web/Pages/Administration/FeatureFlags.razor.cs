@@ -15,8 +15,11 @@ namespace Backoffice.Web.Pages.Administration
         private bool _isProcessing;
         private bool _hasChange;
 
-        private List<Client> _clients = new();
-        private string _selectedClientCode;
+        // webprops-api's clientId is the client's Platform GUID (PlatformClientResponse.ClientId),
+        // not the SBC ClientCode - confirmed by tracing Platform.Parent.Web's Custom:SB:ClientId
+        // (a per-deployment GUID) through to CdnConfigurationProvider's GET /config/{clientId}.
+        private List<PlatformClientResponse> _clients = new();
+        private string _selectedClientGuid;
         private ClientFeatureFlagsResponse _clientFeatureFlags;
         private bool _isNewConfig;
 
@@ -38,7 +41,7 @@ namespace Backoffice.Web.Pages.Administration
 
         private async Task LoadClients()
         {
-            var response = await _backofficeService.GetClients();
+            var response = await _backofficeService.GetPlatformClients();
 
             if (response.StatusCode == StatusCode.Success && response.Result?.Clients != null)
                 _clients = response.Result.Clients.OrderBy(c => c.ClientName).ToList();
@@ -46,18 +49,18 @@ namespace Backoffice.Web.Pages.Administration
 
         private async Task HandleClientSelected(ChangeEventArgs e)
         {
-            _selectedClientCode = e.Value?.ToString();
+            _selectedClientGuid = e.Value?.ToString();
             _clientFeatureFlags = null;
             _isNewConfig = false;
             _hasChange = false;
 
-            if (string.IsNullOrEmpty(_selectedClientCode))
+            if (string.IsNullOrEmpty(_selectedClientGuid))
                 return;
 
             _isPreloader = true;
             StateHasChanged();
 
-            var response = await _backofficeService.GetClientFeatureFlags(_selectedClientCode);
+            var response = await _backofficeService.GetClientFeatureFlags(_selectedClientGuid);
 
             if (response.StatusCode == StatusCode.Success && response.Result != null)
             {
@@ -65,7 +68,7 @@ namespace Backoffice.Web.Pages.Administration
             }
             else if (response.StatusCode == StatusCode.NotFound)
             {
-                _clientFeatureFlags = new ClientFeatureFlagsResponse() { ClientCode = _selectedClientCode };
+                _clientFeatureFlags = new ClientFeatureFlagsResponse() { ClientCode = _selectedClientGuid };
                 _isNewConfig = true;
             }
             else
@@ -90,7 +93,7 @@ namespace Backoffice.Web.Pages.Administration
 
             var response = await _backofficeService.UpdateClientFeatureFlags(new UpdateClientFeatureFlagsRequest()
             {
-                ClientCode = _selectedClientCode,
+                ClientCode = _selectedClientGuid,
                 BettingRules = _clientFeatureFlags.Features.BettingRules,
                 DarkMode = _clientFeatureFlags.Features.DarkMode,
                 LanguageOptions = _clientFeatureFlags.Features.LanguageOptions,
@@ -112,6 +115,6 @@ namespace Backoffice.Web.Pages.Administration
                 await _alertToastService.SetToast("Error Saving Feature Flags");
         }
 
-        private async Task HandleCancelClick() => await HandleClientSelected(new ChangeEventArgs() { Value = _selectedClientCode });
+        private async Task HandleCancelClick() => await HandleClientSelected(new ChangeEventArgs() { Value = _selectedClientGuid });
     }
 }
