@@ -31,6 +31,8 @@ namespace Backoffice.API.Controllers.Backoffice
             {
                 case BoStatusCode.Success:
                     return Ok(result);
+                case BoStatusCode.NotFound:
+                    return NotFound(result);
                 default:
                     return BadRequest(result);
             }
