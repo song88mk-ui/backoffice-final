@@ -32,26 +32,36 @@
             @if (_clientFeatureFlags != null)
             {
                 <div class="m-2 mt-4">
-                    <p class="fw-bold">Features</p>
-                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                        <p>Betting Rules</p>
-                        <input class="form-check-input" type="checkbox" @bind="_clientFeatureFlags.Features.BettingRules" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                        <p>Dark Mode</p>
-                        <input class="form-check-input" type="checkbox" @bind="_clientFeatureFlags.Features.DarkMode" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                        <p>Language Options</p>
-                        <input class="form-check-input" type="checkbox" @bind="_clientFeatureFlags.Features.LanguageOptions" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                        <p>OG Auth</p>
-                        <input class="form-check-input" type="checkbox" @bind="_clientFeatureFlags.Features.OGAuth" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                        <p>Partial Cashout</p>
-                        <input class="form-check-input" type="checkbox" @bind="_clientFeatureFlags.Features.PartialCashout" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                    <div class="category-title fw-bold mb-3">Features</div>
+                    <div class="d-flex">
+                        <div class="w-50 noselect">
+                            <div class="form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-betting-rules" @bind="_clientFeatureFlags.Features.BettingRules" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <label class="form-check-label" for="ff-betting-rules">Betting Rules</label>
+                            </div>
+                            <div class="form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-dark-mode" @bind="_clientFeatureFlags.Features.DarkMode" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <label class="form-check-label" for="ff-dark-mode">Dark Mode</label>
+                            </div>
+                            <div class="form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-language-options" @bind="_clientFeatureFlags.Features.LanguageOptions" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <label class="form-check-label" for="ff-language-options">Language Options</label>
+                            </div>
+                        </div>
+                        <div class="w-50 noselect">
+                            <div class="form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-og-auth" @bind="_clientFeatureFlags.Features.OGAuth" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <label class="form-check-label" for="ff-og-auth">OG Auth</label>
+                            </div>
+                            <div class="form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-partial-cashout" @bind="_clientFeatureFlags.Features.PartialCashout" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <label class="form-check-label" for="ff-partial-cashout">Partial Cashout</label>
+                            </div>
+                            <div class="form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-bet-recommendation" @bind="_clientFeatureFlags.Features.BetRecommendation" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <label class="form-check-label" for="ff-bet-recommendation">Bet Recommendation</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 @if (_clientFeatureFlags.Features.GameTrackerProductNames.Any() || _clientFeatureFlags.Layout.Any())

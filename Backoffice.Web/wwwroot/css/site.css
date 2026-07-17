@@ -232,6 +232,10 @@ a, .btn-link {
     content: "\1115";
 }
 
+.ico-feature-flags:before {
+    content: "\1110";
+}
+
 .ico-warning:before {
     content: "\1114";
 }

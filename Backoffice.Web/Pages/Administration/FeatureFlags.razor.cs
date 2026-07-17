@@ -83,7 +83,8 @@ namespace Backoffice.Web.Pages.Administration
                 DarkMode = _clientFeatureFlags.Features.DarkMode,
                 LanguageOptions = _clientFeatureFlags.Features.LanguageOptions,
                 OGAuth = _clientFeatureFlags.Features.OGAuth,
-                PartialCashout = _clientFeatureFlags.Features.PartialCashout
+                PartialCashout = _clientFeatureFlags.Features.PartialCashout,
+                BetRecommendation = _clientFeatureFlags.Features.BetRecommendation
             });
 
             _isProcessing = false;

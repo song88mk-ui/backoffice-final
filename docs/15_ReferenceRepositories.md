@@ -104,6 +104,10 @@ Small Go HTTP API that serves per-client frontend configuration (feature flags, 
 
 **Consumed by backoffice-final:** `Backoffice.API/Repositories/WebPropsRepository.cs` calls `GET/POST /api/v1/config/{clientId}` via an `IWebPropsRepository`, exposed through `WebPropsController` (`api/config/feature-flags/{clientCode}`, gated by the `Admin.FeatureFlags` claim) and surfaced in `Backoffice.Web`'s "Feature Flags" admin page (`Pages/Administration/FeatureFlags.razor`). The `/maintenance` endpoints are **not** consumed — see the callout above.
 
+**Schema note:** webprops-api's config storage/API has no fixed schema — `get_config.go`/`update_config.go` decode/encode the whole document as a generic `map[string]interface{}`, so any key sent by a caller (Backoffice included) is persisted and returned as-is. The `Features` shape in the README/SKILL.md is illustrative convention, not an enforced contract. This means Backoffice can freely add new flags (e.g. `Features.BetRecommendation`, see `ClientFeatureFlags`) and they'll round-trip through S3 correctly with zero changes needed in webprops-api itself.
+
+**Backoffice-only field:** `Features.BetRecommendation` (`Backoffice.Shared/Models/Response/ClientFeatureFlagsResponse.cs`) round-trips fine per the schema note above, but has no effect until `platform-web`'s own `Features` model and `Pages/Index.razor` (where `<BetRecommendation>` renders unconditionally today) are updated to read and gate on it.
+
 | Endpoint | Auth | Purpose |
 |---|---|---|
 | `GET /api/v1/config/{clientId}` | none | Full client config (features, layout/theme options) |

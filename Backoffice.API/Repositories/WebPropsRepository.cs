@@ -91,6 +91,7 @@ namespace Backoffice.API.Repositories
                 features["LanguageOptions"] = request.LanguageOptions;
                 features["OGAuth"] = request.OGAuth;
                 features["PartialCashout"] = request.PartialCashout;
+                features["BetRecommendation"] = request.BetRecommendation;
                 configNode["Features"] = features;
 
                 var payload = JsonConvert.SerializeObject(configNode);
