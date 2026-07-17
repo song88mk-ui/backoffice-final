@@ -20,6 +20,8 @@
         </div>
         <div class="page-content m-3">
             <div class="m-2">
+                <p class="fw-bolder">Manage Client Feature Flags</p>
+                <p class="text-muted mb-3">Controls per-client toggles read by platform-web (dark mode, language options, betting rules, OG auth, partial cashout). Changes save directly to the client's config in webprops-api and take effect immediately, without a deploy.</p>
                 <p class="fw-bold">Select Client</p>
                 <select class="form-select" @onchange="HandleClientSelected" disabled="@_isProcessing">
                     <option value="">-- Select a client --</option>
