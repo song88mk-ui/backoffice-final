@@ -1,0 +1,163 @@
+@inherits BasePage
+@layout OEMonitoringLayout
+
+@page "/hk/odds-engine/selector-market-templates"
+
+<AuthorizeView Policy="sbc-market-selectortemplates">
+    <Authorized>
+        <div class="col-md-12">
+            <Breadcrumb Breadcrumbs="_breadcrumbs" />
+        </div>
+        <div class="col-md-12">
+            <OEPageHeader PageHeaderModel="_pageHeaderModel" />
+        </div>
+        <div class="col-md-12">
+            <div class="mx-3 mt-3">
+                <p class="text-muted">Defines which market templates appear in the market selector of the client site, per sport. A client without rows here fails to load its site, so every new client needs this filled in or copied from an existing client.</p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="fw-bold mb-1">@_translationState.GetValue("Client")</label>
+                        <select class="form-select" @onchange="OnClientChangedEvent" disabled="@_isProcessing">
+                            <option value="">-- @_translationState.GetValue("Select a client") --</option>
+                            @foreach (var client in _clients)
+                            {
+                                <option value="@client.ClientCode" selected="@(client.ClientCode == _selectedClientCode)">@client.ClientName (@client.ClientCode)</option>
+                            }
+                        </select>
+                    </div>
+                    <AuthorizeView Policy="sbc-market-selectortemplates-canedit" Context="canEditContext">
+                        <Authorized Context="canEditContext">
+                            @if (!string.IsNullOrEmpty(_selectedClientCode) && _templates != null)
+                            {
+                                <div class="col-md-8 d-flex align-items-end justify-content-end">
+                                    <button class="btn btn-primary me-2" @onclick="OnAddRowClickEvent" disabled="@_isProcessing">@_translationState.GetValue("Add Row")</button>
+                                    <button class="btn btn-secondary me-2" @onclick="OnOpenCopyModalClickEvent" disabled="@_isProcessing">@_translationState.GetValue("Copy From Client")</button>
+                                    <button class="btn btn-success" @onclick="OnSaveClickEvent" disabled="@_isProcessing">@_translationState.GetValue("Save")</button>
+                                </div>
+                            }
+                        </Authorized>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>
+
+        @if (_alertModel != null && !string.IsNullOrEmpty(_alertModel.Message))
+        {
+            <div class="col-md-12">
+                <div class="mt-3 mx-3">
+                    <AlertMessage AlertModel="@_alertModel" />
+                </div>
+            </div>
+        }
+
+        <div class="col-md-12">
+            <div class="mx-3 mt-3">
+                @if (_isPreLoader)
+                {
+                    <Preloader />
+                }
+                else if (_templates != null)
+                {
+                    <table class="table table-bordered">
+                        <thead class="table-head">
+                            <tr>
+                                <th>@_translationState.GetValue("Sport")</th>
+                                <th>@_translationState.GetValue("Market Template")</th>
+                                <th>@_translationState.GetValue("Template Code")</th>
+                                <th>@_translationState.GetValue("Asia Sort Order")</th>
+                                <th>@_translationState.GetValue("Euro Sort Order")</th>
+                                <th>@_translationState.GetValue("Identifier")</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (_templates.Any())
+                            {
+                                @foreach (var row in _templates.OrderBy(t => t.SportId).ThenBy(t => t.AsiaSortOrder).ToList())
+                                {
+                                    <tr>
+                                        <td>
+                                            <select class="form-select" value="@row.SportId" @onchange="e => OnRowSportChangedEvent(row, e)" disabled="@(_isProcessing || !_canEdit)">
+                                                <option value="0">-- @_translationState.GetValue("Select sport") --</option>
+                                                @foreach (var sport in _sports)
+                                                {
+                                                    <option value="@sport.SportId" selected="@(sport.SportId == row.SportId)">@sport.SportName</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-select" value="@row.MarketTemplateId" @onchange="e => OnRowTemplateChangedEvent(row, e)" disabled="@(_isProcessing || !_canEdit || row.SportId == 0)">
+                                                <option value="">-- @_translationState.GetValue("Select template") --</option>
+                                                @foreach (var template in _templateLookup.Where(t => t.SportId == row.SportId).OrderBy(t => t.SortOrder))
+                                                {
+                                                    <option value="@template.MarketTemplateId" selected="@(template.MarketTemplateId == row.MarketTemplateId)">@template.MarketTemplateCode (@template.MarketTemplateId)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>@row.MarketTemplateCode</td>
+                                        <td>
+                                            <input type="number" class="form-control" @bind="row.AsiaSortOrder" disabled="@(_isProcessing || !_canEdit)" />
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control" @bind="row.EuroSortOrder" disabled="@(_isProcessing || !_canEdit)" />
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" @bind="row.Identifier" disabled="@(_isProcessing || !_canEdit)" />
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            @if (_canEdit)
+                                            {
+                                                <a class="link-danger" href="javascript:void(0)" @onclick="() => OnDeleteRowClickEvent(row)">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="7">
+                                        <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+
+        @if (_showCopyModal)
+        {
+            <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                <div class="modal-dialog" style="max-width: 500px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">@_translationState.GetValue("Copy Selector Market Templates")</h5>
+                        </div>
+                        <div class="modal-body">
+                            <p>@_translationState.GetValue("Copy all selector market templates from the selected client to") <strong>@_selectedClientCode</strong>. @_translationState.GetValue("Existing rows of the target client will be replaced.")</p>
+                            <label class="fw-bold mb-1">@_translationState.GetValue("Copy from")</label>
+                            <select class="form-select" @onchange="OnCopyFromClientChangedEvent" disabled="@_isProcessing">
+                                <option value="">-- @_translationState.GetValue("Select a client") --</option>
+                                @foreach (var client in _clients.Where(c => c.ClientCode != _selectedClientCode))
+                                {
+                                    <option value="@client.ClientCode" selected="@(client.ClientCode == _copyFromClientCode)">@client.ClientName (@client.ClientCode)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-cancel" @onclick="OnCloseCopyModalClickEvent" disabled="@_isProcessing">@_translationState.GetValue("Cancel")</button>
+                            <button class="btn btn-success" @onclick="OnCopyConfirmClickEvent" disabled="@(_isProcessing || string.IsNullOrEmpty(_copyFromClientCode))">@_translationState.GetValue("Copy")</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <RedirectToPage FromPage="@SportsbookClientPermission.SBC_OE_MarketSetting_SelectorTemplates.ToString().Replace('_', '.')" />
+    </NotAuthorized>
+</AuthorizeView>

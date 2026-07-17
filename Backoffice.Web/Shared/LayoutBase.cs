@@ -49,6 +49,7 @@ namespace Backoffice.Web.Shared
             { "SBC.OE.SportsSettings", "/sport-settings" },
             { "SBC.OE.MarketSetting.SortOrder", "/market-sort-order" },
             { "SBC.OE.MarketSetting.Group", "/market-groups" },
+            { "SBC.OE.MarketSetting.SelectorTemplates", "/selector-market-templates" },
             { "SBC.OE.PriceBoost.Manage", "/manage-boost" },
             { "SBC.OE.PriceBoost.Settings", "/boosted-settings" }
         };

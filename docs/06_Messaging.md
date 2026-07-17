@@ -120,6 +120,16 @@ OnDeleteCacheMessage
 ├─ CacheType enum
 ├─ Route: r.oe.cachesync.ondeletecache
 └─ Consumers: Utility, WebSocket.Service
+
+OnMarketSortOrderChange  (payload: OnDeleteCacheMessage { CacheType = MarketSortOrder })
+├─ Route: r.oe.cachesync.onmarketsortorderchange
+├─ Published by SportsbookRepository after:
+│   · AddOrUpdateClientMarketTemplatesOrder / CopyClientMarketTemplatesOrder (market sort order)
+│   · AddOrUpdateClientSelectorMarketTemplates / CopyClientSelectorMarketTemplates
+│     (BO-87: ClientSelectorMarketTemplate2 writes from the Selector Market Templates page)
+└─ Platform.CacheSync.Service ──POST v1/cachepreload──▶ Platform.Sportsbook.API
+   · purges "mtg2", "cmtg", "csmt" (BO-87) and the cached REST responses, then
+     republishes r.oe.sb.engine.onmarketsortorderchange.{clientCode} to the engine.
 ```
 
 ### Translation

@@ -1087,6 +1087,224 @@ namespace Backoffice.API.Repositories
 
         #endregion
 
+        #region Client Selector Market Templates
+
+        public async Task<BaseResponse<List<ClientSelectorMarketTemplate>>> GetClientSelectorMarketTemplates(Guid clientId)
+        {
+            try
+            {
+                var result = await _sportsbookContext.ClientSelectorMarketTemplate
+                    .AsNoTracking()
+                    .Where(c => c.ClientId == clientId)
+                    .OrderBy(o => o.SportId).ThenBy(o => o.AsiaSortOrder)
+                    .ToListAsync();
+
+                return new BaseResponse<List<ClientSelectorMarketTemplate>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<ClientSelectorMarketTemplate>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<SelectorMarketTemplate>>> GetSelectorMarketTemplateLookup()
+        {
+            try
+            {
+                var result = await _sportsbookContext.SelectorMarketTemplate
+                    .AsNoTracking()
+                    .OrderBy(o => o.SportId).ThenBy(o => o.SortOrder)
+                    .ToListAsync();
+
+                return new BaseResponse<List<SelectorMarketTemplate>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<SelectorMarketTemplate>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> AddOrUpdateClientSelectorMarketTemplates(ClientSelectorMarketTemplateRequest request)
+        {
+            try
+            {
+                if (request == null || request.ClientId == Guid.Empty)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Result = false,
+                        Message = "ClientId is required"
+                    };
+                }
+
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var existingTemplates = await _sportsbookContext.ClientSelectorMarketTemplate.Where(x => x.ClientId == request.ClientId).ToListAsync();
+                    if (existingTemplates.Any())
+                    {
+                        _sportsbookContext.ClientSelectorMarketTemplate.RemoveRange(existingTemplates);
+                        await _sportsbookContext.SaveChangesAsync();
+                    }
+
+                    var newTemplates = request.Templates.Select(x => new ClientSelectorMarketTemplate
+                    {
+                        ClientId = request.ClientId,
+                        SportId = x.SportId,
+                        MarketTemplateId = x.MarketTemplateId,
+                        MarketTemplateCode = x.MarketTemplateCode,
+                        AsiaSortOrder = x.AsiaSortOrder,
+                        EuroSortOrder = x.EuroSortOrder,
+                        Identifier = x.Identifier
+                    }).ToList();
+
+                    await _sportsbookContext.AddRangeAsync(newTemplates);
+                    await _sportsbookContext.SaveChangesAsync();
+
+                    scope.Complete();
+                }
+
+                await PublishSelectorMarketTemplateCacheSync(request.ClientId, request.ClientCode);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = true,
+                    Message = "Selector market templates saved successfully"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Result = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> CopyClientSelectorMarketTemplates(CopyClientSelectorMarketTemplateRequest request)
+        {
+            try
+            {
+                if (request == null || request.CopyFromClientId == Guid.Empty || request.CopyToClientId == Guid.Empty)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Result = false,
+                        Message = "CopyFromClientId and CopyToClientId are required"
+                    };
+                }
+
+                if (request.CopyFromClientId == request.CopyToClientId)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Result = false,
+                        Message = "Cannot copy selector market templates to the same client"
+                    };
+                }
+
+                var sourceTemplates = await _sportsbookContext.ClientSelectorMarketTemplate.AsNoTracking().Where(x => x.ClientId == request.CopyFromClientId).ToListAsync();
+                if (!sourceTemplates.Any())
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Result = false,
+                        Message = "The source client has no selector market templates to copy"
+                    };
+                }
+
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var existingTemplates = await _sportsbookContext.ClientSelectorMarketTemplate.Where(x => x.ClientId == request.CopyToClientId).ToListAsync();
+                    if (existingTemplates.Any())
+                    {
+                        _sportsbookContext.ClientSelectorMarketTemplate.RemoveRange(existingTemplates);
+                        await _sportsbookContext.SaveChangesAsync();
+                    }
+
+                    var newTemplates = sourceTemplates.Select(x => new ClientSelectorMarketTemplate
+                    {
+                        ClientId = request.CopyToClientId,
+                        SportId = x.SportId,
+                        MarketTemplateId = x.MarketTemplateId,
+                        MarketTemplateCode = x.MarketTemplateCode,
+                        AsiaSortOrder = x.AsiaSortOrder,
+                        EuroSortOrder = x.EuroSortOrder,
+                        Identifier = x.Identifier
+                    }).ToList();
+
+                    await _sportsbookContext.AddRangeAsync(newTemplates);
+                    await _sportsbookContext.SaveChangesAsync();
+
+                    scope.Complete();
+                }
+
+                await PublishSelectorMarketTemplateCacheSync(request.CopyToClientId, request.CopyToClientCode);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = true,
+                    Message = "Copy selector market templates successful"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Result = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        // The csmt cache in Platform.Sportsbook.API is only purged by the MarketSortOrder
+        // cache type, so selector market template writes reuse the existing
+        // OnMarketSortOrderChange cache-sync route instead of introducing a new message type.
+        private async Task PublishSelectorMarketTemplateCacheSync(Guid clientId, string clientCode)
+        {
+            await _rabbitMqRepository.Publish(new MessageRequest
+            {
+                Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                {
+                    CacheType = CacheType.MarketSortOrder,
+                    ClientId = clientId,
+                    ClientCode = clientCode ?? string.Empty,
+                    CacheKey = string.Empty
+                }),
+                CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                MessageType = "OnMarketSortOrderChange",
+                RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
+            });
+        }
+
+        #endregion
+
         #region Lookup
 
         public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string langCode = "EN")

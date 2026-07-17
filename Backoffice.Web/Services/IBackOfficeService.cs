@@ -98,6 +98,13 @@ namespace Backoffice.Web.Services
 
         #endregion
 
+        #region Selector Market Templates
+        Task<BaseResponse<List<ClientSelectorMarketTemplateModel>>> GetClientSelectorMarketTemplates(Guid clientId);
+        Task<BaseResponse<List<SelectorMarketTemplateLookupModel>>> GetSelectorMarketTemplateLookup();
+        Task<BaseResponse<bool>> AddOrUpdateClientSelectorMarketTemplates(ClientSelectorMarketTemplateRequest request);
+        Task<BaseResponse<bool>> CopyClientSelectorMarketTemplates(CopyClientSelectorMarketTemplateRequest request);
+        #endregion
+
         #region Sport Settings
         Task<BaseResponse<List<ClientSportOrderListResponse>>> GetClientSportOrderList(ClientSportOrderListRequest request);
         Task<BaseResponse<List<ClientSegmentOrderListResponse>>> GetClientSegmentOrderList(ClientSegmentOrderListRequest request);

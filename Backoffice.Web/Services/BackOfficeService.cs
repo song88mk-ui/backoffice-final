@@ -2737,6 +2737,126 @@ namespace Backoffice.Web.Services
             }
         }
 
+        public async Task<BaseResponse<List<ClientSelectorMarketTemplateModel>>> GetClientSelectorMarketTemplates(Guid clientId)
+        {
+            try
+            {
+                var respond = await _httpClient.GetStreamAsync($"sportsbook/client/selectormarkettemplate/{clientId}");
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<List<ClientSelectorMarketTemplateModel>>>
+                (respond, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<List<ClientSelectorMarketTemplateModel>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<SelectorMarketTemplateLookupModel>>> GetSelectorMarketTemplateLookup()
+        {
+            try
+            {
+                var respond = await _httpClient.GetStreamAsync($"sportsbook/client/selectormarkettemplate/lookup");
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<List<SelectorMarketTemplateLookupModel>>>
+                (respond, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<List<SelectorMarketTemplateLookupModel>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> AddOrUpdateClientSelectorMarketTemplates(ClientSelectorMarketTemplateRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"sportsbook/client/selectormarkettemplate", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> CopyClientSelectorMarketTemplates(CopyClientSelectorMarketTemplateRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"sportsbook/client/selectormarkettemplate/copy", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<ClientMarketTemplateResponse>> AddOrUpdateClientMarketTemplatesOrder(ClientMarketTemplateRequest request)
         {
             try

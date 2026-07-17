@@ -317,6 +317,66 @@ namespace Backoffice.API.Controllers.SportsbookClients
 
         #endregion
 
+        #region Selector Market Templates
+
+        [HttpGet("selectormarkettemplate/{clientId:guid}")]
+        public async Task<IActionResult> GetClientSelectorMarketTemplates(System.Guid clientId)
+        {
+            var result = await _sportsbookRepository.GetClientSelectorMarketTemplates(clientId);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("selectormarkettemplate/lookup")]
+        public async Task<IActionResult> GetSelectorMarketTemplateLookup()
+        {
+            var result = await _sportsbookRepository.GetSelectorMarketTemplateLookup();
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("selectormarkettemplate")]
+        public async Task<IActionResult> AddOrUpdateClientSelectorMarketTemplates([FromBody] ClientSelectorMarketTemplateRequest request)
+        {
+            var result = await _sportsbookRepository.AddOrUpdateClientSelectorMarketTemplates(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("selectormarkettemplate/copy")]
+        public async Task<IActionResult> CopyClientSelectorMarketTemplates([FromBody] CopyClientSelectorMarketTemplateRequest request)
+        {
+            var result = await _sportsbookRepository.CopyClientSelectorMarketTemplates(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        #endregion
+
         #region Lookup - Sport/Segment/League
         [HttpGet("sports/lookup")]
         public async Task<IActionResult> GetSportLookup()
