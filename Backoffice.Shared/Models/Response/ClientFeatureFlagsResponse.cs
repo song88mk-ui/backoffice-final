@@ -17,6 +17,11 @@ namespace Backoffice.Shared.Models.Response
         public bool LanguageOptions { get; set; }
         public bool OGAuth { get; set; }
         public bool PartialCashout { get; set; }
+
+        // Backoffice-only addition: not yet in webprops-api's real schema and not read by
+        // platform-web. Stored/round-tripped like the other flags, but has no downstream
+        // effect until platform-web is updated to gate BetRecommendation on it.
+        public bool BetRecommendation { get; set; }
     }
 
     public class ClientLayoutTheme
