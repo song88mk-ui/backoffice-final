@@ -45,34 +45,34 @@
                     <div class="d-flex">
                         <div class="w-50 noselect">
                             <div class="form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" role="switch" id="ff-betting-rules" @bind="_clientFeatureFlags.Features.BettingRules" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-betting-rules" @bind="_clientFeatureFlags.Features.BettingRules" @bind:after="HandleFlagChanged" disabled="@(_isProcessing || !_canEdit)">
                                 <label class="form-check-label" for="ff-betting-rules">Betting Rules</label>
                                 <div class="text-muted small">Shows the Betting Rules button in the site header.</div>
                             </div>
                             <div class="form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" role="switch" id="ff-dark-mode" @bind="_clientFeatureFlags.Features.DarkMode" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-dark-mode" @bind="_clientFeatureFlags.Features.DarkMode" @bind:after="HandleFlagChanged" disabled="@(_isProcessing || !_canEdit)">
                                 <label class="form-check-label" for="ff-dark-mode">Dark Mode</label>
                                 <div class="text-muted small">Enables the dark mode theme toggle for the client's site.</div>
                             </div>
                             <div class="form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" role="switch" id="ff-language-options" @bind="_clientFeatureFlags.Features.LanguageOptions" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-language-options" @bind="_clientFeatureFlags.Features.LanguageOptions" @bind:after="HandleFlagChanged" disabled="@(_isProcessing || !_canEdit)">
                                 <label class="form-check-label" for="ff-language-options">Language Options</label>
                                 <div class="text-muted small">Enables the language selector, scoped to English and Chinese (ZH) only.</div>
                             </div>
                         </div>
                         <div class="w-50 noselect">
                             <div class="form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" role="switch" id="ff-og-auth" @bind="_clientFeatureFlags.Features.OGAuth" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-og-auth" @bind="_clientFeatureFlags.Features.OGAuth" @bind:after="HandleFlagChanged" disabled="@(_isProcessing || !_canEdit)">
                                 <label class="form-check-label" for="ff-og-auth">OG Auth</label>
                                 <div class="text-muted small">Switches the site into Oriental Gaming (OG) mode: page title, bet ID formatting, and header/auth behavior for OG-integrated operators.</div>
                             </div>
                             <div class="form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" role="switch" id="ff-partial-cashout" @bind="_clientFeatureFlags.Features.PartialCashout" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-partial-cashout" @bind="_clientFeatureFlags.Features.PartialCashout" @bind:after="HandleFlagChanged" disabled="@(_isProcessing || !_canEdit)">
                                 <label class="form-check-label" for="ff-partial-cashout">Partial Cashout</label>
                                 <div class="text-muted small">Enables the partial cash-out button on eligible open bets.</div>
                             </div>
                             <div class="form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" role="switch" id="ff-bet-recommendation" @bind="_clientFeatureFlags.Features.BetRecommendation" @bind:after="HandleFlagChanged" disabled="@_isProcessing">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-bet-recommendation" @bind="_clientFeatureFlags.Features.BetRecommendation" @bind:after="HandleFlagChanged" disabled="@(_isProcessing || !_canEdit)">
                                 <label class="form-check-label" for="ff-bet-recommendation">Bet Recommendation</label>
                                 <div class="text-muted small">Backoffice-only for now - not yet read by platform-web, so this has no visible effect until that's wired up.</div>
                             </div>
@@ -95,7 +95,7 @@
                 }
             }
         </div>
-        @if (_hasChange)
+        @if (_hasChange && _canEdit)
         {
             <div>
                 <button class="btn btn-save" @onclick="HandleSaveClick" disabled="@_isProcessing">Save</button>
