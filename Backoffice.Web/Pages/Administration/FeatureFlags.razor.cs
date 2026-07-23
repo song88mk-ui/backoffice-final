@@ -14,6 +14,7 @@ namespace Backoffice.Web.Pages.Administration
         private bool _isPreloader = true;
         private bool _isProcessing;
         private bool _hasChange;
+        private bool _canEdit;
 
         // webprops-api's clientId is the client's Platform GUID (PlatformClientResponse.ClientId),
         // not the SBC ClientCode - confirmed by tracing Platform.Parent.Web's Custom:SB:ClientId
@@ -33,6 +34,10 @@ namespace Backoffice.Web.Pages.Administration
                 Title = "Feature Flags",
                 IconClass = "ico ico-feature-flags"
             };
+
+            _canEdit = _userState.Model.Claims?.Any(x =>
+                x.Type == AdminPermission.Admin_FeatureFlags.ToString().Replace("_", ".")
+                && x.Value == $"{(int)Access.Edit}") ?? false;
 
             await LoadClients();
 
