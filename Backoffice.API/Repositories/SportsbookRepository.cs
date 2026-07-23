@@ -444,6 +444,7 @@ namespace Backoffice.API.Repositories
             }
 
             var clientList = (await _platformRepository.GetClients("HK")).Result;
+
             var client = clientList.FirstOrDefault(c => c.ClientCode == request.ClientCode);
 
             if (client == null)
@@ -466,46 +467,7 @@ namespace Backoffice.API.Repositories
             {
                 #region Delete Existing Client Sport Order
 
-                using (var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    var existingClientSportOrder = _sportsbookContext.ClientSportOrder.Where(c => c.ClientId == client.ClientId);
-
-                    if (existingClientSportOrder != null && existingClientSportOrder.Any())
-                    {
-                        //changeFrom = $"<b>Sports</b></br>";
-                        //changeFrom = changeFrom + string.Join(", ", existingClientSportOrder.ToList().OrderBy(o => o.SortOrder).Select(s => s.SportName.Trim()).ToList());
-                        //changeFrom = changeFrom + "<br/><br/>";
-                        _sportsbookContext.ClientSportOrder.RemoveRange(existingClientSportOrder);
-                    }
-
-                    var existingClientSegmentOrder = _sportsbookContext.ClientSegmentOrder.Where(c => c.ClientId == client.ClientId);
-                    if (existingClientSegmentOrder != null && existingClientSegmentOrder.Any())
-                    {
-                        //foreach (var segment in existingClientSegmentOrder.ToList().GroupBy(g => g.SportId))
-                        //{
-                        //    changeFrom = changeFrom + $"<b>{segment.FirstOrDefault().SportName.Trim()} > Segment</b></br>";
-                        //    changeFrom = changeFrom + string.Join(", ", segment.ToList().OrderBy(o => o.SortOrder).Select(s => s.SegmentName.Trim()).ToList());
-                        //    changeFrom = changeFrom + "<br/><br/>";
-                        //}
-
-                        _sportsbookContext.ClientSegmentOrder.RemoveRange(existingClientSegmentOrder);
-                    }
-
-                    var existingClientLeagueOrder = _sportsbookContext.ClientLeagueOrder.Where(c => c.ClientId == client.ClientId);
-                    if (existingClientLeagueOrder != null && existingClientLeagueOrder.Any())
-                    {
-                        //foreach (var league in existingClientLeagueOrder.ToList().GroupBy(g => new { g.SportId, g.SegmentId }))
-                        //{
-                        //    changeFrom = changeFrom + $"<b>{league.FirstOrDefault().SportName.Trim()} > {league.FirstOrDefault().SegmentName.Trim()} > League</b></br>";
-                        //    changeFrom = changeFrom + string.Join(", ", league.ToList().OrderBy(o => o.SortOrder).Select(s => s.LeagueName.Trim()).ToList());
-                        //    changeFrom = changeFrom + "<br/><br/>";
-                        //}
-                        _sportsbookContext.ClientLeagueOrder.RemoveRange(existingClientLeagueOrder);
-                    }
-
-                    await _sportsbookContext.SaveChangesAsync();
-                    scope.Complete();
-                }
+                await _sportsbookContext.Database.ExecuteSqlRawAsync("EXEC DeleteClientSportSettings {0}", client.ClientId);
 
                 #endregion
 

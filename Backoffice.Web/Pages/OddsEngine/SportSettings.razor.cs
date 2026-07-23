@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Enums;
+﻿
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -588,7 +589,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 if (response.StatusCode == StatusCode.Success)
                 {
-                    await _backofficeService.AddActivityLog(activityLog);
+                    _ = _backofficeService.AddActivityLog(activityLog);
                     _alertModel = new AlertModel()
                     {
                         Status = AlertStatus.Success,
