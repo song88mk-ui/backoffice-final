@@ -286,7 +286,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (response.StatusCode == StatusCode.Success)
             {
-                _templates = response.Result ?? new List<ClientSelectorMarketTemplateModel>();
+                _templates = (response.Result ?? new List<ClientSelectorMarketTemplateModel>())
+                    .OrderBy(t => t.SportId).ThenBy(t => t.AsiaSortOrder).ToList();
             }
             else
             {

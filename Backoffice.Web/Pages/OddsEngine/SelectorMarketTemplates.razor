@@ -30,7 +30,6 @@
                             @if (!string.IsNullOrEmpty(_selectedClientCode) && _templates != null)
                             {
                                 <div class="col-md-8 d-flex align-items-end justify-content-end">
-                                    <button class="btn btn-primary me-2" @onclick="OnAddRowClickEvent" disabled="@_isProcessing">@_translationState.GetValue("Add Row")</button>
                                     <button class="btn btn-secondary me-2" @onclick="OnOpenCopyModalClickEvent" disabled="@_isProcessing">@_translationState.GetValue("Copy From Client")</button>
                                     <button class="btn btn-success" @onclick="OnSaveClickEvent" disabled="@_isProcessing">@_translationState.GetValue("Save")</button>
                                 </div>
@@ -58,7 +57,7 @@
                 }
                 else if (_templates != null)
                 {
-                    <table class="table table-bordered">
+                    <table class="table table-hover table-bordered">
                         <thead class="table-head">
                             <tr>
                                 <th>@_translationState.GetValue("Sport")</th>
@@ -73,7 +72,7 @@
                         <tbody>
                             @if (_templates.Any())
                             {
-                                @foreach (var row in _templates.OrderBy(t => t.SportId).ThenBy(t => t.AsiaSortOrder).ToList())
+                                @foreach (var row in _templates)
                                 {
                                     <tr>
                                         <td>
@@ -124,6 +123,18 @@
                                 </tr>
                             }
                         </tbody>
+                        @if (_canEdit)
+                        {
+                            <tfoot>
+                                <tr>
+                                    <td colspan="7" class="text-center">
+                                        <button class="btn btn-primary btn-sm" @onclick="OnAddRowClickEvent" disabled="@_isProcessing">
+                                            <i class="fa fa-plus me-1"></i>@_translationState.GetValue("Add Row")
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        }
                     </table>
                 }
             </div>
