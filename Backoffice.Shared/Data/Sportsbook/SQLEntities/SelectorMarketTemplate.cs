@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OE.Shared.Data.Sportsbook.SQLEntities
 {
+    [Table("SelectorMarketTemplate2")]
     public class SelectorMarketTemplate
     {
         public int SportId { get; set; }
