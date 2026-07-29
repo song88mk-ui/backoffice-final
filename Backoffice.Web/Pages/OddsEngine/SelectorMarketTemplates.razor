@@ -57,7 +57,7 @@
                 }
                 else if (_templates != null)
                 {
-                    <table class="table table-hover table-bordered">
+                    <table class="table table-hover table-bordered table-selector-templates">
                         <thead class="table-head">
                             <tr>
                                 <th>@_translationState.GetValue("Sport")</th>
@@ -67,6 +67,7 @@
                                 <th>@_translationState.GetValue("Euro Sort Order")</th>
                                 <th>@_translationState.GetValue("Identifier")</th>
                                 <th></th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -74,10 +75,14 @@
                             {
                                 @foreach (var row in _templates)
                                 {
-                                    <tr>
+                                    <tr @key="row" data-id="@row.RowKey">
                                         <td>
                                             <select class="form-select" value="@row.SportId" @onchange="e => OnRowSportChangedEvent(row, e)" disabled="@(_isProcessing || !_canEdit)">
                                                 <option value="0">-- @_translationState.GetValue("Select sport") --</option>
+                                                @if (row.SportId != 0 && !_sports.Any(s => s.SportId == row.SportId))
+                                                {
+                                                    <option value="@row.SportId" selected>@row.SportId (@_translationState.GetValue("missing from lookup"))</option>
+                                                }
                                                 @foreach (var sport in _sports)
                                                 {
                                                     <option value="@sport.SportId" selected="@(sport.SportId == row.SportId)">@sport.SportName</option>
@@ -87,6 +92,10 @@
                                         <td>
                                             <select class="form-select" value="@row.MarketTemplateId" @onchange="e => OnRowTemplateChangedEvent(row, e)" disabled="@(_isProcessing || !_canEdit || row.SportId == 0)">
                                                 <option value="">-- @_translationState.GetValue("Select template") --</option>
+                                                @if (!string.IsNullOrEmpty(row.MarketTemplateId) && !_templateLookup.Any(t => t.SportId == row.SportId && t.MarketTemplateId == row.MarketTemplateId))
+                                                {
+                                                    <option value="@row.MarketTemplateId" selected>@row.MarketTemplateCode (@row.MarketTemplateId) - @_translationState.GetValue("missing from lookup")</option>
+                                                }
                                                 @foreach (var template in _templateLookup.Where(t => t.SportId == row.SportId).OrderBy(t => t.SortOrder))
                                                 {
                                                     <option value="@template.MarketTemplateId" selected="@(template.MarketTemplateId == row.MarketTemplateId)">@template.MarketTemplateCode (@template.MarketTemplateId)</option>
@@ -106,8 +115,19 @@
                                         <td class="text-center align-middle">
                                             @if (_canEdit)
                                             {
+                                                <a class="link-add insert-row me-2" href="javascript:void(0)" title="@_translationState.GetValue("Insert row below")" @onclick="() => OnInsertRowClickEvent(row)">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
                                                 <a class="link-danger" href="javascript:void(0)" @onclick="() => OnDeleteRowClickEvent(row)">
                                                     <i class="fa fa-trash"></i>
+                                                </a>
+                                            }
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            @if (_canEdit)
+                                            {
+                                                <a href="javascript:void(0);" class="link-bars drag-handle">
+                                                    <i class="fa fa-bars"></i>
                                                 </a>
                                             }
                                         </td>
@@ -117,7 +137,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="7">
+                                    <td colspan="8">
                                         <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                     </td>
                                 </tr>
@@ -127,7 +147,7 @@
                         {
                             <tfoot>
                                 <tr>
-                                    <td colspan="7" class="text-center">
+                                    <td colspan="8" class="text-center">
                                         <button class="btn btn-primary btn-sm" @onclick="OnAddRowClickEvent" disabled="@_isProcessing">
                                             <i class="fa fa-plus me-1"></i>@_translationState.GetValue("Add Row")
                                         </button>
