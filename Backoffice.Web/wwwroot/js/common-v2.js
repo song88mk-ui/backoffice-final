@@ -582,6 +582,29 @@ window.getCurrentSortOrder = (id) => {
     return data;
 }
 
+// Selector Market Templates: drag rows via the .drag-handle column. On drop the DOM move is
+// reverted (sortable('cancel')) and the new order is pushed to Blazor, which re-renders the
+// keyed rows and renumbers the sort orders - keeps the DOM and the render tree in sync.
+window.enableSelectorTemplateSort = (tableSelector, dotnetRef) => {
+    var tbody = tableSelector + ' > tbody';
+
+    $(tbody).sortable({
+        handle: '.drag-handle',
+        placeholder: 'placeholder',
+        stop: function () {
+            var rowKeys = [];
+
+            $(tbody + ' > tr[data-id]').each(function () {
+                rowKeys.push($(this).attr('data-id'));
+            });
+
+            $(this).sortable('cancel');
+
+            dotnetRef.invokeMethodAsync('UpdateSelectorTemplateOrder', rowKeys);
+        },
+    });
+}
+
 
 window.setCookie = (name, value, days) => {
     let expires = "";

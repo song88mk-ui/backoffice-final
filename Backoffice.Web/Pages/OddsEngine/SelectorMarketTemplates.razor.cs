@@ -2,10 +2,11 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class SelectorMarketTemplates
+    public partial class SelectorMarketTemplates : IDisposable
     {
         #region Fields
 
@@ -13,6 +14,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isProcessing;
         private bool _canEdit;
         private bool _showCopyModal;
+        private bool _sortInitialized;
+        private DotNetObjectReference<SelectorMarketTemplates> _dotNetRef;
         private string _selectedClientCode;
         private string _copyFromClientCode;
         private PageHeaderModel _pageHeaderModel;
@@ -95,6 +98,37 @@ namespace Backoffice.Web.Pages.OddsEngine
             await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (_canEdit && !_sortInitialized && _templates != null && _templates.Any())
+            {
+                _sortInitialized = true;
+                _dotNetRef ??= DotNetObjectReference.Create(this);
+                await _jsRuntime.InvokeVoidAsync("enableSelectorTemplateSort", ".table-selector-templates", _dotNetRef);
+            }
+        }
+
+        [JSInvokable]
+        public async Task UpdateSelectorTemplateOrder(List<string> rowKeys)
+        {
+            if (_templates == null || rowKeys == null || !rowKeys.Any())
+                return;
+
+            var ordered = rowKeys
+                .Select(key => _templates.FirstOrDefault(t => t.RowKey.ToString() == key))
+                .Where(t => t != null)
+                .ToList();
+
+            // A mismatch means the DOM and the model diverged; keep the model untouched.
+            if (ordered.Count != _templates.Count)
+                return;
+
+            _templates = ordered;
+            RenumberSortOrders();
+
+            await InvokeAsync(StateHasChanged);
+        }
+
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
             _selectedClientCode = e.Value?.ToString();
@@ -122,9 +156,30 @@ namespace Backoffice.Web.Pages.OddsEngine
             });
         }
 
+        public void OnInsertRowClickEvent(ClientSelectorMarketTemplateModel row)
+        {
+            var index = _templates.IndexOf(row);
+            if (index < 0)
+                return;
+
+            _templates.Insert(index + 1, new ClientSelectorMarketTemplateModel
+            {
+                SportId = row.SportId,
+                MarketTemplateId = string.Empty,
+                MarketTemplateCode = string.Empty,
+                AsiaSortOrder = row.AsiaSortOrder + 1,
+                EuroSortOrder = row.EuroSortOrder + 1,
+                Identifier = row.Identifier
+            });
+
+            RenumberSortOrders();
+        }
+
         public void OnDeleteRowClickEvent(ClientSelectorMarketTemplateModel row)
         {
             _templates.Remove(row);
+
+            RenumberSortOrders();
         }
 
         public void OnRowSportChangedEvent(ClientSelectorMarketTemplateModel row, ChangeEventArgs e)
@@ -270,9 +325,31 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
+        public void Dispose()
+        {
+            _dotNetRef?.Dispose();
+        }
+
         #endregion
 
         #region Utilities
+
+        // Both sort orders are renumbered 1..n per sport to follow the visual row order, so a
+        // reorder, insert or delete never leaves gaps or duplicates behind. Only called from the
+        // row mutations - loading a client must preserve whatever is stored.
+        private void RenumberSortOrders()
+        {
+            foreach (var sportGroup in _templates.GroupBy(t => t.SportId))
+            {
+                var sortOrder = 1;
+                foreach (var row in sportGroup)
+                {
+                    row.AsiaSortOrder = sortOrder;
+                    row.EuroSortOrder = sortOrder;
+                    sortOrder++;
+                }
+            }
+        }
 
         private async Task LoadTemplates()
         {
@@ -281,6 +358,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                 return;
 
             _isPreLoader = true;
+            // The preloader replaces the table while loading, so the sortable has to be re-attached
+            // to the rebuilt tbody on the next render.
+            _sortInitialized = false;
 
             var response = await _backofficeService.GetClientSelectorMarketTemplates(client.ClientId);
 

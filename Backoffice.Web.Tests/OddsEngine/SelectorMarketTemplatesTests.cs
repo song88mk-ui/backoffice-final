@@ -103,6 +103,8 @@ namespace Backoffice.Web.Tests.OddsEngine
                 });
 
             // Returned deliberately unsorted: LoadTemplates must order by sport then Asia sort order.
+            // Euro sort orders are deliberately unrelated to the Asia ones so the renumbering tests
+            // can tell "renumbered to follow the row order" apart from "left untouched".
             _backofficeService
                 .Setup(s => s.GetClientSelectorMarketTemplates(ClientId))
                 .ReturnsAsync(new BaseResponse<List<ClientSelectorMarketTemplateModel>>
@@ -110,12 +112,19 @@ namespace Backoffice.Web.Tests.OddsEngine
                     StatusCode = StatusCode.Success,
                     Result = new List<ClientSelectorMarketTemplateModel>
                     {
-                        new ClientSelectorMarketTemplateModel { SportId = 2, MarketTemplateId = "2001", MarketTemplateCode = "HDP", AsiaSortOrder = 1, EuroSortOrder = 1, Identifier = "FT" },
-                        new ClientSelectorMarketTemplateModel { SportId = 1, MarketTemplateId = "1002", MarketTemplateCode = "O/U", AsiaSortOrder = 2, EuroSortOrder = 2, Identifier = "FT" },
-                        new ClientSelectorMarketTemplateModel { SportId = 1, MarketTemplateId = "1001", MarketTemplateCode = "ML", AsiaSortOrder = 1, EuroSortOrder = 1, Identifier = "FT" }
+                        new ClientSelectorMarketTemplateModel { SportId = 2, MarketTemplateId = "2001", MarketTemplateCode = "HDP", AsiaSortOrder = 1, EuroSortOrder = 7, Identifier = "FT" },
+                        new ClientSelectorMarketTemplateModel { SportId = 1, MarketTemplateId = "1002", MarketTemplateCode = "O/U", AsiaSortOrder = 2, EuroSortOrder = 8, Identifier = "FT" },
+                        new ClientSelectorMarketTemplateModel { SportId = 1, MarketTemplateId = "1001", MarketTemplateCode = "ML", AsiaSortOrder = 1, EuroSortOrder = 9, Identifier = "FT" }
                     }
                 });
         }
+
+        // Asia is the first number input of a row, Euro the second.
+        private static List<string?> AsiaSortOrders(IEnumerable<AngleSharp.Dom.IElement> rows) =>
+            rows.Select(r => r.QuerySelectorAll("input[type=number]")[0].GetAttribute("value")).ToList();
+
+        private static List<string?> EuroSortOrders(IEnumerable<AngleSharp.Dom.IElement> rows) =>
+            rows.Select(r => r.QuerySelectorAll("input[type=number]")[1].GetAttribute("value")).ToList();
 
         private IRenderedComponent<SelectorMarketTemplates> RenderPageWithClientSelected()
         {
@@ -140,6 +149,9 @@ namespace Backoffice.Web.Tests.OddsEngine
 
             var templateCodes = rows.Select(r => r.QuerySelectorAll("td")[2].TextContent.Trim()).ToList();
             Assert.Equal(new[] { "ML", "O/U", "HDP" }, templateCodes);
+
+            // Loading must not renumber: the stored Euro sort orders survive untouched.
+            Assert.Equal(new[] { "9", "8", "7" }, EuroSortOrders(rows));
         }
 
         [Fact]
@@ -156,6 +168,108 @@ namespace Backoffice.Web.Tests.OddsEngine
             // would jump to the top of the table.
             var sportValues = rows.Select(r => r.QuerySelector("select")!.GetAttribute("value")).ToList();
             Assert.Equal(new[] { "1", "1", "2", "0" }, sportValues);
+        }
+
+        [Fact]
+        public void InsertRowBelowPrefillsSportAndRenumbersSortOrders()
+        {
+            var cut = RenderPageWithClientSelected();
+
+            // Insert below the first row (sport 1, ML, Asia 1).
+            cut.FindAll("tbody .insert-row")[0].Click();
+
+            var rows = cut.FindAll("tbody tr");
+            Assert.Equal(4, rows.Count);
+
+            // New row sits directly under its source with the same sport and no template yet.
+            var newRow = rows[1];
+            Assert.Equal("1", newRow.QuerySelector("select")!.GetAttribute("value"));
+            Assert.Equal("", newRow.QuerySelectorAll("select")[1].GetAttribute("value"));
+
+            // Both sort orders renumbered 1..n within each sport: ML, new, O/U then HDP.
+            Assert.Equal(new[] { "1", "2", "3", "1" }, AsiaSortOrders(rows));
+            Assert.Equal(new[] { "1", "2", "3", "1" }, EuroSortOrders(rows));
+        }
+
+        [Fact]
+        public async Task UpdateSelectorTemplateOrderReordersRowsAndRenumbersPerSport()
+        {
+            var cut = RenderPageWithClientSelected();
+
+            var rowKeys = cut.FindAll("tbody tr").Select(r => r.GetAttribute("data-id")!).ToList();
+            rowKeys.Reverse();
+
+            await cut.InvokeAsync(() => cut.Instance.UpdateSelectorTemplateOrder(rowKeys));
+
+            var rows = cut.FindAll("tbody tr");
+            var templateCodes = rows.Select(r => r.QuerySelectorAll("td")[2].TextContent.Trim()).ToList();
+            Assert.Equal(new[] { "HDP", "O/U", "ML" }, templateCodes);
+
+            // Both sort orders renumbered by the new visual order within each sport:
+            // sport 2 (HDP) -> 1; sport 1 (O/U, ML) -> 1, 2.
+            Assert.Equal(new[] { "1", "1", "2" }, AsiaSortOrders(rows));
+            Assert.Equal(new[] { "1", "1", "2" }, EuroSortOrders(rows));
+        }
+
+        [Fact]
+        public void DeletingARowRenumbersTheRemainingSortOrders()
+        {
+            // Three rows in one sport so removing the middle one leaves a gap unless renumbered.
+            _backofficeService
+                .Setup(s => s.GetClientSelectorMarketTemplates(ClientId))
+                .ReturnsAsync(new BaseResponse<List<ClientSelectorMarketTemplateModel>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new List<ClientSelectorMarketTemplateModel>
+                    {
+                        new ClientSelectorMarketTemplateModel { SportId = 1, MarketTemplateId = "1001", MarketTemplateCode = "ML", AsiaSortOrder = 1, EuroSortOrder = 7, Identifier = "FT" },
+                        new ClientSelectorMarketTemplateModel { SportId = 1, MarketTemplateId = "1002", MarketTemplateCode = "O/U", AsiaSortOrder = 2, EuroSortOrder = 8, Identifier = "FT" },
+                        new ClientSelectorMarketTemplateModel { SportId = 1, MarketTemplateId = "1003", MarketTemplateCode = "HTFT", AsiaSortOrder = 3, EuroSortOrder = 9, Identifier = "FT" }
+                    }
+                });
+
+            var cut = RenderPageWithClientSelected();
+
+            cut.FindAll("tbody .link-danger")[1].Click();
+
+            var rows = cut.FindAll("tbody tr");
+            Assert.Equal(2, rows.Count);
+
+            var templateCodes = rows.Select(r => r.QuerySelectorAll("td")[2].TextContent.Trim()).ToList();
+            Assert.Equal(new[] { "ML", "HTFT" }, templateCodes);
+
+            // No gap left behind where O/U was.
+            Assert.Equal(new[] { "1", "2" }, AsiaSortOrders(rows));
+            Assert.Equal(new[] { "1", "2" }, EuroSortOrders(rows));
+        }
+
+        [Fact]
+        public void SavedValuesMissingFromLookupsRenderFallbackOptions()
+        {
+            _backofficeService
+                .Setup(s => s.GetClientSelectorMarketTemplates(ClientId))
+                .ReturnsAsync(new BaseResponse<List<ClientSelectorMarketTemplateModel>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new List<ClientSelectorMarketTemplateModel>
+                    {
+                        new ClientSelectorMarketTemplateModel { SportId = 99, MarketTemplateId = "9999", MarketTemplateCode = "XX", AsiaSortOrder = 1, EuroSortOrder = 1, Identifier = "HT" }
+                    }
+                });
+
+            var cut = RenderPageWithClientSelected();
+
+            var row = cut.FindAll("tbody tr")[0];
+
+            var sportOptions = row.QuerySelectorAll("select")[0].QuerySelectorAll("option");
+            var sportFallback = sportOptions.FirstOrDefault(o => o.GetAttribute("value") == "99");
+            Assert.NotNull(sportFallback);
+            Assert.Contains("missing from lookup", sportFallback!.TextContent);
+
+            var templateOptions = row.QuerySelectorAll("select")[1].QuerySelectorAll("option");
+            var templateFallback = templateOptions.FirstOrDefault(o => o.GetAttribute("value") == "9999");
+            Assert.NotNull(templateFallback);
+            Assert.Contains("XX (9999)", templateFallback!.TextContent);
         }
 
         [Fact]
