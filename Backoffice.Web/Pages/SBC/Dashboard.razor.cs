@@ -72,7 +72,7 @@ namespace Backoffice.Web.Pages.SBC
             {
                 Search = "",
                 Page = 1,
-                PageSize = 25,
+                PageSize = 10000,
                 SortBy = (ClientSorting)0
             };
             var response = await BackofficeService.GetClientList(request);
