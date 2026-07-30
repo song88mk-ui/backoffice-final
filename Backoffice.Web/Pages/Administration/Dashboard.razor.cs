@@ -68,18 +68,38 @@ namespace Backoffice.Web.Pages.Administration
 
         private async Task<List<string>> GetClientCodeList()
         {
-            var request = new GetClientListRequest
-            {
-                Search = "",
-                Page = 1,
-                PageSize = 10000,
-                SortBy = (ClientSorting)0
-            };
-            var response = await BackofficeService.GetClientList(request);
-            if (response.StatusCode != StatusCode.Success || response.Result?.Clients == null)
-                return new List<string>();
+            var allClientCodes = new List<string>();
+            var page = 1;
+            const int pageSize = 25;
 
-            return response.Result.Clients.Select(c => c.ClientCode).ToList();
+            while (true)
+            {
+                var request = new GetClientListRequest
+                {
+                    Search = "",
+                    Page = page,
+                    PageSize = pageSize,
+                    SortBy = (ClientSorting)0
+                };
+
+                var response = await BackofficeService.GetClientList(request);
+
+                if (response.StatusCode != StatusCode.Success ||
+                    response.Result?.Clients == null ||
+                    !response.Result.Clients.Any())
+                    break;
+
+                allClientCodes.AddRange(
+                    response.Result.Clients.Select(c => c.ClientCode)
+                );
+
+                if (response.Result.Clients.Count < pageSize)
+                    break;
+
+                page++;
+            }
+
+            return allClientCodes;
         }
 
         private async Task LoadEmbedData()
