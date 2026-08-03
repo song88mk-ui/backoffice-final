@@ -79,8 +79,8 @@ namespace Backoffice.Web.Pages.Administration
                 _hasChange = false;
                 _clients = await LoadClients();
 
-                _liveClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == false).Select(c => c.ClientName).ToList();
-                _underMaintenanceClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == true).Select(c => c.ClientName).ToList();
+                _liveClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == false).Select(DisplayName).ToList();
+                _underMaintenanceClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == true).Select(DisplayName).ToList();
 
                 _isAllClient = (_underMaintenanceClients.Any() && !_liveClients.Any()) || (!_underMaintenanceClients.Any() && _liveClients.Any());
                 _isDropDownDisabled = _underMaintenanceClients.Any();
@@ -178,6 +178,12 @@ namespace Backoffice.Web.Pages.Administration
         private void HandleCancel() => LoadPage();
 
         private List<MaintenanceConfigModel> _maintenanceConfigModels = new List<MaintenanceConfigModel>();
+
+        // A client can be listed once per app/layout; prefix duplicates with the app
+        // (same convention as the selection dropdown) so banner chips are unambiguous.
+        private string DisplayName(MaintenanceConfigModel e) =>
+            _maintenanceConfigModels.Count(c => c.ClientId == e.ClientId) > 1 ? $"{e.App}-{e.ClientName}" : $"{e.ClientName}";
+
         private async Task<List<MaintenanceSelectListItemWithCheckboxModel>> LoadClients()
         {
             var response = await _backofficeService.GetMaintenanceV2();
@@ -194,7 +200,7 @@ namespace Backoffice.Web.Pages.Administration
                     new MaintenanceSelectListItemWithCheckboxModel()
                     {
                         IsChecked = e.IsMaintenance,
-                        Name = _maintenanceConfigModels.Count(c => c.ClientId == e.ClientId) > 1 ? $"{e.App}-{e.ClientName.ToString()}" : $"{e.ClientName.ToString()}",
+                        Name = DisplayName(e),
                         Value = _maintenanceConfigModels.Count(c => c.ClientId == e.ClientId) > 1 ? $"{e.App}:{e.ClientId.ToString()}" : $"{e.ClientId.ToString()}",
                         IsMaintenanceEnabled = e.IsMaintenance
                     }).ToList();

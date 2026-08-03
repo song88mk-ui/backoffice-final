@@ -103,39 +103,39 @@ namespace Backoffice.API.Repositories
 
                         _logger.LogInformation($"[GetMaintenanceV2] app={app} configs count={configs.Count}");
 
-                        var matchedClientIds = new HashSet<Guid>();
+                        // The exposed ClientId is always the platform client Guid: it is the
+                        // identifier the sportsbook frontends pass to webprops, so flags must
+                        // live in {LAYOUT}/{GUID}.json to take effect. Legacy code-keyed objects
+                        // are still read (matched by ClientCode) but a Guid-keyed object for the
+                        // same client wins, and SetMaintenanceV2 only ever writes Guid-keyed ones.
+                        var matched = new Dictionary<Guid, (ExternalMaintenanceConfig Config, bool IsGuidKeyed)>();
 
                         foreach (var config in configs)
                         {
-                            // webprops S3 objects may be keyed by client code or by platform client id
                             var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase)
                                                     || (c.ClientCode?.Equals(config.ClientId, StringComparison.OrdinalIgnoreCase) ?? false));
 
                             if (reference == null)
                                 continue;
 
-                            matchedClientIds.Add(reference.ClientId);
-                            clientsConfig.Add(new MaintenanceConfigModel()
-                            {
-                                ClientId = config.ClientId,
-                                IsMaintenance = config.IsMaintenance,
-                                Site = config.Site,
-                                ClientCode = reference.ClientCode,
-                                ClientName = reference.ClientName,
-                                App = app
-                            });
+                            var isGuidKeyed = reference.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase);
+
+                            if (!matched.TryGetValue(reference.ClientId, out var existing) || (isGuidKeyed && !existing.IsGuidKeyed))
+                                matched[reference.ClientId] = (config, isGuidKeyed);
                         }
 
-                        // Clients with no config object under this layout yet are still listed
-                        // (IsMaintenance=false) so operators can toggle them; SetMaintenanceV2
-                        // creates the missing object on demand.
-                        foreach (var client in clientReference.Where(c => !matchedClientIds.Contains(c.ClientId)))
+                        foreach (var client in clientReference)
                         {
+                            var hasMatch = matched.TryGetValue(client.ClientId, out var entry);
+
+                            // Clients with no config object under this layout yet are still listed
+                            // (IsMaintenance=false) so operators can toggle them; SetMaintenanceV2
+                            // creates the missing object on demand.
                             clientsConfig.Add(new MaintenanceConfigModel()
                             {
-                                ClientId = client.ClientCode,
-                                IsMaintenance = false,
-                                Site = string.Empty,
+                                ClientId = client.ClientId.ToString().ToUpper(),
+                                IsMaintenance = hasMatch && entry.Config.IsMaintenance,
+                                Site = hasMatch ? entry.Config.Site : string.Empty,
                                 ClientCode = client.ClientCode,
                                 ClientName = client.ClientName,
                                 App = app
@@ -200,27 +200,25 @@ namespace Backoffice.API.Repositories
                     foreach (var appGroup in appGroups)
                     {
                         var app = appGroup.Key;
-                        var isAll = requestClientIds.Count() == 1 && requestClientIds.FirstOrDefault().ToUpper() == "ALL";
 
                         try
                         {
-                            if (!isAll)
+                            // webprops setMaintenance fails on clients with no config object under
+                            // the layout, so create missing objects first (idempotent: existing
+                            // objects are left untouched). This also applies to "ALL": webprops'
+                            // own "all" only flips clients whose objects already exist, so the
+                            // explicit id list is always sent instead.
+                            var existing = await FetchLayoutConfigsAsync(app, activity) ?? new List<ExternalMaintenanceConfig>();
+
+                            foreach (var clientId in appGroup.Select(c => c.ClientId))
                             {
-                                // webprops setMaintenance fails on clients with no config object under
-                                // the layout, so create missing objects first (idempotent: existing
-                                // objects are left untouched).
-                                var existing = await FetchLayoutConfigsAsync(app, activity) ?? new List<ExternalMaintenanceConfig>();
+                                if (existing.Any(e => e.ClientId?.Equals(clientId, StringComparison.OrdinalIgnoreCase) ?? false))
+                                    continue;
 
-                                foreach (var clientId in appGroup.Select(c => c.ClientId))
-                                {
-                                    if (existing.Any(e => e.ClientId?.Equals(clientId, StringComparison.OrdinalIgnoreCase) ?? false))
-                                        continue;
-
-                                    await CreateLayoutClientConfigAsync(app, clientId, activity);
-                                }
+                                await CreateLayoutClientConfigAsync(app, clientId, activity);
                             }
 
-                            var clientIds = isAll ? "all" : string.Join(",", appGroup.Select(c => c.ClientId));
+                            var clientIds = string.Join(",", appGroup.Select(c => c.ClientId));
 
                             var stringPayload = JsonSerializer.Serialize(new
                             {
