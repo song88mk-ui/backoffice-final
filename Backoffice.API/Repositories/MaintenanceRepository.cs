@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -29,8 +28,6 @@ namespace Backoffice.API.Repositories
         private readonly ILogger<MaintenanceRepository> _logger;
 
         private readonly List<string>? _maintenanceApps;
-        private readonly string _maintenanceConfigJson;
-        private readonly string _maintenanceConfigJsonTest;
 
 
         public MaintenanceRepository(HttpClient httpClient, IConfiguration configuration, IPlatformRepository platformRepository,
@@ -42,8 +39,6 @@ namespace Backoffice.API.Repositories
             _activitySource = instrumentation.ActivitySource;
             _logger = logger;
 
-            _maintenanceConfigJson = configuration["Custom:MaintenanceConfigFile"];
-            _maintenanceConfigJsonTest = configuration["Custom:MaintenanceConfigFileTest"];
             _maintenanceApps = configuration["Maintenance:Apps"]?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.Select(s => s.Trim().ToUpper()).ToList() ?? null;
             _maintenanceHttpClient = httpClient;
         }
@@ -93,90 +88,57 @@ namespace Backoffice.API.Repositories
 
                     foreach (var app in _maintenanceApps)
                     {
-                        var configs = new List<ExternalMaintenanceConfig>();
-
                         _logger.LogInformation($"[GetMaintenanceV2] Processing app={app}");
 
-                        if (app.Equals("bl", StringComparison.OrdinalIgnoreCase))
+                        var configs = new List<ExternalMaintenanceConfig>();
+
+                        try
                         {
-                            var tempConfigs = new List<ExternalMaintenanceConfig>();
-                            using (StreamReader reader = new StreamReader(_maintenanceConfigJson))
-                            {
-                                string text = await reader.ReadToEndAsync();
-
-                                tempConfigs = JsonSerializer.Deserialize<List<ExternalMaintenanceConfig>>(text);
-                            }
-
-                            _logger.LogInformation($"[GetMaintenanceV2] bl file configs count={tempConfigs?.Count ?? -1}");
-
-                            if (tempConfigs != null && tempConfigs.Any())
-                                configs.AddRange(tempConfigs);
+                            configs = await FetchLayoutConfigsAsync(app, activity) ?? new List<ExternalMaintenanceConfig>();
                         }
-                        else
+                        catch (Exception e)
                         {
-                            try
-                            {
-                                var response = await _maintenanceHttpClient.GetAsync($"/v1.0/invoke/{app.ToLower()}/method/maintenance");
-                                var content = await response.Content.ReadAsStringAsync();
-
-                                _logger.LogInformation($"[GetMaintenanceV2] Dapr app={app} status={response.StatusCode}");
-
-                                if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                                {
-                                    activity?.SetTag("app", app);
-                                    activity?.SetTag("status", response.StatusCode.ToString());
-                                    activity?.SetTag("events", content);
-                                    continue;
-                                }
-
-                                var externalContent = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-
-                                configs.AddRange(externalContent.Config);
-                            }
-                            catch (Exception e)
-                            {
-                                _logger.LogError($"[GetMaintenanceV2] Dapr error app={app}: {e.Message}");
-                            }
+                            _logger.LogError($"[GetMaintenanceV2] webprops error app={app}: {e.Message}");
                         }
 
-                        _logger.LogInformation($"[GetMaintenanceV2] app={app} configs count={configs?.Count ?? -1}");
+                        _logger.LogInformation($"[GetMaintenanceV2] app={app} configs count={configs.Count}");
 
-                        if (configs != null && configs.Any())
+                        var matchedClientIds = new HashSet<Guid>();
+
+                        foreach (var config in configs)
                         {
-                            foreach (var config in configs)
+                            // webprops S3 objects may be keyed by client code or by platform client id
+                            var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase)
+                                                    || (c.ClientCode?.Equals(config.ClientId, StringComparison.OrdinalIgnoreCase) ?? false));
+
+                            if (reference == null)
+                                continue;
+
+                            matchedClientIds.Add(reference.ClientId);
+                            clientsConfig.Add(new MaintenanceConfigModel()
                             {
-                                var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase));
-
-                                if (reference == null)
-                                    continue;
-
-                                clientsConfig.Add(new MaintenanceConfigModel()
-                                {
-                                    ClientId = config.ClientId,
-                                    IsMaintenance = config.IsMaintenance,
-                                    Site = config.Site,
-                                    ClientCode = reference.ClientCode,
-                                    ClientName = reference.ClientName,
-                                    App = app
-                                });
-                            }
+                                ClientId = config.ClientId,
+                                IsMaintenance = config.IsMaintenance,
+                                Site = config.Site,
+                                ClientCode = reference.ClientCode,
+                                ClientName = reference.ClientName,
+                                App = app
+                            });
                         }
-                    }
 
-                    // If no app returned any config entries, seed from Platform clients
-                    // so the dropdown is populated for first-time setup
-                    if (!clientsConfig.Any() && clientReference.Any())
-                    {
-                        foreach (var client in clientReference)
+                        // Clients with no config object under this layout yet are still listed
+                        // (IsMaintenance=false) so operators can toggle them; SetMaintenanceV2
+                        // creates the missing object on demand.
+                        foreach (var client in clientReference.Where(c => !matchedClientIds.Contains(c.ClientId)))
                         {
                             clientsConfig.Add(new MaintenanceConfigModel()
                             {
-                                ClientId = client.ClientId.ToString(),
+                                ClientId = client.ClientCode,
                                 IsMaintenance = false,
                                 Site = string.Empty,
                                 ClientCode = client.ClientCode,
                                 ClientName = client.ClientName,
-                                App = "BL"
+                                App = app
                             });
                         }
                     }
@@ -237,76 +199,58 @@ namespace Backoffice.API.Repositories
 
                     foreach (var appGroup in appGroups)
                     {
-                        var app = appGroup.Key.ToLower();
-                        var clientIds = (requestClientIds.Count() == 1 && requestClientIds.FirstOrDefault().ToUpper() == "ALL") ? "all" : string.Join(",", appGroup.Select(c => c.ClientId));
+                        var app = appGroup.Key;
+                        var isAll = requestClientIds.Count() == 1 && requestClientIds.FirstOrDefault().ToUpper() == "ALL";
 
-
-                        if (app.Equals("bl", StringComparison.OrdinalIgnoreCase))
+                        try
                         {
-                            var configs = new List<ExternalMaintenanceConfig>();
-                            if (clientIds.Equals("ALL", StringComparison.OrdinalIgnoreCase))
+                            if (!isAll)
                             {
-                                if (appGroup != null)
-                                {
-                                    configs = referenceClients.Where(c => c.App.Equals("bl", StringComparison.OrdinalIgnoreCase)).Select(c => new ExternalMaintenanceConfig()
-                                    {
-                                        ClientId = c.ClientId,
-                                        IsMaintenance = request.IsMaintenance,
-                                        Site = c.Site
-                                    }).ToList();
-                                }
-                            }
-                            else
-                            {
-                                // Default all to false — only the selected clients get request.IsMaintenance
-                                configs = referenceClients.Where(c => c.App.Equals("bl", StringComparison.OrdinalIgnoreCase)).Select(c => new ExternalMaintenanceConfig()
-                                {
-                                    ClientId = c.ClientId,
-                                    IsMaintenance = false,
-                                    Site = c.Site
-                                }).ToList();
+                                // webprops setMaintenance fails on clients with no config object under
+                                // the layout, so create missing objects first (idempotent: existing
+                                // objects are left untouched).
+                                var existing = await FetchLayoutConfigsAsync(app, activity) ?? new List<ExternalMaintenanceConfig>();
 
-                                if (configs != null)
+                                foreach (var clientId in appGroup.Select(c => c.ClientId))
                                 {
-                                    configs.ForEach(config =>
-                                    {
-                                        if (clientIds.Contains(config.ClientId, StringComparison.OrdinalIgnoreCase))
-                                            config.IsMaintenance = request.IsMaintenance;
-                                    });
+                                    if (existing.Any(e => e.ClientId?.Equals(clientId, StringComparison.OrdinalIgnoreCase) ?? false))
+                                        continue;
+
+                                    await CreateLayoutClientConfigAsync(app, clientId, activity);
                                 }
                             }
 
-                            if (configs != null && configs.Any())
-                            {
-                                using (FileStream fs = new FileStream(_maintenanceConfigJson, FileMode.Create, FileAccess.Write, FileShare.None))
-                                using (StreamWriter writer = new StreamWriter(fs))
-                                {
-                                    var configText = JsonSerializer.Serialize(configs, new JsonSerializerOptions
-                                    {
-                                        WriteIndented = true
-                                    });
-                                    writer.Write(configText);
-                                }
-                            }
-                        }
-                        else
-                        {
+                            var clientIds = isAll ? "all" : string.Join(",", appGroup.Select(c => c.ClientId));
+
                             var stringPayload = JsonSerializer.Serialize(new
                             {
                                 ClientIds = clientIds,
                                 request.IsMaintenance
-                            }); 
+                            });
 
-                            var result = await _maintenanceHttpClient.PostAsync($"/v1.0/invoke/{app}/method/maintenance", new StringContent(stringPayload, Encoding.UTF8, "application/json"));
-
-                            if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                            using (var maintenanceRequest = new HttpRequestMessage(HttpMethod.Post, "/api/v1/maintenance")
                             {
-                                var content = await result.Content.ReadAsStringAsync();
-                                activity?.SetTag("app", app);
-                                activity?.SetTag("status", result.StatusCode.ToString());
-                                activity?.SetTag("payload", stringPayload);
-                                activity?.SetTag("content", content);
+                                Content = new StringContent(stringPayload, Encoding.UTF8, "application/json")
+                            })
+                            {
+                                maintenanceRequest.Headers.Add("x-layout", app);
+
+                                var result = await _maintenanceHttpClient.SendAsync(maintenanceRequest);
+
+                                if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                                {
+                                    var content = await result.Content.ReadAsStringAsync();
+                                    _logger.LogError($"[SetMaintenanceV2] webprops set failed app={app} status={result.StatusCode} content={content}");
+                                    activity?.SetTag("app", app);
+                                    activity?.SetTag("status", result.StatusCode.ToString());
+                                    activity?.SetTag("payload", stringPayload);
+                                    activity?.SetTag("content", content);
+                                }
                             }
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError($"[SetMaintenanceV2] webprops error app={app}: {e.Message}");
                         }
                     }
 
@@ -335,6 +279,61 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Utilities
+        private async Task<List<ExternalMaintenanceConfig>> FetchLayoutConfigsAsync(string app, System.Diagnostics.Activity activity)
+        {
+            using (var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/maintenance"))
+            {
+                request.Headers.Add("x-layout", app);
+
+                var response = await _maintenanceHttpClient.SendAsync(request);
+                var content = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    _logger.LogError($"[FetchLayoutConfigs] app={app} status={response.StatusCode} content={content}");
+                    activity?.SetTag("app", app);
+                    activity?.SetTag("status", response.StatusCode.ToString());
+                    activity?.SetTag("events", content);
+                    return null;
+                }
+
+                // webprops-api returns a bare JSON array: [{"clientId":...,"isMaintenance":...,"site":...}]
+                return JsonSerializer.Deserialize<List<ExternalMaintenanceConfig>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            }
+        }
+
+        private async Task CreateLayoutClientConfigAsync(string app, string clientId, System.Diagnostics.Activity activity)
+        {
+            var stringPayload = JsonSerializer.Serialize(new
+            {
+                clientId = clientId,
+                site = string.Empty,
+                isMaintenance = false
+            });
+
+            using (var request = new HttpRequestMessage(HttpMethod.Post, $"/api/v1/config/{clientId}")
+            {
+                Content = new StringContent(stringPayload, Encoding.UTF8, "application/json")
+            })
+            {
+                request.Headers.Add("x-layout", app);
+
+                var response = await _maintenanceHttpClient.SendAsync(request);
+
+                if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"[CreateLayoutClientConfig] app={app} clientId={clientId} status={response.StatusCode} content={content}");
+                    activity?.SetTag("create.app", app);
+                    activity?.SetTag("create.clientId", clientId);
+                    activity?.SetTag("create.status", response.StatusCode.ToString());
+                }
+                else
+                {
+                    _logger.LogInformation($"[CreateLayoutClientConfig] created config for app={app} clientId={clientId}");
+                }
+            }
+        }
         #endregion
     }
 }

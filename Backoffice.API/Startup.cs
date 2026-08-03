@@ -103,10 +103,12 @@ namespace Backoffice.API
 
             services.AddHttpClient<IRabbitMqRepository, RabbitMqRepository>();
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
+            // Maintenance flags live in webprops-api (S3-backed); the legacy bo-maintenance-api
+            // Dapr router is gone, so the maintenance client targets webprops directly.
             services.AddHttpClient<IMaintenanceRepository, MaintenanceRepository>(client =>
             {
-                client.BaseAddress = new Uri(Configuration["API:Maintenance:Uri"]);
-                client.DefaultRequestHeaders.Add("x-api-key", "API:Maintenance:Security:ApiKey");
+                client.BaseAddress = new Uri(Configuration["API:WebProps:Uri"]);
+                client.DefaultRequestHeaders.Add("x-api-key", Configuration["API:WebProps:Security:ApiKey"]);
             });
             services.AddHttpClient<IWebPropsRepository, WebPropsRepository>(client =>
             {

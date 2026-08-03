@@ -124,6 +124,20 @@ Deliberately mirrors, rather than upgrades, Static Translation's existing "Expor
 
 ---
 
+## Maintenance Page — Dead `bl` Local-File Branch Broke the Whole Fan-Out (BO-2)
+
+**Date noted:** August 3, 2026 (fixed same date under BO-2)
+
+**Issue:** `GET/POST api/config/maintenance` failed on Staging (and, by identical config, Production) with `Could not find a part of the path '/app/Configs/maintenance.json'`, which the MaintenanceV2 page surfaced as an empty/broken client dropdown ("works on my local, not on staging", BO-2). Root cause: `MaintenanceRepository` fanned out over `Maintenance:Apps` = `el1, el2, el3, al, el4, bl`; the five layout apps go through the Dapr-style invoke (`/v1.0/invoke/{app}/method/maintenance`, each guarded by its own try/catch), but `bl` read/wrote a **local file** `Configs/maintenance.json` on the BO API pod with no existence check and no per-app isolation — the thrown exception hit the outer catch and discarded the results of all other apps. The file was never shipped (no `Configs/` folder in the repo, no csproj copy rule, no volume mount in argocd stg/prd), so the `bl` path could never work in a deployed container. Even if it had, the write went to the pod's ephemeral local disk that no other service reads — the frontends read their **own** local `Configs/maintenance.json` on their own pods — so the `bl` branch was dead functionality, not just broken.
+
+**Resolved:** removed the `bl` special-case from `GetMaintenanceV2`/`SetMaintenanceV2` (all apps now go through the uniformly-guarded Dapr path), dropped `bl` from `Maintenance:Apps` and the dead `Custom:MaintenanceConfigFile` key in `appsettings.json`, and changed the first-time-setup seeding fallback to use the first configured app instead of hardcoded `"BL"`. Also fixed the related Startup.cs literal api-key bug (item 18 below). Covered by `Backoffice.API.Tests/Maintenance/MaintenanceRepositoryTests.cs` (per-app fault isolation, seeding fallback, upstream-failure passthrough, Set fan-out payload).
+
+**Residual unknowns:** the source of `bo-maintenance-api` (the Dapr-style router the BO API calls, `API:Maintenance:Uri`) is not in any sibling repo, and whether it validates the `x-api-key` header is unverified. What the `el1–el4`/`al` apps return on Staging can only be confirmed after this fix is deployed.
+
+**Follow-up (same ticket, August 2026) — migrated to webprops-api:** `bo-maintenance-api` was confirmed no longer deployed (absent from every argocd app list; its source exists in no sibling repo; the frontends never exposed the `/maintenance` endpoints it would have routed to — platform-web's `MaintenanceReponseDTO`/`SetMaintenanceRequestDTO` are dead code). `MaintenanceRepository` now targets webprops-api directly (`API:WebProps:Uri`, already configured in argocd stg/prd, so **no argocd change was needed**): `GET/POST /api/v1/maintenance` with `X-Layout: {app}` per configured app, bare-array response parsing, matching S3 clientIds by client code or platform Guid. Missing `{LAYOUT}/{CLIENTID}.json` objects are created on demand (stub via `POST /api/v1/config/{code}` with `X-Layout`) before setting a flag — idempotent by design. `GetMaintenanceV2` union-seeds clients without config objects (per app, `IsMaintenance=false`) so the page is fully operable from an empty bucket. Remaining gap: no frontend consumes webprops maintenance flags yet (see `docs/15_ReferenceRepositories.md`); `ALL` requests only affect clients whose config objects already exist.
+
+---
+
 ## Critical Issues (Fix Immediately)
 
 ### 1. Developer Exception Page Always Enabled
@@ -624,24 +638,16 @@ builder.Services.AddServerSideBlazor()
 
 ---
 
-### 18. Partial HttpClient Configuration
+### 18. Partial HttpClient Configuration — ✅ RESOLVED (BO-2, 2026-08)
 
-**Location:** `Backoffice.API/Startup.cs` line 83+
-```csharp
-services.AddHttpClient<IMaintenanceRepository, MaintenanceRepository>(client =>
-{
-    client.BaseAddress = new Uri(Configuration["API:Maintenance:Uri"]);
-    client.DefaultRequestHeaders.Add("x-api-key", 
-        "API:Maintenance:Security:ApiKey");  // String literal, not value!
-});
-```
+**Location:** `Backoffice.API/Startup.cs` (Maintenance HttpClient registration)
 
-**Severity:** 🟡 MEDIUM
+The `x-api-key` header for the Maintenance HttpClient was set to the string literal
+`"API:Maintenance:Security:ApiKey"` instead of `Configuration["API:Maintenance:Security:ApiKey"]`,
+so every Dapr maintenance call was sent with a garbage key. Fixed under BO-2 by reading the
+value from configuration.
 
-**Impact:**
-- API key value hardcoded as string literal "API:Maintenance:Security:ApiKey"
-- Not reading from configuration
-- Maintenance API calls will fail with wrong key
+**Severity:** 🟡 MEDIUM (historical)
 
 ---
 
