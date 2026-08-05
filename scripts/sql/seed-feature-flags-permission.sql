@@ -39,9 +39,15 @@
 -- Idempotent: guarded by IF NOT EXISTS on ClaimType (no unique DB constraint
 -- exists on that column today, so this script is the only protection
 -- against accidental duplicate rows on re-run).
+--
+-- SUPERSEDED (GM-693): the permission was renamed to "Admin.ClientSiteConfig"
+-- by rename-feature-flags-to-client-site-config.sql, which also handles fresh
+-- environments. Use that script instead. The guard below checks BOTH claim
+-- types so re-running this script after the rename cannot re-insert the old
+-- row as a duplicate.
 -- ============================================================================
 
-IF NOT EXISTS (SELECT 1 FROM dbo.Permission WHERE ClaimType = N'Admin.FeatureFlags')
+IF NOT EXISTS (SELECT 1 FROM dbo.Permission WHERE ClaimType IN (N'Admin.FeatureFlags', N'Admin.ClientSiteConfig'))
 BEGIN
     INSERT INTO dbo.Permission
         (PermissionId, CategoryId, CategoryName, SubCategoryName, GroupName, Name, ClaimType, HasReadOnly, SortOrder, IsSubUser, UserGroupTemplateIdRef, Version)

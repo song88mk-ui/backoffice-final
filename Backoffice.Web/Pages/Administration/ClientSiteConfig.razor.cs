@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Pages.Administration
 {
-    public partial class FeatureFlags
+    public partial class ClientSiteConfig
     {
-        private string _title = "Feature Flags";
+        private string _title = "Client Site Config";
         private PageHeaderModel _pageHeaderModel;
 
         private bool _isPreloader = true;
@@ -31,12 +31,12 @@ namespace Backoffice.Web.Pages.Administration
 
             _pageHeaderModel = new()
             {
-                Title = "Feature Flags",
+                Title = "Client Site Config",
                 IconClass = "ico ico-feature-flags"
             };
 
             _canEdit = _userState.Model.Claims?.Any(x =>
-                x.Type == AdminPermission.Admin_FeatureFlags.ToString().Replace("_", ".")
+                x.Type == AdminPermission.Admin_ClientSiteConfig.ToString().Replace("_", ".")
                 && x.Value == $"{(int)Access.Edit}") ?? false;
 
             await LoadClients();

@@ -1492,7 +1492,7 @@ All related service repos are **siblings** of `backoffice-final` in the same par
 | `../platform-final/` | Platform.Settlement.Service, Platform.Operator.Servicev2, Platform.Sportsbook.API, Platform.BetForwarder.Service, Platform.CashOutStake.Servicev2, Platform.Shared |
 | `../platform-web/` | Platform web frontend |
 | `../bet-genius/` | BetGenius integration |
-| `../webprops-api/` | Web Properties API (Go) — per-client feature flags/themes/layouts + maintenance flags, S3-backed. Consumed via `IWebPropsRepository` (`Backoffice.Web` "Feature Flags" page) and via `MaintenanceRepository` (`MaintenanceV2` page, `GET/POST /api/v1/maintenance` per layout with `X-Layout`; replaced the dead `bo-maintenance-api` Dapr router, BO-2 2026-08) |
+| `../webprops-api/` | Web Properties API (Go) — per-client feature flags/themes/layouts + maintenance flags, S3-backed. Consumed via `IWebPropsRepository` (`Backoffice.Web` "Client Site Config" page, renamed from "Feature Flags" GM-693) and via `MaintenanceRepository` (`MaintenanceV2` page, `GET/POST /api/v1/maintenance` per layout with `X-Layout`; replaced the dead `bo-maintenance-api` Dapr router, BO-2 2026-08) |
 | `../argocd/` | Kubernetes / ArgoCD deployment configs |
 | `../Reference/` | **Frozen AI baseline snapshot. Do not use for cross-service comparison — use the live sibling repos instead.** |
 

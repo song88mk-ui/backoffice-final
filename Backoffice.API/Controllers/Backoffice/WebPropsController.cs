@@ -10,7 +10,7 @@ using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.Backoffice
 {
-    [Authorize("Admin.FeatureFlags", ((int)Access.View))]
+    [Authorize("Admin.ClientSiteConfig", ((int)Access.View))]
     [Route("api/config/feature-flags")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class WebPropsController : ControllerBase
@@ -39,7 +39,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpPost("{clientCode}")]
-        [Authorize("Admin.FeatureFlags", ((int)Access.Edit))]
+        [Authorize("Admin.ClientSiteConfig", ((int)Access.Edit))]
         public async Task<IActionResult> UpdateClientFeatureFlags(string clientCode, [FromBody] UpdateClientFeatureFlagsRequest request)
         {
             request.ClientCode = clientCode;
