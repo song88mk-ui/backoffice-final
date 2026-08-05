@@ -386,7 +386,7 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 | GET | `api/translation/sportsbook/glossary/export` | Export all glossary rows as JSON (Dynamic View) |
 | POST | `api/translation/sportsbook/glossary/import` | Import parsed glossary rows (Dynamic Edit) |
 
-#### WebPropsController - `api/config/feature-flags` (x-api-key + JWT claim `Admin.FeatureFlags`)
+#### WebPropsController - `api/config/feature-flags` (x-api-key + JWT claim `Admin.ClientSiteConfig`)
 
 | Method | Route | Purpose |
 |---|---|---|
