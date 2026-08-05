@@ -143,6 +143,145 @@ docker build -f Backoffice.API/Dockerfile --build-arg NUGET_PASSWORD=<github-tok
 Note: the publish step deletes `appsettings.*.json` overrides from the image, so
 containers must be configured via environment variables.
 
+## Quick start (concrete example)
+
+A copy-paste path from a clean checkout to something visible in the browser. Two
+targets are worth knowing about:
+
+- Backoffice.API Swagger UI at http://localhost:5000/swagger - works with **no
+  infrastructure at all** (no SQL, no Mongo, no RabbitMQ, no Auth API).
+- Backoffice.Web login page at http://localhost:5131 - renders with the API down;
+  actually logging in additionally needs Backoffice.API plus a reachable Auth API.
+
+### Needed to start vs needed at first request
+
+Traced against `Backoffice.API/Startup.cs` and `Backoffice.Web/Program.cs`:
+
+| | Needed to start the process | Needed only at first request |
+|---|---|---|
+| Backoffice.API | .NET Core 3.1 runtime, restored NuGet packages, parseable `appsettings.json` | Everything external. The four SQL databases (`Backoffice`, `Sportsbook`, `Trading`, `Translation`) are registered as DbContexts in `Startup.cs` (lines 92-102) but no connection is opened until the first query. MongoDB connects lazily in the `SportsbookRepository`/`TradingRepository` constructors on the first request that resolves them. The Auth API and WebProps HttpClients are configured lazily on first resolution. `AddHealthChecks()` registers no database checks, so `/healthz` is green regardless. |
+| Backoffice.Web | .NET 8 SDK, restored NuGet packages | Backoffice.API (`API:Backoffice:Uri`) for translations, login and all data; the SignalR hub (`API:HubAPI`) for live updates. The login page GET fetches UI translations from the API but swallows every failure and falls back to English labels (`Login.cshtml.cs` -> `TranslationService` -> `BackofficeService.GetTranslation`), so the page renders even with nothing else running. |
+
+Logging in is the first thing that needs the full chain: Web -> Backoffice.API
+`POST /api/authentication/login` -> Auth API (`API:AuthenticationAPI:Uri`, default
+`http://localhost:40114`, the sibling `../Auth` repo) - plus a user provisioned in
+the Auth API's own database.
+
+### Step 0 - one-time NuGet source (all options)
+
+```powershell
+dotnet nuget add source "https://nuget.pkg.github.com/FlyingCockatoo/index.json" `
+  --name github --username <your-github-username> --password <GITHUB_PAT> `
+  --store-password-in-clear-text
+```
+
+`<GITHUB_PAT>` needs `read:packages` scope. Without this, `dotnet run` fails at
+restore on `Infra.Extensions.Telemetry`.
+
+### Option A - committed defaults (shared staging backends)
+
+The checked-in `appsettings.json` files point SQL, Mongo and the upstream APIs at
+shared staging hosts (`stg-song88-mssql-server...rds.amazonaws.com`,
+`bo-api.stg.song88.com`, `platform-api.stg.song88.com`, ...). Two caveats:
+
+- Those hosts are network-restricted. From a machine without VPN / IP-allowlist
+  access, requests to them time out (verified 2026-08: `curl
+  https://bo-api.stg.song88.com/healthz` times out while general internet access
+  works). None of that stops the local processes from starting.
+- Staging is shared. Treat it as read-only browsing; do not exercise write
+  endpoints against it (see `CLAUDE.md` Safety & Environment Rules).
+
+```powershell
+# Terminal 1 - REST gateway (starts with zero infrastructure)
+dotnet run --project Backoffice.API
+# -> listening on https://localhost:5001 and http://localhost:5000
+
+# Terminal 2 - Web UI
+dotnet run --project Backoffice.Web
+# -> listening on https://localhost:7131 and http://localhost:5131
+```
+
+Open http://localhost:5131. The Blazor router treats you as unauthenticated and
+redirects to `/login` (`App.razor` -> `LoginRedirect`), so you get the Back Office
+login form ("Welcome to / Back Office" banner, username/password, language
+dropdown). With the committed defaults the Web UI calls `bo-api.stg.song88.com`;
+point it at your local API instead by setting `API:Backoffice:Uri` to
+`https://localhost:5001` (the committed `API:Backoffice:Security:APIKey` already
+matches the local API's `Security:ApiKey`).
+
+Whether login succeeds depends on the Auth API: the default
+`API:AuthenticationAPI:Uri` is `http://localhost:40114`, so run the sibling repo
+(`dotnet run --project ../Auth/Auth.Api`) and have a user in its database. This
+repo's quick start cannot verify that step for you - if the Auth API is not
+running, the login form shows an error after submit, but everything up to that
+point (login page, Swagger, healthz) still works.
+
+### Minimum browser-visible win (no infrastructure at all)
+
+With only `dotnet run --project Backoffice.API` running:
+
+```powershell
+curl http://localhost:5000/healthz
+# expected output (200 OK):
+# Healthy
+
+curl http://localhost:5000/swagger/v1/swagger.json
+# expected: JSON starting {"openapi":"3.0.1","info":{"title":"Backoffice API","version":"v1"},...
+```
+
+Then open http://localhost:5000/swagger in a browser: the Swagger UI for
+"Backoffice API v1" with every controller listed. This works with no databases
+because nothing in `Startup.cs` touches SQL/Mongo/RabbitMQ at startup. Endpoints
+that hit a database will of course fail until one is reachable.
+
+### Option B - fully local infrastructure (Docker)
+
+Local-only example password below - never use it anywhere shared.
+
+```powershell
+# SQL Server (the four databases live on one instance)
+docker run -d --name bo-sql -p 1433:1433 `
+  -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD="YourStrong@Passw0rd123" `
+  mcr.microsoft.com/mssql/server:2022-latest
+
+# Create the four (empty) databases - idempotent
+docker exec bo-sql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "YourStrong@Passw0rd123" `
+  -Q "IF DB_ID('Backoffice') IS NULL CREATE DATABASE [Backoffice]; IF DB_ID('Sportsbook') IS NULL CREATE DATABASE [Sportsbook]; IF DB_ID('Trading') IS NULL CREATE DATABASE [Trading]; IF DB_ID('Translation') IS NULL CREATE DATABASE [Translation];"
+
+# RabbitMQ (only the three worker services consume it; management UI on :15672)
+docker run -d --name bo-rabbit -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+
+# MongoDB (read by Backoffice.API for sportsbook lookups)
+docker run -d --name bo-mongo -p 27017:27017 mongo:6
+```
+
+Matching configuration - either environment variables:
+
+```powershell
+$env:ConnectionStrings__Backoffice  = "Data Source=127.0.0.1,1433;Database=Backoffice;User Id=sa;Password=YourStrong@Passw0rd123;TrustServerCertificate=True"
+$env:ConnectionStrings__Sportsbook  = "Data Source=127.0.0.1,1433;Database=Sportsbook;User Id=sa;Password=YourStrong@Passw0rd123;TrustServerCertificate=True"
+$env:ConnectionStrings__Trading     = "Data Source=127.0.0.1,1433;Database=Trading;User Id=sa;Password=YourStrong@Passw0rd123;TrustServerCertificate=True"
+$env:ConnectionStrings__Translation = "Data Source=127.0.0.1,1433;Database=Translation;User Id=sa;Password=YourStrong@Passw0rd123;TrustServerCertificate=True"
+dotnet run --project Backoffice.API
+```
+
+or the same keys in `Backoffice.API/appsettings.Development.json` (that file is
+checked in - do not commit your local values). The Mongo key contains a dash, so
+in PowerShell set it as `${env:Custom__MongoDB-Sportsbook} =
+"mongodb://localhost:27017/sportsbook"` or put it in the Development override.
+For the Web UI set `API:Backoffice:Uri` to `https://localhost:5001` and, if you
+run the hub, `API:HubAPI` to `http://localhost:5190/bohub`.
+
+**Honest gap - schema provisioning.** This repo contains no EF Core migrations,
+no `EnsureCreated`/`Migrate` calls, and no schema creation scripts. The only SQL
+in the repo is a handful of seed/permission scripts (`scripts/sql/`,
+`docs/sql/`) that assume the schema already exists. The freshly created databases
+above are empty: Backoffice.API still starts and serves `/swagger` and
+`/healthz`, but any data endpoint fails at its first query until you provision
+the schema from an existing environment (backup/restore or schema-compare from
+staging). The same applies to Mongo (expects a populated `sportsbook` database)
+and to login (the Auth API is a separate repo with its own database).
+
 ## API endpoints
 
 ### Backoffice.API (REST)
