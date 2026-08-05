@@ -24,7 +24,7 @@ namespace Backoffice.Shared.Enums
         Admin_CancelBets,
         Admin_CancelBetsHistory,
         Admin_Maintenance,
-        Admin_FeatureFlags
+        Admin_ClientSiteConfig
     }
     public enum PartnerManagementPermission
     {

@@ -1,8 +1,8 @@
 @inherits BasePage
 
-@page "/admin/feature-flags"
+@page "/admin/client-site-config"
 
-<div class="row feature-flags me-3">
+<div class="row client-site-config me-3">
     @if (_isPreloader)
     {
         <Preloader />
@@ -20,7 +20,7 @@
         </div>
         <div class="page-content m-3">
             <div class="m-2">
-                <p class="fw-bolder">Manage Client Feature Flags</p>
+                <p class="fw-bolder">Manage Client Site Config</p>
                 <p class="text-muted mb-3">Controls per-client toggles read by platform-web (dark mode, language options, betting rules, OG auth, partial cashout). Changes save directly to the client's config in webprops-api and take effect immediately, without a deploy.</p>
                 <p class="fw-bold">Select Client</p>
                 <select class="form-select" @onchange="HandleClientSelected" disabled="@_isProcessing">
@@ -41,7 +41,7 @@
                             No existing configuration found for this client. Saving will create a new one.
                         </div>
                     }
-                    <div class="category-title fw-bold mb-3">Features</div>
+                    <div class="category-title fw-bold mb-3">Feature Flags</div>
                     <div class="d-flex">
                         <div class="w-50 noselect">
                             <div class="form-switch mb-3">

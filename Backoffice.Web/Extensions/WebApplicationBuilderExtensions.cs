@@ -78,7 +78,7 @@ namespace Backoffice.Web.Extensions
                 options.AddPolicy("admin-cancel", policy => policy.RequireClaim($"{AdminPermission.Admin_CancelBets.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
                 options.AddPolicy("admin-cancel-history", policy => policy.RequireClaim($"{AdminPermission.Admin_CancelBetsHistory.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
                 options.AddPolicy("admin-maintenance", policy => policy.RequireClaim($"{AdminPermission.Admin_Maintenance.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
-                options.AddPolicy("admin-feature-flags", policy => policy.RequireClaim($"{AdminPermission.Admin_FeatureFlags.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
+                options.AddPolicy("admin-client-site-config", policy => policy.RequireClaim($"{AdminPermission.Admin_ClientSiteConfig.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
 
                 #endregion
 

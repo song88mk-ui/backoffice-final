@@ -78,7 +78,7 @@ Primary REST API gateway for all backoffice operations. Orchestrates data access
 7a. **IWebPropsRepository / WebPropsRepository**
    - Delegates to the sibling `webprops-api` service (`../webprops-api/`) for per-client feature flags
    - GET/POST `/api/v1/config/{clientId}` (full-replace POST; repository round-trips the JSON to preserve `Layout`/unmodeled fields)
-   - Backs the `Backoffice.Web` "Feature Flags" admin page (`Pages/Administration/FeatureFlags.razor`)
+   - Backs the `Backoffice.Web` "Client Site Config" admin page (`Pages/Administration/ClientSiteConfig.razor`; renamed from "Feature Flags" in GM-693, claim `Admin.ClientSiteConfig`)
 
 8. **IBackofficeActivityLogRepository / BackofficeActivityLogRepository**
    - Activity logging to RabbitMQ
