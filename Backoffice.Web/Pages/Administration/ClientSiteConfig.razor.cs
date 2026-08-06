@@ -23,6 +23,16 @@ namespace Backoffice.Web.Pages.Administration
         private string _selectedClientGuid;
         private ClientFeatureFlagsResponse _clientFeatureFlags;
         private bool _isNewConfig;
+        private string _newGameTrackerProductName = string.Empty;
+
+        // Valid theme names per layout, from platform-web's wwwroot/scss/{layout}/theme
+        // folders plus themes present in live webprops configs (EL2 "red" is the base
+        // theme without its own SCSS folder). Keep in sync with platform-web.
+        private static readonly Dictionary<string, List<string>> ValidLayoutThemes = new()
+        {
+            ["AL"] = new() { "red", "red-light", "gray", "blue", "orange-light", "orange-dark" },
+            ["EL2"] = new() { "red", "white" }
+        };
 
         protected override async Task OnInitializedAsync()
         {
@@ -87,6 +97,40 @@ namespace Backoffice.Web.Pages.Administration
 
         private void HandleFlagChanged() => _hasChange = true;
 
+        private void HandleAddGameTrackerProductName()
+        {
+            var name = _newGameTrackerProductName?.Trim();
+            if (string.IsNullOrEmpty(name) || _clientFeatureFlags.Features.GameTrackerProductNames.Contains(name))
+                return;
+
+            _clientFeatureFlags.Features.GameTrackerProductNames.Add(name);
+            _newGameTrackerProductName = string.Empty;
+            _hasChange = true;
+        }
+
+        private void HandleRemoveGameTrackerProductName(string name)
+        {
+            _clientFeatureFlags.Features.GameTrackerProductNames.Remove(name);
+            _hasChange = true;
+        }
+
+        private bool IsThemeSelected(string layoutKey, string theme) =>
+            _clientFeatureFlags.Layout.TryGetValue(layoutKey, out var layoutTheme)
+            && layoutTheme.Themes.Contains(theme);
+
+        private void HandleThemeToggled(string layoutKey, string theme, bool isChecked)
+        {
+            if (!_clientFeatureFlags.Layout.TryGetValue(layoutKey, out var layoutTheme))
+                return;
+
+            if (isChecked && !layoutTheme.Themes.Contains(theme))
+                layoutTheme.Themes.Add(theme);
+            else if (!isChecked)
+                layoutTheme.Themes.Remove(theme);
+
+            _hasChange = true;
+        }
+
         private async Task HandleSaveClick()
         {
             if (_clientFeatureFlags == null)
@@ -104,7 +148,10 @@ namespace Backoffice.Web.Pages.Administration
                 LanguageOptions = _clientFeatureFlags.Features.LanguageOptions,
                 OGAuth = _clientFeatureFlags.Features.OGAuth,
                 PartialCashout = _clientFeatureFlags.Features.PartialCashout,
-                BetRecommendation = _clientFeatureFlags.Features.BetRecommendation
+                BetRecommendation = _clientFeatureFlags.Features.BetRecommendation,
+                IsEuroLayout = _clientFeatureFlags.Features.IsEuroLayout,
+                GameTrackerProductNames = _clientFeatureFlags.Features.GameTrackerProductNames,
+                LayoutThemes = _clientFeatureFlags.Layout.ToDictionary(l => l.Key, l => l.Value.Themes)
             });
 
             _isProcessing = false;

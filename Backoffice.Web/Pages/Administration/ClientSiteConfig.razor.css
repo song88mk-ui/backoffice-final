@@ -22,8 +22,22 @@ p {
     margin: 0;
 }
 
-.read-only-section {
-    opacity: 0.7;
+.product-name-tag {
+    background: #4F4F50;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 400;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+}
+
+.product-name-tag .btn-close {
+    font-size: 10px;
+}
+
+.product-name-input {
+    max-width: 300px;
 }
 
 .noselect {

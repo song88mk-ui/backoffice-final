@@ -76,9 +76,9 @@ Primary REST API gateway for all backoffice operations. Orchestrates data access
    - Maintenance API delegation (stub)
 
 7a. **IWebPropsRepository / WebPropsRepository**
-   - Delegates to the sibling `webprops-api` service (`../webprops-api/`) for per-client feature flags
-   - GET/POST `/api/v1/config/{clientId}` (full-replace POST; repository round-trips the JSON to preserve `Layout`/unmodeled fields)
-   - Backs the `Backoffice.Web` "Client Site Config" admin page (`Pages/Administration/ClientSiteConfig.razor`; renamed from "Feature Flags" in GM-693, claim `Admin.ClientSiteConfig`)
+   - Delegates to the sibling `webprops-api` service (`../webprops-api/`) for per-client site config: feature flags, game tracker product names, per-layout themes, Euro layout
+   - GET/POST `/api/v1/config/{clientId}` (full-replace POST; repository round-trips the JSON so unmodeled fields - and modeled fields the caller leaves null - are preserved)
+   - Backs the `Backoffice.Web` "Client Site Config" admin page (`Pages/Administration/ClientSiteConfig.razor`; renamed from "Feature Flags" in GM-696, claim `Admin.ClientSiteConfig`; editable themes/game tracker/Euro layout added in GM-697)
 
 8. **IBackofficeActivityLogRepository / BackofficeActivityLogRepository**
    - Activity logging to RabbitMQ

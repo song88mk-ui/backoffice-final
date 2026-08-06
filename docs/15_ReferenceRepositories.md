@@ -110,7 +110,9 @@ Small Go HTTP API that serves per-client frontend configuration (feature flags, 
 
 **Schema note:** webprops-api's config storage/API has no fixed schema — `get_config.go`/`update_config.go` decode/encode the whole document as a generic `map[string]interface{}`, so any key sent by a caller (Backoffice included) is persisted and returned as-is. The `Features` shape in the README/SKILL.md is illustrative convention, not an enforced contract. This means Backoffice can freely add new flags (e.g. `Features.BetRecommendation`, see `ClientFeatureFlags`) and they'll round-trip through S3 correctly with zero changes needed in webprops-api itself.
 
-**Backoffice-only field:** `Features.BetRecommendation` (`Backoffice.Shared/Models/Response/ClientFeatureFlagsResponse.cs`) round-trips fine per the schema note above, but has no effect until `platform-web`'s own `Features` model and `Pages/Index.razor` (where `<BetRecommendation>` renders unconditionally today) are updated to read and gate on it.
+**BetRecommendation is live (2026-07):** `Features.BetRecommendation` (`Backoffice.Shared/Models/Response/ClientFeatureFlagsResponse.cs`) is now read by platform-web (`Pages/_Host.cshtml` reads `Features:BetRecommendation`; `Pages/Index.razor` gates `<BetRecommendation>` on `ClientInfo.Config.BetRecommendation`), so the Backoffice toggle has real effect.
+
+**Editable from BO since GM-697:** `Features.GameTrackerProductNames`, `Features.IsEuroLayout`, and `Layout.{AL|EL2}.Themes` are editable on the Client Site Config page. The update request's `GameTrackerProductNames`/`LayoutThemes` fields are nullable - null means "leave unchanged", preserving the JObject merge safety in `WebPropsRepository`. Theme options are constrained to platform-web's real SCSS themes per layout (AL: red, red-light, gray, blue, orange-light, orange-dark; EL2: red, white).
 
 | Endpoint | Auth | Purpose |
 |---|---|---|
