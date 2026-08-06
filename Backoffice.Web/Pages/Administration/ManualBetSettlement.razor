@@ -58,7 +58,21 @@
 
                                             @foreach (var log in ActivityLogs)
                                             {
-                                                var betDetails = JsonSerializer.Deserialize<ManualBetDetails>(log.To);
+                                                ManualBetDetails betDetails;
+                                                try
+                                                {
+                                                    betDetails = JsonSerializer.Deserialize<ManualBetDetails>(log.To);
+                                                }
+                                                catch (JsonException)
+                                                {
+                                                    continue;
+                                                }
+
+                                                if (betDetails == null)
+                                                {
+                                                    continue;
+                                                }
+
                                                 rowCount++;
 
                                                 <tr>

@@ -2388,6 +2388,18 @@ namespace Backoffice.API.Repositories
             return cache.Result?.Result?.SportLookup ?? null;
         }
 
+        private static ManualBetDetails TryParseManualBetDetails(string json)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<ManualBetDetails>(json);
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+        }
+
         private List<ActivityLogModel> FilterManualSettlementLogs(List<ActivityLogModel> activityLogs, ManualBetSettlementCallbackModel callbackModel)
         {
             string[] clientIds = null;
@@ -2419,7 +2431,7 @@ namespace Backoffice.API.Repositories
                 clientIds = string.Join(",", callbackModel.Clients.Select(client => client.ClientId)).Split(',');
 
                 activityLogs = activityLogs
-                .Where(x => clientIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).ClientIdRef.ToString())).ToList();
+                .Where(x => clientIds.Contains(TryParseManualBetDetails(x.To)?.ClientIdRef.ToString())).ToList();
             }
 
             if (callbackModel.Sports != null && callbackModel.Sports.Any())
@@ -2427,7 +2439,7 @@ namespace Backoffice.API.Repositories
                 sportIds = string.Join(",", callbackModel.Sports.Select(sport => sport.SportId)).Split(',');
 
                 activityLogs = activityLogs
-                .Where(x => sportIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).Selections.FirstOrDefault().SportId.ToString())).ToList();
+                .Where(x => sportIds.Contains(TryParseManualBetDetails(x.To)?.Selections?.FirstOrDefault()?.SportId.ToString())).ToList();
             }
 
             if (callbackModel.Currencies != null && callbackModel.Currencies.Any())
@@ -2435,7 +2447,7 @@ namespace Backoffice.API.Repositories
                 currencyCodes = string.Join(",", callbackModel.Currencies.Select(currency => currency.CurrencyCode)).Split(',');
 
                 activityLogs = activityLogs
-                .Where(x => currencyCodes.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).CurrencyCode)).ToList();
+                .Where(x => currencyCodes.Contains(TryParseManualBetDetails(x.To)?.CurrencyCode)).ToList();
             }
 
             if (callbackModel.FromBetStatuses.Any())
@@ -2443,7 +2455,7 @@ namespace Backoffice.API.Repositories
                 fromStatusesIds = string.Join(",", callbackModel.FromBetStatuses.Select(status => status.BetStatusId)).Split(',');
 
                 activityLogs = activityLogs
-                .Where(x => fromStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).BetStatusId.ToString())).ToList();
+                .Where(x => fromStatusesIds.Contains(TryParseManualBetDetails(x.To)?.BetStatusId.ToString())).ToList();
             }
 
             if (callbackModel.ToBetStatuses != null && callbackModel.ToBetStatuses.Any())
@@ -2451,7 +2463,7 @@ namespace Backoffice.API.Repositories
                 toStatusesIds = string.Join(",", callbackModel.ToBetStatuses.Select(status => status.BetStatusId)).Split(',');
 
                 activityLogs = activityLogs
-                .Where(x => toStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).NewBetStatusId.ToString())).ToList();
+                .Where(x => toStatusesIds.Contains(TryParseManualBetDetails(x.To)?.NewBetStatusId.ToString())).ToList();
             }
 
             return activityLogs;

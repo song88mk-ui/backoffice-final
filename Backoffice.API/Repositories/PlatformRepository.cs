@@ -866,23 +866,31 @@ namespace Backoffice.API.Repositories
             {
                 var response = await GetHttpClient(region).PostAsync($"v1/bet/manualsettlement", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                if (response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
                 {
-                    await _activityLogRepository.ProcessActivityLog(request.ActivityLogs);
-                    return JsonConvert.DeserializeObject<BaseResponse<ManualBetSettlementResponse>>(await response.Content.ReadAsStringAsync());
+                    var result = JsonConvert.DeserializeObject<BaseResponse<ManualBetSettlementResponse>>(await response.Content.ReadAsStringAsync());
+
+                    if (result?.Result?.Data != null)
+                    {
+                        var successfulLogs = result.Result.Data
+                            .Select((bet, index) => (bet, index))
+                            .Where(x => x.bet.IsSuccess && x.index < request.ActivityLogs.OnActivityLogMessages.Count)
+                            .Select(x => request.ActivityLogs.OnActivityLogMessages[x.index])
+                            .ToList();
+
+                        if (successfulLogs.Count > 0)
+                            await _activityLogRepository.ProcessActivityLog(new OnActivityLogListMessage { OnActivityLogMessages = successfulLogs });
+                    }
+
+                    return result;
                 }
                 else
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonConvert.DeserializeObject<BaseResponse<ManualBetSettlementResponse>>(await response.Content.ReadAsStringAsync());
-                    else
+                    return new BaseResponse<ManualBetSettlementResponse>
                     {
-                        return new BaseResponse<ManualBetSettlementResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
+                        StatusCode = StatusCode.Error,
+                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                    };
                 }
             }
             catch (Exception ex)
