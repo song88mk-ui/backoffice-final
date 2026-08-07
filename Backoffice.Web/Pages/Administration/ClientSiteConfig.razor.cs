@@ -1,8 +1,10 @@
 using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -24,6 +26,9 @@ namespace Backoffice.Web.Pages.Administration
         private ClientFeatureFlagsResponse _clientFeatureFlags;
         private bool _isNewConfig;
         private string _newGameTrackerProductName = string.Empty;
+
+        // Pre-edit snapshot of the loaded config, used as the activity log's From value.
+        private string _loadedConfigJson;
 
         // Valid theme names per layout, from platform-web's wwwroot/scss/{layout}/theme
         // folders plus themes present in live webprops configs (EL2 "red" is the base
@@ -80,11 +85,13 @@ namespace Backoffice.Web.Pages.Administration
             if (response.StatusCode == StatusCode.Success && response.Result != null)
             {
                 _clientFeatureFlags = response.Result;
+                _loadedConfigJson = JsonSerializer.Serialize(_clientFeatureFlags);
             }
             else if (response.StatusCode == StatusCode.NotFound)
             {
                 _clientFeatureFlags = new ClientFeatureFlagsResponse() { ClientCode = _selectedClientGuid };
                 _isNewConfig = true;
+                _loadedConfigJson = JsonSerializer.Serialize(_clientFeatureFlags);
             }
             else
             {
@@ -158,9 +165,24 @@ namespace Backoffice.Web.Pages.Administration
 
             if (response.StatusCode == StatusCode.Success)
             {
+                var wasNewConfig = _isNewConfig;
                 _clientFeatureFlags = response.Result;
                 _isNewConfig = false;
                 _hasChange = false;
+
+                var savedConfigJson = JsonSerializer.Serialize(response.Result);
+                await _backofficeService.AddActivityLog(new ActivityLogModel()
+                {
+                    Page = AdminPermission.Admin_ClientSiteConfig.ToString().Replace("_", "."),
+                    Activity = (wasNewConfig ? Activity.Create : Activity.Update).ToString(),
+                    From = _loadedConfigJson,
+                    To = savedConfigJson,
+                    Payload = $"{_userState.Model.Name}.{_selectedClientGuid}",
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name
+                });
+                _loadedConfigJson = savedConfigJson;
+
                 await _alertToastService.SetToast("Feature Flags Saved");
             }
             else

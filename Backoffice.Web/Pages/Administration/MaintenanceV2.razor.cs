@@ -165,11 +165,31 @@ namespace Backoffice.Web.Pages.Administration
 
             await _alertToastService.SetLoadingToast($"{(_isMaintenance ? "Enabling" : "Disabling")} Maintenance");
 
-            var result = await _backofficeService.SetMaintenanceV2(new SetMaintenanceRequest()
+            // Snapshot before saving - LoadPage() below reloads _maintenanceConfigModels.
+            var previousStateJson = System.Text.Json.JsonSerializer.Serialize(
+                _maintenanceConfigModels.Select(c => new { c.App, c.ClientId, c.ClientName, c.IsMaintenance }));
+
+            var request = new SetMaintenanceRequest()
             {
                 ClientIds = clientIds,
                 IsMaintenance = _isMaintenance
-            });
+            };
+
+            var result = await _backofficeService.SetMaintenanceV2(request);
+
+            if (result.StatusCode == StatusCode.Success)
+            {
+                await _backofficeService.AddActivityLog(new ActivityLogModel()
+                {
+                    Page = AdminPermission.Admin_Maintenance.ToString().Replace("_", "."),
+                    Activity = Activity.Update.ToString(),
+                    From = previousStateJson,
+                    To = System.Text.Json.JsonSerializer.Serialize(request),
+                    Payload = $"{_userState.Model.Name}.{clientIds}",
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name
+                });
+            }
 
             LoadPage();
 
