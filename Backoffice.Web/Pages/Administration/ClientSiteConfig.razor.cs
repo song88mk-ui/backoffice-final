@@ -2,6 +2,7 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.Administration.ClientSiteConfig;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
@@ -37,6 +38,19 @@ namespace Backoffice.Web.Pages.Administration
         {
             ["AL"] = new() { "red", "red-light", "gray", "blue", "orange-light", "orange-dark" },
             ["EL2"] = new() { "red", "white" }
+        };
+
+        // Adding a new feature flag = one entry here (plus the property on
+        // ClientFeatureFlags/UpdateClientFeatureFlagsRequest and the save mapping below).
+        private static readonly List<FeatureFlagDefinition> FeatureFlagDefinitions = new()
+        {
+            new FeatureFlagDefinition("ff-betting-rules", "Betting Rules", "Shows the Betting Rules button in the site header.", f => f.BettingRules, (f, v) => f.BettingRules = v),
+            new FeatureFlagDefinition("ff-dark-mode", "Dark Mode", "Enables the dark mode theme toggle for the client's site.", f => f.DarkMode, (f, v) => f.DarkMode = v),
+            new FeatureFlagDefinition("ff-language-options", "Language Options", "Enables the language selector, scoped to English and Chinese (ZH) only.", f => f.LanguageOptions, (f, v) => f.LanguageOptions = v),
+            new FeatureFlagDefinition("ff-og-auth", "OG Auth", "Switches the site into Oriental Gaming (OG) mode: page title, bet ID formatting, and header/auth behavior for OG-integrated operators.", f => f.OGAuth, (f, v) => f.OGAuth = v),
+            new FeatureFlagDefinition("ff-partial-cashout", "Partial Cashout", "Enables the partial cash-out button on eligible open bets.", f => f.PartialCashout, (f, v) => f.PartialCashout = v),
+            new FeatureFlagDefinition("ff-bet-recommendation", "Bet Recommendation", "Shows the bet recommendation widget on the client site's main odds table.", f => f.BetRecommendation, (f, v) => f.BetRecommendation = v),
+            new FeatureFlagDefinition("ff-euro-layout", "Euro Layout", "Switches the client's site to the Euro (EL2) layout variant instead of the default Asian layout.", f => f.IsEuroLayout, (f, v) => f.IsEuroLayout = v)
         };
 
         protected override async Task OnInitializedAsync()
@@ -102,7 +116,23 @@ namespace Backoffice.Web.Pages.Administration
             StateHasChanged();
         }
 
-        private void HandleFlagChanged() => _hasChange = true;
+        private void HandleFlagToggled(FeatureFlagDefinition flag, bool value)
+        {
+            flag.Set(_clientFeatureFlags.Features, value);
+            _hasChange = true;
+        }
+
+        private void HandleViewLogsClick()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
+            parameters.Add("DialogStyle", "max-width:1200px");
+            parameters.Add("Clients", _clients);
+
+            _modalService.Open<ClientSiteConfigLogsModal>("Client Site Config Logs", parameters, new ModalOptions());
+        }
 
         private void HandleAddGameTrackerProductName()
         {
@@ -191,4 +221,23 @@ namespace Backoffice.Web.Pages.Administration
 
         private async Task HandleCancelClick() => await HandleClientSelected(new ChangeEventArgs() { Value = _selectedClientGuid });
     }
+
+    public class FeatureFlagDefinition
+    {
+        public string Id { get; }
+        public string Label { get; }
+        public string Description { get; }
+        public Func<ClientFeatureFlags, bool> Get { get; }
+        public Action<ClientFeatureFlags, bool> Set { get; }
+
+        public FeatureFlagDefinition(string id, string label, string description, Func<ClientFeatureFlags, bool> get, Action<ClientFeatureFlags, bool> set)
+        {
+            Id = id;
+            Label = label;
+            Description = description;
+            Get = get;
+            Set = set;
+        }
+    }
 }
+

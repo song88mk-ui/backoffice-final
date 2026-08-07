@@ -1,0 +1,93 @@
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <div class="d-flex justify-content-between log-filter">
+                <BlazorDateRangePicker.DateRangePicker class="form-control date-range" DateFormat="MM/dd/yyyy" StartDate="_dateFrom" EndDate="_dateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDatePickerRangeSelected"></BlazorDateRangePicker.DateRangePicker>
+                <EditForm Model="_searchForm" OnValidSubmit="OnSearchSubmitted" Context="FormContext">
+                    <div class="input-group">
+                        <input id="search" placeholder="@_translationState.GetValue("Search")" class="form-control search-text valid border-end-0" @bind-value="_searchForm.SearchText" />
+                        <span class="input-group-text border-start-0">
+                            <i class="fa fa-search"></i>
+                        </span>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered table-striped table-logs">
+                <thead>
+                    <tr>
+                        <th scope="col" class="date">@_translationState.GetValue("Date")</th>
+                        <th scope="col">@_translationState.GetValue("Client")</th>
+                        <th scope="col">@_translationState.GetValue("Activity")</th>
+                        <th scope="col">@_translationState.GetValue("From")</th>
+                        <th scope="col">@_translationState.GetValue("To")</th>
+                        <th scope="col">@_translationState.GetValue("Updated By")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (_isPreLoader)
+                    {
+                        <tr>
+                            <td colspan="6">
+                                <Preloader />
+                            </td>
+                        </tr>
+                    }
+                    else if (_activityLogs != null && _activityLogs.Any())
+                    {
+                        @foreach (var activityLog in _activityLogs)
+                        {
+                            var changes = GetChanges(activityLog.From, activityLog.To);
+                            <tr>
+                                <td>@activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy HH:mm")</td>
+                                <td>@GetClientName(activityLog.Payload)</td>
+                                <td>@activityLog.Activity</td>
+                                @if (changes == null)
+                                {
+                                    <td class="td-left changes">@activityLog.From</td>
+                                    <td class="td-left changes">@activityLog.To</td>
+                                }
+                                else if (!changes.Any())
+                                {
+                                    <td class="td-left" colspan="2">@_translationState.GetValue("No setting changes")</td>
+                                }
+                                else
+                                {
+                                    <td class="td-left changes">
+                                        @foreach (var change in changes)
+                                        {
+                                            <div><strong>@change.Setting:</strong> @change.From</div>
+                                        }
+                                    </td>
+                                    <td class="td-left changes">
+                                        @foreach (var change in changes)
+                                        {
+                                            <div><strong>@change.Setting:</strong> @change.To</div>
+                                        }
+                                    </td>
+                                }
+                                <td>@activityLog.UserName</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6">
+                                <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <Pagination MetaData="_metaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseClicked">@_translationState.GetValue("Close")</button>
+</div>
