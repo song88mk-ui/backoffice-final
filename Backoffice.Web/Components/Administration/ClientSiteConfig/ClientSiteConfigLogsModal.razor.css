@@ -1,0 +1,30 @@
+table thead {
+    color: white;
+    background-color: #354156;
+}
+
+.table-logs td {
+    vertical-align: top;
+}
+
+.table-logs td.date {
+    white-space: nowrap;
+}
+
+.td-left {
+    text-align: left;
+}
+
+.changes {
+    word-break: break-word;
+    max-width: 300px;
+    font-size: 13px;
+}
+
+.date-range {
+    width: 200px;
+}
+
+.log-filter .input-group {
+    width: 220px;
+}

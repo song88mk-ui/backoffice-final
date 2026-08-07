@@ -79,3 +79,21 @@ p {
 .btn-save:disabled {
     background: #FF6B003e;
 }
+
+.btn-logs {
+    color: black;
+    font-weight: bold;
+    font-size: 14px;
+    width: auto;
+    background: none;
+}
+
+.btn-logs .fa {
+    color: #404E67;
+    margin-right: 6px;
+}
+
+.feature-flag .flag-description {
+    font-size: 12px;
+    line-height: 1.3;
+}
