@@ -25,6 +25,7 @@ namespace Backoffice.Web.Pages.Administration
         private bool _isProcessing;
         private bool _isDropDownDisabled;
         private bool _clienHasChange;
+        private bool _canEdit;
         public bool IsMaintenance
         {
             get { return _isMaintenance; }
@@ -57,6 +58,10 @@ namespace Backoffice.Web.Pages.Administration
                 Title = "Maintenance",
                 IconClass = "ico ico-maintenance"
             };
+
+            _canEdit = _userState.Model.Claims?.Any(x =>
+                x.Type == AdminPermission.Admin_Maintenance.ToString().Replace("_", ".")
+                && x.Value == $"{(int)Access.Edit}") ?? false;
 
             _allClientsEvent = _ => HandleChangeMode(true);
             _specificClientsEvent = _ => HandleChangeMode(false);
