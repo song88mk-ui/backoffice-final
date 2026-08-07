@@ -21,7 +21,7 @@
         <div class="page-content m-3">
             <div class="m-2">
                 <p class="fw-bolder">Manage Client Site Config</p>
-                <p class="text-muted mb-3">Controls per-client toggles read by platform-web (dark mode, language options, betting rules, OG auth, partial cashout). Changes save directly to the client's config in webprops-api and take effect immediately, without a deploy.</p>
+                <p class="text-muted mb-3">Controls the per-client site configuration read by platform-web (feature toggles, themes, game tracker products, layout). Changes save directly to the client's config in webprops-api without a deploy, and appear on the client site within about an hour (the site caches its config for up to 60 minutes).</p>
                 <p class="fw-bold">Select Client</p>
                 <select class="form-select" @onchange="HandleClientSelected" disabled="@_isProcessing">
                     <option value="">-- Select a client --</option>
@@ -74,23 +74,72 @@
                             <div class="form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" role="switch" id="ff-bet-recommendation" @bind="_clientFeatureFlags.Features.BetRecommendation" @bind:after="HandleFlagChanged" disabled="@(_isProcessing || !_canEdit)">
                                 <label class="form-check-label" for="ff-bet-recommendation">Bet Recommendation</label>
-                                <div class="text-muted small">Backoffice-only for now - not yet read by platform-web, so this has no visible effect until that's wired up.</div>
+                                <div class="text-muted small">Shows the bet recommendation widget on the client site's main odds table.</div>
+                            </div>
+                            <div class="form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ff-euro-layout" @bind="_clientFeatureFlags.Features.IsEuroLayout" @bind:after="HandleFlagChanged" disabled="@(_isProcessing || !_canEdit)">
+                                <label class="form-check-label" for="ff-euro-layout">Euro Layout</label>
+                                <div class="text-muted small">Switches the client's site to the Euro (EL2) layout variant instead of the default Asian layout.</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                @if (_clientFeatureFlags.Features.GameTrackerProductNames.Any() || _clientFeatureFlags.Layout.Any())
+                <div class="m-2 mt-4">
+                    <div class="category-title fw-bold mb-3">Game Tracker Product Names</div>
+                    <div class="text-muted small mb-2">Product name strings passed to the Game Tracker widget on the client's site.</div>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                        @foreach (var productName in _clientFeatureFlags.Features.GameTrackerProductNames)
+                        {
+                            <span class="badge product-name-tag">
+                                @productName
+                                @if (_canEdit)
+                                {
+                                    <button type="button" class="btn-close btn-close-white ms-1" title="Remove" disabled="@_isProcessing" @onclick="() => HandleRemoveGameTrackerProductName(productName)"></button>
+                                }
+                            </span>
+                        }
+                        @if (!_clientFeatureFlags.Features.GameTrackerProductNames.Any())
+                        {
+                            <span class="text-muted small">None configured.</span>
+                        }
+                    </div>
+                    @if (_canEdit)
+                    {
+                        <div class="d-flex gap-2">
+                            <input class="form-control product-name-input" placeholder="e.g. song88-light" @bind="_newGameTrackerProductName" disabled="@_isProcessing" />
+                            <button class="btn btn-save" @onclick="HandleAddGameTrackerProductName" disabled="@_isProcessing">Add</button>
+                        </div>
+                    }
+                </div>
+                @if (_clientFeatureFlags.Layout.Any())
                 {
-                    <div class="m-2 mt-4 read-only-section">
-                        <p class="fw-bold">Read-only (managed elsewhere)</p>
-                        @if (_clientFeatureFlags.Features.GameTrackerProductNames.Any())
-                        {
-                            <p>Game Tracker Product Names: @string.Join(", ", _clientFeatureFlags.Features.GameTrackerProductNames)</p>
-                        }
-                        @if (_clientFeatureFlags.Layout.Any())
-                        {
-                            <p>Layouts: @string.Join(", ", _clientFeatureFlags.Layout.Keys)</p>
-                        }
+                    <div class="m-2 mt-4">
+                        <div class="category-title fw-bold mb-3">Themes</div>
+                        <div class="text-muted small mb-2">Theme options available to the client's site, per layout. Only themes that exist in platform-web are listed.</div>
+                        <div class="d-flex">
+                            @foreach (var layout in _clientFeatureFlags.Layout)
+                            {
+                                var layoutKey = layout.Key;
+                                <div class="w-50 noselect">
+                                    <p class="fw-bold">@layoutKey</p>
+                                    @if (ValidLayoutThemes.TryGetValue(layoutKey.ToUpper(), out var validThemes))
+                                    {
+                                        @foreach (var theme in validThemes)
+                                        {
+                                            var themeName = theme;
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="theme-@layoutKey-@themeName" checked="@IsThemeSelected(layoutKey, themeName)" disabled="@(_isProcessing || !_canEdit)" @onchange="e => HandleThemeToggled(layoutKey, themeName, (bool)e.Value)">
+                                                <label class="form-check-label" for="theme-@layoutKey-@themeName">@themeName</label>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted small">Unknown layout - themes managed elsewhere: @string.Join(", ", layout.Value.Themes)</p>
+                                    }
+                                </div>
+                            }
+                        </div>
                     </div>
                 }
             }

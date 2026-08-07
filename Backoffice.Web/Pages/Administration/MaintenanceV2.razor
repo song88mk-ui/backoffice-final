@@ -35,7 +35,7 @@
                 </div>
                 <div>
                     <div class="form-switch d-flex justify-content-center">
-                        <input class="form-check-input me-3" type="checkbox" id="maitenance-mode" @bind="IsMaintenance" disabled="@_isProcessing">
+                        <input class="form-check-input me-3" type="checkbox" id="maitenance-mode" @bind="IsMaintenance" disabled="@(_isProcessing || !_canEdit)">
                     </div>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                     <div class="maintenance-mode-container all-clients border border-2 px-3 mb-3 @_maintenanceModeAllClientsCss">
                         <div class="d-flex align-items-center gap-3">
                             <div class="wrapper-input">
-                                <input type="radio" name="one" id="radio1" checked="@_isAllClientMode" @onchange="_allClientsEvent" disabled="@_isProcessing">
+                                <input type="radio" name="one" id="radio1" checked="@_isAllClientMode" @onchange="_allClientsEvent" disabled="@(_isProcessing || !_canEdit)">
                                 <label for="radio1"></label>
                             </div>
                             <div class="option-item">
@@ -63,7 +63,7 @@
                     <div class="maintenance-mode-container specific-clients border border-2 px-3 mb-3 @_maintenanceModeSpecificClientsCss">
                         <div class="d-flex align-items-center gap-3 pb-3">
                             <div class="wrapper-input">
-                                <input type="radio" name="one" id="radio2" checked="@(!_isAllClientMode)" @onchange="_specificClientsEvent" disabled="@_isProcessing">
+                                <input type="radio" name="one" id="radio2" checked="@(!_isAllClientMode)" @onchange="_specificClientsEvent" disabled="@(_isProcessing || !_canEdit)">
                                 <label for="radio2"></label>
                             </div>
                             <div class="option-item">
@@ -75,14 +75,14 @@
                             <div class="d-flex p-0">
                                 <p>Select which clients you want to apply maintenance mode to</p>
                             </div>
-                            <ClientSelectionDropDown @bind-Clients="_clients" Disabled="_isAllClientMode || _isDropDownDisabled || _isProcessing" OnHasChange="HandlePropertyChange" />
+                            <ClientSelectionDropDown @bind-Clients="_clients" Disabled="_isAllClientMode || _isDropDownDisabled || _isProcessing || !_canEdit" OnHasChange="HandlePropertyChange" />
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     }
-    @if (_hasChange)
+    @if (_hasChange && _canEdit)
     {
         <div>
             <button class="btn btn-save" @onclick="HandleSaveClick" disabled="@_isProcessing">Save</button>

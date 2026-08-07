@@ -76,9 +76,9 @@ namespace Backoffice.API.Repositories
             try
             {
                 // webprops-api's POST /config/{clientId} is a full replace, not a merge, so the
-                // current document is fetched and only the Features the UI edits are overwritten
-                // in place (via JObject, not the typed model) so Layout/Themes and any fields not
-                // modeled here are never clobbered.
+                // current document is fetched and only the fields the caller edits are overwritten
+                // in place (via JObject, not the typed model) so any fields not modeled here -
+                // and any modeled field the caller left null - are never clobbered.
                 var getResponse = await _webPropsHttpClient.GetAsync($"/api/v1/config/{request.ClientCode}");
                 var getContent = await getResponse.Content.ReadAsStringAsync();
 
@@ -116,7 +116,25 @@ namespace Backoffice.API.Repositories
                 features["OGAuth"] = request.OGAuth;
                 features["PartialCashout"] = request.PartialCashout;
                 features["BetRecommendation"] = request.BetRecommendation;
+                features["IsEuroLayout"] = request.IsEuroLayout;
+
+                // Null means the caller didn't edit these - leave the stored values untouched.
+                if (request.GameTrackerProductNames != null)
+                    features["GameTrackerProductNames"] = JArray.FromObject(request.GameTrackerProductNames);
+
                 configNode["Features"] = features;
+
+                if (request.LayoutThemes != null)
+                {
+                    var layout = configNode["Layout"] as JObject ?? new JObject();
+                    foreach (var layoutThemes in request.LayoutThemes)
+                    {
+                        var layoutNode = layout[layoutThemes.Key] as JObject ?? new JObject();
+                        layoutNode["Themes"] = JArray.FromObject(layoutThemes.Value ?? new System.Collections.Generic.List<string>());
+                        layout[layoutThemes.Key] = layoutNode;
+                    }
+                    configNode["Layout"] = layout;
+                }
 
                 var payload = JsonConvert.SerializeObject(configNode);
                 var postResponse = await _webPropsHttpClient.PostAsync($"/api/v1/config/{request.ClientCode}", new StringContent(payload, Encoding.UTF8, "application/json"));

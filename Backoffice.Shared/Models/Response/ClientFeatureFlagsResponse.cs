@@ -17,11 +17,8 @@ namespace Backoffice.Shared.Models.Response
         public bool LanguageOptions { get; set; }
         public bool OGAuth { get; set; }
         public bool PartialCashout { get; set; }
-
-        // webprops-api has no fixed schema (stores config as a generic JSON map), so this
-        // round-trips through S3 fine. It has no downstream effect until platform-web's own
-        // Features model and Index.razor are updated to read and gate on it.
         public bool BetRecommendation { get; set; }
+        public bool IsEuroLayout { get; set; }
     }
 
     public class ClientLayoutTheme

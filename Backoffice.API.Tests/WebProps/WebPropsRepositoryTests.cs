@@ -124,6 +124,78 @@ namespace Backoffice.API.Tests.WebProps
         }
 
         [Fact]
+        public async Task UpdateClientFeatureFlagsAsync_NullOptionalFields_LeavesStoredValuesUntouched()
+        {
+            string capturedPostBody = null;
+
+            var (sut, _) = BuildSut(
+                getResponder: _ => Json(HttpStatusCode.OK, RealConfigJson),
+                postResponder: req =>
+                {
+                    capturedPostBody = req.Content.ReadAsStringAsync().Result;
+                    return Json(HttpStatusCode.OK, "\"ok\"");
+                });
+
+            // GameTrackerProductNames and LayoutThemes left null = "not edited".
+            var request = new UpdateClientFeatureFlagsRequest { ClientCode = "G02", BettingRules = true };
+
+            await sut.UpdateClientFeatureFlagsAsync(request);
+
+            Assert.NotNull(capturedPostBody);
+            // Stored values from RealConfigJson must survive verbatim.
+            Assert.Contains("\"song88-light\"", capturedPostBody);
+            Assert.Contains("\"red\"", capturedPostBody);
+            Assert.Contains("\"gray\"", capturedPostBody);
+        }
+
+        [Fact]
+        public async Task UpdateClientFeatureFlagsAsync_ProvidedOptionalFields_OverwriteStoredValues()
+        {
+            string capturedPostBody = null;
+
+            var (sut, _) = BuildSut(
+                getResponder: _ => Json(HttpStatusCode.OK, RealConfigJson),
+                postResponder: req =>
+                {
+                    capturedPostBody = req.Content.ReadAsStringAsync().Result;
+                    return Json(HttpStatusCode.OK, "\"ok\"");
+                });
+
+            var request = new UpdateClientFeatureFlagsRequest
+            {
+                ClientCode = "G02",
+                IsEuroLayout = true,
+                GameTrackerProductNames = new System.Collections.Generic.List<string> { "song88-dark" },
+                LayoutThemes = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<string>>
+                {
+                    ["AL"] = new System.Collections.Generic.List<string> { "blue", "orange-light" }
+                }
+            };
+
+            await sut.UpdateClientFeatureFlagsAsync(request);
+
+            Assert.NotNull(capturedPostBody);
+            Assert.Contains("\"IsEuroLayout\":true", capturedPostBody);
+            Assert.Contains("\"song88-dark\"", capturedPostBody);
+            Assert.DoesNotContain("\"song88-light\"", capturedPostBody);
+            Assert.Contains("\"blue\"", capturedPostBody);
+            Assert.Contains("\"orange-light\"", capturedPostBody);
+            Assert.DoesNotContain("\"gray\"", capturedPostBody);
+        }
+
+        [Fact]
+        public async Task GetClientFeatureFlagsAsync_IsEuroLayout_RoundTrips()
+        {
+            var json = RealConfigJson.Replace("\"OGAuth\":false", "\"OGAuth\":false,\"IsEuroLayout\":true");
+            var (sut, _) = BuildSut(_ => Json(HttpStatusCode.OK, json));
+
+            var result = await sut.GetClientFeatureFlagsAsync("G02");
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.True(result.Result.Features.IsEuroLayout);
+        }
+
+        [Fact]
         public async Task UpdateClientFeatureFlagsAsync_ConfirmedAbsent_CreatesFreshConfigAndSucceeds()
         {
             var (sut, _) = BuildSut(

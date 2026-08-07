@@ -1,8 +1,10 @@
 using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -23,6 +25,19 @@ namespace Backoffice.Web.Pages.Administration
         private string _selectedClientGuid;
         private ClientFeatureFlagsResponse _clientFeatureFlags;
         private bool _isNewConfig;
+        private string _newGameTrackerProductName = string.Empty;
+
+        // Pre-edit snapshot of the loaded config, used as the activity log's From value.
+        private string _loadedConfigJson;
+
+        // Valid theme names per layout, from platform-web's wwwroot/scss/{layout}/theme
+        // folders plus themes present in live webprops configs (EL2 "red" is the base
+        // theme without its own SCSS folder). Keep in sync with platform-web.
+        private static readonly Dictionary<string, List<string>> ValidLayoutThemes = new()
+        {
+            ["AL"] = new() { "red", "red-light", "gray", "blue", "orange-light", "orange-dark" },
+            ["EL2"] = new() { "red", "white" }
+        };
 
         protected override async Task OnInitializedAsync()
         {
@@ -70,11 +85,13 @@ namespace Backoffice.Web.Pages.Administration
             if (response.StatusCode == StatusCode.Success && response.Result != null)
             {
                 _clientFeatureFlags = response.Result;
+                _loadedConfigJson = JsonSerializer.Serialize(_clientFeatureFlags);
             }
             else if (response.StatusCode == StatusCode.NotFound)
             {
                 _clientFeatureFlags = new ClientFeatureFlagsResponse() { ClientCode = _selectedClientGuid };
                 _isNewConfig = true;
+                _loadedConfigJson = JsonSerializer.Serialize(_clientFeatureFlags);
             }
             else
             {
@@ -86,6 +103,40 @@ namespace Backoffice.Web.Pages.Administration
         }
 
         private void HandleFlagChanged() => _hasChange = true;
+
+        private void HandleAddGameTrackerProductName()
+        {
+            var name = _newGameTrackerProductName?.Trim();
+            if (string.IsNullOrEmpty(name) || _clientFeatureFlags.Features.GameTrackerProductNames.Contains(name))
+                return;
+
+            _clientFeatureFlags.Features.GameTrackerProductNames.Add(name);
+            _newGameTrackerProductName = string.Empty;
+            _hasChange = true;
+        }
+
+        private void HandleRemoveGameTrackerProductName(string name)
+        {
+            _clientFeatureFlags.Features.GameTrackerProductNames.Remove(name);
+            _hasChange = true;
+        }
+
+        private bool IsThemeSelected(string layoutKey, string theme) =>
+            _clientFeatureFlags.Layout.TryGetValue(layoutKey, out var layoutTheme)
+            && layoutTheme.Themes.Contains(theme);
+
+        private void HandleThemeToggled(string layoutKey, string theme, bool isChecked)
+        {
+            if (!_clientFeatureFlags.Layout.TryGetValue(layoutKey, out var layoutTheme))
+                return;
+
+            if (isChecked && !layoutTheme.Themes.Contains(theme))
+                layoutTheme.Themes.Add(theme);
+            else if (!isChecked)
+                layoutTheme.Themes.Remove(theme);
+
+            _hasChange = true;
+        }
 
         private async Task HandleSaveClick()
         {
@@ -104,16 +155,34 @@ namespace Backoffice.Web.Pages.Administration
                 LanguageOptions = _clientFeatureFlags.Features.LanguageOptions,
                 OGAuth = _clientFeatureFlags.Features.OGAuth,
                 PartialCashout = _clientFeatureFlags.Features.PartialCashout,
-                BetRecommendation = _clientFeatureFlags.Features.BetRecommendation
+                BetRecommendation = _clientFeatureFlags.Features.BetRecommendation,
+                IsEuroLayout = _clientFeatureFlags.Features.IsEuroLayout,
+                GameTrackerProductNames = _clientFeatureFlags.Features.GameTrackerProductNames,
+                LayoutThemes = _clientFeatureFlags.Layout.ToDictionary(l => l.Key, l => l.Value.Themes)
             });
 
             _isProcessing = false;
 
             if (response.StatusCode == StatusCode.Success)
             {
+                var wasNewConfig = _isNewConfig;
                 _clientFeatureFlags = response.Result;
                 _isNewConfig = false;
                 _hasChange = false;
+
+                var savedConfigJson = JsonSerializer.Serialize(response.Result);
+                await _backofficeService.AddActivityLog(new ActivityLogModel()
+                {
+                    Page = AdminPermission.Admin_ClientSiteConfig.ToString().Replace("_", "."),
+                    Activity = (wasNewConfig ? Activity.Create : Activity.Update).ToString(),
+                    From = _loadedConfigJson,
+                    To = savedConfigJson,
+                    Payload = $"{_userState.Model.Name}.{_selectedClientGuid}",
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name
+                });
+                _loadedConfigJson = savedConfigJson;
+
                 await _alertToastService.SetToast("Feature Flags Saved");
             }
             else

@@ -25,6 +25,7 @@ namespace Backoffice.Web.Pages.Administration
         private bool _isProcessing;
         private bool _isDropDownDisabled;
         private bool _clienHasChange;
+        private bool _canEdit;
         public bool IsMaintenance
         {
             get { return _isMaintenance; }
@@ -57,6 +58,10 @@ namespace Backoffice.Web.Pages.Administration
                 Title = "Maintenance",
                 IconClass = "ico ico-maintenance"
             };
+
+            _canEdit = _userState.Model.Claims?.Any(x =>
+                x.Type == AdminPermission.Admin_Maintenance.ToString().Replace("_", ".")
+                && x.Value == $"{(int)Access.Edit}") ?? false;
 
             _allClientsEvent = _ => HandleChangeMode(true);
             _specificClientsEvent = _ => HandleChangeMode(false);
@@ -160,11 +165,31 @@ namespace Backoffice.Web.Pages.Administration
 
             await _alertToastService.SetLoadingToast($"{(_isMaintenance ? "Enabling" : "Disabling")} Maintenance");
 
-            var result = await _backofficeService.SetMaintenanceV2(new SetMaintenanceRequest()
+            // Snapshot before saving - LoadPage() below reloads _maintenanceConfigModels.
+            var previousStateJson = System.Text.Json.JsonSerializer.Serialize(
+                _maintenanceConfigModels.Select(c => new { c.App, c.ClientId, c.ClientName, c.IsMaintenance }));
+
+            var request = new SetMaintenanceRequest()
             {
                 ClientIds = clientIds,
                 IsMaintenance = _isMaintenance
-            });
+            };
+
+            var result = await _backofficeService.SetMaintenanceV2(request);
+
+            if (result.StatusCode == StatusCode.Success)
+            {
+                await _backofficeService.AddActivityLog(new ActivityLogModel()
+                {
+                    Page = AdminPermission.Admin_Maintenance.ToString().Replace("_", "."),
+                    Activity = Activity.Update.ToString(),
+                    From = previousStateJson,
+                    To = System.Text.Json.JsonSerializer.Serialize(request),
+                    Payload = $"{_userState.Model.Name}.{clientIds}",
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name
+                });
+            }
 
             LoadPage();
 
