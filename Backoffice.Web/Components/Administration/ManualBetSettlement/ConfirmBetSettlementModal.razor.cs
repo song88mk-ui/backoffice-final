@@ -62,9 +62,9 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
                 {
                     Page = AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_','.'),
                     Activity = Activity.ManualSettlement.ToString(),
-                    Payload = "",
+                    Payload = JsonSerializer.Serialize(bet),
                     From = "-",
-                    To = JsonSerializer.Serialize(bet),
+                    To = bet.BetStatusName,
                     UserId = _userState.Model.Id,
                     UserName = _userState.Model.Name,
                     TimeStamp = DateTime.UtcNow
