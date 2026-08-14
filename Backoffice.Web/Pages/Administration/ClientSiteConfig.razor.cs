@@ -155,10 +155,23 @@ namespace Backoffice.Web.Pages.Administration
             _clientFeatureFlags.Layout.TryGetValue(layoutKey, out var layoutTheme)
             && layoutTheme.Themes.Contains(theme);
 
+        // Layouts rendered in the Themes section: every layout stored in the client's config
+        // plus the known platform-web layouts, so themes are configurable even before the
+        // client has any layout data (new/empty configs preload AL and EL2 unchecked).
+        private List<string> GetDisplayLayoutKeys()
+        {
+            var keys = _clientFeatureFlags.Layout.Keys.ToList();
+            keys.AddRange(ValidLayoutThemes.Keys.Where(k => !keys.Contains(k, StringComparer.OrdinalIgnoreCase)));
+            return keys;
+        }
+
         private void HandleThemeToggled(string layoutKey, string theme, bool isChecked)
         {
             if (!_clientFeatureFlags.Layout.TryGetValue(layoutKey, out var layoutTheme))
-                return;
+            {
+                layoutTheme = new ClientLayoutTheme();
+                _clientFeatureFlags.Layout[layoutKey] = layoutTheme;
+            }
 
             if (isChecked && !layoutTheme.Themes.Contains(theme))
                 layoutTheme.Themes.Add(theme);
