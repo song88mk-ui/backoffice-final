@@ -231,6 +231,24 @@ Processes: Serialization & deserialization
 Publishes: Via BackofficeHub to WebSocket clients
 ```
 
+**Incoming wire contract (Odds Engine v2)** — added Aug 2026 (BO-97):
+
+`Backoffice.WebSocket.Service` binds `q.bo.websocket` on exchange `e.central` to
+`r.oe.sb.engine.onoddschange`, `r.oe.sb.engine.onbetstopfixture`, `r.oe.sb.engine.onbetstopglobal`
+and `r.oe.bm.engine.notifications`. The `OnOddsChange` and `OnBetStopFixture` producers are
+**Odds Engine v2** (`odds-engine-2`: OE.Sportsbook.Service, OE.Translation.Service), which
+serialize payloads with **abbreviated JSON property names** (`FiNa`, `FiTyId`, `Ma`, `Se`, `Od`, ...)
+— unlike the retired OddsEngine v1, which used full names.
+
+The incoming models in `Backoffice.Shared/IncomingSbEngineMessages/` therefore carry
+`[JsonPropertyName]` attributes mapping each property to its OEv2 wire name
+(`IncomingOddsChangeMessage`, `IncomingMarketMessage`, `IncomingSelectionMessage`,
+`IncomingBetStopFixtureMessage`). Properties without an attribute are **not** on the OEv2 wire and
+stay at their defaults - notably `CurrentPeriod` (OEv2 sends only the numeric `CuPe`),
+`ProviderSelectionId`, and `MarketTemplateGroups` (betstop). If OEv2's
+`OnInternalOddsChangeMessage` contract changes, these attributes must be kept in sync
+(contract tests: `Backoffice.API.Tests/IncomingSbEngineMessages/`).
+
 ---
 
 ## Message Flow Sequence
