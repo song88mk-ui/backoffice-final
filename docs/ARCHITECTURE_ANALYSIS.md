@@ -1,14 +1,14 @@
 # Backoffice Solution - Architecture Analysis Report
 
 **Date:** June 18, 2026  
-**Target Framework:** .NET Core 3.1  
+**Target Framework:** .NET 10 (upgraded from .NET Core 3.1, August 2026, GM-743)  
 **Analysis Scope:** Complete solution architecture, patterns, dependencies, and design decisions
 
 ---
 
 ## Executive Summary
 
-The Backoffice solution is a **multi-tier, event-driven microservices application** designed to manage sports betting operations. The architecture implements enterprise-grade patterns including repository-based data access, dependency injection, message-driven communication, distributed tracing, and multi-region support. The system is built on .NET Core 3.1 with SQL Server databases and RabbitMQ for asynchronous messaging.
+The Backoffice solution is a **multi-tier, event-driven microservices application** designed to manage sports betting operations. The architecture implements enterprise-grade patterns including repository-based data access, dependency injection, message-driven communication, distributed tracing, and multi-region support. The system is built on .NET 10 with SQL Server databases and RabbitMQ for asynchronous messaging.
 
 ---
 
@@ -33,7 +33,7 @@ The Backoffice solution is a **multi-tier, event-driven microservices applicatio
 
 ### 2.1 Backoffice.API
 **Role:** Primary REST API gateway for backoffice operations  
-**Framework:** ASP.NET Core 3.1  
+**Framework:** ASP.NET Core (.NET 10)  
 **Port:** Configurable (default dev: 5000+)
 
 **Key Responsibilities:**
@@ -81,7 +81,7 @@ The Backoffice solution is a **multi-tier, event-driven microservices applicatio
 
 ### 2.2 Backoffice.Web
 **Role:** Server-side Blazor web application  
-**Framework:** ASP.NET Core 3.1 + Blazor Server  
+**Framework:** ASP.NET Core (.NET 10) + Blazor Server  
 **Rendering:** Server-side with WebSocket real-time updates
 
 **Key Responsibilities:**
@@ -109,7 +109,7 @@ The Backoffice solution is a **multi-tier, event-driven microservices applicatio
 
 ### 2.3 Backoffice.WebSocket.API
 **Role:** Real-time bidirectional communication gateway  
-**Framework:** ASP.NET Core 3.1 + SignalR with MessagePack  
+**Framework:** ASP.NET Core (.NET 10) + SignalR with MessagePack  
 **Transport:** WebSockets (primary), Server-Sent Events (fallback), Long Polling (fallback)
 
 **Key Responsibilities:**
@@ -1764,20 +1764,20 @@ var apiKey = Configuration[$"API:XxxAPI:{region}:APIKey"];
 
 | Component | Technology | Version |
 |-----------|-----------|---------|
-| Framework | .NET Core | 3.1 |
-| Web Framework | ASP.NET Core | 3.1 |
-| Web Frontend | Blazor Server | 3.1 |
-| ORM | Entity Framework Core | 3.1.15 |
+| Framework | .NET | 10.0 |
+| Web Framework | ASP.NET Core | 10.0 |
+| Web Frontend | Blazor Server | 10.0 |
+| ORM | Entity Framework Core | 10.0.11 |
 | Primary Database | SQL Server | 2019+ |
 | Secondary Database | MongoDB | 4.0+ |
 | Message Broker | RabbitMQ | 3.8+ |
-| Real-time Communication | SignalR / WebSocket | 3.1 |
+| Real-time Communication | SignalR / WebSocket | 10.0 |
 | Logging | Serilog | 4.3.0 |
 | Observability | OpenTelemetry | 1.5.0 |
-| Serialization | System.Text.Json | 6.0.7 |
+| Serialization | System.Text.Json | framework-provided (.NET 10) |
 | Serialization (Binary) | MessagePack | - |
 | Compression | Brotli/Gzip | - |
-| Local Caching | System.Runtime.Caching | 7.0.0 |
+| Local Caching | System.Runtime.Caching | 10.0.11 |
 | JWT | System.IdentityModel.Tokens.Jwt | - |
 | API Documentation | Swagger/OpenAPI | 6.4.0 |
 | Client Libraries | UAParser | 3.1.47 |
@@ -1801,5 +1801,5 @@ Future enhancements should focus on distributed caching, advanced API versioning
 
 **Report Generated:** June 18, 2026  
 **Analysis Completed By:** GitHub Copilot  
-**Framework Version:** .NET Core 3.1  
-**Last Updated:** June 18, 2026
+**Framework Version:** .NET 10 (upgraded August 2026, GM-743)  
+**Last Updated:** August 20, 2026

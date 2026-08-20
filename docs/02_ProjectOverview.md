@@ -23,8 +23,8 @@
 Primary REST API gateway for all backoffice operations. Orchestrates data access, external service communication, and message publishing.
 
 ### Framework
-- ASP.NET Core 3.1
-- .NET Core 3.1
+- ASP.NET Core (.NET 10)
+- .NET 10
 
 ### Key Components
 
@@ -95,7 +95,7 @@ Primary REST API gateway for all backoffice operations. Orchestrates data access
 
 ### Dependencies
 - Backoffice.Shared (shared library)
-- Entity Framework Core 3.1.15
+- Entity Framework Core 10.0.11
 - Newtonsoft.Json (legacy) + System.Text.Json
 - RabbitMQ.Client 5.2.0
 - Serilog 4.3.0
@@ -156,7 +156,7 @@ Primary REST API gateway for all backoffice operations. Orchestrates data access
 Server-side Blazor web application providing UI for backoffice operations. Real-time updates via SignalR.
 
 ### Framework
-- ASP.NET Core 3.1
+- ASP.NET Core (.NET 10)
 - Blazor Server
 - SignalR
 
@@ -222,7 +222,7 @@ Server-side Blazor web application providing UI for backoffice operations. Real-
 Real-time bidirectional communication hub using SignalR with WebSocket protocol and fallback transports.
 
 ### Framework
-- ASP.NET Core 3.1
+- ASP.NET Core (.NET 10)
 - SignalR
 
 ### Key Components
@@ -274,7 +274,7 @@ Background worker service consuming RabbitMQ messages for configuration updates.
 
 ### Framework
 - ASP.NET Core Worker Service
-- .NET Core 3.1
+- .NET 10
 
 ### Key Components
 
@@ -323,7 +323,7 @@ General-purpose background worker for settlement history exports, configuration 
 
 ### Framework
 - ASP.NET Core Worker Service
-- .NET Core 3.1
+- .NET 10
 
 ### Key Components
 
@@ -404,7 +404,7 @@ Shared library containing all domain models, database contexts, utilities, and m
 
 ### Framework
 - .NET Standard Class Library
-- .NET Core 3.1 compatible
+- .NET 10 compatible
 
 ### Key Subdirectories
 
@@ -447,7 +447,7 @@ Shared library containing all domain models, database contexts, utilities, and m
 ### Dependencies
 - MongoDB.Driver 3.7.1
 - RabbitMQ.Client 5.2.0
-- Entity Framework Core 3.1.15
+- Entity Framework Core 10.0.11
 - OpenTelemetry.Api 1.5.0
 - System.Runtime.Caching 7.0.0
 - Newtonsoft.Json 13.0.1
@@ -506,7 +506,7 @@ Backoffice.Shared
 ## Build & Runtime Characteristics
 
 ### Build
-- All projects compile to .NET Core 3.1 binaries
+- All projects compile to .NET 10 binaries
 - Single solution file: backoffice-final.sln
 - Embedded resource files, migrations
 - NuGet dependencies resolved at build time
@@ -550,7 +550,7 @@ Backoffice.Shared
 ## Technology Debt
 
 ### High Priority
-1. .NET Core 3.1 end-of-life (upgrade to 6.0+)
+1. ~~.NET Core 3.1 end-of-life~~ — resolved August 2026 (GM-743): all projects upgraded to .NET 10
 2. Unused/deprecated code marked for removal
 3. Mixed JSON serialization libraries
 4. Developer exception page always enabled

@@ -16,25 +16,21 @@ library.
 
 | Project | Type | Target framework | Purpose |
 |---|---|---|---|
-| `Backoffice.API` | ASP.NET Core Web API | netcoreapp3.1 | Primary REST gateway; controllers, repositories, SQL + Mongo access, Swagger |
-| `Backoffice.Web` | Blazor Server | net8.0 | The back-office UI; talks to Backoffice.API over HTTP and to the WebSocket hub over SignalR |
-| `Backoffice.WebSocket.API` | ASP.NET Core Web API | net7.0 | SignalR hub (`/bohub`, MessagePack) pushing real-time updates to Web clients |
-| `Backoffice.WebSocket.Service` | Worker Service | netcoreapp3.1 | Consumes RabbitMQ messages and routes them to the WebSocket hub |
-| `Backoffice.Config.Service` | Worker Service | netcoreapp3.1 | Background config processing (RabbitMQ consumer + Backoffice DB) |
-| `Backoffice.Utility` | Worker Service | netcoreapp3.1 | General utility jobs (RabbitMQ consumer, Azure Storage, Backoffice DB) |
-| `Backoffice.Shared` | Class library | netcoreapp3.1 | Shared entities, EF Core contexts, message contracts, utilities |
-| `Backoffice.API.Tests` | xUnit tests | netcoreapp3.1 | Tests for Backoffice.API (xUnit, Moq, EF Core InMemory) |
-| `Backoffice.Web.Tests` | xUnit + bUnit tests | net8.0 | Tests for Backoffice.Web and Backoffice.WebSocket.Service |
+| `Backoffice.API` | ASP.NET Core Web API | net10.0 | Primary REST gateway; controllers, repositories, SQL + Mongo access, Swagger |
+| `Backoffice.Web` | Blazor Server | net10.0 | The back-office UI; talks to Backoffice.API over HTTP and to the WebSocket hub over SignalR |
+| `Backoffice.WebSocket.API` | ASP.NET Core Web API | net10.0 | SignalR hub (`/bohub`, MessagePack) pushing real-time updates to Web clients |
+| `Backoffice.WebSocket.Service` | Worker Service | net10.0 | Consumes RabbitMQ messages and routes them to the WebSocket hub |
+| `Backoffice.Config.Service` | Worker Service | net10.0 | Background config processing (RabbitMQ consumer + Backoffice DB) |
+| `Backoffice.Utility` | Worker Service | net10.0 | General utility jobs (RabbitMQ consumer, Azure Storage, Backoffice DB) |
+| `Backoffice.Shared` | Class library | net10.0 | Shared entities, EF Core contexts, message contracts, utilities |
+| `Backoffice.API.Tests` | xUnit tests | net10.0 | Tests for Backoffice.API (xUnit, Moq, EF Core InMemory) |
+| `Backoffice.Web.Tests` | xUnit + bUnit tests | net10.0 | Tests for Backoffice.Web and Backoffice.WebSocket.Service |
 
 ## Prerequisites
 
-- .NET SDKs / runtimes. The solution mixes target frameworks:
-  - The Dockerfiles build `Backoffice.API` and `Backoffice.Web` with the .NET 8 SDK
-    and the remaining services with the .NET 7 SDK, so a .NET 8 SDK is sufficient
-    to build everything.
-  - To run the netcoreapp3.1 projects directly on your machine you also need the
-    .NET Core 3.1 runtime (the Docker runtime image is `aspnet:3.1`), and the
-    .NET 7 runtime for `Backoffice.WebSocket.API`.
+- .NET 10 SDK. Since GM-743 (August 2026) every project targets `net10.0`, so a
+  single .NET 10 SDK builds and runs everything. The Dockerfiles build on
+  `mcr.microsoft.com/dotnet/sdk:10.0` and run on `aspnet:10.0`.
 - Access to the private GitHub Packages NuGet feed. Every runnable project
   references `Infra.Extensions.Telemetry`, which is served from
   `https://nuget.pkg.github.com/FlyingCockatoo/index.json`. Configure the source
@@ -159,8 +155,8 @@ Traced against `Backoffice.API/Startup.cs` and `Backoffice.Web/Program.cs`:
 
 | | Needed to start the process | Needed only at first request |
 |---|---|---|
-| Backoffice.API | .NET Core 3.1 runtime, restored NuGet packages, parseable `appsettings.json` | Everything external. The four SQL databases (`Backoffice`, `Sportsbook`, `Trading`, `Translation`) are registered as DbContexts in `Startup.cs` (lines 92-102) but no connection is opened until the first query. MongoDB connects lazily in the `SportsbookRepository`/`TradingRepository` constructors on the first request that resolves them. The Auth API and WebProps HttpClients are configured lazily on first resolution. `AddHealthChecks()` registers no database checks, so `/healthz` is green regardless. |
-| Backoffice.Web | .NET 8 SDK, restored NuGet packages | Backoffice.API (`API:Backoffice:Uri`) for translations, login and all data; the SignalR hub (`API:HubAPI`) for live updates. The login page GET fetches UI translations from the API but swallows every failure and falls back to English labels (`Login.cshtml.cs` -> `TranslationService` -> `BackofficeService.GetTranslation`), so the page renders even with nothing else running. |
+| Backoffice.API | .NET 10 runtime, restored NuGet packages, parseable `appsettings.json` | Everything external. The four SQL databases (`Backoffice`, `Sportsbook`, `Trading`, `Translation`) are registered as DbContexts in `Startup.cs` (lines 92-102) but no connection is opened until the first query. MongoDB connects lazily in the `SportsbookRepository`/`TradingRepository` constructors on the first request that resolves them. The Auth API and WebProps HttpClients are configured lazily on first resolution. `AddHealthChecks()` registers no database checks, so `/healthz` is green regardless. |
+| Backoffice.Web | .NET 10 SDK, restored NuGet packages | Backoffice.API (`API:Backoffice:Uri`) for translations, login and all data; the SignalR hub (`API:HubAPI`) for live updates. The login page GET fetches UI translations from the API but swallows every failure and falls back to English labels (`Login.cshtml.cs` -> `TranslationService` -> `BackofficeService.GetTranslation`), so the page renders even with nothing else running. |
 
 Logging in is the first thing that needs the full chain: Web -> Backoffice.API
 `POST /api/authentication/login` -> Auth API (`API:AuthenticationAPI:Uri`, default

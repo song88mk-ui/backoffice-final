@@ -34,7 +34,7 @@ Backoffice.Shared
 
 ### Core Framework
 ```
-Microsoft.AspNetCore.* (3.1.x)
+Microsoft.AspNetCore.* (10.0.x)
 ├─ Microsoft.AspNetCore.Hosting
 ├─ Microsoft.AspNetCore.Http
 ├─ Microsoft.AspNetCore.Mvc
@@ -42,12 +42,12 @@ Microsoft.AspNetCore.* (3.1.x)
 ├─ Microsoft.AspNetCore.Diagnostics.HealthChecks
 └─ Microsoft.AspNetCore.ResponseCompression
 
-Microsoft.EntityFrameworkCore (3.1.15)
+Microsoft.EntityFrameworkCore (10.0.11)
 ├─ Microsoft.EntityFrameworkCore.SqlServer
 ├─ Microsoft.EntityFrameworkCore (core)
 └─ (No auto-migrations visible)
 
-Microsoft.Extensions.* (3.1.x - 6.0.x)
+Microsoft.Extensions.* (10.0.x)
 ├─ Microsoft.Extensions.Configuration
 ├─ Microsoft.Extensions.DependencyInjection
 ├─ Microsoft.Extensions.Hosting

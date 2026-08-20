@@ -23,7 +23,7 @@ These rules are defined in full in `CLAUDE.md → Safety & Environment Rules`. T
 | **Connection string safety** | Verify the target environment from the connection string before running any infrastructure-touching operation |
 | **RabbitMQ isolation** | Confirm the broker host is non-production before publishing any messages |
 | **Migration safety** | Run `dotnet ef migrations list` and confirm the target DB before `dotnet ef database update` |
-| **Documentation** | Every code change must update the relevant `docs/*.md` file; PR descriptions must state what changed, which services are affected, and what to test |
+| **Documentation** | Every code change must update the relevant `docs/*.md` file AND `README.md` if the change affects anything the README documents (project/framework table, prerequisites, run/test instructions, config keys, endpoints); PR descriptions must state what changed, which services are affected, and what to test |
 | **Focused commits** | One domain per commit; large mixed-purpose commits are prohibited |
 | **Testing structure** | Code must be written to be testable; once a test suite exists, all commits must pass tests before merge |
 | **SQL idempotency** | Every SQL script (data fix, seed, permission insert, migration) must be idempotent — guard INSERTs with NOT EXISTS/MERGE, schema changes with IF NOT EXISTS, so re-running is a no-op |

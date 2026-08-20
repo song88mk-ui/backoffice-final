@@ -13,14 +13,14 @@
 
 # Claude Code Assistant Configuration
 
-**Backoffice Solution** | .NET Core 3.1 | Multi-tier Event-Driven Architecture  
-**Last Updated:** June 2026 (Safety & Environment Rules added) | Production Environment
+**Backoffice Solution** | .NET 10 | Multi-tier Event-Driven Architecture  
+**Last Updated:** August 2026 (.NET 10 upgrade, GM-743) | Production Environment
 
 ---
 
 ## Repository Overview
 
-The Backoffice solution is a **distributed event-driven microservices platform** serving a betting/sportsbook infrastructure. It consists of 7 interconnected .NET Core 3.1 projects managing configuration, real-time messaging, trading operations, and web interface layer.
+The Backoffice solution is a **distributed event-driven microservices platform** serving a betting/sportsbook infrastructure. It consists of 7 interconnected .NET 10 projects managing configuration, real-time messaging, trading operations, and web interface layer.
 
 ### Architecture Summary
 
@@ -171,6 +171,7 @@ SQL Server Management Studio, Azure Data Studio, MongoDB Compass, and similar to
 Every code change — however small — must be traceable. Other developers must be able to understand what changed and why without archaeology.
 
 - Update the relevant `docs/*.md` file(s) if the change affects architecture, messaging flows, caching strategy, or API contracts.
+- **Update `README.md` in the same change whenever the change affects anything the README documents** — the project/target-framework table, prerequisites, build/run/test instructions, configuration keys, or endpoints. The README must never describe a repo state that no longer exists.
 - If a new message type is added → update `docs/06_Messaging.md`.
 - If a new project or major component is added → update `docs/02_ProjectOverview.md`.
 - If the change introduces or resolves a known technical debt item → update `docs/08_TechnicalDebt.md`.
@@ -1458,7 +1459,7 @@ _ = _messageBroker.Publish(message);  // Result ignored
 
 ## Critical Constraints (DO NOT IGNORE)
 
-1. **.NET Core 3.1 End-of-Life:** Framework version is obsolete. Impacts library choices.
+1. **Framework .NET 10 (since August 2026, GM-743):** all projects target `net10.0`. Several third-party dependencies remain on legacy majors (RabbitMQ.Client 5.2.0, WindowsAzure.Storage 9.3.3, EPPlus 5.8.2) and NuGet audit flags known-vulnerable transitives — see docs/08_TechnicalDebt.md.
 2. **Single-Instance WebSocket:** `BackofficeHub` uses static dictionary. Not distributed.
 3. **No Idempotency:** Message processing not idempotent. Duplicate messages cause duplicate processing.
 4. **FireAndForget Messages:** Publishing failures are not detected or retried.

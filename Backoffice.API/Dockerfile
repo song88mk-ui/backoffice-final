@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 WORKDIR /source
 
@@ -27,7 +27,7 @@ RUN dotnet publish \
 
 RUN cd /app/publish && rm -f appsettings.*.json
 
-FROM mcr.microsoft.com/dotnet/aspnet:3.1
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 
 COPY --from=build /app/publish .

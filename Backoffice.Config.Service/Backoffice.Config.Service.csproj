@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <UserSecretsId>dotnet-Backoffice.Config.Service-674ca7ef-1c24-445a-8ca8-104a47bc30fe</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Infra.Extensions.Telemetry" Version="0.0.1-1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.32" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.11" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
     <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />

@@ -27,7 +27,7 @@ This documentation provides a comprehensive analysis of the Backoffice platform 
 - Communication patterns: HTTP, RabbitMQ, SignalR
 - Multi-region architecture
 - Scaling considerations
-- Technology constraints (legacy .NET Core 3.1)
+- Technology constraints (.NET 10, upgraded from legacy .NET Core 3.1 in August 2026, GM-743)
 - Key architectural decisions and rationale
 
 **Key Insights:**
@@ -581,7 +581,7 @@ This documentation provides a comprehensive analysis of the Backoffice platform 
 ## Document Integrity
 
 **Analysis Date:** June 18, 2026  
-**Framework:** .NET Core 3.1 (Legacy)  
+**Framework:** .NET 10 (upgraded from .NET Core 3.1, August 2026, GM-743)  
 **Analysis Completeness:** 100%  
 **Code Changes:** 0 (Analysis only)  
 **Files Reviewed:** 50+  
