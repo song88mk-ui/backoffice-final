@@ -610,9 +610,9 @@ namespace Backoffice.WebSocket.Service.Repositories
             return Math.Round(100 / ((100 / odds) + 2m), 2);
         }
 
-        private static string GetHomeName(string name, FixtureType fixtureType) => fixtureType == FixtureType.Match ? name.Split(" vs. ").First().Trim() : string.Empty;
+        private static string GetHomeName(string name, FixtureType fixtureType) => fixtureType == FixtureType.Match && !string.IsNullOrEmpty(name) ? name.Split(" vs. ").First().Trim() : string.Empty;
 
-        private static string GetAwayName(string name, FixtureType fixtureType) => fixtureType == FixtureType.Match ? name.Split(" vs. ").Last().Trim() : string.Empty;
+        private static string GetAwayName(string name, FixtureType fixtureType) => fixtureType == FixtureType.Match && !string.IsNullOrEmpty(name) ? name.Split(" vs. ").Last().Trim() : string.Empty;
 
         private async Task PublishToWebSocket<T>(string method, HubConnection hubConnection, T payload)
         {
