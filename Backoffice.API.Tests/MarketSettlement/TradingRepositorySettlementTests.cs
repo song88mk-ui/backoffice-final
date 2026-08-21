@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
@@ -314,6 +315,31 @@ namespace Backoffice.API.Tests.MarketSettlement
 
             // No activity-log message should be published to the broker anymore.
             rabbitMock.Verify(r => r.Publish(It.Is<MessageRequest>(m => m.MessageType == "LogActivityList"), It.IsAny<string>()), Times.Never);
+        }
+
+        // Locks in current behavior: a broker publish failure is reported as Error, but the
+        // activity log write that already happened is not rolled back - so a history row can
+        // exist for a settlement that was never actually broadcast.
+        [Fact]
+        public async Task AddOrUpdateManualMarketSettlement_PublishThrows_ReturnsErrorButActivityLogAlreadyWritten()
+        {
+            var requests = new List<ManualMarketSettlementRequest>
+            {
+                MakeRequest("pf1", "1", "101", "1001", BetStatus.Won),
+            };
+
+            var rabbitMock = new Mock<IRabbitMqRepository>();
+            rabbitMock
+                .Setup(r => r.Publish(It.IsAny<MessageRequest>(), It.IsAny<string>()))
+                .ThrowsAsync(new HttpRequestException("rabbitmq broker unreachable"));
+
+            var activityMock = new Mock<IBackofficeActivityLogRepository>();
+            var sut = BuildSut(rabbitMock.Object, activityMock.Object);
+
+            var result = await sut.AddOrUpdateManualMarketSettlement(requests, "tester", "HK");
+
+            Assert.Equal(StatusCode.Error, result.StatusCode);
+            activityMock.Verify(a => a.ProcessActivityLog(It.IsAny<OnActivityLogListMessage>(), It.IsAny<string>()), Times.Once);
         }
     }
 }
