@@ -4,7 +4,6 @@ using Backoffice.Shared.ExternalApis.Maintenance;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -48,10 +47,10 @@ namespace Backoffice.API.Repositories
         {
             using (var activity = _activitySource.StartActivity("get.maintenance.v2"))
             {
-                activity?.SetTag("client.codes", clientCodes?.Join(","));
+                activity?.SetTag("client.codes", clientCodes != null ? string.Join(",", clientCodes) : null);
                 try
                 {
-                    _logger.LogInformation($"[GetMaintenanceV2] clientCodes={clientCodes?.Join(",") ?? "NULL"}");
+                    _logger.LogInformation($"[GetMaintenanceV2] clientCodes={(clientCodes != null ? string.Join(",", clientCodes) : "NULL")}");
 
                     var clientResponse = await _platformRepository.GetClients("HK");
 
@@ -80,7 +79,7 @@ namespace Backoffice.API.Repositories
                         return new BaseResponse<MaintenanceResponse>()
                         {
                             StatusCode = clientResponse.StatusCode,
-                            Message = $"Empty client reference : {clientCodes?.Join(",") ?? "No Clients"}"
+                            Message = $"Empty client reference : {(clientCodes != null ? string.Join(",", clientCodes) : "No Clients")}"
                         };
                     }
 
@@ -172,7 +171,7 @@ namespace Backoffice.API.Repositories
         {
             using (var activity = _activitySource.StartActivity("set.maintenance.v2"))
             {
-                activity?.SetTag("client.codes", clientCodes?.Join(","));
+                activity?.SetTag("client.codes", clientCodes != null ? string.Join(",", clientCodes) : null);
                 try
                 {
                     var requestClientIds = request?.ClientIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToUpper()).ToList() ?? new List<string>();

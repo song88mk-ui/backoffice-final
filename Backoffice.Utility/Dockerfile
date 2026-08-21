@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /source
 
 ADD Backoffice.Shared Backoffice.Shared
@@ -27,7 +27,7 @@ RUN dotnet publish \
 WORKDIR /app/publish
 RUN rm -f appsettings.*.json
 
-FROM mcr.microsoft.com/dotnet/aspnet:3.1
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 
 COPY --from=build /app/publish .

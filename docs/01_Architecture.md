@@ -2,7 +2,7 @@
 
 **Document Status:** Analysis Complete (No Code Changes Made)  
 **Date:** June 18, 2026  
-**Framework:** .NET Core 3.1
+**Framework:** .NET 10 (upgraded from .NET Core 3.1, August 2026, GM-743)
 
 ## Architecture Pattern: Multi-Tier Event-Driven Microservices
 
@@ -249,11 +249,11 @@ Region-aware services:
 
 | Layer | Technology | Version |
 |-------|-----------|---------|
-| Framework | .NET Core | 3.1 |
-| Web API | ASP.NET Core | 3.1 |
-| Frontend | Blazor Server | 3.1 |
-| ORM | EF Core | 3.1.15 |
-| Real-time | SignalR | 3.1 |
+| Framework | .NET | 10.0 |
+| Web API | ASP.NET Core | 10.0 |
+| Frontend | Blazor Server | 10.0 |
+| ORM | EF Core | 10.0.11 |
+| Real-time | SignalR | 10.0 |
 | Messaging | RabbitMQ Client | 5.2.0 |
 | Database | SQL Server | 2019+ |
 | Cache | MongoDB | 4.0+ |
@@ -283,7 +283,7 @@ Region-aware services:
 ## System Constraints
 
 ### Technology Constraints
-- .NET Core 3.1 (older framework, may need upgrade)
+- .NET 10 (upgraded from .NET Core 3.1, August 2026)
 - Single-region deployment per instance
 - In-process caching limits scalability
 - Static MongoDB client not thread-safe by design

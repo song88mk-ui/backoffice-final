@@ -913,3 +913,27 @@ services.AddHealthChecks();
 4. Add performance baselines
 5. Distribute SignalR tracking
 
+---
+
+## .NET 10 Upgrade (GM-743) — Resolved Framework EOL + Remaining Package Debt
+
+**Date noted:** August 20, 2026
+
+**Resolved:** All 9 projects (7 production + 2 test) upgraded from mixed targets (netcoreapp3.1 / net7.0 / net8.0) to `net10.0`, with framework-aligned packages bumped to 10.0.11 (EF Core, SignalR clients, MessagePack protocol, Mvc.NewtonsoftJson, System.Runtime.Caching, Configuration.Binder). Dockerfiles build/run on `sdk:10.0`/`aspnet:10.0`; CI test job uses `dotnet-version: 10.0.x` (the libssl1.1 workaround for the 3.1 test host was removed). Code changes were limited to `Backoffice.API/Repositories/MaintenanceRepository.cs`, which had accidentally used the `Join` extension from `Microsoft.EntityFrameworkCore.Internal` (removed in newer EF) — replaced with `string.Join`. `System.Text.Json` package reference removed from Shared (framework-provided on net10). bunit bumped 1.26.64 → 1.40.0 (1.26 depended on `IJSUnmarshalledRuntime`, removed from Microsoft.JSInterop in .NET 10).
+
+**Remaining debt (out of scope for GM-743, each needs its own coordinated change):**
+
+| Package | Version | Where | Issue |
+|---------|---------|-------|-------|
+| RabbitMQ.Client | 5.2.0 | Shared, Web | Legacy major; 6.x/7.x have breaking API changes |
+| WindowsAzure.Storage | 9.3.3 | Utility | Deprecated; successor is Azure.Storage.Blobs |
+| EPPlus | 5.8.2 | Utility | Pulls System.Drawing.Common 5.0.0 (NU1904 critical advisory GHSA-rxg9-xrhp-64gj) |
+| MongoDB.Driver | 3.7.1 | Shared | Pulls SharpCompress 0.30.1 (NU1902) and Snappier 1.0.0 (NU1903 high, GHSA-pggp-6c3x-2xmx) |
+| System.IdentityModel.Tokens.Jwt | 6.26.0 | Web | NU1902 advisory GHSA-59j7-ghrg-fj52; 7.x/8.x renames namespaces |
+| Infra.Extensions.Telemetry | 0.0.1-1 | all services | Pins OpenTelemetry 1.14.0 transitively (multiple NU1902 advisories); needs a new package release |
+| Swashbuckle.AspNetCore | 6.4.0 | API | Old but functional on net10; upgrade when convenient |
+
+These NuGet audit warnings (NU1902/1903/1904) are surfaced by the .NET 10 SDK during restore; they existed as transitive dependencies before the upgrade but were not audited by the old SDKs. None fail the build.
+
+**Also noted during the upgrade (pre-existing, unrelated):** real Staging SQL credentials are committed in `Backoffice.API/appsettings.json` (`ConnectionStrings` block, including a commented-out Production string) — violates CLAUDE.md rule 6 (Connection String & Secret Safety); needs a credential rotation + move to git-ignored overrides, tracked separately.
+
