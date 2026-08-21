@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.Extensions;
 using Backoffice.Web.Models;
 using Backoffice.Web.States;
@@ -216,7 +217,7 @@ namespace Backoffice.Web.Services
                 {
                     return JsonSerializer.Deserialize<BaseResponse<List<ClientInformationModel>>>(
                         await response.Content.ReadAsStringAsync(),
-                        new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        JsonSerializerOptionsProvider.CaseInsensitive
                         ) ?? new BaseResponse<List<ClientInformationModel>>();
                 }
                 else
@@ -226,7 +227,7 @@ namespace Backoffice.Web.Services
                         return JsonSerializer.Deserialize<BaseResponse<List<ClientInformationModel>>>
                         (
                             await response.Content.ReadAsStringAsync(),
-                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                            JsonSerializerOptionsProvider.CaseInsensitive
                         ) ?? new BaseResponse<List<ClientInformationModel>>();
                     }
                     else
@@ -263,11 +264,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/priceboost/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<PriceBoostConfigModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<List<PriceBoostConfigModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<PriceBoostConfigModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<List<PriceBoostConfigModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<List<PriceBoostConfigModel>>
@@ -298,11 +299,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/priceboost/settings/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<BoostedSettingsModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<List<BoostedSettingsModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<BoostedSettingsModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<List<BoostedSettingsModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<List<BoostedSettingsModel>>
@@ -334,11 +335,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/priceboost/settings{query}", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<bool>
@@ -370,11 +371,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/priceboost", new StringContent(JsonSerializer.Serialize(request.PriceBoostConfigList), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<PriceBoostConfigResponse>
@@ -406,11 +407,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/priceboost", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<PriceBoostConfigResponse>
@@ -444,11 +445,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/sportsbook/fixtures", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<MarketFixtureResponse>
@@ -479,11 +480,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/sportsbook/outrightfixtures", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<MarketFixtureResponse>
@@ -539,11 +540,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/bet/details", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ManualBetDetailsResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<ManualBetDetailsResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ManualBetDetailsResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<ManualBetDetailsResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<ManualBetDetailsResponse>
@@ -574,11 +575,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/manual/messagesettlement", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<string>
@@ -647,11 +648,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/manual/marketsettlement/details", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ManualMarketSettlementDetailsResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<ManualMarketSettlementDetailsResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ManualMarketSettlementDetailsResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<ManualMarketSettlementDetailsResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<ManualMarketSettlementDetailsResponse>
@@ -683,11 +684,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/manual/marketsettlement?userid={userId}", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ManualMarketSettlementResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<ManualMarketSettlementResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ManualMarketSettlementResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<ManualMarketSettlementResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<ManualMarketSettlementResponse>
@@ -720,11 +721,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/client/config/all", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ConfigModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<ConfigModel>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ConfigModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<ConfigModel>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<ConfigModel>
@@ -759,7 +760,7 @@ namespace Backoffice.Web.Services
                     return JsonSerializer.Deserialize<BaseResponse<MarketTemplateGroupResponse>>
                         (
                             await response.Content.ReadAsStringAsync(),
-                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                            JsonSerializerOptionsProvider.CaseInsensitive
                         ) ?? new BaseResponse<MarketTemplateGroupResponse>();
                 else
                 {
@@ -769,7 +770,7 @@ namespace Backoffice.Web.Services
                             return JsonSerializer.Deserialize<BaseResponse<MarketTemplateGroupResponse>>
                             (
                                 await response.Content.ReadAsStringAsync(),
-                                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                                JsonSerializerOptionsProvider.CaseInsensitive
                             ) ?? new BaseResponse<MarketTemplateGroupResponse>();
                         }
                         else
@@ -814,7 +815,7 @@ namespace Backoffice.Web.Services
                     return JsonSerializer.Deserialize<BaseResponse<MarketLookupResponse>>
                         (
                             await response.Content.ReadAsStringAsync(),
-                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                            JsonSerializerOptionsProvider.CaseInsensitive
                         ) ?? new BaseResponse<MarketLookupResponse>();
                 else
                 {
@@ -824,7 +825,7 @@ namespace Backoffice.Web.Services
                             return JsonSerializer.Deserialize<BaseResponse<MarketLookupResponse>>
                             (
                                 await response.Content.ReadAsStringAsync(),
-                                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                                JsonSerializerOptionsProvider.CaseInsensitive
                             ) ?? new BaseResponse<MarketLookupResponse>();
                         }
                         else
@@ -869,7 +870,7 @@ namespace Backoffice.Web.Services
                     return JsonSerializer.Deserialize<BaseResponse<ClientConfigResponse>>
                         (
                             await response.Content.ReadAsStringAsync(),
-                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                            JsonSerializerOptionsProvider.CaseInsensitive
                         ) ?? new BaseResponse<ClientConfigResponse>();
                 else
                 {
@@ -879,7 +880,7 @@ namespace Backoffice.Web.Services
                             return JsonSerializer.Deserialize<BaseResponse<ClientConfigResponse>>
                             (
                                 await response.Content.ReadAsStringAsync(),
-                                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                                JsonSerializerOptionsProvider.CaseInsensitive
                             ) ?? new BaseResponse<ClientConfigResponse>();
                         }
                         else
@@ -924,7 +925,7 @@ namespace Backoffice.Web.Services
                     return JsonSerializer.Deserialize<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>>
                         (
                             await response.Content.ReadAsStringAsync(),
-                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                            JsonSerializerOptionsProvider.CaseInsensitive
                         ) ?? new BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>();
                 else
                 {
@@ -934,7 +935,7 @@ namespace Backoffice.Web.Services
                             return JsonSerializer.Deserialize<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>>
                             (
                                 await response.Content.ReadAsStringAsync(),
-                                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                                JsonSerializerOptionsProvider.CaseInsensitive
                             ) ?? new BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>();
                         }
                         else
@@ -977,11 +978,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/publish", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<MessageResponse>

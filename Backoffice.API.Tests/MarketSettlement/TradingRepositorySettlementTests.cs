@@ -119,11 +119,11 @@ namespace Backoffice.API.Tests.MarketSettlement
             Assert.All(published, p => Assert.Equal("r.uof.onbetsettlement", p.RoutingKey));
 
             var pf1 = published
-                .Select(s => JsonSerializer.Deserialize<OnBetSettlementMessage>(s.Payload, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }))
+                .Select(s => JsonSerializer.Deserialize<OnBetSettlementMessage>(s.Payload, JsonSerializerOptionsProvider.CaseInsensitive))
                 .Single(m => m.ProviderFixtureId == "pf1");
 
             var pf2 = published
-                .Select(s => JsonSerializer.Deserialize<OnBetSettlementMessage>(s.Payload, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }))
+                .Select(s => JsonSerializer.Deserialize<OnBetSettlementMessage>(s.Payload, JsonSerializerOptionsProvider.CaseInsensitive))
                 .Single(m => m.ProviderFixtureId == "pf2");
 
             Assert.Equal(2, pf1.Selections.Count);
@@ -156,7 +156,7 @@ namespace Backoffice.API.Tests.MarketSettlement
             await sut.AddOrUpdateManualMarketSettlement(requests, "tester", "HK");
 
             var payload = published.Single(p => p.MessageType == "OnBetSettlement").Payload;
-            var msg = JsonSerializer.Deserialize<OnBetSettlementMessage>(payload, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var msg = JsonSerializer.Deserialize<OnBetSettlementMessage>(payload, JsonSerializerOptionsProvider.CaseInsensitive);
 
             Assert.Equal(5, msg.Selections.Count);
             Assert.Equal(2, msg.Selections.Count(s => s.Result));    // Won + HalfWon
@@ -187,7 +187,7 @@ namespace Backoffice.API.Tests.MarketSettlement
             await sut.AddOrUpdateManualMarketSettlement(requests, "tester", "HK");
 
             var payload = published.Single(p => p.MessageType == "OnBetSettlement").Payload;
-            var msg = JsonSerializer.Deserialize<OnBetSettlementMessage>(payload, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var msg = JsonSerializer.Deserialize<OnBetSettlementMessage>(payload, JsonSerializerOptionsProvider.CaseInsensitive);
 
             Assert.Equal(VoidFactor.Zero, msg.Selections.Single(s => s.SelectionTemplateId == "st_won").VoidFactor);
             Assert.Equal(VoidFactor.Half, msg.Selections.Single(s => s.SelectionTemplateId == "st_halfwon").VoidFactor);
@@ -222,7 +222,7 @@ namespace Backoffice.API.Tests.MarketSettlement
             await sut.AddOrUpdateManualMarketSettlement(requests, "tester", "HK");
 
             var payload = published.Single(p => p.MessageType == "OnBetSettlement").Payload;
-            var msg = JsonSerializer.Deserialize<OnBetSettlementMessage>(payload, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var msg = JsonSerializer.Deserialize<OnBetSettlementMessage>(payload, JsonSerializerOptionsProvider.CaseInsensitive);
 
             // Both lines share MaTeId+SeTeId; only SeSp tells them apart — it must be present and distinct.
             Assert.Equal(2, msg.Selections.Count);

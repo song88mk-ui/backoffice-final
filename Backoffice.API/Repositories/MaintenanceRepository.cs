@@ -4,6 +4,7 @@ using Backoffice.Shared.ExternalApis.Maintenance;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -295,7 +296,7 @@ namespace Backoffice.API.Repositories
                 }
 
                 // webprops-api returns a bare JSON array: [{"clientId":...,"isMaintenance":...,"site":...}]
-                return JsonSerializer.Deserialize<List<ExternalMaintenanceConfig>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                return JsonSerializer.Deserialize<List<ExternalMaintenanceConfig>>(content, JsonSerializerOptionsProvider.CaseInsensitive);
             }
         }
 

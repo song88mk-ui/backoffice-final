@@ -5,6 +5,7 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.States;
 using Serilog;
 
@@ -46,7 +47,7 @@ public class ProviderMappingService : IProviderMappingService
                 return JsonSerializer.Deserialize<BaseResponse<UnmappedResponse>>
                 (
                     await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                    JsonSerializerOptionsProvider.CaseInsensitive
                 ) ?? new BaseResponse<UnmappedResponse>();
             }
             else
@@ -78,7 +79,7 @@ public class ProviderMappingService : IProviderMappingService
                 return JsonSerializer.Deserialize<BaseResponse<LeagueMappingResponse>>
                 (
                     await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                    JsonSerializerOptionsProvider.CaseInsensitive
                 ) ?? new BaseResponse<LeagueMappingResponse>();
             }
             else
@@ -109,7 +110,7 @@ public class ProviderMappingService : IProviderMappingService
                 return JsonSerializer.Deserialize<BaseResponse<SegmentMappingResponse>>
                 (
                     await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                    JsonSerializerOptionsProvider.CaseInsensitive
                 ) ?? new BaseResponse<SegmentMappingResponse>();
             }
             else
@@ -141,7 +142,7 @@ public class ProviderMappingService : IProviderMappingService
                 return JsonSerializer.Deserialize<BaseResponse<SportMappingResponse>>
                 (
                     await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                    JsonSerializerOptionsProvider.CaseInsensitive
                 ) ?? new BaseResponse<SportMappingResponse>();
             }
             else
@@ -174,7 +175,7 @@ public class ProviderMappingService : IProviderMappingService
                 return JsonSerializer.Deserialize<BaseResponse<SportMappingItemModel>>
                 (
                     await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                    JsonSerializerOptionsProvider.CaseInsensitive
                 ) ?? new BaseResponse<SportMappingItemModel>();
             }
             else
@@ -205,7 +206,7 @@ public class ProviderMappingService : IProviderMappingService
                 return JsonSerializer.Deserialize<BaseResponse<LeagueMappingItemModel>>
                 (
                     await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                    JsonSerializerOptionsProvider.CaseInsensitive
                 ) ?? new BaseResponse<LeagueMappingItemModel>();
             }
             else
@@ -237,7 +238,7 @@ public class ProviderMappingService : IProviderMappingService
                 return JsonSerializer.Deserialize<BaseResponse<SegmentMappingItemModel>>
                 (
                     await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                    JsonSerializerOptionsProvider.CaseInsensitive
                 ) ?? new BaseResponse<SegmentMappingItemModel>();
             }
             else
@@ -268,7 +269,7 @@ public class ProviderMappingService : IProviderMappingService
             return JsonSerializer.Deserialize<BaseResponse<bool>>
             (
                 await response.Content.ReadAsStringAsync(),
-                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                JsonSerializerOptionsProvider.CaseInsensitive
             ) ?? new BaseResponse<bool>();
         }
         catch (Exception ex)
@@ -294,7 +295,7 @@ public class ProviderMappingService : IProviderMappingService
             return JsonSerializer.Deserialize<BaseResponse<bool>>
             (
                 await response.Content.ReadAsStringAsync(),
-                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                JsonSerializerOptionsProvider.CaseInsensitive
             ) ?? new BaseResponse<bool>();
         }
         catch (Exception ex)
@@ -320,7 +321,7 @@ public class ProviderMappingService : IProviderMappingService
             return JsonSerializer.Deserialize<BaseResponse<bool>>
             (
                 await response.Content.ReadAsStringAsync(),
-                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                JsonSerializerOptionsProvider.CaseInsensitive
             ) ?? new BaseResponse<bool>();
         }
         catch (Exception ex)
@@ -345,7 +346,7 @@ public class ProviderMappingService : IProviderMappingService
             return JsonSerializer.Deserialize<BaseResponse<bool>>
             (
                 await response.Content.ReadAsStringAsync(),
-                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                JsonSerializerOptionsProvider.CaseInsensitive
             ) ?? new BaseResponse<bool>();
         }
         catch (Exception ex)

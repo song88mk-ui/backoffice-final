@@ -2,6 +2,7 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Utilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -52,7 +53,7 @@ namespace Backoffice.API.Repositories
                     };
                 }
 
-                var result = System.Text.Json.JsonSerializer.Deserialize<ClientFeatureFlagsResponse>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                var result = System.Text.Json.JsonSerializer.Deserialize<ClientFeatureFlagsResponse>(content, JsonSerializerOptionsProvider.CaseInsensitive);
 
                 return new BaseResponse<ClientFeatureFlagsResponse>()
                 {

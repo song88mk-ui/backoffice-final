@@ -3,6 +3,7 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Utilities;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Diagnostics;
@@ -39,7 +40,7 @@ namespace Backoffice.API.Repositories
                 {
                     activity?.SetStatus(ActivityStatusCode.Ok);
                     this._publishedMessagesCounter.Add(1);
-                    return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 }
                 else
                 {
