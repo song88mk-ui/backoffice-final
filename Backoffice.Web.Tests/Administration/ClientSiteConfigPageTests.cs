@@ -101,7 +101,7 @@ namespace Backoffice.Web.Tests.Administration
             });
 
             Assert.Contains("No existing configuration found", cut.Markup);
-            Assert.Equal(7, cut.FindAll(".feature-flag").Count);
+            Assert.Equal(8, cut.FindAll(".feature-flag").Count);
             Assert.Contains("Themes", cut.Markup);
             Assert.NotNull(cut.Find("#theme-AL-red"));
             Assert.NotNull(cut.Find("#theme-EL2-white"));

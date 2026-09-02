@@ -48,6 +48,7 @@ namespace Backoffice.Web.Pages.Administration
             new FeatureFlagDefinition("ff-dark-mode", "Dark Mode", "Enables the dark mode theme toggle for the client's site.", f => f.DarkMode, (f, v) => f.DarkMode = v),
             new FeatureFlagDefinition("ff-language-options", "Language Options", "Enables the language selector, scoped to English and Chinese (ZH) only.", f => f.LanguageOptions, (f, v) => f.LanguageOptions = v),
             new FeatureFlagDefinition("ff-og-auth", "OG Auth", "Switches the site into Oriental Gaming (OG) mode: page title, bet ID formatting, and header/auth behavior for OG-integrated operators.", f => f.OGAuth, (f, v) => f.OGAuth = v),
+            new FeatureFlagDefinition("ff-full-cashout", "Full Cashout", "Enables the full cash-out button on eligible open bets.", f => f.FullCashout, (f, v) => f.FullCashout = v),
             new FeatureFlagDefinition("ff-partial-cashout", "Partial Cashout", "Enables the partial cash-out button on eligible open bets.", f => f.PartialCashout, (f, v) => f.PartialCashout = v),
             new FeatureFlagDefinition("ff-bet-recommendation", "Bet Recommendation", "Shows the bet recommendation widget on the client site's main odds table.", f => f.BetRecommendation, (f, v) => f.BetRecommendation = v),
             new FeatureFlagDefinition("ff-euro-layout", "Euro Layout", "Switches the client's site to the Euro (EL2) layout variant instead of the default Asian layout.", f => f.IsEuroLayout, (f, v) => f.IsEuroLayout = v)
@@ -197,6 +198,7 @@ namespace Backoffice.Web.Pages.Administration
                 DarkMode = _clientFeatureFlags.Features.DarkMode,
                 LanguageOptions = _clientFeatureFlags.Features.LanguageOptions,
                 OGAuth = _clientFeatureFlags.Features.OGAuth,
+                FullCashout = _clientFeatureFlags.Features.FullCashout,
                 PartialCashout = _clientFeatureFlags.Features.PartialCashout,
                 BetRecommendation = _clientFeatureFlags.Features.BetRecommendation,
                 IsEuroLayout = _clientFeatureFlags.Features.IsEuroLayout,

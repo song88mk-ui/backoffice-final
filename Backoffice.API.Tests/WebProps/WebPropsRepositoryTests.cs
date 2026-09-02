@@ -58,6 +58,19 @@ namespace Backoffice.API.Tests.WebProps
         }
 
         [Fact]
+        public async Task GetClientFeatureFlagsAsync_MissingFullCashoutKey_DefaultsToTrue()
+        {
+            // RealConfigJson predates FullCashout, so this also covers every existing
+            // client's stored config until it is next saved with the new field.
+            var (sut, _) = BuildSut(_ => Json(HttpStatusCode.OK, RealConfigJson));
+
+            var result = await sut.GetClientFeatureFlagsAsync("G02");
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.True(result.Result.Features.FullCashout);
+        }
+
+        [Fact]
         public async Task GetClientFeatureFlagsAsync_GenuineNotFound_ReturnsNotFoundStatus()
         {
             var (sut, _) = BuildSut(_ => Json(HttpStatusCode.NotFound, NotFoundJson));
@@ -109,6 +122,7 @@ namespace Backoffice.API.Tests.WebProps
                 DarkMode = true,
                 LanguageOptions = true,
                 OGAuth = false,
+                FullCashout = false,
                 PartialCashout = true,
                 BetRecommendation = true
             };
@@ -121,6 +135,7 @@ namespace Backoffice.API.Tests.WebProps
             Assert.Contains("\"GameTrackerProductNames\"", capturedPostBody);
             Assert.Contains("\"BettingRules\":false", capturedPostBody);
             Assert.Contains("\"BetRecommendation\":true", capturedPostBody);
+            Assert.Contains("\"FullCashout\":false", capturedPostBody);
         }
 
         [Fact]

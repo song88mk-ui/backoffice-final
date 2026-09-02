@@ -115,6 +115,7 @@ namespace Backoffice.API.Repositories
                 features["DarkMode"] = request.DarkMode;
                 features["LanguageOptions"] = request.LanguageOptions;
                 features["OGAuth"] = request.OGAuth;
+                features["FullCashout"] = request.FullCashout;
                 features["PartialCashout"] = request.PartialCashout;
                 features["BetRecommendation"] = request.BetRecommendation;
                 features["IsEuroLayout"] = request.IsEuroLayout;
