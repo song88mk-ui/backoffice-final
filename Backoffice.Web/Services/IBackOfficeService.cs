@@ -27,6 +27,10 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ClientModel>> GetClientsV2(CancellationToken cancellationToken = default);
         Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
+        Task<BaseResponse<ValidateClientImportResponse>> ValidateClientImport(ValidateClientImportRequest request);
+        Task<BaseResponse<CommitClientImportResponse>> CommitClientImport(CommitClientImportRequest request);
+        Task<BaseResponse<ClientImportProgressResponse>> GetClientImportProgress(Guid batchId);
+        Task<BaseResponse<string>> GetClientImportEnvironment();
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
         Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates();
         Task<BaseResponse<ClientTopFixtureModel>> GetClientTopFixtures(GetClientTopFixtureRequest request);

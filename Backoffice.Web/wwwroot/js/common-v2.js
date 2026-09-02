@@ -627,6 +627,16 @@ window.getCookie = (name) => {
     return null;
 }
 
+window.blockPageClose = function (message) {
+    window.onbeforeunload = function () {
+        return message;
+    };
+};
+
+window.allowPageClose = function () {
+    window.onbeforeunload = null;
+};
+
 window.languageChanged = function (name, value, days) {
     setCookie(name, value, days);
     window.location.reload();

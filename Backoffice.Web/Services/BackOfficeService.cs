@@ -680,6 +680,86 @@ namespace Backoffice.Web.Services
             }
         }
 
+        public async Task<BaseResponse<string>> GetClientImportEnvironment()
+        {
+            try
+            {
+                return await GetAsync<string>($"sportsbook/clientimport/environment") ?? new BaseResponse<string>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<string>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ClientImportProgressResponse>> GetClientImportProgress(Guid batchId)
+        {
+            try
+            {
+                return await GetAsync<ClientImportProgressResponse>($"sportsbook/clientimport/progress/{batchId}") ?? new BaseResponse<ClientImportProgressResponse>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<ClientImportProgressResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ValidateClientImportResponse>> ValidateClientImport(ValidateClientImportRequest request)
+        {
+            try
+            {
+                return await PostAsJsonAsync<ValidateClientImportResponse, ValidateClientImportRequest>($"sportsbook/clientimport/validate", request) ?? new BaseResponse<ValidateClientImportResponse>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<ValidateClientImportResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<CommitClientImportResponse>> CommitClientImport(CommitClientImportRequest request)
+        {
+            try
+            {
+                return await PostAsJsonAsync<CommitClientImportResponse, CommitClientImportRequest>($"sportsbook/clientimport/commit", request) ?? new BaseResponse<CommitClientImportResponse>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<CommitClientImportResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request)
         {
             try

@@ -124,6 +124,20 @@ namespace Backoffice.Web.Pages.SBC
             ModalService.Open<CreateOrUpdateModal>("Create Client", parameters, options);
         }
 
+        public Task OnImportClientsClickEvent()
+        {
+            Alerts.Clear();
+
+            var parameters = new ModalParameters();
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-xl");
+
+            var options = new ModalOptions();
+            ModalService.Open<ImportClientsModal>("Import Clients from CSV", parameters, options);
+
+            return Task.CompletedTask;
+        }
+
         public async Task OnEditClientClickEvent(ClientListResponse.Client client)
         {
             Alerts.Clear();

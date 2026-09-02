@@ -17,6 +17,8 @@ namespace Backoffice.Shared.Data.Backoffice
             modelBuilder.Entity<ConfigTemplateAssigned>().HasKey(k => new { k.Id });
             //modelBuilder.Entity<Translation>().HasKey(k => new { k.LanguageCode, k.Name });
             modelBuilder.Entity<ConfigTemplateAssignedMapping>().HasKey(k => new { k.ConfigTemplateAssignedId, k.ConfigTemplateId, k.FixtureStatusId });
+            modelBuilder.Entity<ClientImportBatch>().HasKey(k => new { k.BatchId });
+            modelBuilder.Entity<ClientImportBatchRow>().HasKey(k => new { k.Id });
         }
 
         public DbSet<ClientInformation> ClientInformation { get; set; }
@@ -31,5 +33,8 @@ namespace Backoffice.Shared.Data.Backoffice
         public DbSet<ConfigTemplateModel> ConfigTemplateModel { get; set; }
         // Stored Procedure
         public DbSet<ActivityLog> ReadActivityLog { get; set; }
+
+        public DbSet<ClientImportBatch> ClientImportBatch { get; set; }
+        public DbSet<ClientImportBatchRow> ClientImportBatchRow { get; set; }
     }
 }

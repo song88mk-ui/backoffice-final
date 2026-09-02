@@ -11,6 +11,7 @@ namespace Backoffice.Web.Components.SBC.Clients
 
         [Parameter] public EventCallback<ClientListCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<bool> OnCreateClientCallback { get; set; }
+        [Parameter] public EventCallback OnImportClientsCallback { get; set; }
 
         public SearchFormModel SearchForm { get; set; }
         public int SortBy { get; set; }
@@ -81,6 +82,11 @@ namespace Backoffice.Web.Components.SBC.Clients
         public async Task OnCreateClientClickEvent()
         {
             await OnCreateClientCallback.InvokeAsync();
+        }
+
+        public async Task OnImportClientsClickEvent()
+        {
+            await OnImportClientsCallback.InvokeAsync();
         }
 
         public void Dispose()

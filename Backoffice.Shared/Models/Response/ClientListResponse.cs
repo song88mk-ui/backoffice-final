@@ -27,6 +27,8 @@ namespace Backoffice.Shared.Models.Response
             }
             public int Num { get; set; }
             public int ClientId { get; set; }
+
+            public System.Guid? PlatformClientId { get; set; }
             public string ClientCode { get; set; }
             public string Name { get; set; }
             public string Website { get; set; }

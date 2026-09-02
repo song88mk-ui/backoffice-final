@@ -12,6 +12,7 @@ using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -1316,6 +1317,8 @@ namespace Backoffice.API.Repositories
                         var newPlatformResponse = await _platformRepository.AddOrUpdateClient(clientPlatform, request.Region, events);
                         if (newPlatformResponse.StatusCode == StatusCode.Success)
                         {
+                            request.PlatformClientId = newPlatformResponse.Result.ClientId;
+
                             events.Add(GetEvent("UPDATE PLATFORM CLIENT", timestampStartedUpdate, DateTime.UtcNow));
 
                             var betConfigRequest = new AddOrUpdateBetConfigRequest
@@ -1340,11 +1343,16 @@ namespace Backoffice.API.Repositories
                             //new trading
                             //await _tradingClient.UpdateClientEmail(clientPlatform);
                         }
-
+                        else
+                        {
+                            Log.Error("Platform registration returned {StatusCode} for client {ClientCode}: {Message}",
+                                newPlatformResponse.StatusCode, request.ClientCode, newPlatformResponse.Message);
+                        }
 
                     }
                     catch (Exception ex)
                     {
+                        Log.Error(ex, "Platform registration failed for client {ClientCode}", request.ClientCode);
                     }
 
                     scope.Complete();
