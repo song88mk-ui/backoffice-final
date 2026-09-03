@@ -373,6 +373,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             // set InitMultipleSelect to true to enable multiple select2.
             _initSortingAndSelect = true;
             _isMarketPreLoader = false;
+            _isPreLoader = false;
         }
     }
 }

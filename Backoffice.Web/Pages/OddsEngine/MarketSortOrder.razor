@@ -80,7 +80,7 @@
                                         <td>@model.MarketTemplateName</td>
                                         <td>
                                             <div @key="@($"select-sp:{_filterModel.SelectedSportId}-fist:{_filterModel.SelectedFixtureStatusId}-mate:{model.MarketTemplateId}")" class="d-flex justify-content-center">
-                                                <select id="select-@model.MarketTemplateId" class="@_selectClass form-select d-block" multiple="multiple">
+                                                <select id="select-@model.MarketTemplateId" class="@_selectClass form-select" multiple="multiple">
                                                     @foreach (var group in _marketGroups)
                                                     {
                                                         <option value="@group.Value" selected=@(model.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(group.Name.ToLower()))>@group.Name</option>

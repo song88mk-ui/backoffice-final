@@ -120,6 +120,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
             IsPreLoader = true;
+            await IsPreLoaderChanged.InvokeAsync(IsPreLoader);
             await InvokeAsync(StateHasChanged);
 
             var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == e.Value.ToString()).ClientId;
@@ -135,6 +136,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public async void OnSportChangedEvent(ChangeEventArgs e)
         {
             IsPreLoader = true;
+            await IsPreLoaderChanged.InvokeAsync(IsPreLoader);
             await InvokeAsync(StateHasChanged);
 
             _filterModel.SelectedSportId = int.Parse(e.Value.ToString());
@@ -147,6 +149,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public async void OnFixtureStatusChangedEvent(ChangeEventArgs e)
         {
             IsPreLoader = true;
+            await IsPreLoaderChanged.InvokeAsync(IsPreLoader);
             await InvokeAsync(StateHasChanged);
             _filterModel.SelectedFixtureStatusId = int.Parse(e.Value.ToString());
             IsUpdate = false;
