@@ -116,7 +116,10 @@ namespace Backoffice.API.Repositories
                 features["LanguageOptions"] = request.LanguageOptions;
                 features["OGAuth"] = request.OGAuth;
                 features["FullCashout"] = request.FullCashout;
-                features["PartialCashout"] = request.PartialCashout;
+                // Full-before-partial dependency (GM-790): partial cashout cannot be enabled
+                // without full cashout. The UI already prevents the combination; coercing here
+                // keeps a direct API call from storing an inconsistent config.
+                features["PartialCashout"] = request.FullCashout && request.PartialCashout;
                 features["BetRecommendation"] = request.BetRecommendation;
                 features["IsEuroLayout"] = request.IsEuroLayout;
 

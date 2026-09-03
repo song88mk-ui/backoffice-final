@@ -48,8 +48,11 @@ namespace Backoffice.Web.Pages.Administration
             new FeatureFlagDefinition("ff-dark-mode", "Dark Mode", "Enables the dark mode theme toggle for the client's site.", f => f.DarkMode, (f, v) => f.DarkMode = v),
             new FeatureFlagDefinition("ff-language-options", "Language Options", "Enables the language selector, scoped to English and Chinese (ZH) only.", f => f.LanguageOptions, (f, v) => f.LanguageOptions = v),
             new FeatureFlagDefinition("ff-og-auth", "OG Auth", "Switches the site into Oriental Gaming (OG) mode: page title, bet ID formatting, and header/auth behavior for OG-integrated operators.", f => f.OGAuth, (f, v) => f.OGAuth = v),
-            new FeatureFlagDefinition("ff-full-cashout", "Full Cashout", "Enables the full cash-out button on eligible open bets.", f => f.FullCashout, (f, v) => f.FullCashout = v),
-            new FeatureFlagDefinition("ff-partial-cashout", "Partial Cashout", "Enables the partial cash-out button on eligible open bets.", f => f.PartialCashout, (f, v) => f.PartialCashout = v),
+            // Full-before-partial dependency (GM-790): Partial Cashout can only be enabled while
+            // Full Cashout is on (it stays independently disableable), and turning Full Cashout
+            // off also turns Partial Cashout off. WebPropsRepository enforces the same rule on save.
+            new FeatureFlagDefinition("ff-full-cashout", "Full Cashout", "Enables the full cash-out button on eligible open bets.", f => f.FullCashout, (f, v) => { f.FullCashout = v; if (!v) f.PartialCashout = false; }),
+            new FeatureFlagDefinition("ff-partial-cashout", "Partial Cashout", "Enables the partial cash-out slider on eligible open bets.", f => f.PartialCashout, (f, v) => f.PartialCashout = v, disabledWhen: f => !f.FullCashout, disabledReason: "Requires Full Cashout to be enabled first."),
             new FeatureFlagDefinition("ff-bet-recommendation", "Bet Recommendation", "Shows the bet recommendation widget on the client site's main odds table.", f => f.BetRecommendation, (f, v) => f.BetRecommendation = v),
             new FeatureFlagDefinition("ff-euro-layout", "Euro Layout", "Switches the client's site to the Euro (EL2) layout variant instead of the default Asian layout.", f => f.IsEuroLayout, (f, v) => f.IsEuroLayout = v)
         };
@@ -244,14 +247,20 @@ namespace Backoffice.Web.Pages.Administration
         public string Description { get; }
         public Func<ClientFeatureFlags, bool> Get { get; }
         public Action<ClientFeatureFlags, bool> Set { get; }
+        // When this returns true for the current flags, the toggle renders disabled and
+        // DisabledReason is shown under the description (dependency between flags).
+        public Func<ClientFeatureFlags, bool> DisabledWhen { get; }
+        public string DisabledReason { get; }
 
-        public FeatureFlagDefinition(string id, string label, string description, Func<ClientFeatureFlags, bool> get, Action<ClientFeatureFlags, bool> set)
+        public FeatureFlagDefinition(string id, string label, string description, Func<ClientFeatureFlags, bool> get, Action<ClientFeatureFlags, bool> set, Func<ClientFeatureFlags, bool> disabledWhen = null, string disabledReason = null)
         {
             Id = id;
             Label = label;
             Description = description;
             Get = get;
             Set = set;
+            DisabledWhen = disabledWhen;
+            DisabledReason = disabledReason;
         }
     }
 }

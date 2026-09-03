@@ -139,6 +139,62 @@ namespace Backoffice.API.Tests.WebProps
         }
 
         [Fact]
+        public async Task UpdateClientFeatureFlagsAsync_PartialWithoutFullCashout_StoresPartialCashoutDisabled()
+        {
+            string capturedPostBody = null;
+
+            var (sut, _) = BuildSut(
+                getResponder: _ => Json(HttpStatusCode.OK, RealConfigJson),
+                postResponder: req =>
+                {
+                    capturedPostBody = req.Content.ReadAsStringAsync().Result;
+                    return Json(HttpStatusCode.OK, "\"ok\"");
+                });
+
+            // Full-before-partial dependency: the UI never sends this combination, but a
+            // direct API call could - the stored config must not enable partial without full.
+            var request = new UpdateClientFeatureFlagsRequest
+            {
+                ClientCode = "G02",
+                FullCashout = false,
+                PartialCashout = true
+            };
+
+            await sut.UpdateClientFeatureFlagsAsync(request);
+
+            Assert.NotNull(capturedPostBody);
+            Assert.Contains("\"FullCashout\":false", capturedPostBody);
+            Assert.Contains("\"PartialCashout\":false", capturedPostBody);
+        }
+
+        [Fact]
+        public async Task UpdateClientFeatureFlagsAsync_PartialWithFullCashout_StoresPartialCashoutEnabled()
+        {
+            string capturedPostBody = null;
+
+            var (sut, _) = BuildSut(
+                getResponder: _ => Json(HttpStatusCode.OK, RealConfigJson),
+                postResponder: req =>
+                {
+                    capturedPostBody = req.Content.ReadAsStringAsync().Result;
+                    return Json(HttpStatusCode.OK, "\"ok\"");
+                });
+
+            var request = new UpdateClientFeatureFlagsRequest
+            {
+                ClientCode = "G02",
+                FullCashout = true,
+                PartialCashout = true
+            };
+
+            await sut.UpdateClientFeatureFlagsAsync(request);
+
+            Assert.NotNull(capturedPostBody);
+            Assert.Contains("\"FullCashout\":true", capturedPostBody);
+            Assert.Contains("\"PartialCashout\":true", capturedPostBody);
+        }
+
+        [Fact]
         public async Task UpdateClientFeatureFlagsAsync_NullOptionalFields_LeavesStoredValuesUntouched()
         {
             string capturedPostBody = null;

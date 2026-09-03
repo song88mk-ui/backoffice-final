@@ -156,6 +156,63 @@ namespace Backoffice.Web.Tests.Administration
         }
 
         [Fact]
+        public void PartialCashoutToggle_DisabledWithReason_WhileFullCashoutIsOff()
+        {
+            var config = new ClientFeatureFlagsResponse() { ClientCode = ClientGuid.ToString() };
+            config.Features.FullCashout = false;
+            config.Features.PartialCashout = false;
+
+            var cut = RenderWithConfigResponse(new BaseResponse<ClientFeatureFlagsResponse>()
+            {
+                StatusCode = StatusCode.Success,
+                Result = config
+            });
+
+            Assert.True(cut.Find("#ff-partial-cashout").HasAttribute("disabled"));
+            Assert.False(cut.Find("#ff-full-cashout").HasAttribute("disabled"));
+            Assert.Contains("Requires Full Cashout to be enabled first.", cut.Markup);
+        }
+
+        [Fact]
+        public void TurningFullCashoutOff_AlsoTurnsPartialCashoutOff()
+        {
+            var config = new ClientFeatureFlagsResponse() { ClientCode = ClientGuid.ToString() };
+            config.Features.FullCashout = true;
+            config.Features.PartialCashout = true;
+
+            var cut = RenderWithConfigResponse(new BaseResponse<ClientFeatureFlagsResponse>()
+            {
+                StatusCode = StatusCode.Success,
+                Result = config
+            });
+
+            cut.Find("#ff-full-cashout").Change(false);
+
+            Assert.False(cut.Find("#ff-partial-cashout").HasAttribute("checked"));
+            Assert.True(cut.Find("#ff-partial-cashout").HasAttribute("disabled"));
+        }
+
+        [Fact]
+        public void PartialCashout_CanBeDisabledAlone_WhileFullCashoutStaysOn()
+        {
+            var config = new ClientFeatureFlagsResponse() { ClientCode = ClientGuid.ToString() };
+            config.Features.FullCashout = true;
+            config.Features.PartialCashout = true;
+
+            var cut = RenderWithConfigResponse(new BaseResponse<ClientFeatureFlagsResponse>()
+            {
+                StatusCode = StatusCode.Success,
+                Result = config
+            });
+
+            cut.Find("#ff-partial-cashout").Change(false);
+
+            Assert.False(cut.Find("#ff-partial-cashout").HasAttribute("checked"));
+            Assert.True(cut.Find("#ff-full-cashout").HasAttribute("checked"));
+            Assert.False(cut.Find("#ff-partial-cashout").HasAttribute("disabled"));
+        }
+
+        [Fact]
         public void UnknownStoredLayout_RendersReadOnly_AlongsideKnownLayouts()
         {
             var config = new ClientFeatureFlagsResponse() { ClientCode = ClientGuid.ToString() };

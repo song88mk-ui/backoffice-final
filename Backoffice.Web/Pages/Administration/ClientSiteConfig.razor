@@ -52,11 +52,16 @@
                         @foreach (var flag in FeatureFlagDefinitions)
                         {
                             var flagDefinition = flag;
+                            var isDependencyDisabled = flagDefinition.DisabledWhen?.Invoke(_clientFeatureFlags.Features) == true;
                             <div class="col">
                                 <div class="form-switch feature-flag mb-2 pe-3">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="@flagDefinition.Id" checked="@flagDefinition.Get(_clientFeatureFlags.Features)" @onchange="e => HandleFlagToggled(flagDefinition, (bool)e.Value)" disabled="@(_isProcessing || !_canEdit)">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="@flagDefinition.Id" checked="@flagDefinition.Get(_clientFeatureFlags.Features)" @onchange="e => HandleFlagToggled(flagDefinition, (bool)e.Value)" disabled="@(_isProcessing || !_canEdit || isDependencyDisabled)">
                                     <label class="form-check-label" for="@flagDefinition.Id">@flagDefinition.Label</label>
                                     <div class="text-muted flag-description">@flagDefinition.Description</div>
+                                    @if (isDependencyDisabled && !string.IsNullOrEmpty(flagDefinition.DisabledReason))
+                                    {
+                                        <div class="text-muted flag-description fst-italic">@flagDefinition.DisabledReason</div>
+                                    }
                                 </div>
                             </div>
                         }
