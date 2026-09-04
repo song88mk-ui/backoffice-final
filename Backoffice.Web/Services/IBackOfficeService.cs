@@ -75,6 +75,8 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<bool>> DeleteSportsbookGlossary(DeleteSportsbookGlossaryRequest request);
         Task<BaseResponse<List<SportsbookGlossaryExportRow>>> ExportSportsbookGlossary(string searchText, string targetLanguage = null, bool untranslatedOnly = false, bool exactMatch = false);
         Task<BaseResponse<ImportSportsbookGlossaryResponse>> ImportSportsbookGlossary(ImportSportsbookGlossaryRequest request);
+        Task<BaseResponse<List<SportsbookTranslationExportRow>>> ExportSportsbookTranslations();
+        Task<BaseResponse<ImportSportsbookTranslationResponse>> ImportSportsbookTranslations(ImportSportsbookTranslationRequest request);
 
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId);
         Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, CancellationToken cancellationToken = default);

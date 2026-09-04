@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -10,6 +12,7 @@ using Backoffice.Web.Pages.Base;
 using Backoffice.Web.Services;
 using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.SBC
@@ -39,6 +42,11 @@ namespace Backoffice.Web.Pages.SBC
         private string _errorMessage;
 
         private List<LanguageTranslationStat> _stats = new List<LanguageTranslationStat>();
+
+        private bool _isExporting;
+        private string _importResultMessage;
+        private bool _importHasErrors;
+        private List<string> _importRowMessages = new List<string>();
 
         private string _searchText = string.Empty;
         private string SearchText
@@ -409,38 +417,86 @@ namespace Backoffice.Web.Pages.SBC
             }
         }
 
-        private bool CanExportToExcel => FilteredRows.Any();
-
+        // Downloads every static translation key with all supported target languages in one
+        // file (Key, EN, ZH, JA, BR), mirroring the Dynamic Translation "Export to Excel" CSV
+        // so the same file also works as the Upload CSV template.
         private async Task OnExportToExcel()
         {
-            var csvBuilder = new StringBuilder();
-            csvBuilder.AppendLine($"Key,EN,{SelectedLanguageCode}");
+            _isExporting = true;
+            await InvokeAsync(StateHasChanged);
 
-            foreach (var row in FilteredRows)
+            try
             {
-                csvBuilder.AppendLine($"{EscapeCsv(row.Key)},{EscapeCsv(row.SourceText)},{EscapeCsv(row.TargetText)}");
+                var response = await BackofficeService.ExportSportsbookTranslations();
+
+                if (response == null || response.StatusCode != StatusCode.Success || response.Result == null)
+                {
+                    _errorMessage = response?.Message ?? "Failed to export the translations.";
+                    await InvokeAsync(StateHasChanged);
+                    return;
+                }
+
+                _errorMessage = null;
+                var csvText = StaticTranslationCsvHelper.BuildCsv(response.Result);
+                var fileName = $"StaticTranslations-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";
+
+                await JSRuntime.InvokeVoidAsync("downloadFileFromText", fileName, csvText, "text/csv");
             }
-
-            var fileName = $"StaticTranslations-{SelectedLanguageCode}-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";
-            var csvText = "\uFEFF" + csvBuilder.ToString();
-
-            await JSRuntime.InvokeVoidAsync("downloadFileFromText", fileName, csvText, "text/csv");
+            finally
+            {
+                _isExporting = false;
+                await InvokeAsync(StateHasChanged);
+            }
         }
 
-        private string EscapeCsv(string value)
+        // Parses the uploaded CSV client-side (header-validated, same as Dynamic Translation),
+        // then posts the structured rows to the import endpoint and surfaces the per-row summary.
+        private async Task OnImportFileSelected(InputFileChangeEventArgs e)
         {
-            if (string.IsNullOrEmpty(value))
+            _importResultMessage = null;
+            _importRowMessages = new List<string>();
+            _importHasErrors = false;
+
+            var file = e.File;
+            if (file == null)
             {
-                return string.Empty;
+                return;
             }
 
-            var escaped = value.Replace("\"", "\"\"");
-            if (escaped.Contains(',') || escaped.Contains('"') || escaped.Contains('\n') || escaped.Contains('\r'))
+            string csvText;
+            using (var stream = file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024))
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                escaped = $"\"{escaped}\"";
+                csvText = await reader.ReadToEndAsync();
             }
 
-            return escaped;
+            var (success, parseError, rows) = StaticTranslationCsvHelper.ParseCsv(csvText);
+            if (!success)
+            {
+                _importHasErrors = true;
+                _importResultMessage = parseError;
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            var response = await BackofficeService.ImportSportsbookTranslations(new ImportSportsbookTranslationRequest { Rows = rows });
+
+            if (response == null || response.StatusCode != StatusCode.Success || response.Result == null)
+            {
+                _importHasErrors = true;
+                _importResultMessage = response?.Message ?? "Failed to import the translation file.";
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            var summary = response.Result;
+            _importHasErrors = summary.SkippedCount > 0;
+            _importResultMessage = $"Import complete: {summary.CreatedCount} created, {summary.UpdatedCount} updated, {summary.UnchangedCount} unchanged, {summary.SkippedCount} skipped.";
+            _importRowMessages = summary.RowMessages ?? new List<string>();
+
+            await LoadTranslations(SelectedLanguageCode);
+            await LoadStats();
+            await InvokeAsync(StateHasChanged);
         }
     }
 }

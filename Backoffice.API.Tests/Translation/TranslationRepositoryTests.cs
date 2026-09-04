@@ -1026,6 +1026,265 @@ namespace Backoffice.API.Tests.Translation
         }
 
         // ---------------------------------------------------------------
+        // ExportSportsbookTranslations / ImportSportsbookTranslations
+        // (SportsbookStatic table, "Upload CSV" on the Static Translation screen -- mirrors the
+        // Dynamic Translation glossary export/import behaviour)
+        // ---------------------------------------------------------------
+
+        [Fact]
+        public async Task ExportSportsbookTranslations_ReturnsEveryKey_WithAllLanguageColumns()
+        {
+            var dbName = nameof(ExportSportsbookTranslations_ReturnsEveryKey_WithAllLanguageColumns);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "EN", Name = "accept", Value = "Accept" });
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "ZH", Name = "accept", Value = "接受" });
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "JA", Name = "accept", Value = "承認" });
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "BR", Name = "accept", Value = "Aceitar" });
+                // A key with only an EN row must still come back, with blank target columns.
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "EN", Name = "reject", Value = "Reject" });
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ExportSportsbookTranslations();
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(2, result.Result.Count);
+
+            var accept = result.Result.Single(r => r.Key == "accept");
+            Assert.Equal("Accept", accept.SourceText);
+            Assert.Equal("接受", accept.TargetTextZh);
+            Assert.Equal("承認", accept.TargetTextJa);
+            Assert.Equal("Aceitar", accept.TargetTextBr);
+
+            var reject = result.Result.Single(r => r.Key == "reject");
+            Assert.Equal("Reject", reject.SourceText);
+            Assert.Equal(string.Empty, reject.TargetTextZh);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookTranslations_CreatesNewKey_WhenNotFound()
+        {
+            var dbName = nameof(ImportSportsbookTranslations_CreatesNewKey_WhenNotFound);
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookTranslations(
+                new ImportSportsbookTranslationRequest
+                {
+                    Rows = new List<ImportSportsbookTranslationRow>
+                    {
+                        new ImportSportsbookTranslationRow { Key = "accept", SourceText = "Accept", TargetTextZh = "接受" }
+                    }
+                },
+                MakeRequester());
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(1, result.Result.CreatedCount);
+
+            using var verify = BuildTranslationContext(dbName);
+            Assert.Equal("Accept", verify.SportsbookStatic.Single(r => r.LanguageCode == "EN" && r.Name == "accept").Value);
+            Assert.Equal("接受", verify.SportsbookStatic.Single(r => r.LanguageCode == "ZH" && r.Name == "accept").Value);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookTranslations_SkipsNewKey_WhenSourceTextMissing()
+        {
+            var dbName = nameof(ImportSportsbookTranslations_SkipsNewKey_WhenSourceTextMissing);
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookTranslations(
+                new ImportSportsbookTranslationRequest
+                {
+                    Rows = new List<ImportSportsbookTranslationRow>
+                    {
+                        new ImportSportsbookTranslationRow { Key = "accept", SourceText = "", TargetTextZh = "接受" }
+                    }
+                },
+                MakeRequester());
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Equal(1, result.Result.SkippedCount);
+
+            using var verify = BuildTranslationContext(dbName);
+            Assert.Empty(verify.SportsbookStatic);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookTranslations_UpdatesTargetLanguage_WhenValueDiffersFromSourceAndCurrent()
+        {
+            var dbName = nameof(ImportSportsbookTranslations_UpdatesTargetLanguage_WhenValueDiffersFromSourceAndCurrent);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "EN", Name = "accept", Value = "Accept" });
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "ZH", Name = "accept", Value = "旧" });
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookTranslations(
+                new ImportSportsbookTranslationRequest
+                {
+                    Rows = new List<ImportSportsbookTranslationRow>
+                    {
+                        new ImportSportsbookTranslationRow { Key = "accept", SourceText = "Accept", TargetTextZh = "接受" }
+                    }
+                },
+                MakeRequester());
+
+            Assert.Equal(1, result.Result.UpdatedCount);
+
+            using var verify = BuildTranslationContext(dbName);
+            Assert.Equal("接受", verify.SportsbookStatic.Single(r => r.LanguageCode == "ZH" && r.Name == "accept").Value);
+            // EN source text is never rewritten by an import for an existing key.
+            Assert.Equal("Accept", verify.SportsbookStatic.Single(r => r.LanguageCode == "EN" && r.Name == "accept").Value);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookTranslations_SkipsTargetLanguage_WhenValueEqualsSourceText()
+        {
+            var dbName = nameof(ImportSportsbookTranslations_SkipsTargetLanguage_WhenValueEqualsSourceText);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "EN", Name = "accept", Value = "Accept" });
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookTranslations(
+                new ImportSportsbookTranslationRequest
+                {
+                    Rows = new List<ImportSportsbookTranslationRow>
+                    {
+                        new ImportSportsbookTranslationRow { Key = "accept", SourceText = "Accept", TargetTextZh = "Accept" }
+                    }
+                },
+                MakeRequester());
+
+            Assert.Equal(1, result.Result.UnchangedCount);
+
+            using var verify = BuildTranslationContext(dbName);
+            Assert.DoesNotContain(verify.SportsbookStatic, r => r.LanguageCode == "ZH");
+        }
+
+        [Fact]
+        public async Task ImportSportsbookTranslations_IsIdempotent_ReimportingSameValuesProducesNoChanges()
+        {
+            var dbName = nameof(ImportSportsbookTranslations_IsIdempotent_ReimportingSameValuesProducesNoChanges);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "EN", Name = "accept", Value = "Accept" });
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "ZH", Name = "accept", Value = "接受" });
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var request = new ImportSportsbookTranslationRequest
+            {
+                Rows = new List<ImportSportsbookTranslationRow>
+                {
+                    new ImportSportsbookTranslationRow { Key = "accept", SourceText = "Accept", TargetTextZh = "接受" }
+                }
+            };
+
+            var result = await sut.ImportSportsbookTranslations(request, MakeRequester());
+
+            Assert.Equal(0, result.Result.CreatedCount);
+            Assert.Equal(0, result.Result.UpdatedCount);
+            Assert.Equal(1, result.Result.UnchangedCount);
+
+            using var verifyBackoffice = BuildBackofficeContext(dbName);
+            Assert.Empty(verifyBackoffice.ActivityLog);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookTranslations_LeavesTranslationUnchanged_WhenCellIsBlank()
+        {
+            var dbName = nameof(ImportSportsbookTranslations_LeavesTranslationUnchanged_WhenCellIsBlank);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "EN", Name = "accept", Value = "Accept" });
+                seed.SportsbookStatic.Add(new SportsbookStatic { LanguageCode = "ZH", Name = "accept", Value = "接受" });
+                await seed.SaveChangesAsync();
+            }
+
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookTranslations(
+                new ImportSportsbookTranslationRequest
+                {
+                    Rows = new List<ImportSportsbookTranslationRow>
+                    {
+                        new ImportSportsbookTranslationRow { Key = "accept", SourceText = "Accept", TargetTextZh = "", TargetTextJa = "承認" }
+                    }
+                },
+                MakeRequester());
+
+            Assert.Equal(1, result.Result.UpdatedCount);
+
+            using var verify = BuildTranslationContext(dbName);
+            Assert.Equal("接受", verify.SportsbookStatic.Single(r => r.LanguageCode == "ZH" && r.Name == "accept").Value);
+            Assert.Equal("承認", verify.SportsbookStatic.Single(r => r.LanguageCode == "JA" && r.Name == "accept").Value);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookTranslations_SkipsDuplicateKey_WithinSameFile()
+        {
+            var dbName = nameof(ImportSportsbookTranslations_SkipsDuplicateKey_WithinSameFile);
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookTranslations(
+                new ImportSportsbookTranslationRequest
+                {
+                    Rows = new List<ImportSportsbookTranslationRow>
+                    {
+                        new ImportSportsbookTranslationRow { Key = "accept", SourceText = "Accept", TargetTextZh = "接受" },
+                        new ImportSportsbookTranslationRow { Key = "accept", SourceText = "Accept", TargetTextZh = "别的" }
+                    }
+                },
+                MakeRequester());
+
+            Assert.Equal(1, result.Result.CreatedCount);
+            Assert.Equal(1, result.Result.SkippedCount);
+
+            using var verify = BuildTranslationContext(dbName);
+            Assert.Equal("接受", verify.SportsbookStatic.Single(r => r.LanguageCode == "ZH" && r.Name == "accept").Value);
+        }
+
+        [Fact]
+        public async Task ImportSportsbookTranslations_ReturnsValidationError_WhenNoRows()
+        {
+            var dbName = nameof(ImportSportsbookTranslations_ReturnsValidationError_WhenNoRows);
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx);
+
+            var result = await sut.ImportSportsbookTranslations(new ImportSportsbookTranslationRequest(), MakeRequester());
+
+            Assert.Equal(StatusCode.Error, result.StatusCode);
+        }
+
+        // ---------------------------------------------------------------
         // GetSportsbookTranslationStats / GetSportsbookGlossaryStats / GetSportsbookGlossary(UntranslatedOnly)
         // (translated-vs-untranslated legend on the Static/Dynamic Translation screens)
         // ---------------------------------------------------------------

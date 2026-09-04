@@ -2863,6 +2863,226 @@ namespace Backoffice.API.Repositories
             }
         }
 
+        // Returns every static translation key as one row carrying the EN source text and each
+        // supported target-language value -- Backoffice.Web builds the downloadable CSV from
+        // this, mirroring the Dynamic Translation glossary export. A key missing a row for a
+        // given language comes back with an empty string for that column.
+        public async Task<BaseResponse<List<SportsbookTranslationExportRow>>> ExportSportsbookTranslations()
+        {
+            try
+            {
+                var allRows = await _translationContext.SportsbookStatic
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var byLanguage = allRows
+                    .GroupBy(r => r.LanguageCode ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.GroupBy(r => r.Name).ToDictionary(k => k.Key, k => k.First().Value ?? string.Empty),
+                        StringComparer.OrdinalIgnoreCase);
+
+                string ValueFor(string language, string name) =>
+                    byLanguage.TryGetValue(language, out var map) && map.TryGetValue(name, out var value) ? value : string.Empty;
+
+                var rows = allRows
+                    .Select(r => r.Name)
+                    .Distinct()
+                    .OrderBy(name => name)
+                    .Select(name => new SportsbookTranslationExportRow
+                    {
+                        Key = name,
+                        SourceText = ValueFor("EN", name),
+                        TargetTextZh = ValueFor("ZH", name),
+                        TargetTextJa = ValueFor("JA", name),
+                        TargetTextBr = ValueFor("BR", name)
+                    })
+                    .ToList();
+
+                return new BaseResponse<List<SportsbookTranslationExportRow>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = rows
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<SportsbookTranslationExportRow>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        // Upserts static translation rows parsed from an uploaded export/template file (parsing
+        // happens in Backoffice.Web; this only ever sees structured rows). Mirrors the Dynamic
+        // Translation glossary import: idempotent by design -- a target-language cell is skipped
+        // (no write, no activity log, no publish) when it's blank (leave the existing translation
+        // untouched), equal to the EN source text (treated as "not yet translated"), or equal to
+        // the value already stored. The EN column only ever creates a brand-new key; it never
+        // rewrites an existing key's source text.
+        public async Task<BaseResponse<ImportSportsbookTranslationResponse>> ImportSportsbookTranslations(ImportSportsbookTranslationRequest request, RequesterInfo requesterInfo)
+        {
+            try
+            {
+                if (request?.Rows == null || request.Rows.Count == 0)
+                {
+                    return new BaseResponse<ImportSportsbookTranslationResponse> { StatusCode = StatusCode.Error, Message = "The uploaded file has no data rows." };
+                }
+
+                var allRows = await _translationContext.SportsbookStatic.ToListAsync();
+                var rowsByKey = allRows
+                    .GroupBy(r => r.Name, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
+
+                var result = new ImportSportsbookTranslationResponse();
+                var activityLogs = new List<ActivityLogModel>();
+                var changedLanguages = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                var targetLanguages = new[] { "ZH", "JA", "BR" };
+
+                for (var i = 0; i < request.Rows.Count; i++)
+                {
+                    var row = request.Rows[i];
+                    var rowNumber = i + 2; // +1 for 1-based, +1 because row 1 is the header in the source file
+                    var key = row.Key?.Trim();
+
+                    if (string.IsNullOrWhiteSpace(key))
+                    {
+                        continue;
+                    }
+
+                    if (!seenKeys.Add(key))
+                    {
+                        result.SkippedCount++;
+                        result.RowMessages.Add($"Row {rowNumber}: duplicate Key '{key}' already processed earlier in this file — skipped.");
+                        continue;
+                    }
+
+                    var uploadedSourceText = row.SourceText?.Trim() ?? string.Empty;
+                    rowsByKey.TryGetValue(key, out var existingRows);
+                    existingRows ??= new List<SportsbookStatic>();
+
+                    var storedSource = existingRows.FirstOrDefault(r => string.Equals(r.LanguageCode, "EN", StringComparison.OrdinalIgnoreCase))?.Value ?? string.Empty;
+                    var keyExists = existingRows.Count > 0;
+                    var sourceText = keyExists ? storedSource : uploadedSourceText;
+
+                    if (!keyExists)
+                    {
+                        if (string.IsNullOrWhiteSpace(uploadedSourceText))
+                        {
+                            result.SkippedCount++;
+                            result.RowMessages.Add($"Row {rowNumber}: EN is required to create new Key '{key}' — skipped.");
+                            continue;
+                        }
+
+                        var enRow = new SportsbookStatic { LanguageCode = "EN", Name = key, Value = uploadedSourceText };
+                        _translationContext.SportsbookStatic.Add(enRow);
+                        existingRows.Add(enRow);
+                        rowsByKey[key] = existingRows;
+                        changedLanguages.Add("EN");
+                        activityLogs.Add(BuildStaticTranslationActivityLog(requesterInfo, Activity.Create, $"EN.{key}", "-", uploadedSourceText));
+                    }
+
+                    var targetValues = new[] { row.TargetTextZh, row.TargetTextJa, row.TargetTextBr };
+                    var rowChanged = false;
+
+                    for (var t = 0; t < targetLanguages.Length; t++)
+                    {
+                        var language = targetLanguages[t];
+                        var uploadedRaw = targetValues[t];
+                        if (string.IsNullOrWhiteSpace(uploadedRaw))
+                        {
+                            continue; // blank cell => leave the existing translation untouched
+                        }
+
+                        var uploaded = uploadedRaw.Trim();
+                        if (string.Equals(uploaded, sourceText?.Trim(), StringComparison.Ordinal))
+                        {
+                            continue; // matches source text => treat as not-yet-translated, skip
+                        }
+
+                        var existing = existingRows.FirstOrDefault(r => string.Equals(r.LanguageCode, language, StringComparison.OrdinalIgnoreCase));
+                        if (existing != null && string.Equals(uploaded, existing.Value?.Trim(), StringComparison.Ordinal))
+                        {
+                            continue; // already the stored value => idempotent no-op
+                        }
+
+                        var from = existing?.Value ?? "-";
+                        if (existing != null)
+                        {
+                            existing.Value = uploaded;
+                            _translationContext.SportsbookStatic.Update(existing);
+                        }
+                        else
+                        {
+                            var newRow = new SportsbookStatic { LanguageCode = language, Name = key, Value = uploaded };
+                            _translationContext.SportsbookStatic.Add(newRow);
+                            existingRows.Add(newRow);
+                        }
+
+                        activityLogs.Add(BuildStaticTranslationActivityLog(requesterInfo, existing != null ? Activity.Update : Activity.Create, $"{language}.{key}", from, uploaded));
+                        changedLanguages.Add(language);
+                        rowChanged = true;
+                    }
+
+                    if (!keyExists)
+                    {
+                        result.CreatedCount++;
+                    }
+                    else if (rowChanged)
+                    {
+                        result.UpdatedCount++;
+                    }
+                    else
+                    {
+                        result.UnchangedCount++;
+                    }
+                }
+
+                if (changedLanguages.Count > 0)
+                {
+                    await _translationContext.SaveChangesAsync();
+                }
+
+                if (activityLogs.Count > 0)
+                {
+                    await AddActivityLogList(new ActivityLogListRequest { ActivityLogs = activityLogs });
+                }
+
+                foreach (var language in changedLanguages)
+                {
+                    await PublishStaticTranslationChange(language);
+                }
+
+                return new BaseResponse<ImportSportsbookTranslationResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ImportSportsbookTranslationResponse> { StatusCode = StatusCode.Error, Message = ex.Message };
+            }
+        }
+
+        private static ActivityLogModel BuildStaticTranslationActivityLog(RequesterInfo requesterInfo, Activity activity, string payload, string from, string to) => new ActivityLogModel
+        {
+            Page = requesterInfo.Page,
+            UserId = requesterInfo.UserId,
+            UserName = requesterInfo.UserName,
+            Activity = activity.ToString(),
+            Payload = payload,
+            From = from,
+            To = to,
+            TimeStamp = DateTime.UtcNow
+        };
+
         public async Task<BaseResponse<SportsbookGlossaryListResponse>> GetSportsbookGlossary(GetSportsbookGlossaryRequest request)
         {
             try

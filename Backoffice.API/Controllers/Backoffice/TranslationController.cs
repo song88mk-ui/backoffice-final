@@ -137,6 +137,50 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
+        // Returns every static translation key as JSON (no pagination) -- Backoffice.Web builds
+        // the downloadable CSV from this, mirroring the Dynamic Translation glossary export.
+        [HttpGet("sportsbook/translations/export")]
+        [Authorize("Translations.Static", ((int)Access.View))]
+        public async Task<IActionResult> ExportSportsbookTranslations()
+        {
+            var result = await _backofficeRepository.ExportSportsbookTranslations();
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        // Accepts static translation rows already parsed (and header-validated) client-side from
+        // the uploaded export/template file -- this endpoint only ever deals with structured data.
+        [HttpPost("sportsbook/translations/import")]
+        [Authorize("Translations.Static", ((int)Access.Edit))]
+        public async Task<IActionResult> ImportSportsbookTranslations([FromBody] ImportSportsbookTranslationRequest request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var userName = HttpContext.Items["UserName"]?.ToString();
+
+            var requester = new RequesterInfo()
+            {
+                UserId = userId,
+                UserName = userName,
+                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
+            };
+
+            var result = await _backofficeRepository.ImportSportsbookTranslations(request, requester);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpPost("sportsbook/glossary/list")]
         [Authorize("Translations.Dynamic", ((int)Access.View))]
         public async Task<IActionResult> GetSportsbookGlossary([FromBody] GetSportsbookGlossaryRequest request)

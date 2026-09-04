@@ -2259,6 +2259,70 @@ namespace Backoffice.Web.Services
             }
         }
 
+        public async Task<BaseResponse<List<SportsbookTranslationExportRow>>> ExportSportsbookTranslations()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/translation/sportsbook/translations/export");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<List<SportsbookTranslationExportRow>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<List<SportsbookTranslationExportRow>>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<List<SportsbookTranslationExportRow>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<List<SportsbookTranslationExportRow>>();
+                    else
+                    {
+                        return new BaseResponse<List<SportsbookTranslationExportRow>>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<SportsbookTranslationExportRow>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ImportSportsbookTranslationResponse>> ImportSportsbookTranslations(ImportSportsbookTranslationRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"api/translation/sportsbook/translations/import", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ImportSportsbookTranslationResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<ImportSportsbookTranslationResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ImportSportsbookTranslationResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<ImportSportsbookTranslationResponse>();
+                    else
+                    {
+                        return new BaseResponse<ImportSportsbookTranslationResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ImportSportsbookTranslationResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId)
         {
             try

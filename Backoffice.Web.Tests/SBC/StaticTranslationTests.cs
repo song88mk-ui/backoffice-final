@@ -225,6 +225,44 @@ namespace Backoffice.Web.Tests.SBC
         }
 
         [Fact]
+        public void UploadCsvControl_IsRendered_ForUsersWithEditPermission()
+        {
+            var cut = RenderComponent<StaticTranslation>();
+
+            var input = cut.Find("#translationImportInput");
+            Assert.Equal("file", input.GetAttribute("type"));
+            Assert.Equal(".csv", input.GetAttribute("accept"));
+            Assert.Contains(cut.FindAll("label"), l => l.GetAttribute("for") == "translationImportInput" && l.TextContent.Contains("Upload"));
+        }
+
+        [Fact]
+        public void ExportToExcel_PullsEveryLanguageFromTheExportEndpoint_AndTriggersDownload()
+        {
+            _backofficeService
+                .Setup(s => s.ExportSportsbookTranslations())
+                .ReturnsAsync(new BaseResponse<List<SportsbookTranslationExportRow>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new List<SportsbookTranslationExportRow>
+                    {
+                        new SportsbookTranslationExportRow { Key = "accept", SourceText = "Accept", TargetTextZh = "接受", TargetTextJa = "承認", TargetTextBr = "Aceitar" }
+                    }
+                });
+
+            var download = JSInterop.SetupVoid("downloadFileFromText", _ => true);
+
+            var cut = RenderComponent<StaticTranslation>();
+            cut.FindAll("button").Single(b => b.TextContent.Contains("Export to Excel")).Click();
+
+            _backofficeService.Verify(s => s.ExportSportsbookTranslations(), Times.Once);
+            download.SetVoidResult();
+            var invocation = Assert.Single(JSInterop.Invocations["downloadFileFromText"]);
+            var csv = Assert.IsType<string>(invocation.Arguments[1]);
+            Assert.Contains("Key,EN,ZH,JA,BR", csv);
+            Assert.Contains("承認", csv);
+        }
+
+        [Fact]
         public void ExactMatch_NarrowsSearchFromContainsToEquality()
         {
             var cut = RenderComponent<StaticTranslation>();

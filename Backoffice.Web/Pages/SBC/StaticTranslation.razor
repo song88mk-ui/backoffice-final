@@ -71,14 +71,40 @@
                                     <label class="form-check-label" for="showOnlyUntranslated">Show only untranslated</label>
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-secondary" @onclick="OnExportToExcel" disabled="@(!CanExportToExcel)">
+                                    <button class="btn btn-secondary" @onclick="OnExportToExcel" disabled="@_isExporting">
                                         <i class="fa fa-file-excel-o me-1"></i>
                                         Export to Excel
                                     </button>
                                     <AuthorizeView Policy="translations-static-canedit" Context="canEdit">
+                                        <InputFile OnChange="OnImportFileSelected" id="translationImportInput" style="display:none" accept=".csv" />
+                                        <label for="translationImportInput" class="btn btn-secondary mb-0" style="cursor:pointer;">
+                                            <i class="fa fa-upload me-1"></i>
+                                            Upload Excel
+                                        </label>
                                         <button class="add-translation-btn" @onclick="OnAddTranslation">Add Translation</button>
                                     </AuthorizeView>
                                 </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(_importResultMessage))
+                            {
+                                <div class="alert @(_importHasErrors ? "alert-warning" : "alert-success")" role="alert">
+                                    @_importResultMessage
+                                    @if (_importRowMessages.Any())
+                                    {
+                                        <ul class="mb-0">
+                                            @foreach (var rowMessage in _importRowMessages)
+                                            {
+                                                <li>@rowMessage</li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                            }
+
+                            <div class="text-muted small mb-2">
+                                Export to Excel downloads a CSV of every translation key (Key, EN, ZH, JA, BR). Edit the ZH/JA/BR columns and use Upload Excel to re-import &mdash;
+                                a cell equal to the EN column is treated as not-yet-translated and skipped, and a blank cell leaves the existing translation untouched.
                             </div>
 
                             @if (_stats.Any())
