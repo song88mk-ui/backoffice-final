@@ -50,25 +50,28 @@ jobs:
             echo "environment=prd" >> $GITHUB_OUTPUT
             echo "aws_account_id=525375333516" >> $GITHUB_OUTPUT
             echo "aws_region=ap-east-1" >> $GITHUB_OUTPUT
+          else
+            echo "environment=dev" >> $GITHUB_OUTPUT
+            echo "aws_account_id=172065883315" >> $GITHUB_OUTPUT
+            echo "aws_region=ap-south-1" >> $GITHUB_OUTPUT
           fi
 
       - name: Docker meta
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         id: meta
         uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5
         with:
           images: |
             ${{ steps.env.outputs.aws_account_id }}.dkr.ecr.${{ steps.env.outputs.aws_region }}.amazonaws.com/${{ matrix.app.image }}
           tags: |
-            type=sha,event=pr,prefix=pr-sha-
-            type=sha,event=branch,prefix={{branch}}-sha-,enable={{is_default_branch}}
+            type=sha,event=branch,suffix=-dev,enable={{is_default_branch}}
             type=semver,pattern={{version}}
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
       - name: Configure AWS credentials
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b # v6
         with:
           aws-region: ${{ steps.env.outputs.aws_region }}
@@ -77,12 +80,12 @@ jobs:
           role-session-name: GitHubActions
 
       - name: Login to Amazon ECR
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build
-        if: github.event_name != 'release'
+        if: github.event_name == 'pull_request'
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           file: ${{ matrix.app.path }}/Dockerfile
@@ -91,7 +94,7 @@ jobs:
           build-args: NUGET_PASSWORD=${{ secrets.NUGET_PASSWORD }}
 
       - name: Build & Push
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           file: ${{ matrix.app.path }}/Dockerfile
@@ -101,18 +104,13 @@ jobs:
           build-args: NUGET_PASSWORD=${{ secrets.NUGET_PASSWORD }}
 
       - name: Logout to Amazon ECR
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
 
   test:
-    name: Test ${{ matrix.project }}
+    name: Test
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        project:
-          - Backoffice.API.Tests
-          - Backoffice.Web.Tests
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -130,5 +128,5 @@ jobs:
             --store-password-in-clear-text \
             --name github "https://nuget.pkg.github.com/FlyingCockatoo/index.json"
 
-      - name: Test ${{ matrix.project }}
-        run: dotnet test ${{ matrix.project }}/${{ matrix.project }}.csproj -c Release
+      - name: Test
+        run: dotnet test backoffice-final.sln -c Release
