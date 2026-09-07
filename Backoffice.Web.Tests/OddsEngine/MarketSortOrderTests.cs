@@ -211,5 +211,45 @@ namespace Backoffice.Web.Tests.OddsEngine
                 JSInterop.Invocations.Count(i => i.Identifier == "initSelect2") > initSelect2CountAfterLoad,
                 "select2 must be re-initialized after the reload");
         }
+
+        [Fact]
+        public void OlderSlowFilterResponseDoesNotClobberNewerFasterOne()
+        {
+            var cut = RenderComponent<MarketSortOrderPage>();
+
+            cut.WaitForAssertion(() => Assert.Contains("Match Result", cut.Markup));
+
+            // Switch to Sport 2 but hold its response so it is still in flight when the
+            // user switches straight back to Sport 1.
+            var pendingSportTwo = new TaskCompletionSource<BaseResponse<ClientMarketTemplateResponse>>();
+            _backofficeService
+                .Setup(s => s.GetClientMarketTemplates("GSA", 2, It.IsAny<int>(), It.IsAny<LanguageCode>()))
+                .Returns(pendingSportTwo.Task);
+
+            cut.FindAll(".content-filter select")[1].Change("2");
+
+            cut.WaitForAssertion(() => Assert.Contains("spinner-border", cut.Markup));
+
+            // Switch back to Sport 1 before Sport 2's response arrives; Sport 1's mock
+            // resolves immediately, so this newer request completes first.
+            cut.FindAll(".content-filter select")[1].Change("1");
+
+            cut.WaitForAssertion(() =>
+            {
+                Assert.Contains("Match Result", cut.Markup);
+                Assert.DoesNotContain("spinner-border", cut.Markup);
+            });
+
+            // Now let the stale Sport 2 response resolve. It must not overwrite the
+            // already-current Sport 1 data (BO-23 out-of-order response race).
+            pendingSportTwo.SetResult(TemplatesResponse(2, SportTwoTemplates()));
+
+            cut.WaitForAssertion(() =>
+            {
+                Assert.Contains("Match Result", cut.Markup);
+                Assert.DoesNotContain("Point Spread", cut.Markup);
+                Assert.DoesNotContain("spinner-border", cut.Markup);
+            });
+        }
     }
 }

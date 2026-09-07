@@ -39,6 +39,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private AlertModel _alertModel; 
         private int _selectedMarketGroupId;
         private int _allMarketsGroupId;
+        private int _loadRequestId;
         #region Methods
 
         protected override async Task OnInitializedAsync()
@@ -326,19 +327,25 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async Task LoadData()
         {
-            _filteredMarketTemplatesRef = new();
-            _clientMarketTemplateGroupsRef = new();
-            _marketTemplates = new();
+            // Snapshot the filter and tag this call so a filter change that starts
+            // while this load is still in flight can't have its two awaited calls
+            // mix values from different filter selections, and so an older, slower
+            // load can't overwrite a newer one's results when it finally completes.
+            var requestId = ++_loadRequestId;
+            var filterModel = _filterModel;
 
-            if (!string.IsNullOrEmpty(_filterModel.SelectedClientCode) && _filterModel.SelectedClientCode != "NA" && _filterModel.SelectedSportId != 0)
+            var filteredMarketTemplates = new List<ClientMarketTemplate>();
+            var clientMarketTemplateGroups = new List<ClientMarketTemplateGroup>();
+
+            if (!string.IsNullOrEmpty(filterModel.SelectedClientCode) && filterModel.SelectedClientCode != "NA" && filterModel.SelectedSportId != 0)
             {
-                var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == _filterModel.SelectedClientCode).ClientId;
+                var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == filterModel.SelectedClientCode).ClientId;
 
-                var marketTemplateResponse = (await _backofficeService.GetClientMarketTemplates(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId, _translationState.ActiveLanguageCode)).Result;
+                var marketTemplateResponse = (await _backofficeService.GetClientMarketTemplates(filterModel.SelectedClientCode, filterModel.SelectedSportId, filterModel.SelectedFixtureStatusId, _translationState.ActiveLanguageCode)).Result;
 
-                var marketTemplateGroupResponse = (await _backofficeService.GetClientMarketTemplateGroups(clientId, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
+                var marketTemplateGroupResponse = (await _backofficeService.GetClientMarketTemplateGroups(clientId, filterModel.SelectedSportId, filterModel.SelectedFixtureStatusId)).Result;
 
-                _clientMarketTemplateGroupsRef = marketTemplateGroupResponse?.ClientMarketTemplateGroups
+                clientMarketTemplateGroups = marketTemplateGroupResponse?.ClientMarketTemplateGroups
                     .Select(s => new ClientMarketTemplateGroup
                     {
                         Id = s.MarketTemplateGroupId,
@@ -348,7 +355,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         IsSelected = s.Name == "All Markets" ? true : false,
                     }).ToList() ?? new();
 
-                _filteredMarketTemplatesRef = marketTemplateResponse?.MarketTemplates
+                filteredMarketTemplates = marketTemplateResponse?.MarketTemplates
                     .OrderBy(o => o.SortOrder)
                     .Select((s, index) => new ClientMarketTemplate
                     {
@@ -359,6 +366,14 @@ namespace Backoffice.Web.Pages.OddsEngine
                     }).ToList() ?? new List<ClientMarketTemplate>();
             }
 
+            // A newer filter change has since started its own load - let that one
+            // own the final state instead of clobbering it with this stale result.
+            if (requestId != _loadRequestId)
+                return;
+
+            _clientMarketTemplateGroupsRef = clientMarketTemplateGroups;
+            _filteredMarketTemplatesRef = filteredMarketTemplates;
+
             _allMarketsGroupId = _clientMarketTemplateGroupsRef.FirstOrDefault(x => x.Name.ToUpper() == "ALL MARKETS")?.Id ?? -1;
             _selectedMarketGroupId = _allMarketsGroupId;
             _marketGroups = _clientMarketTemplateGroupsRef?
@@ -368,6 +383,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     Value = s.Id,
                     Name = s.Name
                 }).ToList() ?? new();
+
+            _marketTemplates = new();
             _marketTemplates.AddRange(_filteredMarketTemplatesRef);
 
             // set InitMultipleSelect to true to enable multiple select2.
