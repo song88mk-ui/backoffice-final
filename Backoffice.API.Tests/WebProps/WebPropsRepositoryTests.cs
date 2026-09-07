@@ -1,6 +1,8 @@
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Moq.Protected;
@@ -35,7 +37,11 @@ namespace Backoffice.API.Tests.WebProps
                 });
 
             var httpClient = new HttpClient(handler.Object) { BaseAddress = new Uri("https://platform-webprops.stg.song88.com") };
-            var sut = new WebPropsRepository(httpClient, NullLogger<WebPropsRepository>.Instance);
+            var rabbitMqRepository = new Mock<IRabbitMqRepository>();
+            rabbitMqRepository
+                .Setup(r => r.Publish(It.IsAny<MessageRequest>(), It.IsAny<string>()))
+                .ReturnsAsync(new BaseResponse<MessageResponse>() { StatusCode = StatusCode.Success });
+            var sut = new WebPropsRepository(httpClient, NullLogger<WebPropsRepository>.Instance, rabbitMqRepository.Object);
 
             return (sut, handler);
         }

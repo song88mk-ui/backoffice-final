@@ -3,6 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,11 +20,13 @@ namespace Backoffice.API.Repositories
     {
         private readonly HttpClient _webPropsHttpClient;
         private readonly ILogger<WebPropsRepository> _logger;
+        private readonly IRabbitMqRepository _rabbitMqRepository;
 
-        public WebPropsRepository(HttpClient httpClient, ILogger<WebPropsRepository> logger)
+        public WebPropsRepository(HttpClient httpClient, ILogger<WebPropsRepository> logger, IRabbitMqRepository rabbitMqRepository)
         {
             _webPropsHttpClient = httpClient;
             _logger = logger;
+            _rabbitMqRepository = rabbitMqRepository;
         }
 
         #region Methods
@@ -154,6 +157,29 @@ namespace Backoffice.API.Repositories
                         Message = postContent
                     };
                 }
+
+                // Signal-only, deliberately no flag values in the payload: a burst of rapid saves
+                // (e.g. several admins toggling the same client back and forth) would otherwise
+                // queue up through RabbitMQ -> OE.Websocket.Service -> the hub and replay every
+                // intermediate value to platform-web, causing the UI to visibly flicker through
+                // stale states. Each push instead tells platform-web "go re-fetch and compare",
+                // so only the current, converged value from webprops-api is ever applied.
+                //
+                // Routing key carries the client code as its last segment, matching the working
+                // precedent for single-client-targeted pushes (OnVisitFavorites/OnVisitBoostedFixtures
+                // in platform-final/Platform.Sportsbook.API/Repository/SportsbookRepository.cs) -
+                // OE.Websocket.Service's ClientRegistry.ResolveByRoutingKey() resolves the client
+                // from the routing key's last dot-segment.
+                await _rabbitMqRepository.Publish(new MessageRequest
+                {
+                    Payload = System.Text.Json.JsonSerializer.Serialize(new OnWebPropsChangeMessage
+                    {
+                        ClientCode = request.ClientCode
+                    }),
+                    CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                    MessageType = "OnWebPropsChange",
+                    RoutingKey = $"r.oe.cachesync.onwebpropschange.{request.ClientCode.ToLower()}"
+                });
 
                 return await GetClientFeatureFlagsAsync(request.ClientCode);
             }
