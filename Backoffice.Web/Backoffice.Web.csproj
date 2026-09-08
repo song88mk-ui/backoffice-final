@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Infra.Extensions.Telemetry" Version="0.0.1-1" />
+    <PackageReference Include="Infra.Extensions.Telemetry" Version="0.1.1-5" />
     <PackageReference Include="BlazorDateRangePicker" Version="4.2.0" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
     <PackageReference Include="ExcelDataReader" Version="3.6.0" />
