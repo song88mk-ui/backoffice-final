@@ -12,7 +12,7 @@ using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
 {
-    public partial class EditMappingSegmentModal: IDisposable
+    public partial class EditMappingSegmentModal : IDisposable
     {
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IModalService ModalService { get; set; }
@@ -89,9 +89,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
         {
             var providers = new List<MappingProviderItemModel>();
 
-            if(info.SrId.Count() > 0)
+            if (info.SrId.Count() > 0)
             {
-                foreach(var item in info.SrId)
+                foreach (var item in info.SrId)
                 {
                     providers.Add(new MappingProviderItemModel()
                     {
@@ -102,9 +102,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
                     });
                 }
             }
-            if(info.BgId.Count() > 0)
+            if (info.BgId.Count() > 0)
             {
-                foreach(var item in info.BgId)
+                foreach (var item in info.BgId)
                 {
                     providers.Add(new MappingProviderItemModel()
                     {
@@ -118,13 +118,13 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
 
             return providers;
         }
-        
+
         private async Task HandleUpdateMappingClick(MappingSetupItemModel item)
         {
             var info = new ProviderModel<int>()
             {
                 SrId = 0,
-                BgId = 0,   
+                BgId = 0,
             };
 
             if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.LeId, out int SrId))
@@ -149,7 +149,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
             };
 
             var response = await _providerMappingService.AddOrUpdateProviderMapping(_saveMappingCategories[MappingCategory.League], request);
-            
+
             if (response != null && response.StatusCode == StatusCode.Success)
             {
                 ModalService.Cancel();
@@ -191,7 +191,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
 
             allItemsToBeFiltered.AddRange(_currentMappingSetupProviderItems);
 
-            foreach(var mappedItem in _currentMappedItems)
+            foreach (var mappedItem in _currentMappedItems)
             {
                 allItemsToBeFiltered.AddRange(mappedItem.Providers);
             }
@@ -228,7 +228,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
 
             foreach (var item in _tempFilteredUnmappedSegments)
             {
-                if ((srIds.Contains(item.LeId) && item.ChTyId == (int)ChannelType.SR) || 
+                if ((srIds.Contains(item.LeId) && item.ChTyId == (int)ChannelType.SR) ||
                     (bgIds.Contains(item.LeId) && item.ChTyId == (int)ChannelType.BG))
                 {
                     item.IsCurrentLinkedItem = true;
@@ -286,5 +286,5 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
         public void Dispose()
         {
         }
-    }    
+    }
 }

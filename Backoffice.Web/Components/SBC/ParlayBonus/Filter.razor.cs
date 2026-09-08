@@ -38,13 +38,13 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
         {
             ClientId = "0";
 
-            if(_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
+            if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
             {
                 await LoadClients();
             }
 
             _userState.PropertyChanged += UserStatePropertyChanged;
-        } 
+        }
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
@@ -75,7 +75,7 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
             ClientParlayBonusResponse.ParlayBonusMinOdds = OriginalMinOdds;
             IsEdit = !IsEdit;
 
-            await OnCancelClickCallback.InvokeAsync();            
+            await OnCancelClickCallback.InvokeAsync();
         }
 
         public async Task OnAddClickEvent()

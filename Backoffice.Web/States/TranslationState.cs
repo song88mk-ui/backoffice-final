@@ -16,7 +16,7 @@ namespace Backoffice.Web.States
 
         #region Properties
 
-        public List<LanguageCode> LanguageCodes { get;set; }
+        public List<LanguageCode> LanguageCodes { get; set; }
         public LanguageCode ActiveLanguageCode { get; set; }
 
         #endregion

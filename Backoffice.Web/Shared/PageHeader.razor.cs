@@ -37,7 +37,7 @@ namespace Backoffice.Web.Shared
             {
                 _activeLanguageCode = _translationState.ActiveLanguageCode;
 
-                if(PageHeaderModel != null)
+                if (PageHeaderModel != null)
                 {
                     _title = PageHeaderModel.Title;
                     _iconClass = PageHeaderModel.IconClass;

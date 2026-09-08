@@ -193,7 +193,7 @@ namespace Backoffice.API.Tests.MarketSettlement
             Assert.Equal(VoidFactor.Half, msg.Selections.Single(s => s.SelectionTemplateId == "st_halfwon").VoidFactor);
             Assert.Equal(VoidFactor.Zero, msg.Selections.Single(s => s.SelectionTemplateId == "st_lost").VoidFactor);
             Assert.Equal(VoidFactor.Half, msg.Selections.Single(s => s.SelectionTemplateId == "st_halflost").VoidFactor);
-            Assert.Equal(VoidFactor.One,  msg.Selections.Single(s => s.SelectionTemplateId == "st_void").VoidFactor);
+            Assert.Equal(VoidFactor.One, msg.Selections.Single(s => s.SelectionTemplateId == "st_void").VoidFactor);
         }
 
         // GM-543: SelectionSpecifier must survive onto the published OnBetSettlement message.

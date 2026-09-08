@@ -31,7 +31,7 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Methods
-        
+
         public async Task<BaseResponse<OnBulkUpdateConfigMessage>> ConvertExceltoBulkUpdateConfigMessage(MemoryStream stream, string fileName, string userId, string clientCodes, IMessageBroker messageBroker)
         {
             try

@@ -29,7 +29,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
 
             _shouldRender = true;
         }
-        
+
         private async Task FetchSegmentMapping()
         {
             var request = new MappingRequest

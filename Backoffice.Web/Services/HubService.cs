@@ -149,7 +149,7 @@ namespace Backoffice.Web.Services
 
         public async Task RegisterMessageHandlers(Func<BetStopFixtureMessage, Task> processOnBetStopFixture, Func<BetStopGlobalMessage, Task> processOnBetStopGlobal, Func<OddsChangeMonitoringMessage, Task> processOddsChangeMonitoring = null, Func<OddsChangeFixtureDetailsMessage, Task> processOddsChange = null)
         {
-            if(_hubConnection == null) return;
+            if (_hubConnection == null) return;
 
             if (processOddsChangeMonitoring != null)
                 _hubConnection.On<OddsChangeMonitoringMessage>("OnMonitoringOddsChange", async message => await processOddsChangeMonitoring(message));
@@ -176,7 +176,7 @@ namespace Backoffice.Web.Services
         }
         public async ValueTask DisposeAsync()
         {
-            if(_hubConnection != null)
+            if (_hubConnection != null)
             {
                 await _hubConnection.StopAsync();
                 await _hubConnection.DisposeAsync();

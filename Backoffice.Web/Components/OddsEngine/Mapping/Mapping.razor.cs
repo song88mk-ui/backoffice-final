@@ -26,7 +26,7 @@ public partial class Mapping : ComponentBase
             IsCurrentPage = true
         }
     };
-    
+
     private PageHeaderModel _pageHeaderModel = new()
     {
         Title = "Sports Mapping 3",

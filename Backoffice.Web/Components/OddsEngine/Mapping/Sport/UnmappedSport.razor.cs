@@ -45,7 +45,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
                 var info = new ProviderModel<int>()
                 {
                     SrId = 0,
-                    BgId = 0,   
+                    BgId = 0,
                 };
 
                 if (Int32.TryParse(item.Providers.FirstOrDefault(i => i.ChTyId == (int)ChannelType.SR)?.SpId, out SrId))

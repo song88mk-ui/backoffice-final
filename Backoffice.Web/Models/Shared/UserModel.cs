@@ -16,6 +16,6 @@ namespace Backoffice.Web.Models.Shared
         public List<PlatformClientResponse> TradingClients { get; set; } = new List<PlatformClientResponse>();
         public List<Claim> Claims { get; set; } = new List<Claim>();
         public List<Client> SportsbookClients { get; set; } = new List<Client>();
-        public bool IsAuthenticated {  get; set; }
+        public bool IsAuthenticated { get; set; }
     }
 }

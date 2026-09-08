@@ -597,7 +597,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     }
                 }
-            };
+            }
+            ;
         }
 
         private PrematchSettingsTemplateModel GetPrematchSettingsTemplate(ConfigTemplateMargin configTemplateMargin, string marketTemplateId, string marketTemplateName) => new PrematchSettingsTemplateModel()

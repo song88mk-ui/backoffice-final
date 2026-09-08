@@ -97,7 +97,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 var toPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.To);
                 stringBuilder.Append($"<td class=\"px-4\">{toPaylaod?.Name ?? "-"}</td>");
             }
-            else if(activityLog.Activity == Activity.Copy.ToString())
+            else if (activityLog.Activity == Activity.Copy.ToString())
             {
                 stringBuilder.Append($"<td class=\"px-4\">{_translationState.GetValue("Copied Template")}</td>");
                 var fromPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.From);

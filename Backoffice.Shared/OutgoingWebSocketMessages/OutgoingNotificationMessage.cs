@@ -8,6 +8,6 @@ namespace Backoffice.Shared.OutgoingWebSocketMessages
     public class OutgoingNotificationMessage : OutgoingBaseMessage
     {
         public string UsId { get; set; }
-        public NotificationsModel Pa {  get; set; }
+        public NotificationsModel Pa { get; set; }
     }
 }

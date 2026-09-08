@@ -35,10 +35,10 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
             if (Fixture.Markets.Any())
             {
-                foreach(var market in Fixture.Markets)
+                foreach (var market in Fixture.Markets)
                 {
-                    
-                    if(!Markets.Any(m => m.MarketTemplateId == market.MarketTemplateId))
+
+                    if (!Markets.Any(m => m.MarketTemplateId == market.MarketTemplateId))
                     {
                         var newMarket = new MarketFixtureResponse.MarketModel
                         {
@@ -98,7 +98,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
                     marketTemplateGroupId++;
                 }
-                
+
             }
         }
 
@@ -110,7 +110,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             MarketTemplateGroups.ForEach((c) => { c.IsSelected = false; });
 
             var marketGroupTemplate = MarketTemplateGroups.FirstOrDefault(m => m.MarketTemplateGroup.MarketTemplateGroupId == Convert.ToInt32(groupId.Replace("radio", "")));
-            if(marketGroupTemplate != null)
+            if (marketGroupTemplate != null)
             {
                 marketGroupTemplate.IsSelected = true;
                 SelectedMarketTemplateIds = marketGroupTemplate.MarketTemplateGroup.MarketTemplateIds;

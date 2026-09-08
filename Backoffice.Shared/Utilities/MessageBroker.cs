@@ -56,7 +56,7 @@ namespace Backoffice.Shared.Utilities
         private string _externalConsumerName = string.Empty;
         private string _externalRoutingKey = string.Empty;
 
-        MessageBrokerCredentialModel _credential { get;set; }
+        MessageBrokerCredentialModel _credential { get; set; }
 
         private static readonly ActivitySource _activitySource = new ActivitySource(nameof(MessageBroker));
         private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
@@ -185,13 +185,14 @@ namespace Backoffice.Shared.Utilities
                         catch (Exception)
                         {
                             consumer.Model.BasicNack(e.DeliveryTag, false, true);
-                        };
+                        }
+                        ;
                     };
 
                     _modelHk.BasicConsume(messageBroker.Queue, false, $"{messageBroker.Consumer}.{Guid.NewGuid()}", consumer);
                 }
             }
-            catch (Exception) {}
+            catch (Exception) { }
             #endregion
         }
         public void Connect(MessageBrokerCredentialModel messageBroker = null)
@@ -201,9 +202,9 @@ namespace Backoffice.Shared.Utilities
             {
                 byte[] bytes = hasher.ComputeHash(Encoding.UTF8.GetBytes(Environment.MachineName));
                 StringBuilder sb = new StringBuilder();
-                foreach(byte b in bytes)
+                foreach (byte b in bytes)
                     sb.Append(b.ToString("x2"));
-                suffix = sb.ToString().Substring(0,5);
+                suffix = sb.ToString().Substring(0, 5);
             }
 
             var clientProperties = new Dictionary<string, object>
@@ -309,7 +310,7 @@ namespace Backoffice.Shared.Utilities
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -412,33 +413,33 @@ namespace Backoffice.Shared.Utilities
         {
             try
             {
-              var activityName = $"{routingKey} send";
-              using var activity = _activitySource.StartActivity(activityName, ActivityKind.Producer);
+                var activityName = $"{routingKey} send";
+                using var activity = _activitySource.StartActivity(activityName, ActivityKind.Producer);
 
-              var properties = _model.CreateBasicProperties();
-              properties.CorrelationId = correlationId;
-              properties.DeliveryMode = 2;
-              properties.Type = messageType;
+                var properties = _model.CreateBasicProperties();
+                properties.CorrelationId = correlationId;
+                properties.DeliveryMode = 2;
+                properties.Type = messageType;
 
-              ActivityContext contextToInject = default;
-              if (activity != null)
-              {
-                contextToInject = activity.Context;
-              }
-              else if (Activity.Current != null)
-              {
-                contextToInject = Activity.Current.Context;
-              }
+                ActivityContext contextToInject = default;
+                if (activity != null)
+                {
+                    contextToInject = activity.Context;
+                }
+                else if (Activity.Current != null)
+                {
+                    contextToInject = Activity.Current.Context;
+                }
 
-              Propagator.Inject(new PropagationContext(contextToInject, Baggage.Current), properties, this.InjectTraceContextIntoBasicProperties);
+                Propagator.Inject(new PropagationContext(contextToInject, Baggage.Current), properties, this.InjectTraceContextIntoBasicProperties);
 
-              var payloadBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload));
+                var payloadBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload));
 
-              BasicPublish(routingKey, properties, payloadBytes);
+                BasicPublish(routingKey, properties, payloadBytes);
             }
             catch (Exception)
             {
-              // throw?
+                // throw?
             }
         }
 
@@ -475,7 +476,7 @@ namespace Backoffice.Shared.Utilities
             }
             catch (Exception)
             {
-              // throw?
+                // throw?
             }
         }
 
@@ -483,33 +484,33 @@ namespace Backoffice.Shared.Utilities
         {
             try
             {
-              var activityName = $"{routingKey} send";
-              using var activity = _activitySource.StartActivity(activityName, ActivityKind.Producer);
+                var activityName = $"{routingKey} send";
+                using var activity = _activitySource.StartActivity(activityName, ActivityKind.Producer);
 
-              var properties = _model.CreateBasicProperties();
-              properties.CorrelationId = correlationId;
-              properties.DeliveryMode = 2;
-              properties.Type = messageType;
+                var properties = _model.CreateBasicProperties();
+                properties.CorrelationId = correlationId;
+                properties.DeliveryMode = 2;
+                properties.Type = messageType;
 
-              ActivityContext contextToInject = default;
-              if (activity != null)
-              {
-                contextToInject = activity.Context;
-              }
-              else if (Activity.Current != null)
-              {
-                contextToInject = Activity.Current.Context;
-              }
+                ActivityContext contextToInject = default;
+                if (activity != null)
+                {
+                    contextToInject = activity.Context;
+                }
+                else if (Activity.Current != null)
+                {
+                    contextToInject = Activity.Current.Context;
+                }
 
-              Propagator.Inject(new PropagationContext(contextToInject, Baggage.Current), properties, this.InjectTraceContextIntoBasicProperties);
+                Propagator.Inject(new PropagationContext(contextToInject, Baggage.Current), properties, this.InjectTraceContextIntoBasicProperties);
 
-              var payloadBytes = Encoding.UTF8.GetBytes(payload);
+                var payloadBytes = Encoding.UTF8.GetBytes(payload);
 
-              BasicPublish(routingKey, properties, payloadBytes);
+                BasicPublish(routingKey, properties, payloadBytes);
             }
             catch (Exception)
             {
-              // throw?
+                // throw?
             }
         }
 
@@ -517,8 +518,8 @@ namespace Backoffice.Shared.Utilities
         {
             try
             {
-              var activityName = $"{routingKey} send";
-              using var activity = _activitySource.StartActivity(activityName, ActivityKind.Producer);
+                var activityName = $"{routingKey} send";
+                using var activity = _activitySource.StartActivity(activityName, ActivityKind.Producer);
 
                 var conn = GetConnection();
                 using var channel = conn.CreateModel();
@@ -546,23 +547,23 @@ namespace Backoffice.Shared.Utilities
             }
             catch (Exception)
             {
-              // throw?
+                // throw?
             }
         }
 
 
         private void InjectTraceContextIntoBasicProperties(IBasicProperties props, string key, string value)
         {
-          try
-          {
-            if (props.Headers == null)
+            try
             {
-              props.Headers = new Dictionary<string, object>();
+                if (props.Headers == null)
+                {
+                    props.Headers = new Dictionary<string, object>();
+                }
+                props.Headers[key] = value;
             }
-            props.Headers[key] = value;
-          }
-          catch (Exception)
-          { }
+            catch (Exception)
+            { }
         }
 
         public void Dispose()
@@ -587,7 +588,7 @@ namespace Backoffice.Shared.Utilities
             if (_connection != null && _connection.IsOpen)
                 return _connection;
 
-            lock(_lock)
+            lock (_lock)
             {
                 Connect(); //
                 if (_connection == null || !_connection.IsOpen)

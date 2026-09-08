@@ -22,7 +22,7 @@ public class MetabaseService
         _dashboardId = int.Parse(configuration["Metabase:DashboardId"]!);
         _email = configuration["Metabase:Email"]!;
     }
-    
+
     public string GetSsoToken()
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_ssoSecretKey));

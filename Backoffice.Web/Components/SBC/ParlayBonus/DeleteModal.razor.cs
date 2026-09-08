@@ -29,7 +29,7 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
 
         public void Dispose()
         {
-            
+
         }
 
         public async Task OnCancelClickEvent()

@@ -176,7 +176,7 @@ namespace Backoffice.API.Repositories
                 request.DateTo = request.DateTo.Date.Add(new TimeSpan(23, 59, 59));
 
                 var activityLogs = (await _backofficeContext.ReadActivityLog
-                        .FromSqlRaw($"GetActivityLogs '{request.Page}', '{request.Payload}', '{request.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
+                        .FromSql($"GetActivityLogs '{request.Page}', '{request.Payload}', '{request.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
                         .AsNoTracking()
                     .ToListAsync())
                     .Select(s => new ActivityLogModel
@@ -243,7 +243,7 @@ namespace Backoffice.API.Repositories
                 request.ManualBetSettlementCallbackModel.DateTo = request.ManualBetSettlementCallbackModel.DateTo.Date.Add(new TimeSpan(23, 59, 59));
 
                 var activityLogs = (await _backofficeContext.ReadActivityLog
-                        .FromSqlRaw($"GetActivityLogs '{AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_', '.')}', '', '{request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
+                        .FromSql($"GetActivityLogs '{AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_', '.')}', '', '{request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
                         .AsNoTracking()
                     .ToListAsync())
                     .Select(s => new ActivityLogModel
@@ -308,7 +308,7 @@ namespace Backoffice.API.Repositories
                 var fromUTC = request.DateFrom.ToString("yyyy-MM-dd HH:mm:ss");
                 var toUTC = request.DateTo.ToString("yyyy-MM-dd HH:mm:ss");
                 var activityLogs = (await _backofficeContext.ReadActivityLog
-                        .FromSqlRaw($"GetActivityLogs '{request.Page}', '{request.Payload}', '{fromUTC}', '{toUTC}'")
+                        .FromSql($"GetActivityLogs '{request.Page}', '{request.Payload}', '{fromUTC}', '{toUTC}'")
                         .AsNoTracking()
                     .ToListAsync())
                     .Select(s => new ActivityLogModel

@@ -13,7 +13,8 @@ namespace Backoffice.Web.Components.Common
 
         protected override async Task OnParametersSetAsync()
         {
-            switch (ChannelTypeId) {
+            switch (ChannelTypeId)
+            {
                 case (int)ChannelType.SR:
                     _iconClassName = "bet-radar";
                     _label = "SR";

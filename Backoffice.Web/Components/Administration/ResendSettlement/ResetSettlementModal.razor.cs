@@ -22,14 +22,14 @@ namespace Backoffice.Web.Components.Administration.ResendSettlement
         }
 
         public async Task OnModalReset()
-        {            
+        {
             await Modal.OnSaveClickCallback.InvokeAsync();
             ModalService.Cancel();
         }
 
         public void Dispose()
         {
-            
+
         }
 
         #endregion

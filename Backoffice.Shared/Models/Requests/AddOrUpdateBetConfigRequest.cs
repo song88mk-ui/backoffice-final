@@ -6,9 +6,10 @@ namespace Backoffice.Shared.Models.Requests
 {
     public class AddOrUpdateBetConfigRequest
     {
-        public AddOrUpdateBetConfigRequest() {
+        public AddOrUpdateBetConfigRequest()
+        {
             BetConfigPayload = new List<BetConfig>();
-        } 
+        }
         public Guid ClientId { get; set; }
         public List<BetConfig> BetConfigPayload { get; set; }
 

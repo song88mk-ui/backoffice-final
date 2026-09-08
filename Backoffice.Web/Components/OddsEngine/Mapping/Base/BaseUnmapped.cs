@@ -199,9 +199,9 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
                 return itemsToInclude;
             }
 
-            itemsToInclude = UnmappedItems.Where(y => 
-                sportIdsToInclude.Contains(y.SpId) && 
-                segmentIdsToInclude.Contains(y.SegId) && 
+            itemsToInclude = UnmappedItems.Where(y =>
+                sportIdsToInclude.Contains(y.SpId) &&
+                segmentIdsToInclude.Contains(y.SegId) &&
                 leagueIdsToInclude.Contains(y.LeId))
                 .ToList();
 
@@ -286,7 +286,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Base
                 DropdownFilters[MappingCategory.Sport].Items = distinctSports;
                 DropdownFilters[MappingCategory.Segment].Items = distinctSegments;
                 DropdownFilters[MappingCategory.League].Items = distinctLeagues;
-            } else
+            }
+            else
             {
                 var selectedSportIds = DropdownFilters[MappingCategory.Sport].Items.Where(x => x.IsChecked == true).Select(y => y.SportId).ToList();
                 var selectedSegmentIds = DropdownFilters[MappingCategory.Segment].Items.Where(x => x.IsChecked == true).Select(y => y.SegmentId).ToList();

@@ -118,16 +118,16 @@ namespace Backoffice.Utility
 
         private IEnumerable<string> ExtractTraceContextFromBasicProperties(IBasicProperties props, string key)
         {
-          try
-          {
-            if (props.Headers.TryGetValue(key, out var value))
+            try
             {
-              var bytes = value as byte[];
-              return new[] {  Encoding.UTF8.GetString(bytes) };
+                if (props.Headers.TryGetValue(key, out var value))
+                {
+                    var bytes = value as byte[];
+                    return new[] { Encoding.UTF8.GetString(bytes) };
+                }
             }
-          }
-          catch (Exception ex) {}
-          return Enumerable.Empty<string>();
+            catch (Exception ex) { }
+            return Enumerable.Empty<string>();
         }
     }
 }

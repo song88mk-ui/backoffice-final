@@ -7,7 +7,7 @@ namespace Backoffice.Web.Models.Validation
     {
         public override bool IsValid(object value)
         {
-            return value is IList {Count: > 0};
+            return value is IList { Count: > 0 };
         }
     }
 }

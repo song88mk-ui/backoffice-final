@@ -56,7 +56,7 @@ namespace Backoffice.Web.Components.Common
             // modal-lg d-flex justify-content-center align-items-center h-100
             _modalDisplay = "block";
             _modalClass = string.IsNullOrEmpty(modalClass) ? "show" : modalClass;
-            _modalDialogClass = !string.IsNullOrEmpty(modalDialogClass) ?  modalDialogClass: "";
+            _modalDialogClass = !string.IsNullOrEmpty(modalDialogClass) ? modalDialogClass : "";
             _modalDialogStyle = !string.IsNullOrEmpty(style) ? style : "";
             _modalHeaderClass = !string.IsNullOrEmpty(modalHeaderClass) ? modalHeaderClass : "";
             _modalIcon = !string.IsNullOrEmpty(modalIcon) ? modalIcon : "";

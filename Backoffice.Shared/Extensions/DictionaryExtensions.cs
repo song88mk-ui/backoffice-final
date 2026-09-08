@@ -8,7 +8,7 @@ namespace Backoffice.Shared.Extensions
 {
     public static class DictionaryExtensions
     {
-        public static string GetValue(this Dictionary<string,string> model, string word)
+        public static string GetValue(this Dictionary<string, string> model, string word)
         {
             var key = word.Replace(" ", "_").ToLower();
             var placeHolders = ExtractPlaceholders(ref key);

@@ -69,8 +69,9 @@ namespace Backoffice.API.Repositories
                     }
                 };
             }
-            finally {
-              activity?.Stop();
+            finally
+            {
+                activity?.Stop();
             }
         }
 

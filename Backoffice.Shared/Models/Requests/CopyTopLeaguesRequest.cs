@@ -14,7 +14,7 @@ namespace Backoffice.Shared.Models.Requests
         public int SportId { get; set; }
         public List<SportLeague> TopLeagues { get; set; }
 
-        public class SportLeague 
+        public class SportLeague
         {
             public int SportId { get; set; }
             public string SportName { get; set; }

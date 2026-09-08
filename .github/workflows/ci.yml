@@ -130,3 +130,6 @@ jobs:
 
       - name: Test
         run: dotnet test backoffice-final.sln -c Release
+
+      - name: Format
+        run: dotnet format backoffice-final.sln --verify-no-changes --report

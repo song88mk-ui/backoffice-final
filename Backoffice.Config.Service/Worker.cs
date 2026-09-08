@@ -60,7 +60,7 @@ namespace Backoffice.Config.Service
                         _backofficeRepository.UpdateClientMargin(UpdateClientMarginPayload, _messageBroker);
                         break;
                     case "DeleteConfigTemplate":
-                         var DeleteConfigTemplatePayload = JsonSerializer.Deserialize<ConfigTemplate>(payload);
+                        var DeleteConfigTemplatePayload = JsonSerializer.Deserialize<ConfigTemplate>(payload);
                         _backofficeRepository.DeleteConfigTemplate(DeleteConfigTemplatePayload);
                         break;
                 }

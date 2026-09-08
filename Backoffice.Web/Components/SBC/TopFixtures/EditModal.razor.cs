@@ -86,9 +86,9 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
             if (!NewTopFixture.TopFixtures.Any())
             {
-                NewTopFixture.TopFixtures.Add(new ClientTopFixtureModel.TopFixture 
-                { 
-                    SortOrder = 1 
+                NewTopFixture.TopFixtures.Add(new ClientTopFixtureModel.TopFixture
+                {
+                    SortOrder = 1
                 });
             }
 
@@ -134,14 +134,14 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
         }
 
         public async Task OnAddClickEvent(int count)
-        {            
+        {
             NewTopFixture.TopFixtures.Insert(count, new ClientTopFixtureModel.TopFixture
             {
                 SortOrder = count + 1
             });
 
             IsDisabled = NewTopFixture.TopFixtures.Any() && NewTopFixture.TopFixtures.Count >= 50 ? true : false;
-            
+
             SortOrderRow();
         }
 

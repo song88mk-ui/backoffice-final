@@ -17,7 +17,7 @@ namespace Backoffice.Web.Models
         public string Control { get; set; } = "";
     }
 
-    public class AnnouncementsAlertModel: AlertModel
+    public class AnnouncementsAlertModel : AlertModel
     {
         public AnnouncementAlertType AnnouncementAlertType { get; set; }
     }

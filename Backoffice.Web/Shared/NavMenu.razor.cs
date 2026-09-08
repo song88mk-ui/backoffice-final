@@ -192,7 +192,7 @@ namespace Backoffice.Web.Shared
                 }
             }
 
-            if (page != null && (!page.Contains("sportsbook-translations", StringComparison.OrdinalIgnoreCase) 
+            if (page != null && (!page.Contains("sportsbook-translations", StringComparison.OrdinalIgnoreCase)
                                         && !page.Contains("translations", StringComparison.OrdinalIgnoreCase)))
             {
                 menus = menus

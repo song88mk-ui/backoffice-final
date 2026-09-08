@@ -114,7 +114,7 @@ namespace Backoffice.Web.Services
         public async Task<BaseResponse<TokenModel>> AuthenticateToken(string accesstoken = "")
         {
             var userToken = accesstoken;
-            if(string.IsNullOrEmpty(accesstoken))
+            if (string.IsNullOrEmpty(accesstoken))
             {
                 userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
             }
@@ -163,7 +163,7 @@ namespace Backoffice.Web.Services
             var auth = _httpClient.GetAsync("api/authentication/logout").Result;
 
             _httpContextAccessor.HttpContext?.Session.Remove("UserToken");
-           
+
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
             _httpClient.DefaultRequestHeaders.Authorization = null;
 

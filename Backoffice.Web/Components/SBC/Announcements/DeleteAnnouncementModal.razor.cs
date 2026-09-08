@@ -71,7 +71,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     LanguageCode = _announcement.LanguageCode,
                     Title = _announcement.Title,
                     StartDate = _announcement.StartDate,
-                    EndDate =_announcement.EndDate,
+                    EndDate = _announcement.EndDate,
                     Clients = _announcement.Clients
                 };
 

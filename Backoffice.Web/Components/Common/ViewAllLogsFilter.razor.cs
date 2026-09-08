@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backoffice.Web.Components.Common;
+
 public partial class ViewAllLogsFilter : IDisposable
 {
     #region Properties

@@ -53,7 +53,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             {
                 IsSaveDisabled = AddPriceBoostFilterModel.PriceBoostConfigList.Where(x => !string.IsNullOrEmpty(x.BoostedOddsStr)).Any(x => double.TryParse(x.BoostedOddsStr, out double result) && result <= 1);
             }
-            
+
             await InvokeAsync(StateHasChanged);
         }
 
@@ -155,7 +155,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                             MessageType = "OnPriceBoost",
                             RoutingKey = $"r.uof.onpriceboost",
                             Payload = JsonSerializer.Serialize(payload)
-                        });                        
+                        });
                     }
                 }
 
@@ -238,7 +238,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
                         activityLogList.ActivityLogs.Add(onActivityLogMessage);
                     }
-                }                
+                }
 
                 var addLogResponse = await BackofficeService.AddActivityLogList(activityLogList);
 
@@ -254,7 +254,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public void Dispose()
         {
-            
+
         }
 
         #endregion

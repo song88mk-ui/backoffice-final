@@ -105,7 +105,7 @@ namespace Backoffice.Web.Components.Common
 
             if (Multiple)
             {
-                if(!_items?.Any(i => i.Value == "all") ?? false)
+                if (!_items?.Any(i => i.Value == "all") ?? false)
                     _items.Insert(0, new SelectListItemWithCheckboxModel<string>
                     {
                         Value = "all",

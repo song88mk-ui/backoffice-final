@@ -127,7 +127,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                 SettingsLive.LastKey = GetLastKey(false);
             }
-            
+
             StateHasChanged();
 
             Modal.Close(ModalResult.Ok("Form Submitted"));

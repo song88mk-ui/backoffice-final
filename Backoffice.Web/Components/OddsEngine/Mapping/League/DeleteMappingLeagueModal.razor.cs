@@ -12,18 +12,18 @@ using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 {
-    public partial class DeleteMappingLeagueModal: IDisposable
+    public partial class DeleteMappingLeagueModal : IDisposable
     {
-		[Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IModalService ModalService { get; set; }
-		[CascadingParameter] public ModalParameters ModalParameters { get; set; }
-		[CascadingParameter] private CustomModal Modal { get; set; }
-		private bool _isPreLoader = true;
-		private bool _isSportMappingFound = false;
-		private AlertModel _alertModel;
-		private string _leagueId;
-		private List<MappingProviderItemModel> _providers = new List<MappingProviderItemModel>();
-		private Dictionary<int, string> providerIdToName = new Dictionary<int, string>
+        [CascadingParameter] public ModalParameters ModalParameters { get; set; }
+        [CascadingParameter] private CustomModal Modal { get; set; }
+        private bool _isPreLoader = true;
+        private bool _isSportMappingFound = false;
+        private AlertModel _alertModel;
+        private string _leagueId;
+        private List<MappingProviderItemModel> _providers = new List<MappingProviderItemModel>();
+        private Dictionary<int, string> providerIdToName = new Dictionary<int, string>
         {
             {
                 0, "Sports Radar"
@@ -35,7 +35,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
         private string _leagueName;
 
-		protected override async Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
         {
             _leagueName = ModalParameters.TryGet<string>("LeNa");
             var mappedResponse = await _providerMappingService.GetLeagueMappingByLeId(ModalParameters.TryGet<int>("LeId"));
@@ -50,34 +50,34 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
                     Opacity = 1.0m,
                 };
                 return;
-			}
-			_leagueId = leagueMapping.LeId.ToString();
+            }
+            _leagueId = leagueMapping.LeId.ToString();
 
-			var providerMappings = new[]
-			{
-				new { Info = leagueMapping.Info.SrId, ChannelType = ChannelType.SR },
-				new { Info = leagueMapping.Info.BgId, ChannelType = ChannelType.BG }
-			};
-			foreach (var mapping in providerMappings)
-			{
-				// if (mapping.Info != null && mapping.Info.Id > 0)
-				// {
-				// 	// _providers.Add(new MappingProviderItemModel()
-				// 	// {
-				// 	// 	SpId = mapping.Info.Id.ToString(),
-				// 	// 	SpNa = mapping.Info.Name,
-				// 	// 	ChTyId = (int)mapping.ChannelType,
-				// 	// 	OtPrLi = mapping.Info.OtPrLi,
-				// 	// });
-				// }
-			}
+            var providerMappings = new[]
+            {
+                new { Info = leagueMapping.Info.SrId, ChannelType = ChannelType.SR },
+                new { Info = leagueMapping.Info.BgId, ChannelType = ChannelType.BG }
+            };
+            foreach (var mapping in providerMappings)
+            {
+                // if (mapping.Info != null && mapping.Info.Id > 0)
+                // {
+                // 	// _providers.Add(new MappingProviderItemModel()
+                // 	// {
+                // 	// 	SpId = mapping.Info.Id.ToString(),
+                // 	// 	SpNa = mapping.Info.Name,
+                // 	// 	ChTyId = (int)mapping.ChannelType,
+                // 	// 	OtPrLi = mapping.Info.OtPrLi,
+                // 	// });
+                // }
+            }
 
-			_isPreLoader = false;
+            _isPreLoader = false;
         }
-		private async Task HandleDeleteMappingClick()
+        private async Task HandleDeleteMappingClick()
         {
-			var response = await _providerMappingService.DeleteLeagueMapping(_leagueId, _userState.Model.Id);
-            
+            var response = await _providerMappingService.DeleteLeagueMapping(_leagueId, _userState.Model.Id);
+
             if (response != null && response.StatusCode == StatusCode.Success)
             {
                 ModalService.Cancel();
@@ -93,18 +93,18 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
                     Opacity = 1.0m,
                 };
             }
-		}
-		public void OnCloseClickEvent()
+        }
+        public void OnCloseClickEvent()
         {
             ModalService.Cancel();
         }
-        
+
         public void OnDeleteClickEvent()
         {
             ModalService.Cancel();
         }
-		public void Dispose()
-		{
-		}
+        public void Dispose()
+        {
+        }
     }
 }

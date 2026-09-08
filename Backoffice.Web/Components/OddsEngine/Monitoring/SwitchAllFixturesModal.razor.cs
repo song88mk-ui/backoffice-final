@@ -7,7 +7,7 @@ using Backoffice.Web.Services;
 
 namespace Backoffice.Web.Components.OddsEngine.Monitoring
 {
-    public partial class SwitchAllFixturesModal: IDisposable
+    public partial class SwitchAllFixturesModal : IDisposable
     {
 
         [Inject] public IModalService ModalService { get; set; }

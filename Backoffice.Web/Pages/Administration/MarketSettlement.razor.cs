@@ -18,7 +18,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
-        
+
 
         public MarketSettlementModalFilterModel ModalFilterModel { get; set; } = new MarketSettlementModalFilterModel();
         public List<ManualMarketSettlementAuditModel> ManualMarketSettlements { get; set; }

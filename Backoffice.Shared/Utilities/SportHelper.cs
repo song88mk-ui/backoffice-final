@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using Backoffice.Shared.Enums;
 
 namespace Backoffice.Shared.Utilities
-{ public static class SportHelper
+{
+    public static class SportHelper
     {
         public static readonly IReadOnlyDictionary<Sport, string> Names = new Dictionary<Sport, string>
         {

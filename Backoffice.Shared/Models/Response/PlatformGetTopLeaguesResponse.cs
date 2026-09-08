@@ -10,7 +10,7 @@ namespace Backoffice.Shared.Models.Response
         }
 
         public List<ClientTopLeague> TopLeagues { get; set; }
-        
+
         public class ClientTopLeague
         {
             public int ClientIdRef { get; set; }
@@ -18,7 +18,7 @@ namespace Backoffice.Shared.Models.Response
             public List<SportLeague> TopLeagues { get; set; }
         }
 
-        public class SportLeague 
+        public class SportLeague
         {
             public int SportId { get; set; }
             public string SportName { get; set; }

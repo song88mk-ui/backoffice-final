@@ -12,7 +12,7 @@ namespace Backoffice.API.Repositories
 {
     public interface IBackofficeRepository
     {
-        Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request); 
+        Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);
         Task<BaseResponse<bool>> AddActivityLogList(ActivityLogListRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetManualBetSettlementHistoryLogs(ManualBetSettlementActivityLogRequest request);
@@ -24,7 +24,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
         Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates();
         Task<BaseResponse<List<PlatformClientResponse>>> GetPlatformClients();
-        
+
         #region Config
         Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplates(string searchText, List<int> sportIds = null, List<int> scopeIds = null);
         Task<BaseResponse<int>> GetConfigTemplatesCount();

@@ -33,7 +33,7 @@ namespace Backoffice.API.Controllers.Authentication
                 content.IpAddress = GetRemoteIpAddress().Trim();
             if (string.IsNullOrEmpty(content.Country))
                 content.Country = GetIpCountry().Trim();
-            if(string.IsNullOrEmpty(content.UserAgent))
+            if (string.IsNullOrEmpty(content.UserAgent))
                 content.UserAgent = HttpContext.Request.Headers["user-agent"].FirstOrDefault() ?? "";
 
             content.Provider = $"{(int)Application2.BO}";
@@ -167,7 +167,7 @@ namespace Backoffice.API.Controllers.Authentication
         }
 
         [HttpPost("user/modify/{userId}")]
-        public async Task<IActionResult> UpdateUser(string userId,[FromBody] UserRegisterRequest request)
+        public async Task<IActionResult> UpdateUser(string userId, [FromBody] UserRegisterRequest request)
         {
             var result = new BaseResponse<bool>()
             {

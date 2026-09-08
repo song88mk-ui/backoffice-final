@@ -41,7 +41,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportsTree
             var segment = Sport.Segments.FirstOrDefault();
             var league = segment?.Leagues.FirstOrDefault();
 
-            SelectecSport =new SportClickCallbackModel()
+            SelectecSport = new SportClickCallbackModel()
             {
                 SportId = Sport.Id,
                 SegmentId = segment?.Id ?? -1,

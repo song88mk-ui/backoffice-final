@@ -39,7 +39,8 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
 
             SetDynamicProperties();
 
-            if (!string.IsNullOrEmpty(MappingSetupItem.Id) && MappingSetupItem.Id != _mappingSetupItem.Id) {
+            if (!string.IsNullOrEmpty(MappingSetupItem.Id) && MappingSetupItem.Id != _mappingSetupItem.Id)
+            {
                 _mappingSetupItem = new MappingSetupItemModel
                 {
                     Id = MappingSetupItem.Id,
@@ -66,7 +67,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Common
                         }).ToList()
                 };
             }
-            
+
             _mappingSetupItem.Providers = new List<MappingProviderItemModel>(MappingSetupProviderItems);
             _editContext = new EditContext(_mappingSetupItem);
             _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _mappingSetupItem.Providers));

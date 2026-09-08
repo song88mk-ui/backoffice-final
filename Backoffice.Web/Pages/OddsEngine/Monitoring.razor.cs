@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class Monitoring : IDisposable
     {
         #region Properties
-        
+
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
 
         [Parameter] public int SportId { get; set; }

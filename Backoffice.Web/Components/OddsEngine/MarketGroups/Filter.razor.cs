@@ -215,7 +215,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
                 var marketTemplateResponse = (await _backofficeService.GetClientMarketTemplateGroups(clientId, SelectedSportId, SelectedFixtureStatusId)).Result;
 
-                if(marketTemplateResponse != null)
+                if (marketTemplateResponse != null)
                 {
                     MarketGroupModel.ClientCode = SelectedClientCode;
                     MarketGroupModel.SportId = marketTemplateResponse.SportId;

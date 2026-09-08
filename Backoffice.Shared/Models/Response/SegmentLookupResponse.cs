@@ -10,9 +10,9 @@ namespace Backoffice.Shared.Models.Response
         {
             SegmentLookup = new List<SegmentLookupModel>();
         }
-        
+
         public List<SegmentLookupModel> SegmentLookup { get; set; }
-    }    
+    }
 
     #region Nested Class
     public class SegmentLookupModel

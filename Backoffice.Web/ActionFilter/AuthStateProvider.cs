@@ -31,14 +31,14 @@ namespace Backoffice.Web.ActionFilter
         {
             try
             {
-                if(string.IsNullOrEmpty(_userState.Model.AccessToken))
+                if (string.IsNullOrEmpty(_userState.Model.AccessToken))
                     _userState.SetAccessToken(_httpContextAccessor.HttpContext?.Session.GetString("UserToken"));
 
                 if (string.IsNullOrWhiteSpace(_userState.Model.AccessToken))
                     return _anonymous;
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.Model.AccessToken);
-                
+
                 return new AuthenticationState(_userState.Model.ClaimsPrincipal);
             }
             catch (Exception ex)

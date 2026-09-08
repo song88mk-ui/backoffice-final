@@ -1,6 +1,6 @@
 ﻿namespace Backoffice.Web.Models.OddsEngine.SportSetting
 {
-    public  class SportSettingSortOrderAudit
+    public class SportSettingSortOrderAudit
     {
         public List<SportSortOrderAudit> Sports { get; set; }
         public List<SegmentSortOrderAuditSport> Segments { get; set; }

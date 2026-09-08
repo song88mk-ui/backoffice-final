@@ -512,7 +512,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                                     {
                                         ClientCode = client.ClCo,
                                         Odds = clientSelection?.DecOd ?? -99,
-                                        SelectionTemplateId = newSelection.SeTeId,  
+                                        SelectionTemplateId = newSelection.SeTeId,
                                         SelectionId = newSelection.SeId,
                                     });
                                 }

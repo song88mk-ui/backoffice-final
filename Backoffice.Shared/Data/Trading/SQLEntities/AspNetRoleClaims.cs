@@ -10,6 +10,6 @@ namespace Backoffice.Shared.Data.Trading.SQLEntities
         public string RoleId { get; set; }
         public string ClaimType { get; set; }
         public string ClaimValue { get; set; }
-        
+
     }
 }

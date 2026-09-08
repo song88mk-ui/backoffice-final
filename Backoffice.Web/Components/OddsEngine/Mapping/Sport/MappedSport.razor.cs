@@ -52,7 +52,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 
             _shouldRender = true;
         }
-        
+
         public async Task HandleEditMappingClickEvent(SportMappingModel mappingItem)
         {
             var parameters = new ModalParameters();

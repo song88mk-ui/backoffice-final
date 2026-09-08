@@ -3,7 +3,7 @@ using Backoffice.Web.Services;
 
 namespace Backoffice.Web.Components.OddsEngine.Monitoring
 {
-    public partial class ConfirmSelectionModal: IDisposable
+    public partial class ConfirmSelectionModal : IDisposable
     {
 
         [Inject] public IModalService ModalService { get; set; }

@@ -49,7 +49,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
         public void Dispose()
         {
-            
+
         }
 
         #endregion

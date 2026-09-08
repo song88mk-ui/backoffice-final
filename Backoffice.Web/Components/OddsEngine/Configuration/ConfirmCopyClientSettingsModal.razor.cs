@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IBackofficeService BackofficeService { get; set; }
 
-        [CascadingParameter] private ModalParameters ModalParameters { get; set; }        
+        [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
         private EventCallback<AlertModel> OnCopyClientSettingsCallback { get; set; }
         private ClientInformationModel ToClient { get; set; }
@@ -66,14 +66,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     UserId = _userState.Model.Id,
                     FromClientCode = SelectedFromClient.Key,
                     ToClientCode = ToClient.ClientCode,
-                    ToRemoveConfig = response.Result.ToBeRemoved.Select(s => new ClientLeagueConfig 
-                        { 
-                            ClientCode = s.ClientCode, 
-                            ClientId = s.ClientId,
-                            SportId = s.SportId,
-                            SegmentId = s.SegmentId,
-                            LeagueId = s.LeagueId,
-                        }
+                    ToRemoveConfig = response.Result.ToBeRemoved.Select(s => new ClientLeagueConfig
+                    {
+                        ClientCode = s.ClientCode,
+                        ClientId = s.ClientId,
+                        SportId = s.SportId,
+                        SegmentId = s.SegmentId,
+                        LeagueId = s.LeagueId,
+                    }
                     ).ToList()
                 };
 
@@ -99,7 +99,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     Message = "Copy Client Settings Failed.",
                     Opacity = 1.0m
                 };
-            
+
             _isProcessing = false;
 
             ModalService.Cancel();
@@ -107,7 +107,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         }
         public void Dispose()
         {
-            
+
         }
         #endregion        
     }

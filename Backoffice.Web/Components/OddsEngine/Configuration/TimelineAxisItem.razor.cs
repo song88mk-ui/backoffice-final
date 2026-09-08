@@ -47,10 +47,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             Modal.Cancel();
         }
-        
+
         public void Dispose()
         {
-            
+
         }
         #endregion
 

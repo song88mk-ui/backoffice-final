@@ -85,7 +85,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         public async Task GetContent()
         {
             IsPreLoader = true;
-                
+
             ActivityLogs = new List<ActivityLogModel>();
 
             var response = await BackofficeService.GetActivityLogs(new ActivityLogRequest

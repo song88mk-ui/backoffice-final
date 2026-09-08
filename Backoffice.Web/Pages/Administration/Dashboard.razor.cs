@@ -105,7 +105,7 @@ namespace Backoffice.Web.Pages.Administration
         private async Task LoadEmbedData()
         {
             await _userState.SportsbookClientsReadyAsync;
-            
+
             var adminClientCodes = await GetClientCodeList();
             var sportsbookClientCodes = _userState.Model.SportsbookClients.Select(s => s.ClientCode).ToList();
 
@@ -117,7 +117,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 _clientCodes = sportsbookClientCodes;
             }
-            else 
+            else
             {
                 _isPreLoader = false;
                 return;

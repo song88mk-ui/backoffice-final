@@ -41,7 +41,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("DialogStyle","max-width:80rem");
+            parameters.Add("DialogStyle", "max-width:80rem");
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
@@ -65,7 +65,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             toasterService.AddToast(Toast.NewToast("Import Margins",
                 $"{message}"));
-        }        
+        }
         #endregion
     }
 }

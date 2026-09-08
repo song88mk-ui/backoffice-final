@@ -6,7 +6,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class PreMatchConfig : IDisposable
     {
         #region Properties
-        [Parameter] public PrematchSettingsTemplateModel PrematchSettings { get; set; } 
+        [Parameter] public PrematchSettingsTemplateModel PrematchSettings { get; set; }
         [Parameter] public EventCallback OnMarginChangeCallback { get; set; }
         [Parameter] public bool IsReadOnly { get; set; }
 
@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Methods
         public void Dispose()
         {
-            
+
         }
         #endregion
     }

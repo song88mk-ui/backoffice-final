@@ -16,7 +16,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
-        
+
 
         private MetaData MetaData { get; set; }
         public PermissionResponse Permissions { get; set; }

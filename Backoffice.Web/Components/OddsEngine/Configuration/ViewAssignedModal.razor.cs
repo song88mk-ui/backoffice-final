@@ -38,7 +38,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public void Dispose()
         {
-            
+
         }
         #endregion
     }

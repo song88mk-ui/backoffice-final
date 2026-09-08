@@ -39,7 +39,7 @@ namespace Backoffice.Web.Components.Common
 
             if (isValidInput)
             {
-                var response = await AuthenticationService.UpdateUserPassword(_userState.Model.Id, new Backoffice.Shared.Models.Requests.UserRegisterRequest() 
+                var response = await AuthenticationService.UpdateUserPassword(_userState.Model.Id, new Backoffice.Shared.Models.Requests.UserRegisterRequest()
                 {
                     Password = NewPassword
                 });
@@ -62,7 +62,7 @@ namespace Backoffice.Web.Components.Common
                 {
                     Alerts.Clear();
 
-                    Alerts.Add(new AlertModel() 
+                    Alerts.Add(new AlertModel()
                     {
                         Status = AlertStatus.Error,
                         Message = $"An error has occured: {response.Message}",

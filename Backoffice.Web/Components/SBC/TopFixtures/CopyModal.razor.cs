@@ -37,7 +37,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 {
                     ClientIdSelectedModel = _userState.Model.SportsbookClients.Select(s => new ClientIdSelectedModel
                     {
-                        IsSelected = false, 
+                        IsSelected = false,
                         ClientId = s.ClientId.ToString(),
                         ClientName = s.ClientName
                     }).ToList();

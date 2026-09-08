@@ -101,7 +101,7 @@ namespace Backoffice.API.Controllers.Backoffice
             {
                 result = await _platformRepository.CancelBet(request, "HK");
 
-                if(!_isStaging)
+                if (!_isStaging)
                 {
                     result = await _platformRepository.CancelBet(request, "SA");
                 }

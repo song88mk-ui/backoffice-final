@@ -56,7 +56,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
 
-            if(UserGroup.Claims.Any())
+            if (UserGroup.Claims.Any())
             {
                 foreach (var permission in Permissions.Permissions)
                 {
@@ -91,7 +91,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 Num = OldUserGroup.Num,
                 UserGroupId = OldUserGroup.UserGroupId,
                 UserGroupName = OldUserGroup.UserGroupName,
-                Claims = OldUserGroup.Claims 
+                Claims = OldUserGroup.Claims
             };
 
             ModalService.Cancel();
@@ -138,7 +138,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 var newClaims = new List<ClaimModel>();
 
                 foreach (var permission in Permissions.Permissions)
-                {                    
+                {
                     if (string.IsNullOrEmpty(permission.ClaimValue))
                         permission.ClaimValue = "0";
 
@@ -201,7 +201,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                     Log.Error(ex.StackTrace.ToString());
             }
 
-            IsPreload = false; 
+            IsPreload = false;
         }
 
         public async Task IsEmptyClientCallback(bool isEmpty)

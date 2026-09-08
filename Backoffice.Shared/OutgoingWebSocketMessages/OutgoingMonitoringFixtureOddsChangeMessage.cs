@@ -2,8 +2,8 @@
 
 namespace Backoffice.Shared.OutgoingWebSocketMessages
 {
-    public class OutgoingMonitoringFixtureOddsChangeMessage: OutgoingBaseMessage
+    public class OutgoingMonitoringFixtureOddsChangeMessage : OutgoingBaseMessage
     {
-        public OddsChangeMonitoringMessage Pa {  get; set; }
+        public OddsChangeMonitoringMessage Pa { get; set; }
     }
 }

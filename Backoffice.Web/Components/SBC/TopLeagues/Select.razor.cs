@@ -26,7 +26,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 SegmentId = segmentResponse.SegmentId,
                 SegmentName = segmentResponse.SegmentName,
                 LeagueId = league.LeagueId,
-                LeagueName= league.LeagueName,
+                LeagueName = league.LeagueName,
                 //LiveCount = league.LiveCount,
                 SortOrder = RowCount,
                 SportId = SportId,

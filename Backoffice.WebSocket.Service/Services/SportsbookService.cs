@@ -25,7 +25,7 @@ namespace Backoffice.WebSocket.Service.Services
                 Timeout = TimeSpan.FromSeconds(5)
             };
             _platformHttpClient.DefaultRequestHeaders.Add("x-api-key", configuration["API:PlatformAPI:APIKey"]);
-            
+
             _sportsbookHttpClient = new HttpClient()
             {
                 BaseAddress = new Uri(configuration["API:PlatformSportsbook:Uri"]),

@@ -932,7 +932,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                return new BaseResponse <ClientMarketTemplateResponse>
+                return new BaseResponse<ClientMarketTemplateResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
@@ -1381,7 +1381,7 @@ namespace Backoffice.API.Repositories
 
                 throw;
             }
-            
+
         }
         //, 1);
 

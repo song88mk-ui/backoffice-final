@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Backoffice.Shared.Models.Response
 {
-    public  class MarketFixtureDetailResponse
+    public class MarketFixtureDetailResponse
     {
         public MarketFixtureResponse.FixtureModel Fixture { get; set; }
     }

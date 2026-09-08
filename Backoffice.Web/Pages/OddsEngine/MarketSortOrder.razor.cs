@@ -36,7 +36,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<ClientMarketTemplateGroup> _clientMarketTemplateGroupsRef;
         private static List<SelectListItemModel<int>> _marketGroups;
         private List<BreadcrumbModel> _breadcrumbs;
-        private AlertModel _alertModel; 
+        private AlertModel _alertModel;
         private int _selectedMarketGroupId;
         private int _allMarketsGroupId;
         private int _loadRequestId;
@@ -120,10 +120,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnUpdateClickEvent()
         {
             _isUpdate = true;
-            bool exists = _clientMarketTemplateGroupsRef.Any(item => item.Id == _selectedMarketGroupId);            
+            bool exists = _clientMarketTemplateGroupsRef.Any(item => item.Id == _selectedMarketGroupId);
             if (exists)
                 await EnableSortingAndSelect2();
-            else 
+            else
                 await DisableSortingAndSelect2();
         }
 

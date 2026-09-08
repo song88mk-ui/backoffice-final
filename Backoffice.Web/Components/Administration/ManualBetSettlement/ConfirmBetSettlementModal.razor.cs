@@ -60,7 +60,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
             {
                 OnActivityLogMessage ActivityLog = new OnActivityLogMessage()
                 {
-                    Page = AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_','.'),
+                    Page = AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_', '.'),
                     Activity = Activity.ManualSettlement.ToString(),
                     Payload = JsonSerializer.Serialize(bet),
                     From = "-",
@@ -78,7 +78,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
                 BetData = ManualBetDetailsModel.Bets.Select(bet => new ManualBetRequest()
                 {
                     BetId = bet.BetId.ToString(),
-                    NewStatus = (BetStatus) (int.Parse(bet.NewBetStatusId)),
+                    NewStatus = (BetStatus)(int.Parse(bet.NewBetStatusId)),
                     Reason = bet.NewReason,
                 }).ToList(),
                 ActivityLogs = ActivityLogs

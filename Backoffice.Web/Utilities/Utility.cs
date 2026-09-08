@@ -65,7 +65,7 @@ namespace Backoffice.Web.Utilities
                   {117, "mma"},
                   {118, "esport-call-of-duty"},
                   {121, "esport-overwatch"},
-                  {125, "esport-rainbow-six"},  
+                  {125, "esport-rainbow-six"},
                   {128, "rocket-league"},
                   {129, "indy-racing"},
                   {131, "speedway"},

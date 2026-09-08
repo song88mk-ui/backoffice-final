@@ -33,7 +33,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
 
             var response = await _providerMappingService.GetSportMapping(request);
-            
+
             if (response.Result != null)
             {
                 MappedCount = response.Result.TotalCount;
@@ -56,7 +56,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task SetMappingTabCount(UpdateMappingTabCountModel model)
         {
-            switch(model.Tab)
+            switch (model.Tab)
             {
                 case MappingTab.Unmapped:
                     UnmappedCount = model.Count;

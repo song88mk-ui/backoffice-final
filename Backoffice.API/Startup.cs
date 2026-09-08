@@ -91,7 +91,7 @@ namespace Backoffice.API
             var dbContextTimeout = Configuration.GetValue<int>("Custom:DbContextTimeout", 180);
             services.AddDbContext<SportsbookContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:Sportsbook"], options =>
                 options.CommandTimeout(dbContextTimeout)));
-            
+
             services.AddDbContext<TradingContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:Trading"], options =>
                 options.CommandTimeout(dbContextTimeout)));
 

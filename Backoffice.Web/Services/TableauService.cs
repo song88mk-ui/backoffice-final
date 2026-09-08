@@ -39,7 +39,7 @@ namespace Backoffice.Web.Services
         {
             return string.Empty; // TODO: enable when there is tableau
 
-            using(var activity = _activitySource.StartActivity("gettableauurl"))
+            using (var activity = _activitySource.StartActivity("gettableauurl"))
             {
                 try
                 {
@@ -48,12 +48,13 @@ namespace Backoffice.Web.Services
                     var response = await _httpClient.PostAsync($"trusted?username={_configuration["Tableau:UserName"]}&target_site={_configuration["Tableau:SiteId"]}", null);
 
                     if (duration != null)
-                      _tableauTrustedCallDurationHistogram.Record(duration.Elapsed.TotalMilliseconds,
-                          new KeyValuePair<string, object?>("report", reportName));
+                        _tableauTrustedCallDurationHistogram.Record(duration.Elapsed.TotalMilliseconds,
+                            new KeyValuePair<string, object?>("report", reportName));
 
                     var ticket = await response.Content.ReadAsStringAsync();
 
-                    if (ticket.Equals("-1")) {
+                    if (ticket.Equals("-1"))
+                    {
                         activity?.SetStatus(ActivityStatusCode.Error, "disabled");
                         _getTableauUrlFailureCounter.Add(1);
                         return string.Empty;

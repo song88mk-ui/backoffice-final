@@ -25,7 +25,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         [Parameter] public EventCallback OnInitializeCallback { get; set; }
         [Parameter] public EventCallback OnExportCallback { get; set; }
 
-        private bool ShowFilter { get; set; }        
+        private bool ShowFilter { get; set; }
         private List<SelectListItemModel<int>> Sports { get; set; }
         private List<SelectListItemModel<int>> Segments { get; set; }
         private List<SelectListItemModel<int>> Leagues { get; set; }

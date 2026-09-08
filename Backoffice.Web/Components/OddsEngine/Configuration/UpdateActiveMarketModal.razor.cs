@@ -12,7 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
         private EventCallback OnCancelCallback { get; set; }
-        
+
         public int MarketChangedCount { get; set; }
         #endregion
 
@@ -37,7 +37,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public void Dispose()
         {
-            
+
         }
         #endregion
     }

@@ -73,7 +73,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                     Cap = CapEdit != 0 ? CapEdit / 100 : 0
                 };
 
-                var result = await _tradingService.AddOrUpdateBoostedSetting(payload, _userState.Model.Id);  
+                var result = await _tradingService.AddOrUpdateBoostedSetting(payload, _userState.Model.Id);
 
                 if (result.StatusCode == StatusCode.Success)
                 {

@@ -58,13 +58,14 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
                     BgId = new List<int>()
                 };
 
-                foreach (var provider in item.Providers) {
+                foreach (var provider in item.Providers)
+                {
                     if (Int32.TryParse(provider.LeId, out intId))
                     {
                         switch (provider.ChTyId)
                         {
                             case (int)ChannelType.SR:
-                                info.SrId.Add(intId); 
+                                info.SrId.Add(intId);
                                 break;
                             case (int)ChannelType.BG:
                                 info.BgId.Add(intId);

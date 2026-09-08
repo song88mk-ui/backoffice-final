@@ -747,7 +747,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        
+
         #endregion
 
         #region Sportsbook
@@ -2491,7 +2491,7 @@ namespace Backoffice.API.Repositories
         {
             var result = string.Empty;
 
-            if(string.IsNullOrEmpty(request.UserId) || !Guid.TryParse(request.UserId, out var userId))
+            if (string.IsNullOrEmpty(request.UserId) || !Guid.TryParse(request.UserId, out var userId))
                 return $"Invalid User ID";
 
 

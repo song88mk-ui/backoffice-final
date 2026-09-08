@@ -61,7 +61,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         {
             if (firstRender)
             {
-                
+
             }
         }
 
@@ -159,7 +159,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
         public async Task OnBetIdChangedEvent()
         {
-            
+
             AddMarketSettlement.AddMarketSettlementSelections.Clear();
             await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
         }

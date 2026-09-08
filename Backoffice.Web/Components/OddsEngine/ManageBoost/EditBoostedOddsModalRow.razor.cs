@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #region Methods
         public async Task OnSelectLanguage(int index, Language language)
         {
-            await OnSelectLanguageCallback.InvokeAsync(new Tuple<int, Language>(index, language));            
+            await OnSelectLanguageCallback.InvokeAsync(new Tuple<int, Language>(index, language));
         }
 
         public async Task OnAddSelection()

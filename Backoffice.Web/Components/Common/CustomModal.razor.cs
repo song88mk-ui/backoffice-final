@@ -53,7 +53,7 @@ namespace Backoffice.Web.Components.Common
             var modalDialogClass = parameters.TryGet<string>("ModalDialogClass");
             var modalHeaderClass = parameters.TryGet<string>("ModalHeaderClass");
             var modalIcon = parameters.TryGet<string>("ModalIcon");
-            var modalTitleClass = parameters.TryGet<string>("TitleClass");            
+            var modalTitleClass = parameters.TryGet<string>("TitleClass");
 
             _modalDisplay = "block";
             _modalClass = string.IsNullOrEmpty(modalClass) ? "show" : modalClass;
@@ -93,7 +93,7 @@ namespace Backoffice.Web.Components.Common
 
         public void Dispose()
         {
-            
+
         }
         #endregion
     }

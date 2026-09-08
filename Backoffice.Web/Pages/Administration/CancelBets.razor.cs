@@ -305,7 +305,7 @@ namespace Backoffice.Web.Pages.Administration
             if (opacity > 0)
                 return;
 
-            if(Alerts != null && Alerts.Any() && Alerts.Contains(alert))
+            if (Alerts != null && Alerts.Any() && Alerts.Contains(alert))
             {
                 Alerts.Remove(alert);
             }

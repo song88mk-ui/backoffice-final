@@ -23,7 +23,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         #region Fields
         private MarketTemplateGroupResponse _marketTemplateGroupResponse { get; set; }
-        
+
         #endregion
 
 
@@ -72,7 +72,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public void Dispose()
         {
-            
+
         }
 
         #endregion
@@ -86,7 +86,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             {
                 var sportLookUp = await _backofficeService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
 
-                EditConfigTemplateFilterModel.ConfigTemplate = response.Result;                                                   
+                EditConfigTemplateFilterModel.ConfigTemplate = response.Result;
                 EditConfigTemplateFilterModel.SportName = sportLookUp.Result.SportLookup.FirstOrDefault(e => e.SportId == response.Result.SportId)?.SportName ?? string.Empty;
 
                 EditConfigTemplateFilterModel.SportId = response.Result.SportId;
@@ -105,7 +105,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     new SelectListItemWithCheckboxModel<string> { IsChecked = true, Name = s.MarketTemplateGroup.MarketTemplateGroupName, Value = s.MarketTemplateGroup.MarketTemplateGroupId.ToString(), IsSelectAll = s.MarketTemplateGroup.MarketTemplateGroupId == 1 }));
             }
 
-            var selectedMarkets = EditConfigTemplateFilterModel.MarketGroups.Where(c => c.Value != "1" &&  c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
+            var selectedMarkets = EditConfigTemplateFilterModel.MarketGroups.Where(c => c.Value != "1" && c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
 
             EditConfigTemplateFilterModel.SelectedMarketCount = selectedMarkets.Count;
             EditConfigTemplateFilterModel.SelectedMarkets = EditConfigTemplateFilterModel.SelectedMarketCount > 0 ? selectedMarkets : new List<string>();
@@ -118,7 +118,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             {
                 new SelectListItemWithCheckboxModel<string>(){ IsChecked = true, Name = "Select All", Value = "all" },
                 new SelectListItemWithCheckboxModel<string>(){ IsChecked = true, Name = "Active Markets", Value = "1" },
-                new SelectListItemWithCheckboxModel<string>(){ IsChecked = true, Name = "Inactive Markets", Value = "2" },                
+                new SelectListItemWithCheckboxModel<string>(){ IsChecked = true, Name = "Inactive Markets", Value = "2" },
             };
 
             var selectedConfigs = EditConfigTemplateFilterModel.ConfigStatuses.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();

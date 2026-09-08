@@ -31,9 +31,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             _isPreloader = true;
             _languages = ModalParameters.TryGet<LanguagesModel>("Languages");
-            
+
             _priceBoostConfigModel = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
-            
+
             _tradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             _isPreloader = false;
         }
@@ -61,7 +61,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public async Task OnAddSelection()
         {
-            if(_languages.Languages.Count() - _priceBoostConfigModel.BoostedSelectionTranslations.Where(c => c.Language.LanguageCode == string.Empty).Count() > 0)
+            if (_languages.Languages.Count() - _priceBoostConfigModel.BoostedSelectionTranslations.Where(c => c.Language.LanguageCode == string.Empty).Count() > 0)
             {
                 _priceBoostConfigModel.BoostedSelectionTranslations.Add(new BoostedSelectionTranslation
                 {
@@ -91,7 +91,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             _languages.Languages.Add(prevLanguage);
 
-           // await InvokeAsync(StateHasChanged);
+            // await InvokeAsync(StateHasChanged);
         }
 
         public async Task OnCancelModalClick()

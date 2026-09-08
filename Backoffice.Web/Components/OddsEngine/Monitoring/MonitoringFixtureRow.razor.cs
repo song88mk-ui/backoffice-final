@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         #region Properties
         [Parameter] public RenderFragment? FixtureHeaderContent { get; set; }
         [Parameter] public long UnixTime { get; set; }
-        [Parameter] public bool IsBetStop {  get; set; }
+        [Parameter] public bool IsBetStop { get; set; }
         [Parameter] public List<Client> Clients { get; set; }
         [Parameter] public List<MonitoringFixtureClient> Markets { get; set; }
 
@@ -209,7 +209,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         {
             var clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
 
-            return (_init || _unixTime != UnixTime || _clientReference != clientReference || _isBetStop != IsBetStop) && Markets != null ;
+            return (_init || _unixTime != UnixTime || _clientReference != clientReference || _isBetStop != IsBetStop) && Markets != null;
         }
 
         private string GetClientOdds(SelectionModel selection, string clientCode)

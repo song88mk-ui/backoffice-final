@@ -4,7 +4,7 @@ namespace Backoffice.Web.Models
 {
     public class PriceboostFilterModel
     {
-        public PriceboostFilterModel() 
+        public PriceboostFilterModel()
         {
             //Clients = new List<SelectListItemModel<string>>();
             //Sports = new List<SelectListItemModel<int>>();

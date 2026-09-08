@@ -50,14 +50,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 PageSize = 10,
                 TotalCount = 0,
                 TotalPages = 0,
-            };            
+            };
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (!firstRender)
             {
-                                
+
             }
         }
 
@@ -120,7 +120,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public void Dispose()
         {
-            
+
         }
         #endregion
 

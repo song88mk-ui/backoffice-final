@@ -105,18 +105,18 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
             }
             else
             {
-                    if (!string.IsNullOrEmpty(_odds) && Selection.DecimalOdds != "-.-")
+                if (!string.IsNullOrEmpty(_odds) && Selection.DecimalOdds != "-.-")
+                {
+                    if (Convert.ToDecimal(_odds) > Convert.ToDecimal(Selection.DecimalOdds))
                     {
-                        if (Convert.ToDecimal(_odds) > Convert.ToDecimal(Selection.DecimalOdds))
-                        {
-                            color = "odds-bg-danger-active";
-                        }
-
-                        if (Convert.ToDecimal(_odds) < Convert.ToDecimal(Selection.DecimalOdds))
-                        {
-                            color = "odds-bg-success-active";
-                        }
+                        color = "odds-bg-danger-active";
                     }
+
+                    if (Convert.ToDecimal(_odds) < Convert.ToDecimal(Selection.DecimalOdds))
+                    {
+                        color = "odds-bg-success-active";
+                    }
+                }
 
             }
 

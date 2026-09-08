@@ -8,7 +8,7 @@ namespace Backoffice.Shared.Models
 {
     public class MockDataFixtureModel
     {
-        public MockDataFixtureModel() 
+        public MockDataFixtureModel()
         {
             Markets = new List<MarketModel>();
         }

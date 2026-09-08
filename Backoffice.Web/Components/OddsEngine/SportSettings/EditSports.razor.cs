@@ -95,7 +95,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             var selectedSports = SportLookupSettings.Where(c => selectedSportIds.Contains(c.SportId)).ToList();
             var sortOrder = 1;
 
-            if(_sportSettings.Count > 0)
+            if (_sportSettings.Count > 0)
             {
                 sortOrder = _sportSettings.Max(c => c.SortOrder) + 1;
             }
@@ -173,7 +173,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             var selectedSports = _sportLookupSettings.Where(c => sportIds.Contains(c.SportId) && !_sportSettings.Any(x => x.SportId == c.SportId)).ToList();
 
             var sortOrder = 1;
-            if(_sportSettings.Any() && _sportSettings.Count() > 0)
+            if (_sportSettings.Any() && _sportSettings.Count() > 0)
             {
                 sortOrder = _sportSettings.Max(c => c.SortOrder) + 1;
             }

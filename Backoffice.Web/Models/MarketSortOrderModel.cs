@@ -16,7 +16,7 @@
         public List<ClientMarketTemplateGroup> MarketTemplateGroups { get; set; }
 
         // for cancelling changes this can be used when reverting to the original sort order and group names assigned
-        public List<ClientMarketTemplate> OriginalMarketTemplates { get; set; } 
+        public List<ClientMarketTemplate> OriginalMarketTemplates { get; set; }
 
         #region Nested Class
 

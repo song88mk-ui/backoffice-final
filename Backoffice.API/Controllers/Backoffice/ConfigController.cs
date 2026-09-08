@@ -289,7 +289,7 @@ namespace Backoffice.API.Controllers.Backoffice
             switch (result.StatusCode)
             {
                 case BoStatusCode.Success:
-                       return Ok(result);
+                    return Ok(result);
                 default:
                     return BadRequest(result);
             }

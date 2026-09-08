@@ -26,7 +26,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         [CascadingParameter] public CustomModal Modal { get; set; }
 
         private EditContext EditContext { get; set; }
-        
+
         #endregion
 
         #region Fields
@@ -79,10 +79,10 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 Message = _announcement.Message,
                 StartDate = _announcement.StartDate,
                 EndDate = _announcement.EndDate,
-                Languages = _announcement.Languages.Select(l => new AnnouncementMessage { LanguageCode = l.LanguageCode, Message = l.Message}).ToList(),
+                Languages = _announcement.Languages.Select(l => new AnnouncementMessage { LanguageCode = l.LanguageCode, Message = l.Message }).ToList(),
             };
 
-            var clients = ModalParameters.TryGet <List<SelectListItemWithCheckboxModel<string>>>("Clients");
+            var clients = ModalParameters.TryGet<List<SelectListItemWithCheckboxModel<string>>>("Clients");
             _isEdit = ModalParameters.TryGet<bool>("IsEdit");
 
             _languages = new LanguageOptionsModel
@@ -93,7 +93,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _selectedLanguage = _announcement.LanguageCode;
 
             _announcementMessages = new Dictionary<LanguageCode, string>();
-            foreach(var language in _languages.Languages)
+            foreach (var language in _languages.Languages)
             {
                 _announcementMessages[language.Language] = string.Empty;
 
@@ -115,7 +115,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 IsSelectAll = s.IsSelectAll
             }).ToList();
 
-            _selectedClientCodes =_clients.Where(c => c.IsChecked).Select(s => s.Value).ToList();
+            _selectedClientCodes = _clients.Where(c => c.IsChecked).Select(s => s.Value).ToList();
 
             EditContext = new EditContext(_announcement);
         }
@@ -271,7 +271,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     UserRoleId = userRoleId
                 };
 
-                if(_isEdit)
+                if (_isEdit)
                 {
                     var isInternalUser = _userState.Model.Claims.Any(c => c.Type.Contains("Admin.") && c.Value != "0") && _userState.Model.Claims.Any(c => c.Type.Contains("SBC.") && c.Value != "0");
 
@@ -334,7 +334,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
             if (selectedItems.Length > 0)
             {
                 _selectedClientCodes = selectedItems.Split(",").ToList();
-            } else
+            }
+            else
             {
                 _selectedClientCodes.Clear();
             }

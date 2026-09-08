@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
-        
+
 
         public MetaData MetaData { get; set; }
         public UserGroupListResponse UserGroupListModel { get; set; }

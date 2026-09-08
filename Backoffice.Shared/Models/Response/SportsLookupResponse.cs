@@ -8,7 +8,7 @@ namespace Backoffice.Shared.Models.Response
         {
             SportLookup = new List<SportLookupModel>();
         }
-        public List<SportLookupModel> SportLookup { get; set; }        
+        public List<SportLookupModel> SportLookup { get; set; }
     }
 
     public class SportLookupModel

@@ -218,7 +218,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
                     if (!response.Result.Contains("NOTE"))
                         message = $"Done: Request to resend all stateful-messages (BetSettlement, RollbackBetSettlement, BetCancel, UndoBetCancel) for a sport event. {response.Result}";
                     else
-                        message = response.Result.Replace("<br/>","");
+                        message = response.Result.Replace("<br/>", "");
 
                     await InvokeAsync(StateHasChanged);
                     await Modal.OnSaveClickCallback.InvokeAsync();

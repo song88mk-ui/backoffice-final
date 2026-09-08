@@ -39,7 +39,7 @@ namespace Backoffice.Web.Components.Administration.ResendSettlement
 
         public void Dispose()
         {
-            
+
         }
 
         #endregion

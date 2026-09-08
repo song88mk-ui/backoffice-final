@@ -17,7 +17,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         public List<PriceBoostActivityLog> ActivityLogs { get; set; }
-        public PriceBoostConfigModel PriceBoost { get; set; } 
+        public PriceBoostConfigModel PriceBoost { get; set; }
         public bool IsPreLoader { get; set; }
         #endregion
         #region Methods
@@ -33,7 +33,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             var result = (await BackofficeService.GetActivityLogs(new ActivityLogRequest()
             {
                 Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace("_", "."),
-                Payload = payload,                
+                Payload = payload,
                 MetaData = new MetaData() { PageSize = 10 }
             })).Result;
 
@@ -95,7 +95,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     {
                         stringBuilder.Append("<b>Translations:</b> </br>");
                         foreach (var translation in fromDeserialized.Translations)
-                        {                            
+                        {
                             stringBuilder.Append($"{translation.Language.LanguageName}<br>");
                             stringBuilder.Append($"{translation.Language.LanguageCode}<br>");
                             stringBuilder.Append($"{translation.BoostedSelectionName}<br>");
@@ -109,12 +109,12 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                         stringBuilder.Append($"<b>Boosted Odds</b> </br> {toDeserialized.Odds.ToString("0.00")}");
                     }
 
-                    if (fromDeserialized.Translations.Count != toDeserialized.Translations.Count || 
+                    if (fromDeserialized.Translations.Count != toDeserialized.Translations.Count ||
                         JsonConvert.SerializeObject(fromDeserialized.Translations) != JsonConvert.SerializeObject(toDeserialized.Translations))
                     {
                         stringBuilder.Append("<b>Translations:</b> </br>");
                         foreach (var translation in toDeserialized.Translations)
-                        {                            
+                        {
                             stringBuilder.Append($"{translation.Language.LanguageName}<br>");
                             stringBuilder.Append($"{translation.Language.LanguageCode}<br>");
                             stringBuilder.Append($"{translation.BoostedSelectionName}<br>");
@@ -132,7 +132,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public void Dispose()
         {
-            
+
         }
         #endregion
     }

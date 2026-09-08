@@ -32,7 +32,7 @@ namespace Backoffice.Web.Models.OddsEngine.Monitoring
         public int FixtureTypeId { get; set; }
         public long UnixTime { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         public List<MonitoringFixtureClient> ClientMarkets { get; set; } = new List<MonitoringFixtureClient>();
-        public Action<MouseEventArgs> CloseMatchClick {  get; set; }
+        public Action<MouseEventArgs> CloseMatchClick { get; set; }
     }
     public class MonitoringFixtureClient
     {

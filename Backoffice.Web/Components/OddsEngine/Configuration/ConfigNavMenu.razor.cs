@@ -46,9 +46,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         #region Methods
 
-        protected override void OnInitialized() {
+        protected override void OnInitialized()
+        {
             _myTemplateClickEvent = async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.MyTemplates);
-            _assignedClickEvent =  async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.Assigned);
+            _assignedClickEvent = async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.Assigned);
             _unAssignedClickEvent = async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.UnAssigned);
         }
 

@@ -176,7 +176,7 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("ModalHeaderClass", "announcements-delete-header");
             parameters.Add("ModalDialogClass", "modal-l");
             parameters.Add("Announcement", model);
-            parameters.Add("ModalIcon", 
+            parameters.Add("ModalIcon",
                 $"<div class=\"announcements-delete-container\" style=\"padding: 9px 10px; border-radius: 50%; background-color: #FEF3F2;\"><i class=\"fa fa-trash\" style=\"padding: 6px 10px; border-radius: 50%; background-color: #FEE4E2; color: #D92D20; font-size: 24px;\"/></div>");
 
             var options = new ModalOptions();
@@ -223,7 +223,7 @@ namespace Backoffice.Web.Pages.SBC
                 Message = message,
                 Opacity = _opacity
             });
-            
+
             _shouldRender = true;
         }
 

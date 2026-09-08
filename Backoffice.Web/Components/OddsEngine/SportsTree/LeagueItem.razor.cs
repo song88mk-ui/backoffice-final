@@ -5,6 +5,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportsTree
 {
     public partial class LeagueItem
     {
-        [Parameter] public LeagueItemModel League {  get; set; }
+        [Parameter] public LeagueItemModel League { get; set; }
     }
 }

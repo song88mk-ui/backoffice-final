@@ -9,6 +9,6 @@
         }
         public List<ClientTopFixtureModel.OrderedClientTopFixture> TopFixtures { get; set; }
         public List<ClientTopFixtureModel.OrderedClientTopFixture> TopFixturesFiltered { get; set; }
-        
+
     }
 }

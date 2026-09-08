@@ -363,7 +363,7 @@ namespace Backoffice.API.Controllers.Trading
         //        activity?.SetTag("clientCodes", HttpContext.Items["ClientCodes"]?.ToString());
         //        var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
         //        var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
-                
+
         //        var result = await _tradingRepository.GetClientList(region);
 
         //        switch (result.StatusCode)
@@ -1015,7 +1015,7 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetSportMapping([FromBody] MappingRequest request)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
-            
+
             var result = await _tradingRepository.GetSportMapping(region, request);
 
             switch (result.StatusCode)

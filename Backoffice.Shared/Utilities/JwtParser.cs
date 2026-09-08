@@ -10,7 +10,7 @@ namespace Backoffice.Shared.Utilities
     {
         public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
-            if(jwt == null)
+            if (jwt == null)
                 return new List<Claim>();
 
             var claims = new List<Claim>();

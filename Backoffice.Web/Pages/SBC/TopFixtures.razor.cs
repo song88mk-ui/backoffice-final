@@ -19,7 +19,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] private ToastService? ToasterService { get; set; }
 
 
-        
+
 
         public TopFixtureCallbackModel FilterModel { get; set; }
         public MetaData MetaData { get; set; }

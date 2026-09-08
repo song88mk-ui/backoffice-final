@@ -9,7 +9,7 @@ namespace Backoffice.Shared.Models.Response
             TopLeagues = new List<Leagues>();
         }
         public List<Leagues> TopLeagues { get; set; }
-        
+
         public class Leagues
         {
             public int SegmentId { get; set; }

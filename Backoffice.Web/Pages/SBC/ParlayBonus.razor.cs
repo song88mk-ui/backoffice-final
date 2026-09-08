@@ -270,7 +270,7 @@ namespace Backoffice.Web.Pages.SBC
             IsPreloading = true;
             IsEmpty = true;
 
-            if(ClientParlayBonusModel == null)
+            if (ClientParlayBonusModel == null)
                 ClientParlayBonusModel = new ClientParlayBonusModel() { ParlayBonusMinOdds = 1.20m };
 
             ClientParlayBonusModel.ParlayBonusConfig = new List<ParlayBonusConfig>();
