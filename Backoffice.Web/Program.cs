@@ -73,9 +73,25 @@ app.UseRouting();
 
 app.MapBlazorHub(o => { o.Transports = HttpTransportType.WebSockets; });
 
-app.MapGet("/api/metabase/sso-token", (MetabaseService metabaseService) =>
+app.MapGet("/sso/metabase", (HttpContext context, MetabaseService metabaseService, IMemCache memCache) =>
 {
-    var jwt = metabaseService.GetSsoToken();
+    var userToken = context.Session.GetString("UserToken");
+    if (string.IsNullOrWhiteSpace(userToken))
+        return Results.Unauthorized();
+
+    var claims = JwtParser.ParseClaimsFromJwt(userToken).ToList();
+    var username = claims.FirstOrDefault(c => c.Type.ToUpper() == "TOKENNAME")?.Value ?? string.Empty;
+    var userId = claims.FirstOrDefault(c => c.Type.ToUpper() == "USERID")?.Value ?? string.Empty;
+
+    if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(userId))
+        return Results.Unauthorized();
+
+    var clientCodes = memCache.GetCache<List<string>>($"metabase-clients:{userId}")
+        ?? claims.FirstOrDefault(c => c.Type.ToUpper() == "CLIENTCODES")?.Value
+            ?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+        ?? new List<string>();
+
+    var jwt = metabaseService.GetSsoToken(username, clientCodes);
     return Results.Ok(new { jwt });
 });
 

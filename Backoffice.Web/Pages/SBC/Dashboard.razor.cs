@@ -1,6 +1,6 @@
-using System.Text.Json;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -14,6 +14,7 @@ namespace Backoffice.Web.Pages.SBC
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public MetabaseService MetabaseService { get; set; }
+        [Inject] public IMemCache MemCache { get; set; }
         [Inject] public IJSRuntime JS { get; set; }
 
         #endregion
@@ -54,7 +55,7 @@ namespace Backoffice.Web.Pages.SBC
                 _metabaseInitialized = true;
                 _currentLocale = locale;
                 await JS.InvokeVoidAsync("initMetabaseDashboard",
-                    "/api/metabase/sso-token",
+                    "/sso/metabase",
                     MetabaseService.SiteUrl,
                     locale
                 );
@@ -122,7 +123,7 @@ namespace Backoffice.Web.Pages.SBC
                 return;
             }
 
-            _parametersJson = JsonSerializer.Serialize(new { client = _clientCodes });
+            MemCache.AddOrUpdateCache($"metabase-clients:{_userState.Model.Id}", _clientCodes, 12);
             _hasAccess = true;
             _isPreLoader = false;
         }
