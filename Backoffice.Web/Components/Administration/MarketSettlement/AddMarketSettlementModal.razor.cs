@@ -29,6 +29,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         public AlertModel AlertModel { get; set; }
 
         public bool IsPreLoader { get; set; }
+        public bool ShowDiscardConfirm { get; set; }
 
         #endregion
 
@@ -411,7 +412,29 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
         public async Task OnCancelModal()
         {
+            if (HasUnsavedChanges())
+            {
+                ShowDiscardConfirm = true;
+                return;
+            }
+
             ModalService.Cancel();
+        }
+
+        public async Task OnConfirmDiscardChanges()
+        {
+            ShowDiscardConfirm = false;
+            ModalService.Cancel();
+        }
+
+        public async Task OnCancelDiscardChanges()
+        {
+            ShowDiscardConfirm = false;
+        }
+
+        private bool HasUnsavedChanges()
+        {
+            return AddMarketSettlement.AddMarketSettlementSelections.Any(r => r.ToStatus != 0 || !string.IsNullOrWhiteSpace(r.Reason));
         }
 
         public void Dispose()

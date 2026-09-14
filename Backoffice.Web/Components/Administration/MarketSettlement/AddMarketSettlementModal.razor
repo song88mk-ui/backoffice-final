@@ -110,6 +110,20 @@
     <div class="div-alert mb-2 mt-2 pt-1 pb-1">
         <AlertMessage AlertModel="@AlertModel" />
     </div>
+    @if (ShowDiscardConfirm)
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>@_translationState.GetValue("You have unsaved changes. Are you sure you want to discard them?")</span>
+                    <div>
+                        <button type="button" class="btn modal-btn modal-close" @onclick="OnCancelDiscardChanges">@_translationState.GetValue("Cancel")</button>
+                        <button type="button" class="btn modal-btn modal-apply" @onclick="OnConfirmDiscardChanges">@_translationState.GetValue("Confirm")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 <div class="modal-footer">
     <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelModal" disabled="@IsPreLoader">@_translationState.GetValue("Cancel")</button>
