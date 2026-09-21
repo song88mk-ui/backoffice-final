@@ -89,5 +89,5 @@ If a Shared model must change:
 | `BackofficeHub` uses static Dictionary | `Backoffice.WebSocket.API/Hubs/` | Not horizontally scalable |
 | IMemCache is in-process only | All projects | Each instance has its own cache; invalidation via RabbitMQ is mandatory |
 | Fire-and-forget RabbitMQ publish | All repositories | Publish failures are undetected |
-| .NET Core 3.1 EOL | All projects | Library upgrade constraints |
+| Legacy dependency majors on .NET 10 | RabbitMQ.Client 5.2.0, WindowsAzure.Storage 9.3.3, EPPlus 5.8.2 | Library upgrade constraints; see docs/08_TechnicalDebt.md |
 | No idempotency on message consumers | Worker.cs files | Duplicate messages cause duplicate processing |
