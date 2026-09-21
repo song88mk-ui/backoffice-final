@@ -22,7 +22,7 @@
     {
         <div class="mb-3">
             <label class="form-label d-block">Environment</label>
-            <span class="badge @(Environment == "Production" ? "bg-danger" : "bg-primary") px-3 py-2">@Environment</span>
+            <span class="badge @EnvironmentBadgeClass px-3 py-2">@Environment</span>
         </div>
 
         <div class="border rounded p-4 text-center mb-3">
@@ -108,7 +108,7 @@
         }
         else if (ConfirmingCommit)
         {
-            <div class="alert @(Environment == "Production" ? "alert-danger" : "alert-warning") mt-3">
+            <div class="alert @EnvironmentAlertClass mt-3">
                 <strong>You're about to import @ValidateResponse.ReadyCount client(s) into @Environment.</strong>
                 <p class="mb-2">This creates real client records — it isn't a preview. Make sure @Environment is really where you want these to go.</p>
                 <div class="d-flex gap-2">

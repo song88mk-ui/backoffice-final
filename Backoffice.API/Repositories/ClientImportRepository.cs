@@ -40,21 +40,32 @@ namespace Backoffice.API.Repositories
             _configuration = configuration;
         }
 
+        private static readonly (string Match, string Environment)[] KnownDatabaseHosts = new[]
+        {
+            ("stg-song88-mssql-server", "Staging"),
+            ("prd-song88-mssql-server", "Production"),
+            ("k8s-dev-database", "Dev")
+        };
+
         public BaseResponse<string> GetEnvironment()
         {
-            if (!bool.TryParse(_configuration["IsStaging"], out var isStaging))
+            var connectionString = _configuration.GetConnectionString("Backoffice") ?? string.Empty;
+
+            var match = KnownDatabaseHosts.FirstOrDefault(h => connectionString.Contains(h.Match, StringComparison.OrdinalIgnoreCase));
+
+            if (match.Environment == null)
             {
                 return new BaseResponse<string>
                 {
                     StatusCode = StatusCode.Error,
-                    Message = "Could not determine which environment this is (IsStaging config value is missing or invalid). Import is blocked until this is fixed."
+                    Message = "Could not determine which environment this is from the Backoffice connection string. Import is blocked until this is fixed."
                 };
             }
 
             return new BaseResponse<string>
             {
                 StatusCode = StatusCode.Success,
-                Result = isStaging ? "Staging" : "Production"
+                Result = match.Environment
             };
         }
 

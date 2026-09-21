@@ -35,6 +35,20 @@ namespace Backoffice.Web.Components.SBC.Clients
         public CommitClientImportResponse CommitResponse { get; set; }
         public ClientImportProgressResponse Progress { get; set; }
 
+        public string EnvironmentBadgeClass => Environment switch
+        {
+            "Production" => "bg-danger",
+            "Staging" => "bg-primary",
+            _ => "bg-secondary"
+        };
+
+        public string EnvironmentAlertClass => Environment switch
+        {
+            "Production" => "alert-danger",
+            "Staging" => "alert-warning",
+            _ => "alert-info"
+        };
+
         private CancellationTokenSource _progressPollCts;
 
         #endregion
