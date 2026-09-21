@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-12 mb-3">
             <div class="d-flex justify-content-between log-filter">
-                <BlazorDateRangePicker.DateRangePicker class="form-control date-range" DateFormat="MM/dd/yyyy" StartDate="_dateFrom" EndDate="_dateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDatePickerRangeSelected"></BlazorDateRangePicker.DateRangePicker>
+                <BlazorDateRangePicker.DateRangePicker class="form-control date-range" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="_dateFrom" EndDate="_dateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDatePickerRangeSelected"></BlazorDateRangePicker.DateRangePicker>
                 <EditForm Model="_searchForm" OnValidSubmit="OnSearchSubmitted" Context="FormContext">
                     <div class="input-group">
                         <input id="search" placeholder="@_translationState.GetValue("Search")" class="form-control search-text valid border-end-0" @bind-value="_searchForm.SearchText" />
