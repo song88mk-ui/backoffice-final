@@ -13,7 +13,7 @@
 
 # Backoffice
 
-.NET 10 | 7 services + Blazor web | event-driven | **live production infrastructure processing real financial transactions**
+.NET 10 | 5 backend services + Blazor Server web + shared library (7 projects, 2 xUnit test projects) | event-driven | **live production infrastructure processing real financial transactions**
 
 ## Commands
 
@@ -43,12 +43,13 @@ metrics → read-only queries (`AsNoTracking()`, read replica if available).
 
 **Availability & integrity gate.** If an action could affect Production availability, data
 integrity or completeness — even indirectly — stop and get confirmation. Triggers: migrating a
-hot table, restarting a service mid-message-processing, invalidating a cache key all 7 services
-share, publishing a message that cascades to the OddsEngine.
+hot table, restarting a service mid-message-processing, publishing an `OnDeleteCacheMessage` on
+`r.oe.cachesync.*` (it clears caches in downstream services; `IMemCache` itself is in-process), publishing a message that cascades to the OddsEngine.
 
 **Secrets.** Never commit real connection strings, API keys, JWT secrets or RabbitMQ credentials.
-Committed settings files (e.g. `Backoffice.API/appsettings.json`) hold only placeholders; real
-values go in git-ignored Development overlays, env vars, or a secrets manager. Before any operation touching
+Committed settings files (notably `Backoffice.API/appsettings.json`) currently contain real
+credentials, a known leak pending rotation; do not add more. Real values go in git-ignored
+Development overlays, env vars or a secrets manager. Before any operation touching
 external infrastructure, verify which environment the active connection string targets.
 
 **RabbitMQ isolation.** Messages on the OddsEngine exchange (`r.oe.*`) are indistinguishable from
@@ -56,12 +57,13 @@ production events once they leave the broker — local code against a production
 real config changes on the live OddsEngine. Confirm `RabbitMQ:Host` is non-production before
 running anything that publishes. Use Staging, with confirmation, if a real publish is required.
 
-**EF Core migrations** run against whatever the active connection string points at; there is no
-guard. Run `dotnet ef migrations list` and confirm the target host first. Never apply a migration
-dropping columns or changing types without a reviewed rollback plan. Production migrations need
-explicit written approval in the current conversation.
+**Schema changes.** This repo has no EF Core migrations (no `Migrations` folder and no
+`Microsoft.EntityFrameworkCore.Design`/`Tools` package); schema is managed by flyway scripts in
+`../infrastructure/flyway`. Confirm the target host before running any script, never run one that
+drops columns or changes types without a reviewed rollback plan, and get explicit written approval
+in the current conversation before any production schema change.
 
-**`Backoffice.Shared` is referenced by all 7 services.** Any change to its models, message classes
+**`Backoffice.Shared` is referenced by all 6 other projects (5 services + Web).** Any change to its models, message classes
 or DbContext definitions is a cross-service breaking change if deployed to one service alone.
 Document deployment order and rollback sequence before shipping a Shared change to Production.
 
@@ -157,7 +159,7 @@ Siblings of `backoffice-final` in the same parent. Use relative paths, never abs
 | `../platform-final/` | Platform.Settlement.Service, Platform.Operator.Servicev2, Platform.Sportsbook.API, Platform.CashOutStake.Servicev2, Platform.Shared |
 | `../platform-web/` | Platform web frontend (Blazor) |
 | `../bet-genius/` | BetGenius integration |
-| `../webprops-api/` | Web Properties API (Go) — per-client flags/themes/layouts + maintenance, S3-backed. Consumed via `IWebPropsRepository` ("Client Site Config" page, renamed from "Feature Flags", GM-693) and `MaintenanceRepository` (`MaintenanceV2`, `GET/POST /api/v1/maintenance` with `X-Layout`; replaced the dead `bo-maintenance-api` Dapr router, BO-2 2026-08) |
+| `../webprops-api/` | Web Properties API (Go) — per-client flags/themes/layouts + maintenance, S3-backed. Consumed via `IWebPropsRepository` ("Client Site Config" page, renamed from "Feature Flags", GM-696; the webprops key is the client's Platform GUID) and `MaintenanceRepository` (`MaintenanceV2`, `GET/POST /api/v1/maintenance` with `X-Layout`; replaced the dead `bo-maintenance-api` Dapr router, BO-2 2026-08) |
 | `../argocd/` | Kubernetes / ArgoCD deployment configs |
 | `../infrastructure/` | helmfile, terraform, flyway migrations |
 

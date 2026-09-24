@@ -1,3 +1,8 @@
+---
+name: performance-optimization
+description: Known performance bottlenecks in the Backoffice solution and the fixes that apply here: HttpClient creation, AsNoTracking, N+1 queries, caching, pagination and query timeouts. Use when diagnosing slowness, reviewing query efficiency, or adding caching to an existing flow.
+---
+
 # Performance Optimization
 
 Repository-specific performance knowledge for the Backoffice solution — known bottlenecks, proven fixes, and where to look first. Apply this when diagnosing slowness, reviewing query efficiency, or adding caching to an existing flow.
@@ -8,10 +13,10 @@ Repository-specific performance knowledge for the Backoffice solution — known 
 
 | Bottleneck | Location | Impact | Fix approach |
 |-----------|----------|--------|-------------|
-| `HttpClient` created per request | Web service classes in `Backoffice.Web/Services/` | Socket exhaustion under load | Register with `AddHttpClient<T>()` in Startup.cs |
+| `HttpClient` created per call | `Backoffice.API` repositories: `SportsbookRepository.cs:1421`, `RabbitMQRepository.cs:85`, `PlatformRepository.cs:1008`, `TradingRepository.cs:2417,2435` | Socket exhaustion under load | Register with `AddHttpClient<T>()` in `Startup.cs` |
 | N+1 queries in activity log | `BackofficeRepository` — log queries that join per-row | Slow dashboard load | Batch with `.Include()` or grouped fetch |
 | In-process cache not shared | All services using `IMemCache` | Cold-start latency on new instances | Cannot fix without distributed cache; mitigate with event-driven invalidation |
-| Static MongoDB init not thread-safe | `SportsbookRepository` | Potential duplicate init at startup | Use `Lazy<IMongoDatabase>` for thread-safe init |
+| Static MongoDB init not thread-safe | `SportsbookRepository.cs:29`, `TradingRepository.cs:28` | Potential duplicate init at startup | Use `Lazy<IMongoDatabase>` for thread-safe init |
 | Fire-and-forget RabbitMQ publish | All repositories | Undetected failures cause stale state | Await publish and handle exceptions |
 
 ## AsNoTracking — highest ROI fix
@@ -20,10 +25,10 @@ Every read query without `.AsNoTracking()` allocates EF Core change-tracking obj
 
 ```csharp
 // Before — unnecessary tracking
-var clients = await _context.Clients.ToListAsync();
+var clients = await _backofficeContext.ClientInformation.ToListAsync();
 
 // After — no change tracking overhead
-var clients = await _context.Clients.AsNoTracking().ToListAsync();
+var clients = await _backofficeContext.ClientInformation.AsNoTracking().ToListAsync();
 ```
 
 Scan `BackofficeRepository.cs` for any `.FirstOrDefaultAsync()` or `.ToListAsync()` call not preceded by `.AsNoTracking()`.
@@ -64,12 +69,12 @@ Priority targets for caching (not yet cached or partially cached):
 3. Client list — queried by UI on navigation, changes only on client add/update
 4. Fixture translations — stable until explicitly edited
 
-Pattern:
+Pattern (illustrative; the key is made up, `GetCache<T>(string key, Func<T> repositoryCall, int expiration)` is the real signature in `Backoffice.Shared/Utilities/IMemCache.cs`). `ConfigTemplate` has no margins navigation; margins are the separate `ConfigTemplateMargin` DbSet:
 ```csharp
 var templates = _memCache.GetCache<List<ConfigTemplate>>(
-    "config.templates.all",
-    () => _backofficeContext.ConfigTemplates.AsNoTracking().Include(t => t.Margins).ToList(),
-    expiration: 24);
+    "example.configtemplates",
+    () => _backofficeContext.ConfigTemplate.AsNoTracking().ToList(),
+    24);
 ```
 
 After adding caching, always wire the corresponding invalidation in the mutation method.
@@ -77,23 +82,18 @@ After adding caching, always wire the corresponding invalidation in the mutation
 ## N+1 detection and fix
 
 ```csharp
+// Illustrative. ClientInformation has no navigation to ClientBetSetting, so batch by IDs.
 // BAD — N+1: one DB query per client to load settings
-var clients = await _context.Clients.AsNoTracking().ToListAsync();
+var clients = await _backofficeContext.ClientInformation.AsNoTracking().ToListAsync();
 foreach (var c in clients)
 {
-    var settings = await _context.ClientBetSettings
+    var settings = await _backofficeContext.ClientBetSetting
         .Where(s => s.ClientId == c.ClientId).ToListAsync();
 }
 
-// GOOD — single query: Include loads settings in one JOIN
-var clients = await _context.Clients
-    .AsNoTracking()
-    .Include(c => c.BetSettings)
-    .ToListAsync();
-
-// GOOD — when Include is not available (cross-context): batch by IDs
-var clientIds = clients.Select(c => c.ClientId).ToList();
-var settings = await _context.ClientBetSettings
+// GOOD: batch by IDs, one query
+var clientIds = clients.Select(c => (long)c.ClientId).ToList();
+var settings = await _backofficeContext.ClientBetSetting
     .AsNoTracking()
     .Where(s => clientIds.Contains(s.ClientId))
     .ToListAsync();
@@ -108,7 +108,7 @@ MongoDB full-collection scans are the equivalent of `SELECT *` with no WHERE cla
 2. If not, add a background index (does not block reads during build):
 
 ```csharp
-var keys = Builders<Fixture>.IndexKeys.Ascending(f => f.LeagueId);
+var keys = Builders<Fixture>.IndexKeys.Ascending(f => f.LeId);
 await collection.Indexes.CreateOneAsync(
     new CreateIndexModel<Fixture>(keys,
         new CreateIndexOptions { Name = "idx_fixtures_leagueid", Background = true }));
@@ -122,12 +122,12 @@ await collection.Indexes.CreateOneAsync(
 
 ```csharp
 // BAD — blocks thread
-var result = _repository.GetClientsAsync().Result;
-var count = _context.Clients.CountAsync().Result;
+var result = _backofficeRepository.GetClients().Result;
+var count = _backofficeContext.ClientInformation.CountAsync().Result;
 
 // GOOD — frees thread while waiting
-var result = await _repository.GetClientsAsync();
-var count = await _context.Clients.CountAsync();
+var result = await _backofficeRepository.GetClients();
+var count = await _backofficeContext.ClientInformation.CountAsync();
 ```
 
 Search for `.Result` and `.Wait()` in repository and controller files — each instance is a starvation risk.
@@ -137,10 +137,11 @@ Search for `.Result` and `.Wait()` in repository and controller files — each i
 Activity logs, historical data, and any query where the row count is not bounded by a foreign key filter must use pagination:
 
 ```csharp
-var results = await _context.ActivityLogs
+// ActivityLog has no ClientId; filter on a real column such as Page or UserId
+var results = await _backofficeContext.ActivityLog
     .AsNoTracking()
-    .Where(a => a.ClientId == clientId)
-    .OrderByDescending(a => a.Timestamp)
+    .Where(a => a.Page == page)
+    .OrderByDescending(a => a.TimeStamp)
     .Skip((pageNumber - 1) * pageSize)
     .Take(pageSize)
     .ToListAsync();
@@ -154,24 +155,24 @@ For list endpoints that only display summary data, project to a DTO instead of l
 
 ```csharp
 // BAD — loads all columns including blobs/large fields
-var clients = await _context.Clients.AsNoTracking().ToListAsync();
+var clients = await _backofficeContext.ClientInformation.AsNoTracking().ToListAsync();
 
-// GOOD — loads only what the list view needs
-var clients = await _context.Clients
+// GOOD — loads only what the list view needs (ClientSummaryModel is illustrative)
+var clients = await _backofficeContext.ClientInformation
     .AsNoTracking()
     .Select(c => new ClientSummaryModel
     {
         ClientId = c.ClientId,
-        ClientName = c.ClientName,
-        Status = c.Status,
-        RegionCode = c.RegionCode
+        Name = c.Name,
+        StatusId = c.StatusId,
+        Region = c.Region
     })
     .ToListAsync();
 ```
 
 ## Query timeout monitoring
 
-All queries have a 180-second timeout configured in Startup.cs. Any query that regularly takes over 5 seconds in production should be:
+All API DbContexts use `Custom:DbContextTimeout`, default 180 seconds (`Backoffice.API/Startup.cs:91-102`). Any query that regularly takes over 5 seconds in production should be:
 1. Logged with `LogWarning` including query parameters
 2. Reviewed for missing indexes or N+1 patterns
 3. Added to the caching layer if the data is read-heavy

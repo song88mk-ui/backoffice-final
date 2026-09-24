@@ -1,3 +1,8 @@
+---
+name: repository-pattern
+description: Conventions for the repository layer in the Backoffice solution: where repositories live, interface and file names, return types, error handling and DI registration. Use when adding a repository method, creating a repository, or reviewing data access code.
+---
+
 # Repository Pattern
 
 Repository-specific knowledge for implementing and extending the data access layer in the Backoffice solution. Apply this when adding new repository methods, creating new repositories, or reviewing existing implementations.
@@ -10,19 +15,25 @@ Repository-specific knowledge for implementing and extending the data access lay
 |---------|---------------------|------|
 | `Backoffice.API` | `Repositories/` | Primary data access + business logic |
 | `Backoffice.Config.Service` | `Repository/` | Config change processing |
-| `Backoffice.Utility` | `Repository/` | Cache sync, activity log writes, exports |
-| `Backoffice.WebSocket.Service` | (inline in service classes) | Minimal data access |
+| `Backoffice.Utility` | `Repository/` | Activity log writes, exports |
+| `Backoffice.WebSocket.Service` | `Repositories/SportsbookRepository.cs` | Routes engine messages to SignalR |
 
 ## Interface and implementation naming
 
 ```
-IBackofficeRepository  →  BackofficeRepository
-IClientRepository      →  ClientRepository
-ITradingRepository     →  TradingRepository
-ISportsbookRepository  →  SportsbookRepository
-IPlatformRepository    →  PlatformRepository
-IRabbitMqRepository    →  RabbitMqRepository
+IBackofficeRepository            →  BackofficeRepository            (files IBackOfficeRepository.cs / BackOfficeRepository.cs)
+ITradingRepository               →  TradingRepository
+ISportsbookRepository            →  SportsbookRepository
+IPlatformRepository              →  PlatformRepository
+IRabbitMqRepository              →  RabbitMqRepository              (files IRabbitMQRepository.cs / RabbitMQRepository.cs)
+IAuthenticationRepository        →  AuthenticationRepository
+IBackofficeActivityLogRepository →  BackofficeActivityLogRepository
+IClientImportRepository          →  ClientImportRepository
+IMaintenanceRepository           →  MaintenanceRepository
+IWebPropsRepository              →  WebPropsRepository
 ```
+
+All live in `Backoffice.API/Repositories/`. There is no `IClientRepository`; client operations are on `IBackofficeRepository`.
 
 Every public method on `IXxxRepository` must be implemented in `XxxRepository`.
 
@@ -84,7 +95,8 @@ public class XxxRepository : IXxxRepository
 | Fetch single entity | `Task<BaseResponse<EntityModel>>` |
 | Fetch list | `Task<BaseResponse<List<EntityModel>>>` |
 | Create / Update / Delete | `Task<BaseResponse<bool>>` |
-| Fetch with count | `Task<BaseResponse<PagedResult<T>>>` |
+
+There is no `PagedResult<T>` type in the solution.
 
 Never return raw types. Every public method wraps its result in `BaseResponse<T>`.
 
@@ -138,7 +150,7 @@ public void DoWork()
 }
 ```
 
-All dependencies must be constructor-injected. Add new dependencies to both the constructor and the DI registration in `Startup.cs`.
+All dependencies must be constructor-injected. Add new dependencies to both the constructor and the DI registration: `Backoffice.API/Startup.cs` (repositories are Scoped, or typed `AddHttpClient`, `Startup.cs:84-123`) or the worker's `Program.cs` (Singleton). Existing exception: the `Config.Service` and `Utility` repositories, registered as Singletons (`Program.cs:34-35`), new up their DbContexts manually from a `DbContextOptionsBuilder` (`Backoffice.Utility/Repository/BackofficeRepository.cs:38-54`); do not copy that into new code.
 
 ## Method ordering convention
 
@@ -158,7 +170,7 @@ This mirrors the CRUD sequence and makes large repositories (2000+ lines) naviga
 
 ## BackofficeRepository scale
 
-`BackofficeRepository.cs` is the largest file in the solution. When adding methods:
+`Backoffice.API/Repositories/BackOfficeRepository.cs` (3789 lines) is the largest file in the solution. When adding methods:
 - Add to the correct `#region` — do not create new regions.
 - Follow existing indentation and brace style exactly.
 - Do not reorganise existing methods to make room.
