@@ -42,10 +42,23 @@ namespace Backoffice.Web.Services
                 return (false, "The uploaded file has no data.", new List<ImportSportsbookTranslationRow>());
             }
 
+            // Excel commonly leaves a trailing blank column (a trailing comma) after a save --
+            // harmless for data rows (GetCell already defaults missing/extra cells to empty) but
+            // it would otherwise fail an exact SequenceEqual against the header. Strip trailing
+            // blanks before comparing so a re-saved export still validates.
             var header = lines[0].Select(h => h.Trim()).ToArray();
-            if (!header.SequenceEqual(ExpectedHeaders, StringComparer.OrdinalIgnoreCase))
+            var trimmedHeader = header.ToList();
+            while (trimmedHeader.Count > 0 && string.IsNullOrEmpty(trimmedHeader[^1]))
             {
-                return (false, $"Unexpected header row. Expected columns: {string.Join(", ", ExpectedHeaders)}. Use the exported template.", new List<ImportSportsbookTranslationRow>());
+                trimmedHeader.RemoveAt(trimmedHeader.Count - 1);
+            }
+
+            if (!trimmedHeader.SequenceEqual(ExpectedHeaders, StringComparer.OrdinalIgnoreCase))
+            {
+                var found = header.Length == 0 || header.All(string.IsNullOrEmpty)
+                    ? "(blank)"
+                    : string.Join(", ", header);
+                return (false, $"Unexpected header row. Expected columns: {string.Join(", ", ExpectedHeaders)}. Found: {found}. Use the exported template.", new List<ImportSportsbookTranslationRow>());
             }
 
             var rows = new List<ImportSportsbookTranslationRow>();

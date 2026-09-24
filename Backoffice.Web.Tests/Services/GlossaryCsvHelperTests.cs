@@ -94,6 +94,32 @@ namespace Backoffice.Web.Tests.Services
         }
 
         [Fact]
+        public void ParseCsv_RejectsMismatchedHeader_AndReportsWhatWasFound()
+        {
+            var csv = "StringId,English,ZH,ES,FR\r\nSpId:1,Soccer,,,\r\n";
+
+            var (success, error, rows) = GlossaryCsvHelper.ParseCsv(csv);
+
+            Assert.False(success);
+            Assert.Contains("Found: StringId, English, ZH, ES, FR", error);
+            Assert.Empty(rows);
+        }
+
+        [Fact]
+        public void ParseCsv_AcceptsHeader_WithTrailingBlankColumn()
+        {
+            // Excel often appends a trailing empty column (a trailing comma) when re-saving --
+            // the exported template should still be re-importable after that round trip.
+            var csv = "StringId,EN,ZH,ES,FR,\r\nSpId:1,Soccer,,,,\r\n";
+
+            var (success, error, rows) = GlossaryCsvHelper.ParseCsv(csv);
+
+            Assert.True(success);
+            Assert.Null(error);
+            Assert.Equal("SpId:1", Assert.Single(rows).StringId);
+        }
+
+        [Fact]
         public void ParseCsv_ReturnsError_WhenFileEmpty()
         {
             var (success, error, rows) = GlossaryCsvHelper.ParseCsv(string.Empty);

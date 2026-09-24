@@ -94,6 +94,30 @@ namespace Backoffice.Web.Tests.Services
         }
 
         [Fact]
+        public void ParseCsv_RejectsMismatchedHeader_AndReportsWhatWasFound()
+        {
+            var csv = "Key,English,ZH,JA,BR\r\naccept,Accept,,,\r\n";
+
+            var (success, error, rows) = StaticTranslationCsvHelper.ParseCsv(csv);
+
+            Assert.False(success);
+            Assert.Contains("Found: Key, English, ZH, JA, BR", error);
+            Assert.Empty(rows);
+        }
+
+        [Fact]
+        public void ParseCsv_AcceptsHeader_WithTrailingBlankColumn()
+        {
+            var csv = "Key,EN,ZH,JA,BR,\r\naccept,Accept,,,,\r\n";
+
+            var (success, error, rows) = StaticTranslationCsvHelper.ParseCsv(csv);
+
+            Assert.True(success);
+            Assert.Null(error);
+            Assert.Equal("accept", Assert.Single(rows).Key);
+        }
+
+        [Fact]
         public void ParseCsv_ReturnsError_WhenFileEmpty()
         {
             var (success, error, rows) = StaticTranslationCsvHelper.ParseCsv(string.Empty);
