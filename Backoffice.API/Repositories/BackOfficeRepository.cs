@@ -3237,7 +3237,8 @@ namespace Backoffice.API.Repositories
                         {
                             StId = existing.StringId,
                             LaCo = targetLanguage,
-                            Tx = request.TargetText ?? string.Empty
+                            Tx = request.TargetText ?? string.Empty,
+                            SrcTx = existing.SourceText
                         });
                     }
 
@@ -3281,7 +3282,8 @@ namespace Backoffice.API.Repositories
                         {
                             StId = request.StringId,
                             LaCo = targetLanguage,
-                            Tx = request.TargetText ?? string.Empty
+                            Tx = request.TargetText ?? string.Empty,
+                            SrcTx = request.SourceText
                         });
                     }
 
@@ -3349,7 +3351,7 @@ namespace Backoffice.API.Repositories
                 sibling.UpdatedAt = DateTime.UtcNow;
                 _translationContext.TranslationCache2.Update(sibling);
 
-                translationChanges.Add(new TranslationChangeItem { StId = sibling.StringId, LaCo = targetLanguage, Tx = targetText });
+                translationChanges.Add(new TranslationChangeItem { StId = sibling.StringId, LaCo = targetLanguage, Tx = targetText, SrcTx = sourceText });
                 activityLogs.Add(BuildGlossaryActivityLog(requesterInfo, Activity.Update, sibling.StringId, previous, targetText));
                 updatedCount++;
             }
@@ -3414,11 +3416,11 @@ namespace Backoffice.API.Repositories
 
                 var translationChanges = new List<TranslationChangeItem>();
                 if (!string.IsNullOrEmpty(existing.TargetTextZh))
-                    translationChanges.Add(new TranslationChangeItem { StId = existing.StringId, LaCo = "ZH", Tx = string.Empty });
+                    translationChanges.Add(new TranslationChangeItem { StId = existing.StringId, LaCo = "ZH", Tx = string.Empty, SrcTx = existing.SourceText });
                 if (!string.IsNullOrEmpty(existing.TargetTextEs))
-                    translationChanges.Add(new TranslationChangeItem { StId = existing.StringId, LaCo = "ES", Tx = string.Empty });
+                    translationChanges.Add(new TranslationChangeItem { StId = existing.StringId, LaCo = "ES", Tx = string.Empty, SrcTx = existing.SourceText });
                 if (!string.IsNullOrEmpty(existing.TargetTextFr))
-                    translationChanges.Add(new TranslationChangeItem { StId = existing.StringId, LaCo = "FR", Tx = string.Empty });
+                    translationChanges.Add(new TranslationChangeItem { StId = existing.StringId, LaCo = "FR", Tx = string.Empty, SrcTx = existing.SourceText });
 
                 _translationContext.TranslationCache2.Remove(existing);
                 await _translationContext.SaveChangesAsync();
@@ -3710,7 +3712,7 @@ namespace Backoffice.API.Repositories
             }
 
             setter(uploaded);
-            translationChanges.Add(new TranslationChangeItem { StId = stringId, LaCo = languageCode, Tx = uploaded });
+            translationChanges.Add(new TranslationChangeItem { StId = stringId, LaCo = languageCode, Tx = uploaded, SrcTx = sourceText });
             return true;
         }
 

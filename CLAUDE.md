@@ -175,8 +175,12 @@ The workspace root `../CLAUDE.md` and `../INTEGRATION-MAP.md` describe the cross
 
 ## BO API access (local / ad-hoc debugging)
 
-Staging only unless Production is explicitly authorised in the current conversation.
+Staging or DEV only unless Production is explicitly authorised in the current conversation.
 Most endpoints need **two** headers: `x-api-key` (`Security:ApiKey`) **and**
 `Authorization: Bearer <JWT>`. Get the JWT from
 `POST {BO_API_BASE}/api/authentication/login`. Credentials live in a git-ignored
-`.env.bo-api.local` at the repo root, if present. Full procedure: `docs/16_BoApiAccess.md`.
+`.env.bo-api.local` at the repo root, if present. **DEV:** the same file works against DEV
+by overriding `BO_API_BASE=https://bo-api.dev.song88.com` (dev `bo-api` uses the staging Auth
+API and API key); do not create a separate DEV env file. DEV SQL Server and MongoDB are reached
+directly with `sqlcmd` / `mongosh`, allow-listed in the git-ignored `.claude/settings.local.json`.
+Full procedure: `docs/16_BoApiAccess.md`.
