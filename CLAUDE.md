@@ -104,6 +104,12 @@ If testing is not possible: state what could not be validated and why, recommend
 to run before deployment, and mark the work **Implementation Complete – Validation Pending**,
 never **Completed**.
 
+`Backoffice.API.Tests/Translation/TranslationRepositoryTests.cs` has a `BuildSut` overload that
+records every `IRabbitMqRepository.Publish` call. Use it to assert what a repository method
+publishes (routing key and payload), not only the database state. Every glossary
+`OnTranslationChange` delta must set `SrcTx` to the row's SOURCE_TEXT (GM-852). Those tests fail if
+a publish site drops it (GM-874).
+
 ## Critical constraints
 
 1. **.NET 10** (since August 2026, GM-743), all projects `net10.0`. Several dependencies remain on
