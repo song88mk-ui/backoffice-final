@@ -136,12 +136,15 @@ OnMarketSortOrderChange  (payload: OnDeleteCacheMessage { CacheType = MarketSort
 ```
 OnTranslationChangeMessage  (published by BackofficeRepository glossary writes)
 ├─ Route: r.oe.cachesync.ontranslationchange
-├─ Payload: { Tr: [ { StId, LaCo, Tx } ] }
+├─ Payload: { Tr: [ { StId, LaCo, Tx, SrcTx } ] }
 │   · StId = TranslationCache2.STRING_ID
 │     ("SpId:{id}" | "SegId:{id}" | "LeId:{id}" | "Te:{teamId}" | "MaTe:{MaTeId}" | "SeTe:{MaTeId}:{SeTeId}")
 │   · LaCo = target language ("ZH" | "ES" | "FR"), Tx = translated text (empty = clear)
+│   · SrcTx = the row's SOURCE_TEXT (GM-852). OE.Translation.Service uses it to scope a MaTe
+│     update to markets whose MaNa matches it, ignoring case. Set on every delta below;
+│     TranslationRepositoryTests asserts it per path (GM-874).
 ├─ Published after AddOrUpdateSportsbookGlossary (one delta for the edited target
-│  language), ImportSportsbookGlossary (bulk CSV upload/upsert -- one delta per changed
+│  language, plus one per sibling row sharing the same SourceText), ImportSportsbookGlossary (bulk CSV upload/upsert -- one delta per changed
 │  row/language, batched into a single publish call for the whole file), and
 │  DeleteSportsbookGlossary (an empty-Tx clear per language that had text)
 └─ Propagation chain (all downstream of the topic exchange, no further BO involvement):

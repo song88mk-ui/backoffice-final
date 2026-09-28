@@ -6,11 +6,13 @@ using Backoffice.Shared.Data.Translation.Entities;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -49,6 +51,32 @@ namespace Backoffice.API.Tests.Translation
                 new Mock<IMemCache>().Object,
                 new Mock<IRabbitMqRepository>().Object);
         }
+
+        // Same SUT, but every message handed to IRabbitMqRepository.Publish is recorded so a test
+        // can assert what the glossary write announced to Platform.CacheSync.Service.
+        private static BackofficeRepository BuildSut(BackofficeContext backofficeContext, TranslationContext translationContext, List<MessageRequest> published)
+        {
+            var rabbitMq = new Mock<IRabbitMqRepository>();
+            rabbitMq
+                .Setup(r => r.Publish(It.IsAny<MessageRequest>(), It.IsAny<string>()))
+                .Callback<MessageRequest, string>((request, _) => published.Add(request));
+
+            return new BackofficeRepository(
+                backofficeContext,
+                translationContext,
+                new Mock<IPlatformRepository>().Object,
+                new Mock<ISportsbookRepository>().Object,
+                new Mock<ITradingRepository>().Object,
+                new Mock<IMemCache>().Object,
+                rabbitMq.Object);
+        }
+
+        // The TranslationChangeItems of every OnTranslationChange published, in publish order.
+        private static List<TranslationChangeItem> PublishedTranslationChanges(List<MessageRequest> published) =>
+            published
+                .Where(m => m.RoutingKey == "r.oe.cachesync.ontranslationchange")
+                .SelectMany(m => JsonSerializer.Deserialize<OnTranslationChangeMessage>(m.Payload).Tr)
+                .ToList();
 
         private static RequesterInfo MakeRequester(string page = "Translations.Static") =>
             new RequesterInfo { Page = page, UserId = "tester", UserName = "Test User" };
@@ -1495,6 +1523,217 @@ namespace Backoffice.API.Tests.Translation
 
             var fr = result.Result.Languages.Single(l => l.LanguageCode == "FR");
             Assert.Equal(1, fr.TranslatedCount); // same rule for FR
+        }
+
+        // ---------------------------------------------------------------
+        // OnTranslationChange SrcTx (GM-852, GM-874)
+        // OddsEngine scopes a MaTe update to the markets whose MaNa equals SrcTx, so every glossary
+        // write must announce the row's SOURCE_TEXT. SrcTx values below differ from Tx and StId so
+        // a producer that copies the wrong field fails too.
+        // ---------------------------------------------------------------
+
+        [Fact]
+        public async Task AddOrUpdateSportsbookGlossary_Update_PublishesNewSourceTextAsSrcTx()
+        {
+            var dbName = nameof(AddOrUpdateSportsbookGlossary_Update_PublishesNewSourceTextAsSrcTx);
+            long editedId;
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                var row = MakeGlossaryRow("MaTe:16~a1b2c3d4", "Total Goals", zh: "总进球");
+                seed.TranslationCache2.Add(row);
+                await seed.SaveChangesAsync();
+                editedId = row.Id;
+            }
+
+            var published = new List<MessageRequest>();
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx, published);
+
+            var result = await sut.AddOrUpdateSportsbookGlossary(
+                new AddOrUpdateSportsbookGlossaryRequest
+                {
+                    Id = editedId,
+                    StringId = "MaTe:16~a1b2c3d4",
+                    SourceText = "Total Goals Odd/Even",
+                    TargetLanguage = "ZH",
+                    TargetText = "总进球单/双"
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            var item = Assert.Single(PublishedTranslationChanges(published));
+            Assert.Equal("MaTe:16~a1b2c3d4", item.StId);
+            Assert.Equal("ZH", item.LaCo);
+            Assert.Equal("总进球单/双", item.Tx);
+            Assert.Equal("Total Goals Odd/Even", item.SrcTx); // the saved SOURCE_TEXT, not the one it replaced
+        }
+
+        [Fact]
+        public async Task AddOrUpdateSportsbookGlossary_Create_PublishesSrcTx()
+        {
+            var dbName = nameof(AddOrUpdateSportsbookGlossary_Create_PublishesSrcTx);
+            var published = new List<MessageRequest>();
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx, published);
+
+            var result = await sut.AddOrUpdateSportsbookGlossary(
+                new AddOrUpdateSportsbookGlossaryRequest
+                {
+                    StringId = "MaTe:259",
+                    SourceText = "Asian Handicap",
+                    TargetLanguage = "ES",
+                    TargetText = "Handicap asiatico"
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            var item = Assert.Single(PublishedTranslationChanges(published));
+            Assert.Equal("MaTe:259", item.StId);
+            Assert.Equal("ES", item.LaCo);
+            Assert.Equal("Handicap asiatico", item.Tx);
+            Assert.Equal("Asian Handicap", item.SrcTx);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateSportsbookGlossary_Cascade_PublishesSrcTxOnEverySibling()
+        {
+            var dbName = nameof(AddOrUpdateSportsbookGlossary_Cascade_PublishesSrcTxOnEverySibling);
+            long editedId;
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                var edited = MakeGlossaryRow("Te:1", "Argentina", fr: "ancien");
+                seed.TranslationCache2.AddRange(
+                    edited,
+                    MakeGlossaryRow("Te:2", "Argentina", fr: "ancien 2"),
+                    MakeGlossaryRow("SegId:122", "Argentina"));
+                await seed.SaveChangesAsync();
+                editedId = edited.Id;
+            }
+
+            var published = new List<MessageRequest>();
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx, published);
+
+            var result = await sut.AddOrUpdateSportsbookGlossary(
+                new AddOrUpdateSportsbookGlossaryRequest
+                {
+                    Id = editedId,
+                    StringId = "Te:1",
+                    SourceText = "Argentina",
+                    TargetLanguage = "FR",
+                    TargetText = "Argentine"
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            var items = PublishedTranslationChanges(published);
+            Assert.Equal(new[] { "SegId:122", "Te:1", "Te:2" }, items.Select(i => i.StId).OrderBy(s => s, System.StringComparer.Ordinal));
+            Assert.All(items, i =>
+            {
+                Assert.Equal("FR", i.LaCo);
+                Assert.Equal("Argentine", i.Tx);
+                Assert.Equal("Argentina", i.SrcTx);
+            });
+        }
+
+        [Fact]
+        public async Task AddOrUpdateSportsbookGlossary_English_PublishesNothing()
+        {
+            var dbName = nameof(AddOrUpdateSportsbookGlossary_English_PublishesNothing);
+            var published = new List<MessageRequest>();
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx, published);
+
+            var result = await sut.AddOrUpdateSportsbookGlossary(
+                new AddOrUpdateSportsbookGlossaryRequest
+                {
+                    StringId = "MaTe:259",
+                    SourceText = "Asian Handicap",
+                    TargetLanguage = "EN",
+                    TargetText = "Asian Handicap"
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            Assert.Empty(PublishedTranslationChanges(published));
+        }
+
+        [Fact]
+        public async Task DeleteSportsbookGlossary_PublishesSrcTxForEachTranslatedLanguage()
+        {
+            var dbName = nameof(DeleteSportsbookGlossary_PublishesSrcTxForEachTranslatedLanguage);
+            long rowId;
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                var row = MakeGlossaryRow("MaTe:16", "Both Teams To Score", zh: "双方进球", es: "Ambos marcan", fr: "Les deux marquent");
+                seed.TranslationCache2.Add(row);
+                await seed.SaveChangesAsync();
+                rowId = row.Id;
+            }
+
+            var published = new List<MessageRequest>();
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx, published);
+
+            var result = await sut.DeleteSportsbookGlossary(new DeleteSportsbookGlossaryRequest { Id = rowId }, MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            var items = PublishedTranslationChanges(published);
+            Assert.Equal(new[] { "ZH", "ES", "FR" }, items.Select(i => i.LaCo));
+            Assert.All(items, i =>
+            {
+                Assert.Equal("MaTe:16", i.StId);
+                Assert.Equal(string.Empty, i.Tx); // removal: consumers revert to the English name
+                Assert.Equal("Both Teams To Score", i.SrcTx);
+            });
+        }
+
+        [Fact]
+        public async Task ImportSportsbookGlossary_PublishesSrcTx_OnCreateAndUpdate()
+        {
+            var dbName = nameof(ImportSportsbookGlossary_PublishesSrcTx_OnCreateAndUpdate);
+            using (var seed = BuildTranslationContext(dbName))
+            {
+                seed.TranslationCache2.Add(MakeGlossaryRow("MaTe:259", "Asian Handicap"));
+                await seed.SaveChangesAsync();
+            }
+
+            var published = new List<MessageRequest>();
+            using var backofficeCtx = BuildBackofficeContext(dbName);
+            using var translationCtx = BuildTranslationContext(dbName);
+            var sut = BuildSut(backofficeCtx, translationCtx, published);
+
+            var result = await sut.ImportSportsbookGlossary(
+                new ImportSportsbookGlossaryRequest
+                {
+                    Rows = new List<ImportSportsbookGlossaryRow>
+                    {
+                        // Existing row: the file's EN cell differs from the stored SOURCE_TEXT,
+                        // which import does not overwrite, so SrcTx must stay the stored value.
+                        new ImportSportsbookGlossaryRow { StringId = "MaTe:259", SourceText = "Asian Handicap (file)", TargetTextZh = "亚洲让球" },
+                        new ImportSportsbookGlossaryRow { StringId = "MaTe:16", SourceText = "  Total Goals  ", TargetTextEs = "Goles totales" }
+                    }
+                },
+                MakeRequester("Translations.Dynamic"));
+
+            Assert.Equal(StatusCode.Success, result.StatusCode);
+            var items = PublishedTranslationChanges(published);
+            Assert.Equal(2, items.Count);
+
+            var updated = items.Single(i => i.StId == "MaTe:259");
+            Assert.Equal("ZH", updated.LaCo);
+            Assert.Equal("亚洲让球", updated.Tx);
+            Assert.Equal("Asian Handicap", updated.SrcTx);
+
+            var created = items.Single(i => i.StId == "MaTe:16");
+            Assert.Equal("ES", created.LaCo);
+            Assert.Equal("Goles totales", created.Tx);
+            Assert.Equal("Total Goals", created.SrcTx); // trimmed, as stored
         }
     }
 }
