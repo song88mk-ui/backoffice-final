@@ -114,6 +114,16 @@ never **Completed**.
 4. **Fire-and-forget publishing** — failures are neither detected nor retried.
 5. **In-process cache** — not shared across instances.
 6. **Monolithic repositories** — 2000+ lines, hard to test.
+7. **Never put quotes around `FromSql` interpolations.** `FromSql($"Proc '{x}'")` turns `{x}` into
+   a SQL parameter, so the quotes send the literal text `'@p0'` instead of the value. Write
+   `FromSql($"Proc {x}")`. Existing offenders: `Backoffice.API/Repositories/BackOfficeRepository.cs:179`
+   and `:246` (`GetActivityLogs`, BO-113), and `Backoffice.Utility/Repository/BackofficeRepository.cs:627`
+   and `:695`. `GetActivityLogs` is also missing in the PRD database, and no repo holds its DDL
+   (GM-134, BO-113).
+8. **bo-web DataProtection keys are in memory only.** `Backoffice.Web/Program.cs` has no
+   `AddDataProtection()` or `PersistKeysTo*`, so after a pod restart the logs show
+   `The key {...} was not found in the key ring` (`ErrorUnprotectingCookie`) and antiforgery
+   decrypt errors (BO-114). These errors come from the missing key ring, not from the session code.
 
 ## Before modifying code, ask
 
@@ -168,8 +178,11 @@ The workspace root `../CLAUDE.md` and `../INTEGRATION-MAP.md` describe the cross
 
 ## Observability
 
-- **Grafana (staging):** https://grafana.stg.song88.com/ — Google OAuth with an `@song88.com`
-  account. Loki for logs, Prometheus for metrics.
+- **Grafana:** https://grafana.stg.song88.com/ and https://grafana.prd.song88.com/ — Google OAuth
+  with an `@song88.com` account. Loki for logs, Prometheus for metrics.
+- **Loki labels:** bo-api and bo-web run in namespace `corp-apps` as `app="bo-api"` /
+  `app="bo-web"`. The STG cluster also hosts the `dev` namespace. Log lines are Serilog JSON:
+  `@l` (level), `@mt` (template), `@x` (exception), `RequestPath`, and `commandText` for EF SQL.
 - The OAuth browser flow does not work for API calls; generate a service account token from
   Grafana Administration for REST access.
 
