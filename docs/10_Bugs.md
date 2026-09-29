@@ -468,6 +468,55 @@ if (template == null || string.IsNullOrEmpty(template.Name))
 
 ---
 
+## Maintenance Mode UI (Fixed)
+
+### Bug #16: Checking a client didn't enable maintenance for it (BO-115)
+
+**Location:** `Backoffice.Web/Pages/Administration/MaintenanceV2.razor.cs`
+
+**Issue:** the "Enable Maintenance Mode" master switch (`_isMaintenance`) and the "Specific
+Clients" checklist were independent state. Checking a client only marked it as the target of
+whatever the switch already held; nothing set the switch when you checked a client that wasn't
+already under maintenance. An operator checking a live client and clicking Save got a silent
+`IsMaintenance:false` save (toast: "Disabling Maintenance") instead of the expected enable, with
+no error. Confirmed against Staging's `ActivityLog2` and bo-api logs: the requests sent during
+reproduction were `{"ClientIds":"AL:...","IsMaintenance":false}` even though the operator intended
+to enable maintenance for that client.
+
+**Risk:** ⚠️ HIGH (operational: maintenance mode appears to do nothing when toggled this way)
+
+**Fix:** `HandlePropertyChange` now sets `_isMaintenance = true` whenever the checked-client set
+includes a client not already under maintenance, mirroring the pattern `HandleChangeMode` already
+used for the initial mode-switch case. The switch stays manually overridable.
+
+**Tests:** `Backoffice.Web.Tests/Administration/MaintenanceV2PageTests.cs`
+
+---
+
+### Bug #17: Client search box in the maintenance dropdown never filtered
+
+**Location:** `Backoffice.Web/Components/Administration/MaintenanceV2/ClientSelectionDropDown.razor(.cs)`
+
+**Issue:** the search `<input>` used plain `@bind="@_searchField"` with no handler wired to it
+(`HandleSearchInput()` existed but was an empty, unused stub). The actual `.Where(...)` filter only
+ran inside `OnParametersSet()`, gated by `ParameterChanged()`, which only detects changes to the
+checked-item set or the `Disabled` parameter, not to the search text. Typing in the box updated the
+backing field but never re-rendered or re-filtered the list; with ~200 near-duplicate per-layout
+entries, this made finding the correct client effectively impossible. As a secondary effect, the
+old code also reassigned the `Clients` parameter itself to the filtered subset and pushed it back to
+the parent via `ClientsChanged`, so a filter that did apply (indirectly, via a checkbox click) could
+permanently shrink the parent's full client list.
+
+**Risk:** ⚠️ MEDIUM (usability; compounds Bug #16 by making the correct row hard to find)
+
+**Fix:** the search input now uses `@oninput` wired to a real handler that updates `_searchField`
+and requests a render; the list renders from a non-mutating `FilteredClients()` projection instead
+of overwriting the `Clients` parameter.
+
+**Tests:** `Backoffice.Web.Tests/Administration/ClientSelectionDropDownTests.cs`
+
+---
+
 ## Potential Runtime Errors Summary
 
 | Bug # | Issue | Type | Severity | Impact |

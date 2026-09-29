@@ -113,6 +113,12 @@ namespace Backoffice.Web.Pages.Administration
                 if (value != _clienHasChange)
                     _clienHasChange = value;
 
+                // Checking a client that isn't already under maintenance means the operator wants
+                // to put it into maintenance; without this the master switch stayed at whatever it
+                // loaded with, so Save could silently disable instead of enable (BO-115).
+                if (_clients.Any(c => c.IsChecked && !c.IsMaintenanceEnabled))
+                    _isMaintenance = true;
+
                 hasChange = ((_clienHasChange || _isDropDownDisabled) || _isMaintenance != _initialMaintenanceIsOn) && _clients.Any(c => c.IsChecked);
             }
             else

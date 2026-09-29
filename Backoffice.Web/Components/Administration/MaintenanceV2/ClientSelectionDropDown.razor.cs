@@ -27,15 +27,12 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
         {
             if (ParameterChanged())
             {
-                Clients = Clients.Where(x => x.Name.Contains(_searchField, StringComparison.OrdinalIgnoreCase) || x.Value.Contains(_searchField, StringComparison.OrdinalIgnoreCase))
-                    .OrderByDescending(c => c.IsChecked).ToList();
-
-                _activeClients = Clients.Where(c => c.IsChecked).ToList();
+                _activeClients = Clients?.Where(c => c.IsChecked).ToList() ?? new();
                 _isDisabled = Disabled;
                 _shouldRender = true;
 
                 if (_init)
-                    _initialClients = new(Clients.Where(c => c.IsMaintenanceEnabled).Select(s => s.Value));
+                    _initialClients = new(Clients?.Where(c => c.IsMaintenanceEnabled).Select(s => s.Value) ?? Enumerable.Empty<string>());
             }
 
             _init = false;
@@ -59,9 +56,15 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
             _shouldRender = true;
         }
 
-        public async Task HandleSearchInput()
+        public void HandleSearchInput(ChangeEventArgs e)
         {
+            _searchField = e.Value?.ToString() ?? string.Empty;
+            _shouldRender = true;
         }
+
+        private List<MaintenanceSelectListItemWithCheckboxModel> FilteredClients() =>
+            Clients?.Where(x => x.Name.Contains(_searchField, StringComparison.OrdinalIgnoreCase) || x.Value.Contains(_searchField, StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(c => c.IsChecked).ToList() ?? new();
         private async Task HandleRemoveClientClick(string clientId)
         {
             if (Disabled)

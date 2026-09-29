@@ -31,10 +31,10 @@
                     <span class="input-group-text">
                         <i class="fa fa-search"></i>
                     </span>
-                    <input id="search" placeholder=@_translationState.GetValue("Find client") class="search-client form-control border-bottom px-0" @bind="@_searchField" />
+                    <input id="search" placeholder=@_translationState.GetValue("Find client") class="search-client form-control border-bottom px-0" value="@_searchField" @oninput="HandleSearchInput" />
                 </div>
             </li>
-            @foreach (var item in Clients)
+            @foreach (var item in FilteredClients())
             {
                 <li id="@item.Value">
                     <div class="form-check ms-2" @onclick="() => HandleCheckboxCheck(item)">
