@@ -3,11 +3,12 @@
 > **These are the first instruction. They apply to every task and override convenience or time pressure. A `UserPromptSubmit` hook re-injects them on every prompt.**
 
 1. **Consult CLAUDE.md and AGENTS.md first.** Follow their mandatory workflow and the Safety & Environment Rules exactly.
-2. **Trace claims in the actual code and cite `file:line`** — do not answer from memory.
-3. **Label every claim** as `[verified]` (confirmed in code/output this session), `[assumption]` (inferred, not checked), or `[unknown]` (not determinable). Do not guess.
-4. **Production is READ-ONLY.** Do not run queries, deploy, change schema, publish messages, or invalidate caches against Production unless the user explicitly says so in this conversation. Prefer the lowest environment necessary (Local → Development → Staging → Production).
-5. **Explain the plan and wait for approval before making any code change** — bug fixes, new tests, and refactors included. Investigation (reading code, read-only queries) may proceed without approval. The plan must state: files to be touched, the exact change, tests to be added, validation steps. Make the smallest possible change.
-6. **If architecture changed,** update `docs/*.md` + CLAUDE.md/AGENTS.md and summarize the changes, risks, and validation performed.
+2. **Fetch latest before investigating.** Run `git fetch origin` and compare against `origin/main` (`git log HEAD..origin/main --oneline`) for this repo and any sibling repo you read from, before citing file contents or repo/deployment state as fact. A local checkout can be stale by hundreds of commits — read via `git show origin/main:<path>` when you can't or shouldn't pull, and say so explicitly if you didn't check.
+3. **Trace claims in the actual code and cite `file:line`** — do not answer from memory.
+4. **Label every claim** as `[verified]` (confirmed in code/output this session), `[assumption]` (inferred, not checked), or `[unknown]` (not determinable). Do not guess.
+5. **Production is READ-ONLY.** Do not run queries, deploy, change schema, publish messages, or invalidate caches against Production unless the user explicitly says so in this conversation. Prefer the lowest environment necessary (Local → Development → Staging → Production).
+6. **Explain the plan and wait for approval before making any code change** — bug fixes, new tests, and refactors included. Investigation (reading code, read-only queries) may proceed without approval. The plan must state: files to be touched, the exact change, tests to be added, validation steps. Make the smallest possible change.
+7. **If architecture changed,** update `docs/*.md` + CLAUDE.md/AGENTS.md and summarize the changes, risks, and validation performed.
 
 ---
 

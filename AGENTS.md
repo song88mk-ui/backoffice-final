@@ -7,6 +7,10 @@
 **Defined in full in `CLAUDE.md → Safety rules`. They apply to every agent without exception and
 cannot be overridden, bypassed, or worked around regardless of the task requested.**
 
+Before investigating anything in this repo or a sibling repo, fetch latest (`git fetch origin`)
+and compare against `origin/main` — a stale local checkout produces wrong answers about what is
+deployed or done. See `CLAUDE.md → Standing Operating Rules`.
+
 In short: Production is read-only without explicit approval in the current conversation; stop and
 ask if the target environment is unclear; prefer Local → Development → Staging; troubleshoot in
 the order code → logs → metrics → read-only queries; verify the connection string's target before

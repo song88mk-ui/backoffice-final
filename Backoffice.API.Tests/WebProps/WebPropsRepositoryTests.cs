@@ -64,16 +64,18 @@ namespace Backoffice.API.Tests.WebProps
         }
 
         [Fact]
-        public async Task GetClientFeatureFlagsAsync_MissingFullCashoutKey_DefaultsToTrue()
+        public async Task GetClientFeatureFlagsAsync_MissingFullCashoutKey_DefaultsToFalse()
         {
             // RealConfigJson predates FullCashout, so this also covers every existing
-            // client's stored config until it is next saved with the new field.
+            // client's stored config until it is next saved with the new field. GM-863
+            // considered defaulting this to true instead, decided against it (2026-09-28) -
+            // same false-when-absent behavior as every other Features flag here.
             var (sut, _) = BuildSut(_ => Json(HttpStatusCode.OK, RealConfigJson));
 
             var result = await sut.GetClientFeatureFlagsAsync("G02");
 
             Assert.Equal(StatusCode.Success, result.StatusCode);
-            Assert.True(result.Result.Features.FullCashout);
+            Assert.False(result.Result.Features.FullCashout);
         }
 
         [Fact]
