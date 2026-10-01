@@ -160,11 +160,11 @@ namespace Backoffice.Web.Services
 
         #region Method - Feature Flags
 
-        public async Task<BaseResponse<ClientFeatureFlagsResponse>> GetClientFeatureFlags(string clientCode)
+        public async Task<BaseResponse<ClientFeatureFlagsResponse>> GetClientFeatureFlags(string clientId)
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/config/feature-flags/{clientCode}");
+                var response = await _httpClient.GetAsync($"api/config/feature-flags/{clientId}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<ClientFeatureFlagsResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
@@ -199,7 +199,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var endpoint = $"api/config/feature-flags/{request.ClientCode}";
+                var endpoint = $"api/config/feature-flags/{request.ClientId}";
 
                 var response = await _httpClient.PostAsync(endpoint, new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 

@@ -30,11 +30,11 @@ namespace Backoffice.API.Repositories
         }
 
         #region Methods
-        public async Task<BaseResponse<ClientFeatureFlagsResponse>> GetClientFeatureFlagsAsync(string clientCode)
+        public async Task<BaseResponse<ClientFeatureFlagsResponse>> GetClientFeatureFlagsAsync(string clientId)
         {
             try
             {
-                var response = await _webPropsHttpClient.GetAsync($"/api/v1/config/{clientCode}");
+                var response = await _webPropsHttpClient.GetAsync($"/api/v1/config/{clientId}");
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -48,7 +48,7 @@ namespace Backoffice.API.Repositories
                         };
                     }
 
-                    _logger.LogError($"[GetClientFeatureFlagsAsync] clientCode={clientCode} status={response.StatusCode} content={content}");
+                    _logger.LogError($"[GetClientFeatureFlagsAsync] clientId={clientId} status={response.StatusCode} content={content}");
                     return new BaseResponse<ClientFeatureFlagsResponse>()
                     {
                         StatusCode = StatusCode.Error,
@@ -66,7 +66,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[GetClientFeatureFlagsAsync] error clientCode={clientCode}: {ex.Message}");
+                _logger.LogError($"[GetClientFeatureFlagsAsync] error clientId={clientId}: {ex.Message}");
                 return new BaseResponse<ClientFeatureFlagsResponse>()
                 {
                     StatusCode = StatusCode.Error,
@@ -83,7 +83,7 @@ namespace Backoffice.API.Repositories
                 // current document is fetched and only the fields the caller edits are overwritten
                 // in place (via JObject, not the typed model) so any fields not modeled here -
                 // and any modeled field the caller left null - are never clobbered.
-                var getResponse = await _webPropsHttpClient.GetAsync($"/api/v1/config/{request.ClientCode}");
+                var getResponse = await _webPropsHttpClient.GetAsync($"/api/v1/config/{request.ClientId}");
                 var getContent = await getResponse.Content.ReadAsStringAsync();
 
                 JObject configNode;
@@ -96,16 +96,19 @@ namespace Backoffice.API.Repositories
                     // (5xx, network error, a differently-shaped error body) still hard-fails below,
                     // since we can't tell those apart from "client has an existing config we
                     // couldn't read" and a full-replace POST would silently wipe it.
-                    _logger.LogWarning($"[UpdateClientFeatureFlagsAsync] no existing config for clientCode={request.ClientCode}, creating new");
+                    _logger.LogWarning($"[UpdateClientFeatureFlagsAsync] no existing config for clientId={request.ClientId}, creating new");
                     configNode = new JObject
                     {
-                        ["ClientCode"] = request.ClientCode,
+                        // "ClientCode" is webprops-api's own stored-document field name (opaque to
+                        // webprops-api itself, never read back by backoffice-final either), kept as
+                        // written historically; it holds the same GUID as request.ClientId.
+                        ["ClientCode"] = request.ClientId,
                         ["Features"] = new JObject()
                     };
                 }
                 else
                 {
-                    _logger.LogError($"[UpdateClientFeatureFlagsAsync] fetch before update failed clientCode={request.ClientCode} status={getResponse.StatusCode} content={getContent}");
+                    _logger.LogError($"[UpdateClientFeatureFlagsAsync] fetch before update failed clientId={request.ClientId} status={getResponse.StatusCode} content={getContent}");
                     return new BaseResponse<ClientFeatureFlagsResponse>()
                     {
                         StatusCode = StatusCode.Error,
@@ -114,15 +117,22 @@ namespace Backoffice.API.Repositories
                 }
 
                 var features = configNode["Features"] as JObject ?? new JObject();
+
+                // BO-108: FullCashout is nullable - null means the caller didn't edit it,
+                // so the stored value (read above, before any field is written) must survive
+                // untouched rather than being forced to false by an update that omits it.
+                var effectiveFullCashout = request.FullCashout ?? features["FullCashout"]?.Value<bool>() ?? false;
+
                 features["BettingRules"] = request.BettingRules;
                 features["DarkMode"] = request.DarkMode;
                 features["LanguageOptions"] = request.LanguageOptions;
                 features["OGAuth"] = request.OGAuth;
-                features["FullCashout"] = request.FullCashout;
+                if (request.FullCashout.HasValue)
+                    features["FullCashout"] = request.FullCashout.Value;
                 // Full-before-partial dependency (GM-790): partial cashout cannot be enabled
                 // without full cashout. The UI already prevents the combination; coercing here
                 // keeps a direct API call from storing an inconsistent config.
-                features["PartialCashout"] = request.FullCashout && request.PartialCashout;
+                features["PartialCashout"] = effectiveFullCashout && request.PartialCashout;
                 features["BetRecommendation"] = request.BetRecommendation;
                 features["IsEuroLayout"] = request.IsEuroLayout;
 
@@ -145,12 +155,12 @@ namespace Backoffice.API.Repositories
                 }
 
                 var payload = JsonConvert.SerializeObject(configNode);
-                var postResponse = await _webPropsHttpClient.PostAsync($"/api/v1/config/{request.ClientCode}", new StringContent(payload, Encoding.UTF8, "application/json"));
+                var postResponse = await _webPropsHttpClient.PostAsync($"/api/v1/config/{request.ClientId}", new StringContent(payload, Encoding.UTF8, "application/json"));
                 var postContent = await postResponse.Content.ReadAsStringAsync();
 
                 if (!postResponse.IsSuccessStatusCode)
                 {
-                    _logger.LogError($"[UpdateClientFeatureFlagsAsync] update failed clientCode={request.ClientCode} status={postResponse.StatusCode} content={postContent}");
+                    _logger.LogError($"[UpdateClientFeatureFlagsAsync] update failed clientId={request.ClientId} status={postResponse.StatusCode} content={postContent}");
                     return new BaseResponse<ClientFeatureFlagsResponse>()
                     {
                         StatusCode = StatusCode.Error,
@@ -165,27 +175,29 @@ namespace Backoffice.API.Repositories
                 // stale states. Each push instead tells platform-web "go re-fetch and compare",
                 // so only the current, converged value from webprops-api is ever applied.
                 //
-                // Routing key carries the client code as its last segment, matching the working
-                // precedent for single-client-targeted pushes (OnVisitFavorites/OnVisitBoostedFixtures
-                // in platform-final/Platform.Sportsbook.API/Repository/SportsbookRepository.cs) -
-                // OE.Websocket.Service's ClientRegistry.ResolveByRoutingKey() resolves the client
-                // from the routing key's last dot-segment.
+                // Routing key's last segment is request.ClientId, the client's Platform GUID, not an
+                // SBC client code (see ClientSiteConfig.razor.cs:22-26) - OE.Websocket.Service's
+                // ClientRegistry.ResolveByRoutingKey() only matches SBC client codes, so this never
+                // resolves by routing key alone. OE.Websocket.Service's Worker falls back to
+                // ClientRegistry.ResolveByClientId() with the GUID from the payload below (BO-108).
+                // OnWebPropsChangeMessage.ClientId keeps the wire key "ClientCode" via JsonPropertyName,
+                // which OE.Websocket.Service's IncomingWebPropsChange binds to - no change needed there.
                 await _rabbitMqRepository.Publish(new MessageRequest
                 {
                     Payload = System.Text.Json.JsonSerializer.Serialize(new OnWebPropsChangeMessage
                     {
-                        ClientCode = request.ClientCode
+                        ClientId = request.ClientId
                     }),
                     CorrelationId = Guid.NewGuid().ToString().ToUpper(),
                     MessageType = "OnWebPropsChange",
-                    RoutingKey = $"r.oe.cachesync.onwebpropschange.{request.ClientCode.ToLower()}"
+                    RoutingKey = $"r.oe.cachesync.onwebpropschange.{request.ClientId.ToLower()}"
                 });
 
-                return await GetClientFeatureFlagsAsync(request.ClientCode);
+                return await GetClientFeatureFlagsAsync(request.ClientId);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[UpdateClientFeatureFlagsAsync] error clientCode={request.ClientCode}: {ex.Message}");
+                _logger.LogError($"[UpdateClientFeatureFlagsAsync] error clientId={request.ClientId}: {ex.Message}");
                 return new BaseResponse<ClientFeatureFlagsResponse>()
                 {
                     StatusCode = StatusCode.Error,

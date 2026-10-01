@@ -7,7 +7,7 @@ namespace Backoffice.API.Repositories
 {
     public interface IWebPropsRepository
     {
-        Task<BaseResponse<ClientFeatureFlagsResponse>> GetClientFeatureFlagsAsync(string clientCode);
+        Task<BaseResponse<ClientFeatureFlagsResponse>> GetClientFeatureFlagsAsync(string clientId);
         Task<BaseResponse<ClientFeatureFlagsResponse>> UpdateClientFeatureFlagsAsync(UpdateClientFeatureFlagsRequest request);
     }
 }

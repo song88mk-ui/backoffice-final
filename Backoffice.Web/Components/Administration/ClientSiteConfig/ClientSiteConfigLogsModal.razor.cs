@@ -98,6 +98,7 @@ namespace Backoffice.Web.Components.Administration.ClientSiteConfig
                 AddIfChanged("Dark Mode", from.Features.DarkMode.ToString(), to.Features.DarkMode.ToString());
                 AddIfChanged("Language Options", from.Features.LanguageOptions.ToString(), to.Features.LanguageOptions.ToString());
                 AddIfChanged("OG Auth", from.Features.OGAuth.ToString(), to.Features.OGAuth.ToString());
+                AddIfChanged("Full Cashout", from.Features.FullCashout.ToString(), to.Features.FullCashout.ToString());
                 AddIfChanged("Partial Cashout", from.Features.PartialCashout.ToString(), to.Features.PartialCashout.ToString());
                 AddIfChanged("Bet Recommendation", from.Features.BetRecommendation.ToString(), to.Features.BetRecommendation.ToString());
                 AddIfChanged("Euro Layout", from.Features.IsEuroLayout.ToString(), to.Features.IsEuroLayout.ToString());

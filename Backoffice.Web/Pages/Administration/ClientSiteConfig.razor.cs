@@ -107,7 +107,7 @@ namespace Backoffice.Web.Pages.Administration
             }
             else if (response.StatusCode == StatusCode.NotFound)
             {
-                _clientFeatureFlags = new ClientFeatureFlagsResponse() { ClientCode = _selectedClientGuid };
+                _clientFeatureFlags = new ClientFeatureFlagsResponse() { ClientId = _selectedClientGuid };
                 _isNewConfig = true;
                 _loadedConfigJson = JsonSerializer.Serialize(_clientFeatureFlags);
             }
@@ -196,7 +196,7 @@ namespace Backoffice.Web.Pages.Administration
 
             var response = await _backofficeService.UpdateClientFeatureFlags(new UpdateClientFeatureFlagsRequest()
             {
-                ClientCode = _selectedClientGuid,
+                ClientId = _selectedClientGuid,
                 BettingRules = _clientFeatureFlags.Features.BettingRules,
                 DarkMode = _clientFeatureFlags.Features.DarkMode,
                 LanguageOptions = _clientFeatureFlags.Features.LanguageOptions,

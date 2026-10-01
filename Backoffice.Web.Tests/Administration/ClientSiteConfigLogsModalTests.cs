@@ -56,14 +56,15 @@ namespace Backoffice.Web.Tests.Administration
                 sp.GetRequiredService<NavigationManager>()));
         }
 
-        private static string ConfigJson(bool darkMode = false, List<string>? productNames = null, List<string>? alThemes = null)
+        private static string ConfigJson(bool darkMode = false, bool fullCashout = false, List<string>? productNames = null, List<string>? alThemes = null)
         {
             var config = new ClientFeatureFlagsResponse()
             {
-                ClientCode = ClientGuid.ToString().ToUpper(),
+                ClientId = ClientGuid.ToString().ToUpper(),
                 Features = new ClientFeatureFlags()
                 {
                     DarkMode = darkMode,
+                    FullCashout = fullCashout,
                     GameTrackerProductNames = productNames ?? new List<string>()
                 }
             };
@@ -105,6 +106,20 @@ namespace Backoffice.Web.Tests.Administration
             Assert.NotNull(changes);
             var change = Assert.Single(changes!);
             Assert.Equal("Dark Mode", change.Setting);
+            Assert.Equal("False", change.From);
+            Assert.Equal("True", change.To);
+        }
+
+        // BO-108: Full Cashout was missing from the diff entirely, so a change to it
+        // alone showed no changes in the activity log.
+        [Fact]
+        public void GetChanges_FullCashoutChange_Detected()
+        {
+            var changes = ClientSiteConfigLogsModal.GetChanges(ConfigJson(fullCashout: false), ConfigJson(fullCashout: true));
+
+            Assert.NotNull(changes);
+            var change = Assert.Single(changes!);
+            Assert.Equal("Full Cashout", change.Setting);
             Assert.Equal("False", change.From);
             Assert.Equal("True", change.To);
         }

@@ -22,10 +22,10 @@ namespace Backoffice.API.Controllers.Backoffice
             _webPropsRepository = webPropsRepository;
         }
 
-        [HttpGet("{clientCode}")]
-        public async Task<IActionResult> GetClientFeatureFlags(string clientCode)
+        [HttpGet("{clientId}")]
+        public async Task<IActionResult> GetClientFeatureFlags(string clientId)
         {
-            var result = await _webPropsRepository.GetClientFeatureFlagsAsync(clientCode);
+            var result = await _webPropsRepository.GetClientFeatureFlagsAsync(clientId);
 
             switch (result.StatusCode)
             {
@@ -38,11 +38,11 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
-        [HttpPost("{clientCode}")]
+        [HttpPost("{clientId}")]
         [Authorize("Admin.ClientSiteConfig", ((int)Access.Edit))]
-        public async Task<IActionResult> UpdateClientFeatureFlags(string clientCode, [FromBody] UpdateClientFeatureFlagsRequest request)
+        public async Task<IActionResult> UpdateClientFeatureFlags(string clientId, [FromBody] UpdateClientFeatureFlagsRequest request)
         {
-            request.ClientCode = clientCode;
+            request.ClientId = clientId;
 
             var result = await _webPropsRepository.UpdateClientFeatureFlagsAsync(request);
 

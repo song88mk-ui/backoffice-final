@@ -113,7 +113,7 @@ namespace Backoffice.Web.Tests.Administration
             var cut = RenderWithConfigResponse(new BaseResponse<ClientFeatureFlagsResponse>()
             {
                 StatusCode = StatusCode.Success,
-                Result = new ClientFeatureFlagsResponse() { ClientCode = ClientGuid.ToString() }
+                Result = new ClientFeatureFlagsResponse() { ClientId = ClientGuid.ToString() }
             });
 
             Assert.NotNull(cut.Find("#theme-AL-red"));
@@ -140,7 +140,7 @@ namespace Backoffice.Web.Tests.Administration
         [Fact]
         public void ExistingLayout_ChecksStoredThemes()
         {
-            var config = new ClientFeatureFlagsResponse() { ClientCode = ClientGuid.ToString() };
+            var config = new ClientFeatureFlagsResponse() { ClientId = ClientGuid.ToString() };
             config.Layout["AL"] = new ClientLayoutTheme() { Themes = new List<string>() { "red", "blue" } };
 
             var cut = RenderWithConfigResponse(new BaseResponse<ClientFeatureFlagsResponse>()
@@ -158,7 +158,7 @@ namespace Backoffice.Web.Tests.Administration
         [Fact]
         public void PartialCashoutToggle_DisabledWithReason_WhileFullCashoutIsOff()
         {
-            var config = new ClientFeatureFlagsResponse() { ClientCode = ClientGuid.ToString() };
+            var config = new ClientFeatureFlagsResponse() { ClientId = ClientGuid.ToString() };
             config.Features.FullCashout = false;
             config.Features.PartialCashout = false;
 
@@ -176,7 +176,7 @@ namespace Backoffice.Web.Tests.Administration
         [Fact]
         public void TurningFullCashoutOff_AlsoTurnsPartialCashoutOff()
         {
-            var config = new ClientFeatureFlagsResponse() { ClientCode = ClientGuid.ToString() };
+            var config = new ClientFeatureFlagsResponse() { ClientId = ClientGuid.ToString() };
             config.Features.FullCashout = true;
             config.Features.PartialCashout = true;
 
@@ -195,7 +195,7 @@ namespace Backoffice.Web.Tests.Administration
         [Fact]
         public void PartialCashout_CanBeDisabledAlone_WhileFullCashoutStaysOn()
         {
-            var config = new ClientFeatureFlagsResponse() { ClientCode = ClientGuid.ToString() };
+            var config = new ClientFeatureFlagsResponse() { ClientId = ClientGuid.ToString() };
             config.Features.FullCashout = true;
             config.Features.PartialCashout = true;
 
@@ -215,7 +215,7 @@ namespace Backoffice.Web.Tests.Administration
         [Fact]
         public void UnknownStoredLayout_RendersReadOnly_AlongsideKnownLayouts()
         {
-            var config = new ClientFeatureFlagsResponse() { ClientCode = ClientGuid.ToString() };
+            var config = new ClientFeatureFlagsResponse() { ClientId = ClientGuid.ToString() };
             config.Layout["XL9"] = new ClientLayoutTheme() { Themes = new List<string>() { "neon" } };
 
             var cut = RenderWithConfigResponse(new BaseResponse<ClientFeatureFlagsResponse>()

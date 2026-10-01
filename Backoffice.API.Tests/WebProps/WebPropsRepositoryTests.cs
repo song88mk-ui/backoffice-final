@@ -57,7 +57,7 @@ namespace Backoffice.API.Tests.WebProps
             var result = await sut.GetClientFeatureFlagsAsync("G02");
 
             Assert.Equal(StatusCode.Success, result.StatusCode);
-            Assert.Equal("G02", result.Result.ClientCode);
+            Assert.Equal("G02", result.Result.ClientId);
             Assert.True(result.Result.Features.BettingRules);
             Assert.True(result.Result.Features.PartialCashout);
             Assert.False(result.Result.Features.OGAuth);
@@ -125,7 +125,7 @@ namespace Backoffice.API.Tests.WebProps
 
             var request = new UpdateClientFeatureFlagsRequest
             {
-                ClientCode = "G02",
+                ClientId = "G02",
                 BettingRules = false,
                 DarkMode = true,
                 LanguageOptions = true,
@@ -163,7 +163,7 @@ namespace Backoffice.API.Tests.WebProps
             // direct API call could - the stored config must not enable partial without full.
             var request = new UpdateClientFeatureFlagsRequest
             {
-                ClientCode = "G02",
+                ClientId = "G02",
                 FullCashout = false,
                 PartialCashout = true
             };
@@ -190,8 +190,42 @@ namespace Backoffice.API.Tests.WebProps
 
             var request = new UpdateClientFeatureFlagsRequest
             {
-                ClientCode = "G02",
+                ClientId = "G02",
                 FullCashout = true,
+                PartialCashout = true
+            };
+
+            await sut.UpdateClientFeatureFlagsAsync(request);
+
+            Assert.NotNull(capturedPostBody);
+            Assert.Contains("\"FullCashout\":true", capturedPostBody);
+            Assert.Contains("\"PartialCashout\":true", capturedPostBody);
+        }
+
+        // BO-108: FullCashout was a plain bool, so a request that omitted it wrote false
+        // and silently disabled the feature. It must behave like GameTrackerProductNames/
+        // LayoutThemes below - null means "not edited", stored value survives untouched -
+        // and the full-before-partial coercion must use the stored value in that case too,
+        // not force PartialCashout off just because the caller didn't resend FullCashout.
+        [Fact]
+        public async Task UpdateClientFeatureFlagsAsync_FullCashoutOmitted_LeavesStoredValueUntouched()
+        {
+            const string StoredFullCashoutEnabledJson =
+                "{\"ClientCode\":\"G02\",\"Features\":{\"BettingRules\":true,\"FullCashout\":true,\"PartialCashout\":true}}";
+            string capturedPostBody = null;
+
+            var (sut, _) = BuildSut(
+                getResponder: _ => Json(HttpStatusCode.OK, StoredFullCashoutEnabledJson),
+                postResponder: req =>
+                {
+                    capturedPostBody = req.Content.ReadAsStringAsync().Result;
+                    return Json(HttpStatusCode.OK, "\"ok\"");
+                });
+
+            var request = new UpdateClientFeatureFlagsRequest
+            {
+                ClientId = "G02",
+                BettingRules = true,
                 PartialCashout = true
             };
 
@@ -216,7 +250,7 @@ namespace Backoffice.API.Tests.WebProps
                 });
 
             // GameTrackerProductNames and LayoutThemes left null = "not edited".
-            var request = new UpdateClientFeatureFlagsRequest { ClientCode = "G02", BettingRules = true };
+            var request = new UpdateClientFeatureFlagsRequest { ClientId = "G02", BettingRules = true };
 
             await sut.UpdateClientFeatureFlagsAsync(request);
 
@@ -242,7 +276,7 @@ namespace Backoffice.API.Tests.WebProps
 
             var request = new UpdateClientFeatureFlagsRequest
             {
-                ClientCode = "G02",
+                ClientId = "G02",
                 IsEuroLayout = true,
                 GameTrackerProductNames = new System.Collections.Generic.List<string> { "song88-dark" },
                 LayoutThemes = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<string>>
@@ -285,7 +319,7 @@ namespace Backoffice.API.Tests.WebProps
                     : Json(HttpStatusCode.OK, RealConfigJson),
                 postResponder: _ => Json(HttpStatusCode.OK, "\"ok\""));
 
-            var request = new UpdateClientFeatureFlagsRequest { ClientCode = "NEWCLIENT", BettingRules = true };
+            var request = new UpdateClientFeatureFlagsRequest { ClientId = "NEWCLIENT", BettingRules = true };
 
             var result = await sut.UpdateClientFeatureFlagsAsync(request);
 
@@ -309,7 +343,7 @@ namespace Backoffice.API.Tests.WebProps
                     return Json(HttpStatusCode.OK, "\"ok\"");
                 });
 
-            var request = new UpdateClientFeatureFlagsRequest { ClientCode = "G02", BettingRules = true };
+            var request = new UpdateClientFeatureFlagsRequest { ClientId = "G02", BettingRules = true };
 
             var result = await sut.UpdateClientFeatureFlagsAsync(request);
 
@@ -324,7 +358,7 @@ namespace Backoffice.API.Tests.WebProps
                 getResponder: _ => Json(HttpStatusCode.OK, RealConfigJson),
                 postResponder: _ => Json(HttpStatusCode.Forbidden, "{\"code\":403,\"message\":\"Forbidden\"}"));
 
-            var request = new UpdateClientFeatureFlagsRequest { ClientCode = "G02", BettingRules = true };
+            var request = new UpdateClientFeatureFlagsRequest { ClientId = "G02", BettingRules = true };
 
             var result = await sut.UpdateClientFeatureFlagsAsync(request);
 
