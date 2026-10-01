@@ -137,12 +137,15 @@ namespace Backoffice.Web.Pages.Administration
         {
             if (ResendSettlementModel != null && ResendSettlementModel.Any())
             {
-                if (ResendSettlementModel.Any(x => x.Bet.BetStatusId == (int)BetStatus.Rejected))
+                if (ResendSettlementModel.Any(x => x.Bet.BetStatusId == (int)BetStatus.Cancelled
+                                                 || x.Bet.BetStatusId == (int)BetStatus.Rejected
+                                                 || x.Bet.BetStatusId == (int)BetStatus.Waiting
+                                                 || x.Bet.IsCashout))
                 {
                     Alerts.Add(new AlertModel()
                     {
                         Status = AlertStatus.Error,
-                        Message = "Rejected bet are not allowed to be resent to Operator",
+                        Message = "Bets under Cancelled, Rejected, Waiting, and Cashout status is not allowed",
                         Opacity = 1.0m
                     });
 
@@ -242,13 +245,15 @@ namespace Backoffice.Web.Pages.Administration
             }
             else
             {
-                var betSelection = bet.Bet.BetSelections.FirstOrDefault();
-                builder.Append($"<span class=\"segment-league d-block\">{betSelection.LeagueName}</span>");
-                builder.Append($"<span class=\"fixture d-block\">{betSelection.FixtureName}</span>");
-                builder.Append($"<span class=\"segment-league d-block\">{betSelection.FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()}</span>");
-                builder.Append($"<span class=\"selection-details d-block\">{betSelection.SelectionName}</span>");
-                builder.Append($"<span class=\"score d-block\">(Bet Result: {betSelection.BetScore}, Final Score: {betSelection.SettlementScore})</span>");
-                builder.Append($"<span class=\"status\">{betSelection.FixtureStatusName}</span>");
+                foreach (var betSelection in bet.Bet.BetSelections)
+                {
+                    builder.Append($"<span class=\"segment-league d-block\">{betSelection.LeagueName}</span>");
+                    builder.Append($"<span class=\"fixture d-block\">{betSelection.FixtureName}</span>");
+                    builder.Append($"<span class=\"segment-league d-block\">{betSelection.FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()}</span>");
+                    builder.Append($"<span class=\"selection-details d-block\">{betSelection.SelectionName}</span>");
+                    builder.Append($"<span class=\"score d-block\">(Bet Result: {betSelection.BetScore}, Final Score: {betSelection.SettlementScore})</span>");
+                    builder.Append($"<span class=\"status\">{betSelection.FixtureStatusName}</span>");
+                }
             }
 
             builder.Append("<div/>");
