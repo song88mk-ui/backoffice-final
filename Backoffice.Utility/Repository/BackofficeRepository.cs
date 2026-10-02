@@ -624,7 +624,7 @@ namespace Backoffice.Utility.Repository
                 var fromUTC = request.DateFrom.Date.ToString("yyyy-MM-dd HH:mm:ss");
                 var toUTC = request.DateTo.Date.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
                 activityLogs = (await _backofficeContext.ReadActivityLog
-                        .FromSql($"GetActivityLogs '{request.Page}', '{request.Payload}', '{fromUTC}', '{toUTC}'")
+                        .FromSql($"GetActivityLogs {request.Page}, {request.Payload}, {fromUTC}, {toUTC}")
                     .ToListAsync())
                     .Select(s => new ActivityLogModel
                     {
@@ -692,7 +692,7 @@ namespace Backoffice.Utility.Repository
             request.ManualBetSettlementCallbackModel.DateTo = request.ManualBetSettlementCallbackModel.DateTo.Date.Add(new TimeSpan(23, 59, 59));
 
             var activityLogs = (await _backofficeContext.ReadActivityLog
-                    .FromSql($"GetActivityLogs '{AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_', '.')}', '', '{request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
+                    .FromSql($"GetActivityLogs {AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_', '.')}, '', {request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}, {request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}")
                 .ToListAsync())
                 .Select(s => new ActivityLogModel
                 {

@@ -133,15 +133,15 @@ a publish site drops it (GM-874).
    the literal text `'@p2'`. The repository's catch-all swallows this into `StatusCode.Error`, and
    every "View Logs" modal in Backoffice.Web then shows it identically to a genuine empty result
    ("No Record Found!"), so the bug reads as "logs are empty" rather than "logs are broken."
-   Remaining offenders: `Backoffice.API/Repositories/BackOfficeRepository.cs:179` and `:246`
-   (`GetPriceboostActivityLogs`, `GetManualBetSettlementHistoryLogs`), and
-   `Backoffice.Utility/Repository/BackofficeRepository.cs:627` and `:695`.
-   `BackOfficeRepository.cs:311` (the generic `GetActivityLogs(ActivityLogRequest)` - shared by
-   every "View Logs" modal in Backoffice.Web: Client Site Config, OddsEngine templates/market
-   groups/boosted settings/sport settings, user groups, message settlement, cancel bet history)
-   was fixed under BO-113. The `GetActivityLogs` stored procedure is also confirmed missing
-   entirely in DEV (not only PRD as previously noted here) - calling it there throws instead of
-   returning empty, caught by the same catch-all (GM-134, BO-113).
+   All five known offenders are fixed as of BO-113 (2026-10-02): `BackOfficeRepository.cs:179`
+   (`GetPriceboostActivityLogs`), `:246` (`GetManualBetSettlementHistoryLogs`), `:311` (the generic
+   `GetActivityLogs(ActivityLogRequest)` - shared by every "View Logs" modal in Backoffice.Web:
+   Client Site Config, OddsEngine templates/market groups/boosted settings/sport settings, user
+   groups, message settlement, cancel bet history), and
+   `Backoffice.Utility/Repository/BackofficeRepository.cs:627` and `:695`. The `GetActivityLogs`
+   stored procedure is also confirmed missing entirely in DEV (not only PRD as previously noted
+   here) - calling it there throws instead of returning empty, caught by the same catch-all
+   (GM-134, BO-113).
 8. **bo-web DataProtection keys are in memory only.** `Backoffice.Web/Program.cs` has no
    `AddDataProtection()` or `PersistKeysTo*`, so after a pod restart the logs show
    `The key {...} was not found in the key ring` (`ErrorUnprotectingCookie`) and antiforgery
