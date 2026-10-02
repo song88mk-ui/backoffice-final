@@ -67,6 +67,10 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
             parameters.Add("DialogStyle", "max-width: 100rem");
 
             var options = new ModalOptions();
+            // BO-102: the header close (X) button bypasses AddMarketSettlementModal.OnCancelModal,
+            // so it must be hidden here to force Cancel through the confirmation flow, same as
+            // Announcements.razor.cs does for its create/edit modal.
+            options.HideCloseButton = true;
             ModalService.Open<AddMarketSettlementModal>($"Add Market Settlement", parameters, options);
         }
 
