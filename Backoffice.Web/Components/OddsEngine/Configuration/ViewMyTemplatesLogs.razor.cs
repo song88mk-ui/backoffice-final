@@ -228,9 +228,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         }
         public async Task OnDatePickerClickEvent(DateRange range)
         {
-            var clientDateRange = DateTimeHelper.ConvertToClientTimeZone(range, _userState.TimeZoneOffset);
-            FilterModel.DateFrom = clientDateRange.Start.DateTime;
-            FilterModel.DateTo = clientDateRange.End.DateTime;
+            FilterModel.DateFrom = range.Start.Date;
+            FilterModel.DateTo = range.End.Date.AddDays(1).AddTicks(-1);
 
             await SelectPage(1);
         }

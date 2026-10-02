@@ -249,8 +249,12 @@ namespace Backoffice.Web.Services
                     if (request.DateTo == DateTime.MinValue)
                         request.DateTo = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(1).AddTicks(-1);
 
-                    request.DateFrom = request.DateFrom.ToUniversalTime();
-                    request.DateTo = request.DateTo.ToUniversalTime();
+                    // DateFrom/DateTo are the user's local wall-clock boundaries (per _userState.TimeZoneOffset,
+                    // the browser's real offset). ToUniversalTime() assumed the *server's* local offset instead,
+                    // which is UTC in every hosting environment, making it a no-op and sending local time
+                    // mislabeled as UTC. Subtract the real client offset to get the correct UTC instant.
+                    request.DateFrom = DateTime.SpecifyKind(request.DateFrom - _userState.TimeZoneOffset, DateTimeKind.Utc);
+                    request.DateTo = DateTime.SpecifyKind(request.DateTo - _userState.TimeZoneOffset, DateTimeKind.Utc);
                 }
 
                 var response = await _httpClient.PostAsync($"api/config/activitylog/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));

@@ -48,9 +48,8 @@ namespace Backoffice.Web.Components.Administration.ClientSiteConfig
 
         public async Task OnDatePickerRangeSelected(DateRange range)
         {
-            var clientDateRange = DateTimeHelper.ConvertToClientTimeZone(range, _userState.TimeZoneOffset);
-            _dateFrom = clientDateRange.Start.DateTime;
-            _dateTo = clientDateRange.End.DateTime;
+            _dateFrom = range.Start.Date;
+            _dateTo = range.End.Date.AddDays(1).AddTicks(-1);
 
             await SelectPage(1);
         }
