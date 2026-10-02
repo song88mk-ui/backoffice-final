@@ -190,5 +190,76 @@ namespace Backoffice.Web.Tests.Administration
 
             Assert.Contains("No Record Found", cut.Markup);
         }
+
+        // BO-104: the search icon was a <span> with no click handler, so clicking it
+        // (the natural way to trigger a search) silently did nothing; only pressing Enter
+        // inside the text box worked. Clicking the icon must submit the form, re-query with
+        // the typed SearchText, and re-render with the filtered results.
+        [Fact]
+        public void ClickingSearchIcon_SubmitsSearchText_AndRendersFilteredResults()
+        {
+            var allLogs = new List<ActivityLogModel>()
+            {
+                new ActivityLogModel()
+                {
+                    Page = "Admin.ClientSiteConfig",
+                    Activity = "Update",
+                    From = ConfigJson(darkMode: false),
+                    To = ConfigJson(darkMode: true),
+                    Payload = $"jane.doe.{ClientGuid.ToString().ToUpper()}",
+                    UserName = "jane.doe",
+                    TimeStamp = DateTime.UtcNow
+                }
+            };
+
+            var matchingLogs = new List<ActivityLogModel>()
+            {
+                new ActivityLogModel()
+                {
+                    Page = "Admin.ClientSiteConfig",
+                    Activity = "Update",
+                    From = ConfigJson(darkMode: true),
+                    To = ConfigJson(darkMode: false),
+                    Payload = $"john.smith.{ClientGuid.ToString().ToUpper()}",
+                    UserName = "john.smith",
+                    TimeStamp = DateTime.UtcNow
+                }
+            };
+
+            _backofficeService
+                .Setup(s => s.GetActivityLogs(It.Is<ActivityLogRequest>(r => string.IsNullOrEmpty(r.SearchText))))
+                .ReturnsAsync(new BaseResponse<ActivityLogResponse>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new ActivityLogResponse() { ActivityLogs = allLogs, MetaData = new MetaData() { CurrentPage = 1, PageSize = 10, TotalCount = allLogs.Count, TotalPages = 1 } }
+                });
+
+            _backofficeService
+                .Setup(s => s.GetActivityLogs(It.Is<ActivityLogRequest>(r => r.SearchText == "john")))
+                .ReturnsAsync(new BaseResponse<ActivityLogResponse>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new ActivityLogResponse() { ActivityLogs = matchingLogs, MetaData = new MetaData() { CurrentPage = 1, PageSize = 10, TotalCount = matchingLogs.Count, TotalPages = 1 } }
+                });
+
+            var parameters = new ModalParameters();
+            parameters.Add("Clients", new List<PlatformClientResponse>()
+            {
+                new PlatformClientResponse() { ClientId = ClientGuid, ClientName = "Acme Sports", ClientCode = "ACME" }
+            });
+
+            var cut = RenderComponent<ClientSiteConfigLogsModal>(ps => ps.AddCascadingValue(parameters));
+
+            Assert.Contains("jane.doe", cut.Markup);
+            Assert.DoesNotContain("john.smith", cut.Markup);
+
+            cut.Find("#search").Change("john");
+            cut.Find(".input-group-text").Click();
+
+            Assert.Contains("john.smith", cut.Markup);
+            Assert.DoesNotContain("jane.doe", cut.Markup);
+
+            _backofficeService.Verify(s => s.GetActivityLogs(It.Is<ActivityLogRequest>(r => r.SearchText == "john")), Times.Once);
+        }
     }
 }
