@@ -8,7 +8,7 @@
 4. **Label every claim** as `[verified]` (confirmed in code/output this session), `[assumption]` (inferred, not checked), or `[unknown]` (not determinable). Do not guess.
 5. **Production is READ-ONLY.** Do not run queries, deploy, change schema, publish messages, or invalidate caches against Production unless the user explicitly says so in this conversation. Prefer the lowest environment necessary (Local → Development → Staging → Production).
 6. **Explain the plan and wait for approval before making any code change** — bug fixes, new tests, and refactors included. Investigation (reading code, read-only queries) may proceed without approval. The plan must state: files to be touched, the exact change, tests to be added, validation steps. Make the smallest possible change.
-7. **If architecture changed,** update `docs/*.md` + CLAUDE.md/AGENTS.md and summarize the changes, risks, and validation performed.
+7. **Document every change,** not only when architecture changed, update `docs/*.md` + CLAUDE.md/AGENTS.md and summarize the changes, risks, and validation performed. (Already the rule under "Change rules" below for every code change; this restates it so it isn't missed at the top.)
 
 ---
 
@@ -51,7 +51,11 @@ hot table, restarting a service mid-message-processing, publishing an `OnDeleteC
 Committed settings files (notably `Backoffice.API/appsettings.json`) currently contain real
 credentials, a known leak pending rotation; do not add more. Real values go in git-ignored
 Development overlays, env vars or a secrets manager. Before any operation touching
-external infrastructure, verify which environment the active connection string targets.
+external infrastructure, verify which environment the active connection string targets. **Never
+log a secret value in plaintext either.** A sibling repo (platform-final, GM-880, 2026-09-30) found
+`_logger.LogError` printing an OG private API key on every failed bet placement, visible in PRD
+Loki; mask a secret (keep only the last few characters, blank the rest) before it reaches a log
+line, rather than passing the raw value as a template argument.
 
 **RabbitMQ isolation.** Messages on the OddsEngine exchange (`r.oe.*`) are indistinguishable from
 production events once they leave the broker — local code against a production broker triggers

@@ -193,6 +193,12 @@ app.UseDeveloperExceptionPage();  // ALWAYS ENABLED
 - Update CI/CD to use environment variables
 - Audit access logs
 
+**Related pattern to watch for:** a sibling repo (platform-final, GM-880, 2026-09-30) found a
+different but adjacent leak, the OG private API key was printed in plaintext via `_logger.LogError`
+on every failed bet placement, visible in PRD Loki logs. Not found in this repo as of 2026-10-02,
+but applies equally here: never pass a secret/credential value as a log template argument, mask it
+first (keep only the last few characters, blank the rest). See `CLAUDE.md` Safety rules → Secrets.
+
 ---
 
 ### 3. Missing Global Exception Handling
