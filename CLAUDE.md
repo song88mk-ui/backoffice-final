@@ -127,10 +127,21 @@ a publish site drops it (GM-874).
 6. **Monolithic repositories** — 2000+ lines, hard to test.
 7. **Never put quotes around `FromSql` interpolations.** `FromSql($"Proc '{x}'")` turns `{x}` into
    a SQL parameter, so the quotes send the literal text `'@p0'` instead of the value. Write
-   `FromSql($"Proc {x}")`. Existing offenders: `Backoffice.API/Repositories/BackOfficeRepository.cs:179`
-   and `:246` (`GetActivityLogs`, BO-113), and `Backoffice.Utility/Repository/BackofficeRepository.cs:627`
-   and `:695`. `GetActivityLogs` is also missing in the PRD database, and no repo holds its DDL
-   (GM-134, BO-113).
+   `FromSql($"Proc {x}")`. Confirmed via direct `EXEC` against Staging (BO-113, 2026-10-02): the
+   quoted form throws `Msg 241: Conversion failed when converting date and/or time from character
+   string` on every single call, since the stored proc's own `CAST(@From AS datetime2)` chokes on
+   the literal text `'@p2'`. The repository's catch-all swallows this into `StatusCode.Error`, and
+   every "View Logs" modal in Backoffice.Web then shows it identically to a genuine empty result
+   ("No Record Found!"), so the bug reads as "logs are empty" rather than "logs are broken."
+   Remaining offenders: `Backoffice.API/Repositories/BackOfficeRepository.cs:179` and `:246`
+   (`GetPriceboostActivityLogs`, `GetManualBetSettlementHistoryLogs`), and
+   `Backoffice.Utility/Repository/BackofficeRepository.cs:627` and `:695`.
+   `BackOfficeRepository.cs:311` (the generic `GetActivityLogs(ActivityLogRequest)` - shared by
+   every "View Logs" modal in Backoffice.Web: Client Site Config, OddsEngine templates/market
+   groups/boosted settings/sport settings, user groups, message settlement, cancel bet history)
+   was fixed under BO-113. The `GetActivityLogs` stored procedure is also confirmed missing
+   entirely in DEV (not only PRD as previously noted here) - calling it there throws instead of
+   returning empty, caught by the same catch-all (GM-134, BO-113).
 8. **bo-web DataProtection keys are in memory only.** `Backoffice.Web/Program.cs` has no
    `AddDataProtection()` or `PersistKeysTo*`, so after a pod restart the logs show
    `The key {...} was not found in the key ring` (`ErrorUnprotectingCookie`) and antiforgery

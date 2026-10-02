@@ -308,7 +308,7 @@ namespace Backoffice.API.Repositories
                 var fromUTC = request.DateFrom.ToString("yyyy-MM-dd HH:mm:ss");
                 var toUTC = request.DateTo.ToString("yyyy-MM-dd HH:mm:ss");
                 var activityLogs = (await _backofficeContext.ReadActivityLog
-                        .FromSql($"GetActivityLogs '{request.Page}', '{request.Payload}', '{fromUTC}', '{toUTC}'")
+                        .FromSql($"GetActivityLogs {request.Page}, {request.Payload}, {fromUTC}, {toUTC}")
                         .AsNoTracking()
                     .ToListAsync())
                     .Select(s => new ActivityLogModel

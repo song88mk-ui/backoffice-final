@@ -29,6 +29,18 @@ Any user holding the feature's own permission but **not** `SBC.OE.Config` receiv
 
 ---
 
+## Shared `GetActivityLogs` Query Never Returned Rows on Staging (BO-113)
+
+**Date noted:** October 2, 2026 (fixed same date, discovered while verifying BO-108)
+
+**Issue:** `BackOfficeRepository.GetActivityLogs(ActivityLogRequest)` (`Backoffice.API/Repositories/BackOfficeRepository.cs:311`) - the same shared method behind the `activitylog/list` endpoint described above, and therefore every "View Logs" modal in Backoffice.Web (Client Site Config, OddsEngine templates/market groups/boosted settings/sport settings, user groups, Message Settlement, Cancel Bet History) - called the `GetActivityLogs` stored procedure with each parameter wrapped in quotes: `FromSql($"GetActivityLogs '{request.Page}', '{request.Payload}', '{fromUTC}', '{toUTC}'")`. Per the `FromSql` interpolation rule (`CLAUDE.md` critical constraints), this sends the literal text `'@p0'` as the parameter value instead of the real one. Confirmed via direct `EXEC` against Staging: the stored proc's own `CAST(@From AS datetime2)` then throws `Msg 241: Conversion failed when converting date and/or time from character string` - every call has always failed, not just mismatched. The repository's catch-all turns this into `StatusCode.Error`, and the Blazor pages treat that identically to a genuine empty result, so the symptom was indistinguishable from "no history exists" (a third masking of the same "No Record Found" pattern noted above, this time from a thrown exception rather than a 401).
+
+**Resolved:** removed the quotes (`FromSql($"GetActivityLogs {request.Page}, {request.Payload}, {fromUTC}, {toUTC}")`). Verified directly against Staging with `EXEC GetActivityLogs 'Admin.ClientSiteConfig', '%', '2026-09-24 00:00:00', '2026-10-02 23:59:59'`: returns real rows, including entries with genuine `FullCashout` changes in the From/To JSON.
+
+**Residual:** two other occurrences of the identical quoting bug remain unfixed - `BackOfficeRepository.cs:179`/`:246` (`GetPriceboostActivityLogs`, `GetManualBetSettlementHistoryLogs`) and `Backoffice.Utility/Repository/BackofficeRepository.cs:627`/`:695` - see `CLAUDE.md` critical constraints. The `GetActivityLogs` stored procedure is also confirmed missing entirely in DEV (`sys.procedures` returns zero rows there), not only PRD as previously documented (GM-134) - calling it in DEV throws "could not find stored procedure" instead, caught by the same catch-all, so DEV's "View Logs" modals will still show empty until the proc is deployed there, independent of this fix.
+
+---
+
 ## Sportsbook Static Translation — Add/Edit/Delete Were Non-Functional
 
 **Date noted:** July 2, 2026
