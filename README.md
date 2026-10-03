@@ -557,6 +557,15 @@ every push/PR to `main`, and on a published GitHub Release tagged `*-stg` or
 `*-prd` pushes the images to the environment's AWS ECR registry. Kubernetes /
 ArgoCD manifests live in the sibling `../argocd` repository.
 
+## Static analysis
+
+`.github/workflows/sonarqube.yml` runs a SonarQube scan (project key
+`backoffice-final`, https://sonarqube.stg.song88.com, Twingate required) on every
+push to `main`. Vendored third-party scripts that are copied into the repo
+unminified (`wwwroot/js/jquery-ui.js`, `wwwroot/js/jquery.multisortable.js`) are
+excluded via `sonar.exclusions`, since we do not modify them. Add any newly
+vendored library to that list rather than fixing its findings.
+
 ## Related repositories
 
 Sibling repos in the same parent directory (see `docs/15_ReferenceRepositories.md`):

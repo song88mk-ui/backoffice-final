@@ -43,6 +43,7 @@ jobs:
           dotnet sonarscanner begin /k:"backoffice-final" \
                                     /d:sonar.host.url="https://sonarqube.stg.song88.com" \
                                     /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
+                                    /d:sonar.exclusions="**/wwwroot/js/jquery-ui.js,**/wwwroot/js/jquery.multisortable.js" \
                                     /d:sonar.token="${{ secrets.SONARQUBE_TOKEN }}"
           dotnet build --no-incremental backoffice-final.sln
           dotnet test --collect:"XPlat Code Coverage;Format=opencover" backoffice-final.sln
