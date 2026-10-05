@@ -556,6 +556,20 @@ Platform API down:
 
 ---
 
+### Bottleneck #21: Forced `GC.Collect()` on page dispose (Fixed, DEVOPS-371)
+
+**Location:** `Backoffice.Web/Pages/OddsEngine/ConfigAssigned.razor.cs`, `Dispose()`
+
+**Observation:**
+- `Dispose()` called `GC.Collect()` every time a user left the Config Assigned page
+- A forced full, blocking collection pauses the whole bo-web process, so every user's circuit in
+  the pod paid for one user's navigation
+- Nulling two fields before it did not need a forced collection; the runtime reclaims them anyway
+
+**Fix:** removed the call (SonarQube S1215). The field resets in `Dispose()` are unchanged.
+
+---
+
 ## Performance Summary
 
 | # | Bottleneck | Severity | Impact | Affected Areas |

@@ -280,7 +280,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             _selectedConfigClients = null;
             _state = null;
-            GC.Collect();
         }
 
         #endregion
