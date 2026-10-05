@@ -142,7 +142,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message);
+                Log.Error(ex, ex.Message);
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
             }

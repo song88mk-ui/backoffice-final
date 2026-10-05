@@ -77,7 +77,7 @@ namespace Backoffice.WebSocket.Service.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+                _logger.LogError(ex, $"{ex.Message} - {ex.StackTrace}");
             }
         }
 
@@ -100,7 +100,7 @@ namespace Backoffice.WebSocket.Service.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+                _logger.LogError(ex, $"{ex.Message} - {ex.StackTrace}");
             }
         }
 
@@ -128,7 +128,7 @@ namespace Backoffice.WebSocket.Service.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+                _logger.LogError(ex, $"{ex.Message} - {ex.StackTrace}");
             }
         }
 
@@ -151,7 +151,7 @@ namespace Backoffice.WebSocket.Service.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+                _logger.LogError(ex, $"{ex.Message} - {ex.StackTrace}");
             }
         }
 
@@ -280,7 +280,7 @@ namespace Backoffice.WebSocket.Service.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+                _logger.LogError(ex, $"{ex.Message} - {ex.StackTrace}");
                 return null;
             }
         }
@@ -394,7 +394,7 @@ namespace Backoffice.WebSocket.Service.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+                _logger.LogError(ex, $"{ex.Message} - {ex.StackTrace}");
                 return null;
             }
         }
@@ -622,7 +622,7 @@ namespace Backoffice.WebSocket.Service.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex, ex.Message);
                 _logger.LogError(ex.StackTrace);
             }
         }

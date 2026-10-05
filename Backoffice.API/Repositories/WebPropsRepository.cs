@@ -66,7 +66,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[GetClientFeatureFlagsAsync] error clientId={clientId}: {ex.Message}");
+                _logger.LogError(ex, $"[GetClientFeatureFlagsAsync] error clientId={clientId}: {ex.Message}");
                 return new BaseResponse<ClientFeatureFlagsResponse>()
                 {
                     StatusCode = StatusCode.Error,
@@ -197,7 +197,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[UpdateClientFeatureFlagsAsync] error clientId={request.ClientId}: {ex.Message}");
+                _logger.LogError(ex, $"[UpdateClientFeatureFlagsAsync] error clientId={request.ClientId}: {ex.Message}");
                 return new BaseResponse<ClientFeatureFlagsResponse>()
                 {
                     StatusCode = StatusCode.Error,

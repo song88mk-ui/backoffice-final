@@ -85,7 +85,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError("failed to add activity log: {exception}, stacktrace: {stackrace}",
+                _logger.LogError(ex, "failed to add activity log: {exception}, stacktrace: {stackrace}",
                         ex.Message, ex.StackTrace);
             }
         }
@@ -131,7 +131,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError("failed to process activity log: {exception}, stacktrace: {stackrace}",
+                _logger.LogError(ex, "failed to process activity log: {exception}, stacktrace: {stackrace}",
                         ex.Message, ex.StackTrace);
             }
         }
@@ -214,7 +214,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError("failed to process on get message settlement history: {exception}, stacktrace: {stackrace}",
+                _logger.LogError(ex, "failed to process on get message settlement history: {exception}, stacktrace: {stackrace}",
                         ex.Message, ex.StackTrace);
             }
             finally
@@ -314,7 +314,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError("failed to process on get market settlement history: {exception}, stacktrace: {stackrace}",
+                _logger.LogError(ex, "failed to process on get market settlement history: {exception}, stacktrace: {stackrace}",
                         ex.Message, ex.StackTrace);
             }
             finally
@@ -398,7 +398,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError("failed to process on get manual settlement history: {exception}, stacktrace: {stackrace}",
+                _logger.LogError(ex, "failed to process on get manual settlement history: {exception}, stacktrace: {stackrace}",
                         ex.Message, ex.StackTrace);
             }
             finally
@@ -498,7 +498,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError("failed to process on get cancel history: {exception}, stacktrace: {stackrace}",
+                _logger.LogError(ex, "failed to process on get cancel history: {exception}, stacktrace: {stackrace}",
                         ex.Message, ex.StackTrace);
             }
             finally
@@ -540,7 +540,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError("failed to process on get oe config template: {exception}, stacktrace: {stackrace}",
+                _logger.LogError(ex, "failed to process on get oe config template: {exception}, stacktrace: {stackrace}",
                         ex.Message, ex.StackTrace);
             }
         }
@@ -597,7 +597,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex, ex.Message);
             }
         }
         private async Task<ActivityLogResponse> GetActivityLogs(ActivityLogRequest request)
@@ -668,7 +668,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError("error retrieving activity logs using stored procedure: {exception} {stacktrace}",
+                _logger.LogError(ex, "error retrieving activity logs using stored procedure: {exception} {stacktrace}",
                         ex.Message, ex.StackTrace);
                 return null;
             }

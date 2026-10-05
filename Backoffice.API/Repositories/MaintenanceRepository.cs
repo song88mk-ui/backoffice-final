@@ -98,7 +98,7 @@ namespace Backoffice.API.Repositories
                         }
                         catch (Exception e)
                         {
-                            _logger.LogError($"[GetMaintenanceV2] webprops error app={app}: {e.Message}");
+                            _logger.LogError(e, $"[GetMaintenanceV2] webprops error app={app}: {e.Message}");
                         }
 
                         _logger.LogInformation($"[GetMaintenanceV2] app={app} configs count={configs.Count}");
@@ -158,7 +158,7 @@ namespace Backoffice.API.Repositories
                 catch (Exception ex)
                 {
                     activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    _logger.LogError($"error on method: {ex.Message}");
+                    _logger.LogError(ex, $"error on method: {ex.Message}");
                     return new BaseResponse<MaintenanceResponse>()
                     {
                         StatusCode = StatusCode.Error,
@@ -248,7 +248,7 @@ namespace Backoffice.API.Repositories
                         }
                         catch (Exception e)
                         {
-                            _logger.LogError($"[SetMaintenanceV2] webprops error app={app}: {e.Message}");
+                            _logger.LogError(e, $"[SetMaintenanceV2] webprops error app={app}: {e.Message}");
                         }
                     }
 
@@ -264,7 +264,7 @@ namespace Backoffice.API.Repositories
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"error on method: {ex.Message}");
+                    _logger.LogError(ex, $"error on method: {ex.Message}");
                     activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                     return new BaseResponse<MaintenanceResponse>()
                     {

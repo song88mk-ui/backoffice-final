@@ -1298,7 +1298,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError("AddOrUpdateManualMarketSettlement: {Message} | UserId: {UserId} | InnerException: {InnerMessage} | StackTrace: {StackTrace} | Payload: {Payload}", ex.Message, userId, ex.InnerException?.Message, ex.StackTrace, JsonSerializer.Serialize(request));
+                _logger.LogError(ex, "AddOrUpdateManualMarketSettlement: {Message} | UserId: {UserId} | InnerException: {InnerMessage} | StackTrace: {StackTrace} | Payload: {Payload}", ex.Message, userId, ex.InnerException?.Message, ex.StackTrace, JsonSerializer.Serialize(request));
 
                 return new BaseResponse<ManualMarketSettlementResponse>
                 {
@@ -1389,7 +1389,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"GetManualMarketSettlementDetails: {ex.Message}-{ex.InnerException?.Message}");
+                _logger.LogError(ex, $"GetManualMarketSettlementDetails: {ex.Message}-{ex.InnerException?.Message}");
 
                 return new BaseResponse<ManualMarketSettlementDetailsResponse>
                 {
@@ -1505,7 +1505,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Publish: {ex.Message}-{ex.InnerException?.Message}");
+                _logger.LogError(ex, $"Publish: {ex.Message}-{ex.InnerException?.Message}");
 
                 return new BaseResponse<MessageResponse>
                 {

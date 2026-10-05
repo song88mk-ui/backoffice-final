@@ -67,7 +67,7 @@ namespace Backoffice.Config.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError("error processing message: {exception} {stacktrace}", ex.Message, ex.StackTrace);
+                _logger.LogError(ex, "error processing message: {exception} {stacktrace}", ex.Message, ex.StackTrace);
             }
         }
     }

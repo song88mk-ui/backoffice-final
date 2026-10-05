@@ -110,7 +110,7 @@ namespace Backoffice.Utility
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("consume error: {exception}. stacktrace: {stacktrace}", ex.Message, ex.StackTrace);
+                    _logger.LogError(ex, "consume error: {exception}. stacktrace: {stacktrace}", ex.Message, ex.StackTrace);
 
                 }
             }

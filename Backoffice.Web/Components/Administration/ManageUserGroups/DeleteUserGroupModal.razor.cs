@@ -104,7 +104,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message);
+                Log.Error(ex, ex.Message);
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
             }

@@ -229,6 +229,11 @@ Region-aware services:
 - Centralized via Serilog
 - Structured logging with context
 - Log levels: Information, Warning, Error, Debug
+- Exceptions in catch blocks: pass the caught exception as the first argument,
+  `_logger.LogError(ex, "...", args)` or `Log.Error(ex, "...")`, never only `ex.Message`. That
+  way Serilog writes the full exception (type, stack trace, inner exceptions) to the `@x` field in
+  Loki. Existing message text was kept unchanged when the exception argument was added
+  (DEVOPS-371, SonarQube rule S6667).
 
 ### Monitoring & Observability
 - OpenTelemetry ActivitySource for distributed tracing

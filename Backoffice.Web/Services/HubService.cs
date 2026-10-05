@@ -97,7 +97,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                Log.Error($"{ex.Message} - {ex.StackTrace}");
+                Log.Error(ex, $"{ex.Message} - {ex.StackTrace}");
             }
             _isConnecting = false;
         }

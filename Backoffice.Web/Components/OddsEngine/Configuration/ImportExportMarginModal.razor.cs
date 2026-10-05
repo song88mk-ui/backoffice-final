@@ -210,7 +210,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                 Guid = Guid.NewGuid();
 
-                Log.Error(ex.Message);
+                Log.Error(ex, ex.Message);
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
             }

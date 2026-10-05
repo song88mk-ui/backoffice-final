@@ -93,7 +93,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"Hubconnection URI - {_navigationManager.BaseUri}");
+                    Log.Error(ex, $"Hubconnection URI - {_navigationManager.BaseUri}");
                     Console.WriteLine(ex.Message);
 
                     Log.Error(ex.Message);

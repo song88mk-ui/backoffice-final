@@ -53,7 +53,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message);
+                Log.Error(ex, ex.Message);
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
             }

@@ -119,7 +119,7 @@ namespace Backoffice.Config.Service.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{ex.Message}\n{ex.StackTrace}");
+                _logger.LogError(ex, $"{ex.Message}\n{ex.StackTrace}");
             }
         }
 

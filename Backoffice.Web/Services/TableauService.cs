@@ -67,7 +67,7 @@ namespace Backoffice.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation("error getting tableau url: {exception}, stacktrace: {@stacktrace}", ex.Message, ex.StackTrace);
+                    _logger.LogInformation(ex, "error getting tableau url: {exception}, stacktrace: {@stacktrace}", ex.Message, ex.StackTrace);
                     activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                     _getTableauUrlFailureCounter.Add(1);
                     return string.Empty;

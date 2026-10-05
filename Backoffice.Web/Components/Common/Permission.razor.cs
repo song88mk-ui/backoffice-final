@@ -44,7 +44,7 @@ namespace Backoffice.Web.Components.Common
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message);
+                Log.Error(ex, ex.Message);
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
             }

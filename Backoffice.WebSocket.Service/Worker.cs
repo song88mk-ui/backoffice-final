@@ -123,7 +123,7 @@ namespace Backoffice.WebSocket.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError("error starting service: {message} - {stacktrace}", ex.Message, ex.StackTrace);
+                _logger.LogError(ex, "error starting service: {message} - {stacktrace}", ex.Message, ex.StackTrace);
             }
         }
 
@@ -171,7 +171,7 @@ namespace Backoffice.WebSocket.Service
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("message process error: {message} - {stacktrace}", ex.Message, ex.StackTrace);
+                    _logger.LogError(ex, "message process error: {message} - {stacktrace}", ex.Message, ex.StackTrace);
                     activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 }
             }
