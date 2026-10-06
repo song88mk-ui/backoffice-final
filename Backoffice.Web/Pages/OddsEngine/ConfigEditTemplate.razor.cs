@@ -252,7 +252,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     ConfigTemplateMarginModel request = new ConfigTemplateMarginModel();
 
-                    var activityLog = new List<ActivityLogModel>();
                     var oldConfigMarginsLogs = new List<ConfigMarginActivityLogModel>();
                     var newConfigMarginsLogs = new List<ConfigMarginActivityLogModel>();
                     var oldMarketState = new List<ConfigMarginActivityLogModel>();
@@ -420,7 +419,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (isNavigate)
                     _navigationManager.NavigateTo($"hk/odds-engine/config-templates?message=Successfully updated");
             }
-            catch (Exception ex)
+            catch (Exception)
             { }
             finally
             {

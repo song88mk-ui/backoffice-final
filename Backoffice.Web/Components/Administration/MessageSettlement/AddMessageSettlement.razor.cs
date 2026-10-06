@@ -51,7 +51,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
         public async Task<AddMessageSettlementModel> GetBetDetails()
         {
-            if (!string.IsNullOrWhiteSpace(AddMessageSettlementModel.BetId) && Guid.TryParse(AddMessageSettlementModel.BetId, out Guid validBetId))
+            if (!string.IsNullOrWhiteSpace(AddMessageSettlementModel.BetId) && Guid.TryParse(AddMessageSettlementModel.BetId, out _))
             {
                 var manualBetDetailsRequest = new ManualBetDetailsRequest
                 {
@@ -209,7 +209,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
                     if (onActivityLogListMessage.ActivityLogs.Any())
                     {
-                        var activityLogResponse = await BackofficeService.AddActivityLogList(onActivityLogListMessage);
+                        await BackofficeService.AddActivityLogList(onActivityLogListMessage);
                     }
 
 

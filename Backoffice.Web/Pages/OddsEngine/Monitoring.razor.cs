@@ -32,7 +32,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         private PageHeaderModel _pageHeaderModel;
         private List<MonitoringFixtureModel>? _fixtureMarkets;
         private List<BreadcrumbModel> _breadcrumbs;
-        private List<string>? _slugs;
         private string _userId;
 
         private bool _isPreloader = true;
@@ -56,7 +55,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             PageState.Page = this;
 
-            _slugs = new List<string>();
             _breadcrumbs = new()
             {
                 new()
@@ -66,7 +64,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
-            _slugs = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "").Split("/").ToList();
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
@@ -88,8 +85,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                         processOddsChangeMonitoring: ProcessOddsChange
                     );
                 }
-
-                var isReloadFixtureMarkets = ((SelectedSport?.SportId ?? _sportId) == _sportId && (LeagueId == 0 && LeagueId != _leagueId)) || _languageCode != _translationState.ActiveLanguageCode;
 
                 if (SelectedSport != null)
                 {
@@ -330,7 +325,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / Convert.ToDecimal(s.DecimalOdds))) - 100) + 100}";
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }
@@ -366,7 +361,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / Convert.ToDecimal(s.DeOd))) - 100) + 100}";
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }

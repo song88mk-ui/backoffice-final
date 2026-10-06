@@ -279,9 +279,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                     marketTemplateGroups.Add(marketTemplateGroup);
                 }
 
-                var oldMarketGroupSerialize = JsonSerializer.Serialize(MarketGroupModel.OldMarketTemplateGroups);
-                var newMarketGroupSerialize = JsonSerializer.Serialize(marketTemplateGroups);
-
                 var hasChange = false;
 
                 if (MarketGroupModel.OldMarketTemplateGroups.Count != marketTemplateGroups.Count)
@@ -345,8 +342,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     await OnInit();
                 }
-
-                var AlertMessages = response.StatusCode == StatusCode.Success ? $"Market group order update for {MarketGroupModel.ClientCode} is successful" : $"Market sort order updated for {MarketGroupModel.ClientCode} failed";
             }
 
             await OnInit();

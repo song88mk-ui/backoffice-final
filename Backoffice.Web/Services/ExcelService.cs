@@ -325,7 +325,7 @@ namespace Backoffice.Web.Services
             {
                 webClient.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
                 byte[] request = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
-                byte[] response = webClient.UploadData(url, "POST", request);
+                webClient.UploadData(url, "POST", request);
             }
         }
 

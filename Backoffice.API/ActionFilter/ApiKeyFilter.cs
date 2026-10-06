@@ -18,7 +18,6 @@ namespace Backoffice.API.ActionFilter
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var apiKey = context.HttpContext.Request.Headers["x-api-key"].FirstOrDefault();
-            var token = context.HttpContext.Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer", "").Trim();
 
             if (string.IsNullOrEmpty(apiKey) || string.IsNullOrWhiteSpace(apiKey) || _configuration["Security:ApiKey"] != apiKey)
             {

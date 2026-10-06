@@ -24,7 +24,6 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         private bool _hasLine;
         private string _marketLine;
         private string _columnSize;
-        private string _fixtureName;
         private int _fixtureStatusId;
         private string _currentPeriod;
         private string _currentMinute;
@@ -56,7 +55,6 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             {
                 _clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
                 _unixTime = Market.UnixTime;
-                _fixtureName = Market.FixtureName;
                 _fixtureStatusId = Market.FixtureStatusId;
                 _currentPeriod = Market.CurrentPeriod;
                 _currentMinute = Market.CurrentMinute;
@@ -133,7 +131,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             {
                 computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId)?.Odds ?? 1)) - 100) + 100}";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }

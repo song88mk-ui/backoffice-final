@@ -240,7 +240,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     }
                 }
 
-                var addLogResponse = await BackofficeService.AddActivityLogList(activityLogList);
+                await BackofficeService.AddActivityLogList(activityLogList);
 
                 //await JsRuntime.InvokeVoidAsync("ShowNotication", SaveButton, "Priceboost has been updated");
 

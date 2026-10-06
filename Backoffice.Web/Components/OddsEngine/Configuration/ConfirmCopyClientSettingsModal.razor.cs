@@ -39,7 +39,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             parameters.Add("FromClientCode", SelectedFromClient.Key);
             parameters.Add("ToClientCode", ToClient.ClientCode);
 
-            var options = new ModalOptions();
             ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
         }
 

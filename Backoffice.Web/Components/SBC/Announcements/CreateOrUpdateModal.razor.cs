@@ -54,8 +54,6 @@ namespace Backoffice.Web.Components.SBC.Announcements
         private List<SelectListItemWithCheckboxModel<string>> _clients;
         private LanguageOptionsModel _languages;
         private Dictionary<LanguageCode, string> _announcementMessages;
-        private DateTime _startDate;
-        private DateTime _endDate;
 
         #endregion
 
@@ -64,9 +62,6 @@ namespace Backoffice.Web.Components.SBC.Announcements
         protected override async Task OnInitializedAsync()
         {
             _isPreload = false;
-
-            _startDate = DateTime.UtcNow.AddDays(-1);
-            _endDate = DateTime.UtcNow.AddDays(1).AddTicks(-1);
 
             _alerts = new List<AnnouncementsAlertModel>();
             _announcement = ModalParameters.TryGet<Models.Announcements>("Announcement");

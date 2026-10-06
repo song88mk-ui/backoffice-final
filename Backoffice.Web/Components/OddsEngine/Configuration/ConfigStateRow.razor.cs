@@ -20,14 +20,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private bool _IsEdit = false;
 
-        private List<ConfigTemplateModel> _template;
-        protected override Task OnInitializedAsync()
-        {
-            _template = new List<ConfigTemplateModel>();
-
-            return base.OnInitializedAsync();
-        }
-
         #region Methods
         public async Task OnEditClickedEvent()
         {

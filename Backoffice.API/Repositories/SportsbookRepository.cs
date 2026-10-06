@@ -459,7 +459,6 @@ namespace Backoffice.API.Repositories
                     }
                 };
 
-            var auditList = new List<ClientSportOrderAudit>();
             //var changeFrom = string.Empty;
             //var changeTo = string.Empty;
 
@@ -482,14 +481,14 @@ namespace Backoffice.API.Repositories
 
                     foreach (var item in request.SportsSortOrder)
                     {
-                        var entity = _sportsbookContext.ClientSportOrder.Add(new ClientSportOrder()
+                        _sportsbookContext.ClientSportOrder.Add(new ClientSportOrder()
                         {
                             ClientId = client.ClientId,
                             SportId = item.SportId,
                             SportName = item.SportName,
                             SortOrder = item.SortOrder,
                             IsActive = item.IsActive
-                        }).Entity;
+                        });
 
                         //Segments
                         if (item.SegmentsSortOrder != null && item.SegmentsSortOrder.Any())
@@ -500,7 +499,7 @@ namespace Backoffice.API.Repositories
 
                             foreach (var segment in item.SegmentsSortOrder)
                             {
-                                var segmentEntity = _sportsbookContext.ClientSegmentOrder.Add(new ClientSegmentOrder()
+                                _sportsbookContext.ClientSegmentOrder.Add(new ClientSegmentOrder()
                                 {
                                     ClientId = client.ClientId,
                                     SportId = segment.SportId,
@@ -508,7 +507,7 @@ namespace Backoffice.API.Repositories
                                     SegmentId = segment.SegmentId,
                                     SegmentName = segment.SegmentName,
                                     SortOrder = segment.SortOrder,
-                                }).Entity;
+                                });
 
                                 //Leagues
                                 if (segment.LeagueSortOrder != null && segment.LeagueSortOrder.Any())
@@ -519,7 +518,7 @@ namespace Backoffice.API.Repositories
 
                                     foreach (var league in segment.LeagueSortOrder)
                                     {
-                                        var leagueEntity = _sportsbookContext.ClientLeagueOrder.Add(new ClientLeagueOrder()
+                                        _sportsbookContext.ClientLeagueOrder.Add(new ClientLeagueOrder()
                                         {
                                             ClientId = client.ClientId,
                                             SportId = league.SportId,
@@ -529,7 +528,7 @@ namespace Backoffice.API.Repositories
                                             LeagueId = league.LeagueId,
                                             LeagueName = league.LeagueName,
                                             SortOrder = league.SortOrder,
-                                        }).Entity;
+                                        });
                                     }
                                 }
                             }
@@ -1277,7 +1276,6 @@ namespace Backoffice.API.Repositories
                 {
                     var sportsLookup = await _sportLookupCollection.Find(_ => true).ToListAsync();
 
-                    var sportIds = sportsLookup.Select(s => $"{langCode}:{s.SpId}").ToList();
                     //var translationLookup = sportTranslationLookupCollection.Find(c => sportIds.Contains(c.SpTrLoId)).ToList();
 
                     return new BaseResponse<SportsLookupResponse>
@@ -1294,7 +1292,7 @@ namespace Backoffice.API.Repositories
                         }
                     };
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                     throw;
@@ -1320,7 +1318,6 @@ namespace Backoffice.API.Repositories
                 }
 
                 var leagueLookup = await _leagueLookupCollection.Find(leagueLookupFilter).ToListAsync();
-                var leagueIds = leagueLookup.Select(s => $"{langCode}:{s.SpId}:{s.SegId}:{s.LeId}").ToList();
                 //var translationLookup = leagueTranslationLookupCollection.Find(c => leagueIds.Contains(c.LeTrLoId)).ToList();
 
 
@@ -1358,7 +1355,6 @@ namespace Backoffice.API.Repositories
                 var segmentLookupFilter = sportId == 0 ? Builders<SegmentLookup>.Filter.Empty : Builders<SegmentLookup>.Filter.Where(c => c.SpId == sportId);
                 var segmentLookup = await _segmentLookupCollection.Find(segmentLookupFilter).ToListAsync();
 
-                var segmentIds = segmentLookup.Select(s => $"{langCode}:{s.SpId}:{s.SegId}").ToList();
                 //var translationLookup = segmentTranslationLookupCollection.Find(c => segmentIds.Contains(c.SegTrLoId)).ToList();
 
                 return new BaseResponse<SegmentLookupResponse>
@@ -1376,7 +1372,7 @@ namespace Backoffice.API.Repositories
                     }
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 throw;
@@ -1391,7 +1387,6 @@ namespace Backoffice.API.Repositories
             var marketLookupFilter = Builders<MarketLookup>.Filter.Where(c => c.SpId == request.SportId && c.FiTyId == request.FixtureTypeId);
             var marketTemplates = await _marketLookupCollection.Find(marketLookupFilter).ToListAsync();
 
-            var marketTemplateIds = marketTemplates.Select(s => $"{langCode}:{s.MaTeId}").ToList();
             //var translations = marketTranslationLookupCollection.Find(c => marketTemplateIds.Contains(c.MaTeTrLoId)).ToList();
 
             return new BaseResponse<MarketLookupResponse>

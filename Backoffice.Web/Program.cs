@@ -10,9 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-#pragma warning disable ASP0000
-var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
-#pragma warning restore ASP0000
 
 builder.Host.UseSerilog((context, _, serilog) =>
 {

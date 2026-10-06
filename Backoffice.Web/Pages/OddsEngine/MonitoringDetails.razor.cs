@@ -484,8 +484,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 foreach (var newMarket in message.Ma.Where(c => c.MaTeId == marketFixture.MarketTemplateId && c.MaSp == marketFixture.MarketSpecifier))
                 {
-                    var selectionIds = newMarket.Se.Select(s => s.SeTeId).Distinct().ToList();
-
                     var providerMarketId = $"{Fixture.ProviderFixtureId}:{newMarket.MaTeId}:{newMarket.MaSp}";
                     var currentMarket = Fixture.Markets.FirstOrDefault(c => c.ProviderMarketId == providerMarketId);
 

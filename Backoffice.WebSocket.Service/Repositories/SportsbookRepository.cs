@@ -299,7 +299,6 @@ namespace Backoffice.WebSocket.Service.Repositories
 
                     foreach (var market in message.Markets.Where(c => topMarketTemplateIds.Contains(c.MarketTemplateId)))
                     {
-                        var selections = new List<OddsChangeFixtureDetailsSelection>();
                         var clientOdds = new Dictionary<string, List<OddsChangeFixtureDetailsClientOdds>>();
                         var margin = 0m;
 
@@ -361,7 +360,7 @@ namespace Backoffice.WebSocket.Service.Repositories
                                 }).ToList()
                             });
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                         }
                     }
@@ -409,7 +408,6 @@ namespace Backoffice.WebSocket.Service.Repositories
             var clientWithouMargins = GetAsianClientsWithoutMargin();
 
             var result = new List<OddsChangeFixtureDetailsClientOdds>();
-            var isBinary = selections.Count > 2 ? false : true;
 
             var playerPropMarketTemplateIds = string.Join(",", marketTemplateGroups.Select(s => s.MarketTemplates).ToList()).Split(",").ToList();
 

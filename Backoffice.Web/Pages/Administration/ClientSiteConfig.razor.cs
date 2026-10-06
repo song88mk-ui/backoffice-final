@@ -12,7 +12,6 @@ namespace Backoffice.Web.Pages.Administration
     public partial class ClientSiteConfig
     {
         private string _title = "Client Site Config";
-        private PageHeaderModel _pageHeaderModel;
 
         private bool _isPreloader = true;
         private bool _isProcessing;
@@ -61,12 +60,6 @@ namespace Backoffice.Web.Pages.Administration
         {
             PageState.Page = this;
             await PageState.AuthenticateAccessEvent.InvokeAsync();
-
-            _pageHeaderModel = new()
-            {
-                Title = "Client Site Config",
-                IconClass = "ico ico-feature-flags"
-            };
 
             _canEdit = _userState.Model.Claims?.Any(x =>
                 x.Type == AdminPermission.Admin_ClientSiteConfig.ToString().Replace("_", ".")

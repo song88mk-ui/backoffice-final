@@ -110,7 +110,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalDialogClass", "modal-md");
             parameters.Add("OnCopyClientSettingsCallback", EventCallback.Factory.Create(this, (AlertModel alert) => HandleCopyClientSettingsAlert(alert)));
 
-            var options = new ModalOptions();
             _modalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
         }
 
@@ -221,7 +220,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             catch (TaskCanceledException)
             {
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }

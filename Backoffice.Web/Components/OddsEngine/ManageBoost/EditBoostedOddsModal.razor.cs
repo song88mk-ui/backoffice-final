@@ -122,7 +122,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             _priceBoostConfigModel.UserName = _userState.Model.Name;
 
             string currentPriceBoostString = ModalParameters.TryGet<string>("PriceBoostConfigModelSerialized");
-            var region = ModalParameters.TryGet<string>("Region") ?? string.Empty;
 
             var result = await _tradingService.AddOrUpdatePriceBoost(new List<PriceBoostConfigModel>() { _priceBoostConfigModel });
             if (result.StatusCode == StatusCode.Success)
@@ -256,7 +255,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     Translations = _priceBoostConfigModel.BoostedSelectionTranslations
                 };
 
-                var updateLogResponse = await _backofficeService.AddActivityLog(new ActivityLogModel()
+                await _backofficeService.AddActivityLog(new ActivityLogModel()
                 {
                     Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace('_', '.'),
                     Payload = $"{_priceBoostConfigModel.ClientCode}.{_priceBoostConfigModel.SportId}.{_priceBoostConfigModel.SegmentId}.{_priceBoostConfigModel.LeagueId}",

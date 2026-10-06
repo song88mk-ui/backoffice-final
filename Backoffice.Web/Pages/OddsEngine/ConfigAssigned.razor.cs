@@ -20,7 +20,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Fields
-        private List<BreadcrumbModel> _breadcrumbs;
         private List<ConfigClientViewModel> _configClients = new();
         private List<ConfigClientViewModel>? _selectedConfigClients = new();
 
@@ -29,7 +28,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         private MetaData _metaData = new();
         private string _iconClass = "";
         private bool _isPreloader = true;
-        private bool _isEdit = false;
         private bool _init = true;
 
         private ConfigState? _state = null;
@@ -49,16 +47,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         protected override async Task OnInitializedAsync()
         {
             _pageTitle = State == ConfigState.Assigned ? "Assigned Leagues" : "Unassigned Leagues";
-
-            _breadcrumbs = new List<BreadcrumbModel>()
-            {
-                new BreadcrumbModel
-                {
-                    Name = "Config",
-                    Url = $"odds-engine/config/{(State == ConfigState.Assigned ? "assigned":"unassigned")}",
-                    IsCurrentPage = true
-                }
-            };
         }
 
         protected override async Task OnParametersSetAsync()
@@ -182,11 +170,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task HandleConfigSelectionChange(ConfigClientViewModel config)
         {
-            if (_configClients.Any(x => x.IsChecked))
-                _isEdit = true;
-            else
-                _isEdit = false;
-
             if (_selectedConfigClients == null)
                 _selectedConfigClients = new();
 
@@ -212,7 +195,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task HandleClearSelectionClick()
         {
             _configClients.ForEach(x => x.IsChecked = false);
-            _isEdit = false;
 
             var configs = _configClients.Where(x => !x.IsChecked).ToList();
 

@@ -19,7 +19,6 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         private List<Client>? _clients;
         private string _clientCode;
         private string _clientCodeMargin;
-        private string _selectionName;
 
         private bool _shouldRender = true;
         private bool _init = true;
@@ -41,7 +40,6 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
                     _clients = new List<Client>(Clients);
                 }
 
-                _selectionName = Selection.SelectionName;
                 _unixTimeMarket = Market.UnixTime;
                 _unixTimeSelection = Selection.UnixTime;
                 _clientCode = Market.ClientCode;

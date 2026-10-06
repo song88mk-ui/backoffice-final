@@ -126,7 +126,7 @@ namespace Backoffice.Utility
                     return new[] { Encoding.UTF8.GetString(bytes) };
                 }
             }
-            catch (Exception ex) { }
+            catch (Exception) { }
             return Enumerable.Empty<string>();
         }
     }

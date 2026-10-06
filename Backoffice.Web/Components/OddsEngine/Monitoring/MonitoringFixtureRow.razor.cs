@@ -122,7 +122,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
             {
                 computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId)?.Odds ?? 1)) - 100) + 100}";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -185,7 +185,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                 {
                     computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / Convert.ToDecimal(s.DecimalOdds))) - 100) + 100}";
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }

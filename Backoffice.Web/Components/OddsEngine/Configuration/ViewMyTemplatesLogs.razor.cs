@@ -28,8 +28,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public List<ActivityLogModel> ActivitLogs { get; set; }
         public MetaData MetaData { get; set; }
 
-        private string _region = string.Empty;
-
         private bool IsPreLoader = true;
         #endregion
 
@@ -43,7 +41,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 CurrentPage = 1,
                 PageSize = 20
             };
-            _region = ModalParameters.TryGet<string>("Region");
             var sports = ModalParameters.TryGet<List<SelectListItemModel<string>>>("Sports") ?? new List<SelectListItemModel<string>>();
             var scopes = ModalParameters.TryGet<List<SelectListItemModel<string>>>("Scopes") ?? new List<SelectListItemModel<string>>();
 

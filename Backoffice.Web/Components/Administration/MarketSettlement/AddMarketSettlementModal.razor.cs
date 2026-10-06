@@ -304,9 +304,6 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         {
             var request = new List<ManualMarketSettlementRequest>();
 
-            var wonCount = AddMarketSettlement.AddMarketSettlementSelections.Count(c => c.ToStatus == (int)BetStatus.Won);
-            var deadHeat = 1m;
-
             foreach (var row in AddMarketSettlement.AddMarketSettlementSelections)
             {
                 if (!string.IsNullOrEmpty(AddMarketSettlement.BetId) && AddMarketSettlement.AddMarketSettlementSelections.Count > 1 && row.Selected == false)

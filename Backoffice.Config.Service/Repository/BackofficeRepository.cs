@@ -125,7 +125,6 @@ namespace Backoffice.Config.Service.Repository
 
         public void DeleteConfigTemplate(ConfigTemplate config)
         {
-            var fixtureStatusId = config.FixtureStatusId;
             var assignedLiveTemplates = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(c => c.LiveConfigTemplateId == config.Id).ToList();
 
             using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))

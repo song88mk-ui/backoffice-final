@@ -2463,10 +2463,10 @@ namespace Backoffice.API.Repositories
         {
             var result = string.Empty;
 
-            if (string.IsNullOrEmpty(request.UserId) || !Guid.TryParse(request.UserId, out var userId))
+            if (string.IsNullOrEmpty(request.UserId) || !Guid.TryParse(request.UserId, out _))
                 return $"Invalid User ID";
 
-            if (!string.IsNullOrEmpty(request.Mapping.Id) && !int.TryParse(request.Mapping.Id, out int id))
+            if (!string.IsNullOrEmpty(request.Mapping.Id) && !int.TryParse(request.Mapping.Id, out _))
                 return $"Invalid {category} ID";
 
             switch (category)
@@ -2491,7 +2491,7 @@ namespace Backoffice.API.Repositories
         {
             var result = string.Empty;
 
-            if (string.IsNullOrEmpty(request.UserId) || !Guid.TryParse(request.UserId, out var userId))
+            if (string.IsNullOrEmpty(request.UserId) || !Guid.TryParse(request.UserId, out _))
                 return $"Invalid User ID";
 
 
@@ -2533,7 +2533,7 @@ namespace Backoffice.API.Repositories
                 case "fixture":
                     foreach (var mapping in request.Mapping)
                     {
-                        if (!int.TryParse(mapping.Id, out int id))
+                        if (!int.TryParse(mapping.Id, out _))
                         {
                             result = "Invalid Fixture ID";
                             break;

@@ -23,7 +23,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isPreLoader;
         private PageHeaderModel _pageHeaderModel;
         private List<BreadcrumbModel> _breadcrumbs;
-        private string _tHeadClass;
         private string _searchText;
         protected List<BoostedSettingsModel> _clientsView;
         private List<PlatformClientResponse> _clientListReference = new List<PlatformClientResponse>();
@@ -38,7 +37,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             PageState.Page = this;
 
             _isPreLoader = true;
-            _tHeadClass = "table-head";
             _pageHeaderModel = new()
             {
                 Title = "Boosted Settings",

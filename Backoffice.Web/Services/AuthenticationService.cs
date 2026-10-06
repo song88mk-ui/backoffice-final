@@ -160,7 +160,7 @@ namespace Backoffice.Web.Services
         {
             var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
-            var auth = _httpClient.GetAsync("api/authentication/logout").Result;
+            _ = _httpClient.GetAsync("api/authentication/logout").Result;
 
             _httpContextAccessor.HttpContext?.Session.Remove("UserToken");
 

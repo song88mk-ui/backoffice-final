@@ -11,11 +11,9 @@ namespace Backoffice.Web.Pages.Administration
     public partial class MaintenanceV2
     {
         private string _title = "Maintenance";
-        private PageHeaderModel _pageHeaderModel;
         private string _maintenanceModeAllClientsCss;
         private string _maintenanceModeSpecificClientsCss;
 
-        private bool _init = true;
         private bool _shouldRender = true;
         private bool _isAllClientMode = true;
         private bool _isAllClient = false;
@@ -42,7 +40,6 @@ namespace Backoffice.Web.Pages.Administration
         private Action<EventArgs> _allClientsEvent;
         private Action<EventArgs> _specificClientsEvent;
 
-        private bool _initialStatusIsAllClient;
         private bool _initialMaintenanceIsOn;
         private List<string> _liveClients = new();
         private List<string> _underMaintenanceClients = new();
@@ -53,12 +50,6 @@ namespace Backoffice.Web.Pages.Administration
             PageState.Page = this;
             await PageState.AuthenticateAccessEvent.InvokeAsync();
 
-            _pageHeaderModel = new()
-            {
-                Title = "Maintenance",
-                IconClass = "ico ico-maintenance"
-            };
-
             _canEdit = _userState.Model.Claims?.Any(x =>
                 x.Type == AdminPermission.Admin_Maintenance.ToString().Replace("_", ".")
                 && x.Value == $"{(int)Access.Edit}") ?? false;
@@ -67,10 +58,6 @@ namespace Backoffice.Web.Pages.Administration
             _specificClientsEvent = _ => HandleChangeMode(false);
 
             LoadPage();
-        }
-        protected override void OnParametersSet()
-        {
-            _init = false;
         }
         protected override bool ShouldRender() => _shouldRender;
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
@@ -92,10 +79,9 @@ namespace Backoffice.Web.Pages.Administration
                 _isAllClientMode = _isAllClient;
 
                 HandleChangeMode(_isAllClientMode);
-                _initialStatusIsAllClient = _isAllClientMode;
                 _initialMaintenanceIsOn = _isMaintenance;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             finally

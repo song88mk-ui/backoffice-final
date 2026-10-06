@@ -22,7 +22,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         private AlertModel _alertModel;
 
         private string _pageTitle = "My Templates";
-        private List<BreadcrumbModel> _breadcrumbs;
 
         private List<ConfigMyTemplateModel>? _configTemplates = null;
 
@@ -34,19 +33,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Methods
-        protected override void OnInitialized()
-        {
-            _breadcrumbs = new List<BreadcrumbModel>()
-            {
-                new BreadcrumbModel
-                {
-                    Name = "Config",
-                    Url = "hk/odds-engine/config/my-templates",
-                    IsCurrentPage = true
-                }
-            };
-        }
-
         protected override async Task OnParametersSetAsync()
         {
             _shouldRender = ValidateParameters();

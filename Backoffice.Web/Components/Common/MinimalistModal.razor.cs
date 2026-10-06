@@ -24,10 +24,7 @@ namespace Backoffice.Web.Components.Common
         private string _modalClass = "";
         private string _modalDialogClass = "";
         private bool _showBackdrop = false;
-        private string _modalTitle = "";
         private string _modalDialogStyle = "";
-        private string _modalIcon = "";
-        private string _titleClass = "";
         private string _modalHeaderClass = "";
 
         #endregion
@@ -43,7 +40,6 @@ namespace Backoffice.Web.Components.Common
         #region Methods
         public void Open(string title, RenderFragment content, ModalParameters parameters, ModalOptions options)
         {
-            _modalTitle = title;
             ModalContent = content;
             ModalParameters = parameters;
 
@@ -51,16 +47,12 @@ namespace Backoffice.Web.Components.Common
             var modalClass = parameters.TryGet<string>("ModalClass");
             var modalDialogClass = parameters.TryGet<string>("ModalDialogClass");
             var modalHeaderClass = parameters.TryGet<string>("ModalHeaderClass");
-            var modalIcon = parameters.TryGet<string>("ModalIcon");
-            var modalTitleClass = parameters.TryGet<string>("TitleClass");
             // modal-lg d-flex justify-content-center align-items-center h-100
             _modalDisplay = "block";
             _modalClass = string.IsNullOrEmpty(modalClass) ? "show" : modalClass;
             _modalDialogClass = !string.IsNullOrEmpty(modalDialogClass) ? modalDialogClass : "";
             _modalDialogStyle = !string.IsNullOrEmpty(style) ? style : "";
             _modalHeaderClass = !string.IsNullOrEmpty(modalHeaderClass) ? modalHeaderClass : "";
-            _modalIcon = !string.IsNullOrEmpty(modalIcon) ? modalIcon : "";
-            _titleClass = !string.IsNullOrEmpty(modalTitleClass) ? modalTitleClass : "";
 
             ToolTip = options.Tooltip;
             HideCloseButton = options.HideCloseButton == null ? false : (bool)options.HideCloseButton;

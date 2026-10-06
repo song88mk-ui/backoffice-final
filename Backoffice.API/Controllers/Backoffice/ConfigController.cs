@@ -64,8 +64,6 @@ namespace Backoffice.API.Controllers.Backoffice
         [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> AddOrUpdateConfigTemplate([FromBody] ConfigTemplateModel request)
         {
-            var userId = HttpContext.Items["UserId"]?.ToString();
-
             var result = await _backofficeRepository.AddOrUpdateConfigTemplate(request);
 
             switch (result.StatusCode)
@@ -81,7 +79,6 @@ namespace Backoffice.API.Controllers.Backoffice
         [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> ConfigTemplateSetState([FromBody] ConfigSetLeagueStateRequest request, [FromRoute] string state)
         {
-            var userId = HttpContext.Items["UserId"]?.ToString();
             var result = new BaseResponse<bool>()
             {
                 StatusCode = BoStatusCode.Error,
@@ -128,9 +125,7 @@ namespace Backoffice.API.Controllers.Backoffice
         [HttpPost("template/{state}")]
         public async Task<IActionResult> GetConfigClients([FromRoute] string state, [FromQuery] int templateId = -1, [FromBody] ConfigTemplateLeagueRequest payload = null)
         {
-            var userId = HttpContext.Items["UserId"]?.ToString();
             var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
-            var languageCode = HttpContext.Items["x-language-code"]?.ToString();
 
             var result = new BaseResponse<ConfigTemplateLeagueResponse>()
             {
@@ -166,7 +161,6 @@ namespace Backoffice.API.Controllers.Backoffice
                 var userToken = HttpContext.Items["UserToken"].ToString();
                 activity?.SetTag("authorization", userToken);
 
-                var userId = HttpContext.Items["UserId"].ToString();
                 var clientCodes = HttpContext.Items["ClientCodes"].ToString().Split(',').ToList();
 
                 var result = await _backofficeRepository.GetTemplateConfigCount(clientCodes, state);
@@ -214,8 +208,6 @@ namespace Backoffice.API.Controllers.Backoffice
         [Authorize("SBC.OE.Config", ((int)Access.View))]
         public async Task<IActionResult> CopyClientConfig([FromBody] CopyClientConfigRequest request)
         {
-            var userId = HttpContext.Items["UserId"]?.ToString();
-
             var result = await _backofficeRepository.CopyClientConfig(request);
 
             switch (result.StatusCode)
@@ -334,7 +326,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
 
 
-            var result = await _backofficeRepository.CachePreload(request);
+            await _backofficeRepository.CachePreload(request);
 
             return Ok(new
             {
@@ -347,8 +339,6 @@ namespace Backoffice.API.Controllers.Backoffice
         [HttpGet("translations")]
         public async Task<IActionResult> GetTranslations()
         {
-            var userId = HttpContext.Items["UserId"]?.ToString();
-
             var langCode = LanguageCode.EN;
             Enum.TryParse(HttpContext.Request.Headers["x-language-code"].ToString(), out langCode);
 

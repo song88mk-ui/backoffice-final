@@ -315,8 +315,6 @@ namespace Backoffice.Web.Components.Common
         }
         public string GetSportName(PriceBoostActivityLog activityLog)
         {
-            var splitPayload = activityLog.Payload.Split(".");
-
             return activityLog.Activity == Activity.Create.ToString() || activityLog.Activity == Activity.Update.ToString() ?
                 activityLog.To.SportName : activityLog.From.SportName;
         }

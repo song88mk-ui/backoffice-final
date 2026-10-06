@@ -25,7 +25,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         private List<SportSettingsActivityLog> _clientSportOrderAudit;
         private MetaData _metaData;
         private int _selectedPage;
-        private string _clientCode;
         private bool _isPreloader;
 
         #endregion
@@ -44,7 +43,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 TotalPages = 0,
                 TotalCount = 0
             };
-            _clientCode = ModalParameters.TryGet<string>("ClientCode");
 
             await GetContent();
             //_clientSportOrderAudit = (await TradingService.GetClientSportOrderAuditList(new ClientSportOrderAuditRequest()

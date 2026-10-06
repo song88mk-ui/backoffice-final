@@ -78,7 +78,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             parameters.Add("SelectedFromClient", SelectedFromClient);
             parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);
 
-            var options = new ModalOptions();
             _modalService.Open<ConfirmCopyClientSettingsModal>($"Copy Client Settings", parameters);
         }
         public void Dispose()

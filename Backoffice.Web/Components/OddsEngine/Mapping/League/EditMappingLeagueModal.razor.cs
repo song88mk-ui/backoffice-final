@@ -215,8 +215,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 
         private void SetLinkedItems()
         {
-            int itemIndex = -1;
-
             List<string> srIds = new List<string>();
             List<string> bgIds = new List<string>();
 

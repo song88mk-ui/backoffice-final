@@ -164,8 +164,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 OldMarketTemplateGroups = new List<ClientMarketTemplateGroupDTO>()
             };
 
-            var copyToClient = ClientInformations.FirstOrDefault(f => f.ClientCode == CopyToClientCode);
-
             var parameters = new ModalParameters();
 
             parameters.Add("MarketGroupModel", copyFromMarketGroupModel);

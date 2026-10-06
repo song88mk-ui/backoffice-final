@@ -77,7 +77,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
                 if (result.StatusCode == StatusCode.Success)
                 {
-                    var activityLogResponse = await _backofficeService.AddActivityLog(new ActivityLogModel()
+                    await _backofficeService.AddActivityLog(new ActivityLogModel()
                     {
                         Page = SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace('_', '.'),
                         Payload = $"{ClientCode.ToUpper()}",

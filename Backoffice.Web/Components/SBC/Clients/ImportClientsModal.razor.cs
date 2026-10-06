@@ -179,7 +179,7 @@ namespace Backoffice.Web.Components.SBC.Clients
             await JSRuntime.InvokeVoidAsync("blockPageClose", "An import is still running. Leaving now may leave clients half-created.");
 
             _progressPollCts = new CancellationTokenSource();
-            var pollingTask = PollProgress(batchId, _progressPollCts.Token);
+            _ = PollProgress(batchId, _progressPollCts.Token);
 
             var response = await BackofficeService.CommitClientImport(new CommitClientImportRequest
             {

@@ -916,7 +916,7 @@ namespace Backoffice.Web.Components.SBC.Clients
         {
             var baseSettings = 0.02m;
 
-            if (Enum.TryParse<Currency>(currencyCode.ToUpper(), out var currency))
+            if (Enum.TryParse<Currency>(currencyCode.ToUpper(), out _))
             {
                 baseSettings = GetExchangeRate(currencyCode);
             }

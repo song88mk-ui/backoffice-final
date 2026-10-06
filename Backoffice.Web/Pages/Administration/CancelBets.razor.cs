@@ -241,7 +241,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 if (!string.IsNullOrEmpty(bet.Trim()))
                 {
-                    var isValid = Guid.TryParse(bet.Trim(), out var betId);
+                    var isValid = Guid.TryParse(bet.Trim(), out _);
                     if (!isValid)
                     {
                         Alerts.Add(new()

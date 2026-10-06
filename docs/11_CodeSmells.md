@@ -655,3 +655,49 @@ await PublishMessage();
 | 19 | No unit tests | Testing | HIGH | Entire solution |
 | 20 | Hard to test | Testability | HIGH | All repositories |
 
+
+## Dead code removed (DEVOPS-371)
+
+SonarQube rules S1481 (unused local variable) and S4487 (unread private field) were cleaned up
+across all services as part of DEVOPS-371. Only code with no observable effect was removed:
+
+- **Unused locals** that held pure values (header/`HttpContext.Items` reads, in-memory LINQ
+  projections, `new ModalOptions()`, discarded `JsonSerializer.Serialize` results, unused `out`
+  variables now written as `out _`, and unused `catch (Exception ex)` variables now written as
+  `catch (Exception)`).
+- **Unused locals whose initializer has a side effect** keep the call and only drop the variable:
+  awaited activity-log writes (`await BackofficeService.AddActivityLog(...)`), EF `Add`/`Update`
+  calls, `new MailAddress(...)` (still used as e-mail validation), `CachePreload`, the logout HTTP
+  call, `WebClient.UploadData`, the import progress poller (`_ = PollProgress(...)`), and the two
+  never-awaited `CountAsync` calls in `BackOfficeRepository.GetAssignedCount`.
+- **Unread private fields** in Backoffice.Web components and pages (breadcrumbs, page header
+  models, unused modal title/icon plumbing in `MinimalistModal`, preloader flags, cached
+  parameter copies), together with the assignments that only fed them. Three overrides that only
+  set such a field were removed (`ConfigStateRow.OnInitializedAsync`,
+  `ConfigMyTemplates.OnInitialized`, `MaintenanceV2.OnParametersSet`).
+- The unused `BuildServiceProvider()` call (and its `ASP0000` pragma) at the top of
+  `Backoffice.Web/Program.cs`.
+
+### Remaining dead code (intentionally not touched)
+
+- **Constructor-injected fields that are never read.** Removing them would change constructor
+  signatures and DI wiring: `TradingController._activitySource`,
+  `BackOfficeRepository._sportsbookRepository`, `MaintenanceRepository._isStaging` (its
+  `bool.Parse(configuration["IsStaging"])` also acts as a startup check),
+  `SportsbookRepository._activityLogRepository`, `TradingRepository._memCache`,
+  `Login._jsRuntime`, `ErrorModel._logger`, `BackOfficeService._configuration`,
+  `_authenticationService`, `_httpContextAccessor`, `_jsRuntime`,
+  `TradingService._configuration`, `_httpContextAccessor`, and
+  `TranslationService._httpContextAccessor`.
+- **Backoffice.Shared** (`MessageBroker._externalQueue`, `_externalConsumerName`,
+  `_externalRoutingKey`, and an unused `catch (Exception ex)`), since Shared changes are
+  cross-service.
+- **Export payloads kept for the pending "Migrate to api call" task** (the message object is
+  built but the publish is commented out): MarketSettlement and MessageSettlement `Filter`,
+  `ExportTemplateModal`, `ImportExportMarginModal`, `CancelBetHistory`, `ManualBetSettlement`.
+- `MappingFixtures._alertModel`: the success alert is built but never rendered, which looks like
+  an unfinished feature rather than dead code.
+- `Backoffice.Utility` `BackofficeRepository` `clientCodes` (parses the JWT, which can throw on a
+  malformed token).
+- The never-awaited `CountAsync` calls in `GetAssignedCount` start queries on the shared
+  `DbContext` concurrently with the awaited ones; they were kept as-is to avoid a behavior change.

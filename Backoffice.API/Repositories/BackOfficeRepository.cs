@@ -102,7 +102,7 @@ namespace Backoffice.API.Repositories
                     Result = true
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new BaseResponse<bool>
                 {
@@ -673,7 +673,7 @@ namespace Backoffice.API.Repositories
                 //validate email
                 try
                 {
-                    var emailAddress = new MailAddress(request.Email);
+                    _ = new MailAddress(request.Email);
                 }
                 catch
                 {
@@ -1357,12 +1357,6 @@ namespace Backoffice.API.Repositories
 
                     scope.Complete();
 
-
-                    var properties = new Dictionary<string, string>
-                    {
-                        { "client-code", request.ClientCode },
-                        { "events", JsonSerializer.Serialize(events) }
-                    };
 
                     //_telemetryClient.TrackEvent($"e:backoffice.client={request.ClientCode}", properties);
 
@@ -2336,7 +2330,7 @@ namespace Backoffice.API.Repositories
         }
         private long UpdateClientRecord(ClientInformation client)
         {
-            var entity = _backofficeContext.ClientInformation.Update(client).Entity;
+            _backofficeContext.ClientInformation.Update(client);
             _backofficeContext.SaveChanges();
             //_memCache.AddOrUpdateCache<List<ClientInformation>>("boci", _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24);
 
@@ -2483,9 +2477,9 @@ namespace Backoffice.API.Repositories
         }
         private async Task<int> GetAssignedCount(List<string> clientCodes)
         {
-            var prematchTask = _backofficeContext.ConfigTemplateAssigned.CountAsync(e => e.PrematchConfigTemplateId != -1);
+            _ = _backofficeContext.ConfigTemplateAssigned.CountAsync(e => e.PrematchConfigTemplateId != -1);
 
-            var liveTask = _backofficeContext.ConfigTemplateAssigned.CountAsync(e => e.LiveConfigTemplateId != -1);
+            _ = _backofficeContext.ConfigTemplateAssigned.CountAsync(e => e.LiveConfigTemplateId != -1);
 
             var result = 0;
             var assignedConfigTask = GetConfigState(clientCodes, null, ConfigState.Assigned);

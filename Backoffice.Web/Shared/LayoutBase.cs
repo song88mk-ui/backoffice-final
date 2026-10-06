@@ -257,7 +257,7 @@ namespace Backoffice.Web.Shared
 
                 await InvokeAsync(StateHasChanged);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 NavigationManager.NavigateTo("login", true);
             }
