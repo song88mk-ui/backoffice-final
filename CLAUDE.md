@@ -147,6 +147,23 @@ a publish site drops it (GM-874).
    `The key {...} was not found in the key ring` (`ErrorUnprotectingCookie`) and antiforgery
    decrypt errors (BO-114). These errors come from the missing key ring, not from the session code.
 
+## Architecture and stack (overrides dotnet-claude-kit defaults)
+
+Brownfield layered services, not VSA/Clean/DDD/Modular Monolith. Do not restructure. Kit skills
+emit greenfield defaults; use these facts instead:
+
+- **Shape:** MVC controllers call repositories in `Backoffice.API/Repositories`, hosted via
+  `Backoffice.API/Startup.cs`. The only Minimal API endpoint is in `Backoffice.Web/Program.cs`.
+- **Auth:** custom filters, not ASP.NET auth middleware: `Backoffice.API/ActionFilter/ApiKeyFilter.cs`
+  and `Backoffice.API/ActionFilter/AuthorizeAttribute.cs`.
+- **Data:** EF Core 10.0.11, four SQL Server DbContexts in `Backoffice.Shared/Data`; MongoDB.Driver
+  3.7.1, read-only.
+- **Messaging/caching:** raw RabbitMQ.Client 5.2.0; in-process `IMemCache`. No Wolverine,
+  MassTransit, outbox, HybridCache or Redis.
+- **Tests:** xUnit 2.4.2 (not v3), Moq 4.18.4, EF Core InMemory, bUnit 1.40.0. No Testcontainers,
+  WebApplicationFactory, Verify or FluentAssertions.
+- **Packages:** pinned inline per project file; no central package management.
+
 ## Before modifying code, ask
 
 Multiple projects? Migration needed? Other services consuming the message? Cache-invalidation
