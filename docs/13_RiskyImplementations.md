@@ -237,6 +237,43 @@ Request 3: Create MongoClient #3
 
 ---
 
+### CancellationTokenSource disposal and token flow (DEVOPS-371)
+
+**Fixed (SonarQube S2930 / S8949, DEVOPS-371, 2026-10):**
+- Blazor components that keep a `CancellationTokenSource` field and already implement
+  `IDisposable` now dispose the previous source when they replace it, and dispose the current
+  one in `Dispose()`: `MonitoringSelectionRow`, `MonitoringDetailsSelectionRow`,
+  `SBC/Announcements/CreateOrUpdateModal`, `DeleteAnnouncementModal`, `BoostedSettings`,
+  `ConfigAssigned`, `ConfigMyTemplates`, `Configuration2`, `SBC/Announcements`. `Dispose()` only
+  disposes, it does not cancel, so in-flight requests behave exactly as before. Code that needs
+  the token after an `await` reads it from a local copied before the `await`, never from the
+  field, so a replaced (disposed) source is never touched again.
+- `NavMenu` creates its per-load source with `using var`.
+- Services pass the token they already give to `HttpClient` on to
+  `response.Content.ReadAsStringAsync(token)` as well (`BaseService`, `BackOfficeService`,
+  `TradingService`), so a cancelled request no longer finishes reading the body.
+- `LayoutBase` passes its token to the `getClientTimeZoneOffset` JS call, and
+  `Backoffice.WebSocket.Service/Worker.cs` passes `stoppingToken` to `_hubConnection.StartAsync`.
+
+**Remaining debt (intentionally not changed):**
+- `MatchDetailsClientSelectionComponent`, `OEMonitoringLayout` and `LayoutBase` hold a
+  `CancellationTokenSource` field but do not implement `IDisposable`. Fixing them means adding
+  `@implements IDisposable`, which was kept out of this cleanup.
+- `ModifyLeagueTemplateModal` creates a `CancellationTokenSource` local that is never used. It is
+  removed with the unused locals (S1481), not here.
+- `ConfigAssigned` (`showSelectedLeagueCount` JS calls), `Configuration2` (`Task.Run` for
+  sports/clients and `GetClientList`) and `ImportClientsModal` (file `CopyToAsync`,
+  `allowPageClose`) were flagged to pass the page's `_cts` token, but that token belongs to an
+  unrelated load. Passing it would let a reload cancel those calls (for `allowPageClose`, the
+  token is already cancelled on the line before), so they were left alone.
+- `Backoffice.WebSocket.Service/Worker.cs` `Thread*` methods (S2190) are deliberate
+  `while (true)` consumer loops over a `BlockingCollection`, not recursion. They never observe
+  `stoppingToken`, and each is `async void` with no `try/catch`, so one exception from a
+  `SportsbookRepository.Process*` call ends that consumer (and an `async void` exception can take
+  the process down). Worth a separate change to add a token and error handling.
+
+---
+
 ## Data Consistency Risks
 
 ### Risk #7: Fire-and-Forget Message Publishing

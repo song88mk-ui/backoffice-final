@@ -237,6 +237,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public void Dispose()
         {
+            _cts?.Dispose();
             GC.SuppressFinalize(this);
         }
 
@@ -252,6 +253,7 @@ namespace Backoffice.Web.Pages.SBC
         private async Task GetContent(AnnouncementsFilterModel model)
         {
             _cts?.Cancel();
+            _cts?.Dispose();
             _cts = new CancellationTokenSource();
 
             if (model.ClientCodes == null)

@@ -55,12 +55,12 @@ namespace Backoffice.Web.Services
                 var response = await _httpClient.PostAsync(requestUri, new StringContent(JsonSerializer.Serialize(requestPayload), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<T1>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive)
+                    return JsonSerializer.Deserialize<BaseResponse<T1>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive)
                         ?? new BaseResponse<T1>();
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<T1>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                        return JsonSerializer.Deserialize<BaseResponse<T1>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive);
                     if (response.StatusCode == HttpStatusCode.Unauthorized)
                     {
                         var result = new BaseResponse<T1>
@@ -98,11 +98,11 @@ namespace Backoffice.Web.Services
                 var response = await _httpClient.GetAsync(requestUri, cancellationToken);
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<T1>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                    return JsonSerializer.Deserialize<BaseResponse<T1>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<T1>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                        return JsonSerializer.Deserialize<BaseResponse<T1>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive);
 
                     if (response.StatusCode == HttpStatusCode.Unauthorized)
                     {

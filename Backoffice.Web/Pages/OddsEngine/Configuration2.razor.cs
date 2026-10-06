@@ -124,7 +124,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
-
+            _cts?.Dispose();
         }
 
         #endregion
@@ -161,6 +161,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = true;
 
             _cts?.Cancel();
+            _cts?.Dispose();
 
             _cts = new CancellationTokenSource();
             var token = _cts.Token;

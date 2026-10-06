@@ -75,7 +75,7 @@ namespace Backoffice.Web.Shared
                     return;
                 }
 
-                var timeZoneOffset = await JSRuntime.InvokeAsync<int>("getClientTimeZoneOffset");
+                var timeZoneOffset = await JSRuntime.InvokeAsync<int>("getClientTimeZoneOffset", _cts.Token);
                 UserState.TimeZoneOffset = TimeSpan.FromMinutes(timeZoneOffset);
 
                 var ctsToken = _cts.Token;

@@ -113,7 +113,7 @@ namespace Backoffice.WebSocket.Service
                 _threadNotification.Start();
 
                 _logger.LogInformation("Connecting to WebSocket API");
-                await _hubConnection.StartAsync();
+                await _hubConnection.StartAsync(stoppingToken);
                 _logger.LogInformation("Connected");
 
                 _logger.LogInformation("Connecting to message broker");

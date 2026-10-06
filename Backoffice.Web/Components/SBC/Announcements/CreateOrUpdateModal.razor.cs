@@ -168,6 +168,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         {
             try
             {
+                _cts?.Dispose();
                 _cts = new CancellationTokenSource();
 
                 if (_isPreload)
@@ -351,7 +352,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         public void Dispose()
         {
-
+            _cts?.Dispose();
         }
 
         #endregion

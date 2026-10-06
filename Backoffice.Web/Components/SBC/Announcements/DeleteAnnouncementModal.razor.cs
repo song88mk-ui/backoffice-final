@@ -47,6 +47,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _isPreload = true;
             await InvokeAsync(StateHasChanged);
 
+            _cts?.Dispose();
             _cts = new CancellationTokenSource();
 
             var token = _cts.Token;
@@ -105,7 +106,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         public void Dispose()
         {
-
+            _cts?.Dispose();
         }
 
         #endregion

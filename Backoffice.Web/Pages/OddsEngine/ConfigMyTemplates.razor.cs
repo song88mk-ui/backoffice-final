@@ -146,7 +146,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
-
+            _cts?.Dispose();
         }
 
         #endregion
@@ -156,6 +156,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private async Task LoadConfigTemplates(bool isReload = true)
         {
             _cts?.Cancel();
+            _cts?.Dispose();
 
             _cts = new CancellationTokenSource();
 

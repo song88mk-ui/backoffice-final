@@ -1048,7 +1048,7 @@ namespace Backoffice.Web.Services
                 if (response.IsSuccessStatusCode)
                 {
                     return JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>(
-                        await response.Content.ReadAsStringAsync(),
+                        await response.Content.ReadAsStringAsync(cancellationToken),
                         JsonSerializerOptionsProvider.CaseInsensitive
                         ) ?? new BaseResponse<SportsTreeResponse>();
                 }
@@ -1058,7 +1058,7 @@ namespace Backoffice.Web.Services
                     {
                         return JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>
                         (
-                            await response.Content.ReadAsStringAsync(),
+                            await response.Content.ReadAsStringAsync(cancellationToken),
                             JsonSerializerOptionsProvider.CaseInsensitive
                         ) ?? new BaseResponse<SportsTreeResponse>();
                     }
@@ -1510,11 +1510,11 @@ namespace Backoffice.Web.Services
                 var response = await _httpClient.PostAsync($"sportsbook/settings/announcements", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<AnnouncementResponse>();
+                    return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<AnnouncementResponse>();
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<AnnouncementResponse>();
+                        return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<AnnouncementResponse>();
                     else
                     {
                         return new BaseResponse<AnnouncementResponse>
@@ -1546,11 +1546,11 @@ namespace Backoffice.Web.Services
                 var response = await _httpClient.PostAsync($"sportsbook/settings/announcements/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<AnnouncementResponse>();
+                    return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<AnnouncementResponse>();
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<AnnouncementResponse>();
+                        return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<AnnouncementResponse>();
                     else
                     {
                         return new BaseResponse<AnnouncementResponse>
@@ -1582,11 +1582,11 @@ namespace Backoffice.Web.Services
                 var response = await _httpClient.PostAsync($"sportsbook/settings/announcements/delete", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<bool>();
+                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<bool>();
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<bool>();
+                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<bool>();
                     else
                     {
                         return new BaseResponse<bool>
@@ -2379,11 +2379,11 @@ namespace Backoffice.Web.Services
                 var response = await _httpClient.GetAsync($"{path}", cancellationToken);
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                    return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateResponse>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                        return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateResponse>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<ConfigTemplateResponse>
@@ -2516,13 +2516,13 @@ namespace Backoffice.Web.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateLeagueResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<ConfigTemplateLeagueResponse>();
+                    return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateLeagueResponse>>(await response.Content.ReadAsStringAsync(token), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<ConfigTemplateLeagueResponse>();
                 }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
                     {
-                        return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateLeagueResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<ConfigTemplateLeagueResponse>();
+                        return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateLeagueResponse>>(await response.Content.ReadAsStringAsync(token), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<ConfigTemplateLeagueResponse>();
                     }
                     else
                     {
@@ -2553,7 +2553,7 @@ namespace Backoffice.Web.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return JsonSerializer.Deserialize<BaseResponse<int>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<int>();
+                    return JsonSerializer.Deserialize<BaseResponse<int>>(await response.Content.ReadAsStringAsync(token), JsonSerializerOptionsProvider.CaseInsensitive) ?? new BaseResponse<int>();
                 }
                 else
                 {

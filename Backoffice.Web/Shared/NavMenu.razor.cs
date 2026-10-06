@@ -78,7 +78,7 @@ namespace Backoffice.Web.Shared
 
             if (init || _navMenuAccess != NavMenuParameter?.NavMenuAccess || languageCode != _translationState.ActiveLanguageCode)
             {
-                var cts = new CancellationTokenSource();
+                using var cts = new CancellationTokenSource();
                 _languageCode = _translationState.ActiveLanguageCode;
                 _navMenuAccess = NavMenuParameter?.NavMenuAccess;
 

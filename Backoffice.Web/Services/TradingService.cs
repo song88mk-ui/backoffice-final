@@ -216,7 +216,7 @@ namespace Backoffice.Web.Services
                 if (response.IsSuccessStatusCode)
                 {
                     return JsonSerializer.Deserialize<BaseResponse<List<ClientInformationModel>>>(
-                        await response.Content.ReadAsStringAsync(),
+                        await response.Content.ReadAsStringAsync(cancellationToken),
                         JsonSerializerOptionsProvider.CaseInsensitive
                         ) ?? new BaseResponse<List<ClientInformationModel>>();
                 }
@@ -226,7 +226,7 @@ namespace Backoffice.Web.Services
                     {
                         return JsonSerializer.Deserialize<BaseResponse<List<ClientInformationModel>>>
                         (
-                            await response.Content.ReadAsStringAsync(),
+                            await response.Content.ReadAsStringAsync(cancellationToken),
                             JsonSerializerOptionsProvider.CaseInsensitive
                         ) ?? new BaseResponse<List<ClientInformationModel>>();
                     }
@@ -299,11 +299,11 @@ namespace Backoffice.Web.Services
                 var response = await GetHttpClient().PostAsync($"api/trading/priceboost/settings/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<BoostedSettingsModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                    return JsonSerializer.Deserialize<BaseResponse<List<BoostedSettingsModel>>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<BoostedSettingsModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                        return JsonSerializer.Deserialize<BaseResponse<List<BoostedSettingsModel>>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
                         return new BaseResponse<List<BoostedSettingsModel>>

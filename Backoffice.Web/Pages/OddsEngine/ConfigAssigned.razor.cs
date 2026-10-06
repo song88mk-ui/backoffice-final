@@ -260,6 +260,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
+            _cts?.Dispose();
             _selectedConfigClients = null;
             _state = null;
         }
@@ -286,6 +287,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             payload.MetaData = _metaData;
 
+            _cts?.Dispose();
             _cts = new CancellationTokenSource();
 
             var token = _cts.Token;

@@ -108,6 +108,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var clientCodes = _clientListReference.Select(s => s.ClientCode).ToList();
 
                 _cts?.Cancel();
+                _cts?.Dispose();
                 _cts = new CancellationTokenSource();
 
                 var token = _cts.Token;
@@ -187,6 +188,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public void Dispose()
         {
+            _cts?.Dispose();
         }
 
         #endregion

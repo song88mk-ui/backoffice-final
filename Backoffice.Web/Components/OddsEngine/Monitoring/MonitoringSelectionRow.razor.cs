@@ -52,6 +52,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                     _cts?.Cancel();
                     if (_fading)
                     {
+                        _cts?.Dispose();
                         _cts = new CancellationTokenSource();
                         await Task.Delay(4000, _cts.Token);
 
@@ -71,6 +72,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         public void Dispose()
         {
+            _cts?.Dispose();
         }
 
         #endregion
