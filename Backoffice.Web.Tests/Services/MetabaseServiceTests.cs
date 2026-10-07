@@ -11,6 +11,8 @@ namespace Backoffice.Web.Tests.Services
     {
         // 64 characters, the same length as the deployed Metabase SSO keys.
         private const string ValidKey = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        private static readonly string[] TwoClientCodes = { "C1", "C2" };
+        private static readonly string[] OneClientCode = { "C1" };
 
         private static MetabaseService BuildSut(string ssoSecretKey) =>
             new(new ConfigurationBuilder()
@@ -26,7 +28,7 @@ namespace Backoffice.Web.Tests.Services
         [Fact]
         public void GetSsoToken_SignsHs256TokenThatValidatesWithTheSsoKey()
         {
-            var token = BuildSut(ValidKey).GetSsoToken("jdoe@corp.local", new[] { "C1", "C2" });
+            var token = BuildSut(ValidKey).GetSsoToken("jdoe@corp.local", TwoClientCodes);
 
             var principal = new JwtSecurityTokenHandler().ValidateToken(token, new TokenValidationParameters
             {
@@ -39,7 +41,7 @@ namespace Backoffice.Web.Tests.Services
             Assert.Equal(SecurityAlgorithms.HmacSha256, jwt.Header.Alg);
             Assert.Equal("jdoe@example.com", jwt.Payload["email"]);
             Assert.Equal("jdoe", jwt.Payload["first_name"]);
-            Assert.Equal(new[] { "C1", "C2" }, principal.FindAll("clientcode").Select(c => c.Value));
+            Assert.Equal(TwoClientCodes, principal.FindAll("clientcode").Select(c => c.Value));
             Assert.Equal("Clients", principal.FindFirst("groups")?.Value);
             Assert.InRange(jwt.ValidTo - DateTime.UtcNow, TimeSpan.FromMinutes(59), TimeSpan.FromMinutes(61));
         }
@@ -50,7 +52,7 @@ namespace Backoffice.Web.Tests.Services
             // System.IdentityModel.Tokens.Jwt 6.34.0+ rejects HS256 keys under 256 bits (IDX10720). BO-119.
             var sut = BuildSut(new string('k', 16));
 
-            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sut.GetSsoToken("jdoe@corp.local", new[] { "C1" }));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sut.GetSsoToken("jdoe@corp.local", OneClientCode));
             Assert.Contains("IDX10720", ex.Message);
         }
     }
