@@ -18,7 +18,7 @@ namespace Backoffice.Web.Tests.SBC
     // Component tests for the Static Translation page after its restructure to mirror the
     // Dynamic Translation grid: EN is the source column (not a dropdown option), the selected
     // language fills the Translation column, and search supports contains/exact match.
-    public class StaticTranslationTests : TestContext
+    public class StaticTranslationTests : BunitTestContext
     {
         private readonly Mock<IBackofficeService> _backofficeService = new();
 
@@ -53,7 +53,7 @@ namespace Backoffice.Web.Tests.SBC
                 new Mock<IAuthenticationService>().Object,
                 sp.GetRequiredService<NavigationManager>()));
 
-            var authContext = this.AddTestAuthorization();
+            var authContext = this.AddAuthorization();
             authContext.SetAuthorized("test-user");
             authContext.SetPolicies("translations-static", "translations-static-canedit");
 
@@ -106,7 +106,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void LanguageDropdown_HasNoEnglishOption_AndDefaultsToChinese()
         {
-            var cut = RenderComponent<StaticTranslation>();
+            var cut = Render<StaticTranslation>();
 
             var options = cut.FindAll("#languageSelect option");
             Assert.DoesNotContain(options, o => o.GetAttribute("value") == "EN");
@@ -119,7 +119,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void Render_ShowsLegendBadge_ForTargetLanguages_ButNotForEnglish()
         {
-            var cut = RenderComponent<StaticTranslation>();
+            var cut = Render<StaticTranslation>();
 
             var badges = cut.FindAll("span.badge");
             Assert.Contains(badges, b => b.TextContent.Contains("ZH") && b.TextContent.Contains("1/3"));
@@ -129,7 +129,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void Render_ShowsSourceColumn_AndHighlightsOnlyMissingTranslationCell()
         {
-            var cut = RenderComponent<StaticTranslation>();
+            var cut = Render<StaticTranslation>();
 
             var rows = cut.FindAll("tbody tr");
             var missingRow = Assert.Single(rows, r => r.TextContent.Contains("key2"));
@@ -147,7 +147,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void ShowOnlyUntranslated_FiltersGridToBlankTranslationsOnly()
         {
-            var cut = RenderComponent<StaticTranslation>();
+            var cut = Render<StaticTranslation>();
 
             Assert.Equal(4, cut.FindAll("tbody tr").Count);
 
@@ -163,7 +163,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void Render_HighlightsBlankSourceTextCell_WithMissingPlaceholder()
         {
-            var cut = RenderComponent<StaticTranslation>();
+            var cut = Render<StaticTranslation>();
 
             var rows = cut.FindAll("tbody tr");
             var blankSourceRow = Assert.Single(rows, r => r.TextContent.Contains("key0"));
@@ -178,7 +178,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void SearchLabel_DoesNotUseTheInvisibleWhiteLabelClass()
         {
-            var cut = RenderComponent<StaticTranslation>();
+            var cut = Render<StaticTranslation>();
 
             var label = cut.Find("label[for=searchInput]");
             Assert.DoesNotContain("white-label", label.ClassName);
@@ -206,7 +206,7 @@ namespace Backoffice.Web.Tests.SBC
                 .Setup(s => s.AddOrUpdateSportsbookTranslation(It.IsAny<AddOrUpdateSportsbookTranslationRequest>()))
                 .ReturnsAsync(new BaseResponse<bool> { StatusCode = StatusCode.Success, Result = true });
 
-            var cut = RenderComponent<StaticTranslation>();
+            var cut = Render<StaticTranslation>();
             Assert.DoesNotContain("zzz_key", cut.Markup);
 
             cut.Find(".add-translation-btn").Click();
@@ -227,7 +227,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void UploadCsvControl_IsRendered_ForUsersWithEditPermission()
         {
-            var cut = RenderComponent<StaticTranslation>();
+            var cut = Render<StaticTranslation>();
 
             var input = cut.Find("#translationImportInput");
             Assert.Equal("file", input.GetAttribute("type"));
@@ -251,7 +251,7 @@ namespace Backoffice.Web.Tests.SBC
 
             var download = JSInterop.SetupVoid("downloadFileFromText", _ => true);
 
-            var cut = RenderComponent<StaticTranslation>();
+            var cut = Render<StaticTranslation>();
             cut.FindAll("button").Single(b => b.TextContent.Contains("Export to Excel")).Click();
 
             _backofficeService.Verify(s => s.ExportSportsbookTranslations(), Times.Once);
@@ -265,7 +265,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void ExactMatch_NarrowsSearchFromContainsToEquality()
         {
-            var cut = RenderComponent<StaticTranslation>();
+            var cut = Render<StaticTranslation>();
 
             cut.Find("#searchInput").Input("key1");
             Assert.Equal(2, cut.FindAll("tbody tr").Count); // contains: key1 and key11

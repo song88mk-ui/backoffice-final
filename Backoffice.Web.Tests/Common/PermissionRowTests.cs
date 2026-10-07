@@ -15,7 +15,7 @@ namespace Backoffice.Web.Tests.Common
     // Component tests for PermissionRow, covering permission updates via the checkbox
     // (OnCheckboxClicked) and the BO-76 regression where re-rendering the admin's
     // "Sub Users" row kept resetting that permission's saved value back to disabled.
-    public class PermissionRowTests : TestContext
+    public class PermissionRowTests : BunitTestContext
     {
         public PermissionRowTests()
         {
@@ -64,7 +64,7 @@ namespace Backoffice.Web.Tests.Common
                 ClaimValue = "0"
             };
 
-            var cut = RenderComponent<PermissionRow>(ps => ps
+            var cut = Render<PermissionRow>(ps => ps
                 .Add(p => p.Claim, claim)
                 .Add(p => p.Permissions, permissions)
                 .Add(p => p.IsAdmin, false)
@@ -91,7 +91,7 @@ namespace Backoffice.Web.Tests.Common
                 ClaimValue = "1"
             };
 
-            var cut = RenderComponent<PermissionRow>(ps => ps
+            var cut = Render<PermissionRow>(ps => ps
                 .Add(p => p.Claim, claim)
                 .Add(p => p.Permissions, permissions)
                 .Add(p => p.IsAdmin, false)
@@ -122,7 +122,7 @@ namespace Backoffice.Web.Tests.Common
                 ClaimValue = "1"
             };
 
-            var cut = RenderComponent<PermissionRow>(ps => ps
+            var cut = Render<PermissionRow>(ps => ps
                 .Add(p => p.Claim, claim)
                 .Add(p => p.Permissions, permissions)
                 .Add(p => p.IsAdmin, true)
@@ -130,7 +130,7 @@ namespace Backoffice.Web.Tests.Common
 
             // Simulate the parent re-rendering this row again, as happens when an unrelated
             // permission elsewhere in the tree is toggled.
-            cut.SetParametersAndRender(ps => ps
+            cut.Render(ps => ps
                 .Add(p => p.Claim, claim)
                 .Add(p => p.Permissions, permissions)
                 .Add(p => p.IsAdmin, true)

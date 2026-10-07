@@ -14,7 +14,7 @@ namespace Backoffice.Web.Tests.SBC
     // Component tests for the Processed-flag confirmation modal. Every component in
     // Backoffice.Web receives all _Imports.razor @inject services, so the fixture registers
     // the full set even though the modal itself only uses IModalService.
-    public class DynamicTranslationProcessedModalTests : TestContext
+    public class DynamicTranslationProcessedModalTests : BunitTestContext
     {
         private readonly Mock<IModalService> _modalService = new();
 
@@ -50,7 +50,7 @@ namespace Backoffice.Web.Tests.SBC
             parameters.Add("Processed", processed);
             parameters.Add("OnConfirmCallback", onConfirm ?? (() => Task.FromResult(true)));
 
-            return RenderComponent<DynamicTranslationProcessedModal>(ps => ps.AddCascadingValue(parameters));
+            return Render<DynamicTranslationProcessedModal>(ps => ps.AddCascadingValue(parameters));
         }
 
         [Fact]

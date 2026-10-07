@@ -952,6 +952,7 @@ services.AddHealthChecks();
 | System.IdentityModel.Tokens.Jwt | 7.7.1 | Web | Resolved (BO-119): upgraded from 6.26.0 (NU1902 advisory GHSA-59j7-ghrg-fj52), matching the 7.7.1 the other projects already resolve. No code change needed. Every patched version (6.34.0+) rejects HS256 keys under 32 bytes with IDX10720, so `Metabase:SsoSecretKey` must be at least 32 bytes |
 | Infra.Extensions.Telemetry | 0.0.1-1 | all services | Pins OpenTelemetry 1.14.0 transitively (multiple NU1902 advisories); needs a new package release |
 | Swashbuckle.AspNetCore | 6.4.0 | API | Old but functional on net10; upgrade when convenient |
+| bunit | 2.11.3 | Web.Tests | Resolved (BO-120): upgraded from 1.40.0, which pulled AngleSharp 1.2.0 (NU1902 advisory GHSA-pgww-w46g-26qg). A direct AngleSharp override does not work: bunit 1.x is binary-incompatible with AngleSharp 1.5.0+ (`MissingMethodException` on `IHtmlCollection<T>.get_Item`). bunit 2 brings AngleSharp 1.8.1; tests use `BunitTestContext` for async disposal under xUnit 2.x |
 
 These NuGet audit warnings (NU1902/1903/1904) are surfaced by the .NET 10 SDK during restore; they existed as transitive dependencies before the upgrade but were not audited by the old SDKs. None fail the build.
 

@@ -160,8 +160,10 @@ emit greenfield defaults; use these facts instead:
   3.12.0, read-only.
 - **Messaging/caching:** raw RabbitMQ.Client 5.2.0; in-process `IMemCache`. No Wolverine,
   MassTransit, outbox, HybridCache or Redis.
-- **Tests:** xUnit 2.4.2 (not v3), Moq 4.18.4, EF Core InMemory, bUnit 1.40.0. No Testcontainers,
-  WebApplicationFactory, Verify or FluentAssertions.
+- **Tests:** xUnit 2.4.2 (not v3), Moq 4.18.4, EF Core InMemory, bUnit 2.11.3. No Testcontainers,
+  WebApplicationFactory, Verify or FluentAssertions. bUnit test classes inherit
+  `Backoffice.Web.Tests/BunitTestContext.cs`, not `BunitContext`: it disposes the container
+  asynchronously, without which `HubService` (`IAsyncDisposable` only) throws on dispose.
 - **Packages:** pinned inline per project file; no central package management.
 
 ## Before modifying code, ask

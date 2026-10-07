@@ -19,7 +19,7 @@ namespace Backoffice.Web.Tests.Administration
     // Tests for the Client Site Config activity log modal (GM-700): the From/To JSON diff
     // extraction and the rendered table. Every component in Backoffice.Web receives all
     // _Imports.razor @inject services, so the fixture registers the full set.
-    public class ClientSiteConfigLogsModalTests : TestContext
+    public class ClientSiteConfigLogsModalTests : BunitTestContext
     {
         private static readonly Guid ClientGuid = Guid.Parse("11111111-2222-3333-4444-555555555555");
 
@@ -95,7 +95,7 @@ namespace Backoffice.Web.Tests.Administration
                 new PlatformClientResponse() { ClientId = ClientGuid, ClientName = "Acme Sports", ClientCode = "ACME" }
             });
 
-            return RenderComponent<ClientSiteConfigLogsModal>(ps => ps.AddCascadingValue(parameters));
+            return Render<ClientSiteConfigLogsModal>(ps => ps.AddCascadingValue(parameters));
         }
 
         [Fact]
@@ -248,7 +248,7 @@ namespace Backoffice.Web.Tests.Administration
                 new PlatformClientResponse() { ClientId = ClientGuid, ClientName = "Acme Sports", ClientCode = "ACME" }
             });
 
-            var cut = RenderComponent<ClientSiteConfigLogsModal>(ps => ps.AddCascadingValue(parameters));
+            var cut = Render<ClientSiteConfigLogsModal>(ps => ps.AddCascadingValue(parameters));
 
             Assert.Contains("jane.doe", cut.Markup);
             Assert.DoesNotContain("john.smith", cut.Markup);

@@ -17,7 +17,7 @@ namespace Backoffice.Web.Tests.SBC
 {
     // Component tests for the Dynamic Translation page: the translated/untranslated legend and
     // the server-side "Show only untranslated" filter added on top of the existing glossary grid.
-    public class DynamicTranslationTests : TestContext
+    public class DynamicTranslationTests : BunitTestContext
     {
         private readonly Mock<IBackofficeService> _backofficeService = new();
         private GetSportsbookGlossaryRequest? _lastRequest;
@@ -53,7 +53,7 @@ namespace Backoffice.Web.Tests.SBC
                 new Mock<IAuthenticationService>().Object,
                 sp.GetRequiredService<NavigationManager>()));
 
-            var authContext = this.AddTestAuthorization();
+            var authContext = this.AddAuthorization();
             authContext.SetAuthorized("test-user");
             authContext.SetPolicies("translations-dynamic", "translations-dynamic-canedit");
 
@@ -97,7 +97,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void Render_ShowsLegendBadge_ForEachTargetLanguage_WithTranslatedCounts()
         {
-            var cut = RenderComponent<DynamicTranslation>();
+            var cut = Render<DynamicTranslation>();
 
             var badges = cut.FindAll("span.badge");
             Assert.Contains(badges, b => b.TextContent.Contains("ZH") && b.TextContent.Contains("1/2"));
@@ -108,7 +108,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void Render_HighlightsTranslationCell_AndShowsMissingPlaceholder_WhenTargetEqualsSource_WithoutTintingActionsColumn()
         {
-            var cut = RenderComponent<DynamicTranslation>();
+            var cut = Render<DynamicTranslation>();
             cut.Find("#languageSelect").Change("ZH"); // missing-placeholder logic only applies to non-EN target languages
 
             var rows = cut.FindAll("tbody tr");
@@ -126,7 +126,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void Render_DoesNotFlagLetterlessSourceText_AsUntranslated_AndShowsItsValue()
         {
-            var cut = RenderComponent<DynamicTranslation>();
+            var cut = Render<DynamicTranslation>();
             cut.Find("#languageSelect").Change("ZH");
 
             var rows = cut.FindAll("tbody tr");
@@ -140,7 +140,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void ShowOnlyUntranslated_SendsUntranslatedOnlyFlag_ToTheApi()
         {
-            var cut = RenderComponent<DynamicTranslation>();
+            var cut = Render<DynamicTranslation>();
             cut.Find("#languageSelect").Change("ZH"); // the flag is only meaningful once a target language is selected
 
             cut.Find("#showOnlyUntranslated").Change(true);
@@ -152,7 +152,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void LanguageDropdown_HasNoEnglishOption_AndDefaultsToChinese()
         {
-            var cut = RenderComponent<DynamicTranslation>();
+            var cut = Render<DynamicTranslation>();
 
             var options = cut.FindAll("#languageSelect option");
             Assert.DoesNotContain(options, o => o.GetAttribute("value") == "EN");
@@ -165,7 +165,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void ShowOnlyUntranslated_CheckboxIsAlwaysEnabled()
         {
-            var cut = RenderComponent<DynamicTranslation>();
+            var cut = Render<DynamicTranslation>();
 
             var checkbox = cut.Find("#showOnlyUntranslated");
             Assert.False(checkbox.HasAttribute("disabled"));
@@ -174,7 +174,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void ExactMatch_SendsExactMatchFlag_AndResetsToFirstPage()
         {
-            var cut = RenderComponent<DynamicTranslation>();
+            var cut = Render<DynamicTranslation>();
 
             cut.Find("#exactMatch").Change(true);
 
@@ -186,7 +186,7 @@ namespace Backoffice.Web.Tests.SBC
         [Fact]
         public void ExactMatch_DefaultsToFalse_OnInitialLoad()
         {
-            var cut = RenderComponent<DynamicTranslation>();
+            var cut = Render<DynamicTranslation>();
 
             Assert.NotNull(_lastRequest);
             Assert.False(_lastRequest!.ExactMatch);

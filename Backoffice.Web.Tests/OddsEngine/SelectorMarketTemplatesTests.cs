@@ -18,7 +18,7 @@ namespace Backoffice.Web.Tests.OddsEngine
 {
     // Component tests for the Selector Market Templates page: load-time ordering,
     // the inline (tfoot) Add Row control, and the per-sport template dropdown lookup.
-    public class SelectorMarketTemplatesTests : TestContext
+    public class SelectorMarketTemplatesTests : BunitTestContext
     {
         private static readonly Guid ClientId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
@@ -68,7 +68,7 @@ namespace Backoffice.Web.Tests.OddsEngine
                 authenticationService.Object,
                 sp.GetRequiredService<NavigationManager>()));
 
-            var authContext = this.AddTestAuthorization();
+            var authContext = this.AddAuthorization();
             authContext.SetAuthorized("test-user");
             authContext.SetPolicies("sbc-market-selectortemplates", "sbc-market-selectortemplates-canedit");
 
@@ -128,7 +128,7 @@ namespace Backoffice.Web.Tests.OddsEngine
 
         private IRenderedComponent<SelectorMarketTemplates> RenderPageWithClientSelected()
         {
-            var cut = RenderComponent<SelectorMarketTemplates>();
+            var cut = Render<SelectorMarketTemplates>();
 
             cut.Find("select").Change("GSA");
             cut.WaitForAssertion(() => Assert.NotEmpty(cut.FindAll("tbody tr")));

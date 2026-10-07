@@ -19,7 +19,7 @@ namespace Backoffice.Web.Tests.Administration
     // mode, must actually enable maintenance for it on Save. The master "Enable Maintenance
     // Mode" switch and the per-client checklist used to be independent state, so Save could
     // silently disable (or no-op) instead of enable, with no error and a misleading toast.
-    public class MaintenanceV2PageTests : TestContext
+    public class MaintenanceV2PageTests : BunitTestContext
     {
         private static readonly Guid ClientGuid = Guid.Parse("AAAAAAAA-2222-3333-4444-555555555555");
 
@@ -109,7 +109,7 @@ namespace Backoffice.Web.Tests.Administration
                     Result = new MaintenanceResponse() { ClientConfig = new List<MaintenanceConfigModel>() }
                 });
 
-            var cut = RenderComponent<MaintenanceV2Page>();
+            var cut = Render<MaintenanceV2Page>();
 
             cut.Find("#radio2").Change(true);
             cut.Find("#client-dropdown").Click();
@@ -135,7 +135,7 @@ namespace Backoffice.Web.Tests.Administration
                     Result = new MaintenanceResponse() { ClientConfig = new List<MaintenanceConfigModel>() }
                 });
 
-            var cut = RenderComponent<MaintenanceV2Page>();
+            var cut = Render<MaintenanceV2Page>();
 
             cut.Find("#radio2").Change(true);
             // Client is already checked (loaded as under maintenance); turn the master

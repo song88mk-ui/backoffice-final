@@ -16,7 +16,7 @@ namespace Backoffice.Web.Tests.SBC
     // changing the key on an existing row must not be possible from the UI), and the
     // Source Text (EN) / Translation split introduced when the page was restructured to
     // mirror Dynamic Translation.
-    public class StaticTranslationEditModalTests : TestContext
+    public class StaticTranslationEditModalTests : BunitTestContext
     {
         private readonly Mock<IModalService> _modalService = new();
 
@@ -59,7 +59,7 @@ namespace Backoffice.Web.Tests.SBC
             parameters.Add("IsNew", isNew);
             parameters.Add("OnSaveCallback", onSave ?? ((k, s, t) => Task.FromResult(true)));
 
-            return RenderComponent<StaticTranslationEditModal>(ps => ps.AddCascadingValue(parameters));
+            return Render<StaticTranslationEditModal>(ps => ps.AddCascadingValue(parameters));
         }
 
         [Fact]

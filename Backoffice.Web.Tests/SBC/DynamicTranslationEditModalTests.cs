@@ -14,7 +14,7 @@ namespace Backoffice.Web.Tests.SBC
     // Component tests for the Dynamic Translation (glossary) edit modal, covering the String ID
     // field's disabled-on-edit behavior (StringId is the CSV import/export upsert key and the
     // repository already ignores a changed value on edit -- the UI must not suggest otherwise).
-    public class DynamicTranslationEditModalTests : TestContext
+    public class DynamicTranslationEditModalTests : BunitTestContext
     {
         private readonly Mock<IModalService> _modalService = new();
 
@@ -58,7 +58,7 @@ namespace Backoffice.Web.Tests.SBC
             parameters.Add("IsNew", isNew);
             parameters.Add("OnSaveCallback", onSave ?? ((id, src, tgt) => Task.FromResult(true)));
 
-            return RenderComponent<DynamicTranslationEditModal>(ps => ps.AddCascadingValue(parameters));
+            return Render<DynamicTranslationEditModal>(ps => ps.AddCascadingValue(parameters));
         }
 
         [Fact]

@@ -17,7 +17,7 @@ namespace Backoffice.Web.Tests.Administration
     // The search box previously updated `_searchField` but never re-filtered the rendered
     // list or requested a re-render: the filter only ran inside OnParametersSet, which is
     // gated on the checked-item set changing, not on typed search text (BO-115 follow-up).
-    public class ClientSelectionDropDownTests : TestContext
+    public class ClientSelectionDropDownTests : BunitTestContext
     {
         public ClientSelectionDropDownTests()
         {
@@ -70,7 +70,7 @@ namespace Backoffice.Web.Tests.Administration
         [Fact]
         public void TypingInSearchBox_FiltersTheVisibleList()
         {
-            var cut = RenderComponent<ClientSelectionDropDown>(parameters => parameters
+            var cut = Render<ClientSelectionDropDown>(parameters => parameters
                 .Add(p => p.Clients, SampleClients()));
 
             cut.Find("#client-dropdown").Click();
@@ -86,7 +86,7 @@ namespace Backoffice.Web.Tests.Administration
         [Fact]
         public void ClearingSearchBox_RestoresTheFullList()
         {
-            var cut = RenderComponent<ClientSelectionDropDown>(parameters => parameters
+            var cut = Render<ClientSelectionDropDown>(parameters => parameters
                 .Add(p => p.Clients, SampleClients()));
 
             cut.Find("#client-dropdown").Click();

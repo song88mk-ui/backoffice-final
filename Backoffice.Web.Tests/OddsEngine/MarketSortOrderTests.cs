@@ -19,7 +19,7 @@ namespace Backoffice.Web.Tests.OddsEngine
     // Regression tests for BO-23: switching a Market Sort Order filter must hide the
     // table (preloader) for the whole reload instead of briefly re-rendering the old
     // sport's rows, and the table must come back with the new data once loaded.
-    public class MarketSortOrderTests : TestContext
+    public class MarketSortOrderTests : BunitTestContext
     {
         private static readonly Guid ClientId = Guid.Parse("22222222-2222-2222-2222-222222222222");
 
@@ -69,7 +69,7 @@ namespace Backoffice.Web.Tests.OddsEngine
                 authenticationService.Object,
                 sp.GetRequiredService<NavigationManager>()));
 
-            var authContext = this.AddTestAuthorization();
+            var authContext = this.AddAuthorization();
             authContext.SetAuthorized("test-user");
             authContext.SetPolicies("sbc-market-sortorder", "sbc-market-sortorder-canedit");
 
@@ -144,7 +144,7 @@ namespace Backoffice.Web.Tests.OddsEngine
         {
             var events = new List<string>();
 
-            var cut = RenderComponent<MarketSortOrderFilter>(ps => ps
+            var cut = Render<MarketSortOrderFilter>(ps => ps
                 .Add(p => p.Region, "HK")
                 .Add(p => p.IsPreLoader, false)
                 .Add(p => p.IsPreLoaderChanged, (bool value) => events.Add($"preloader:{value}"))
@@ -171,7 +171,7 @@ namespace Backoffice.Web.Tests.OddsEngine
         [Fact]
         public void SportChangeHidesTableWhileLoadingThenRendersNewData()
         {
-            var cut = RenderComponent<MarketSortOrderPage>();
+            var cut = Render<MarketSortOrderPage>();
 
             cut.WaitForAssertion(() =>
             {
@@ -215,7 +215,7 @@ namespace Backoffice.Web.Tests.OddsEngine
         [Fact]
         public void OlderSlowFilterResponseDoesNotClobberNewerFasterOne()
         {
-            var cut = RenderComponent<MarketSortOrderPage>();
+            var cut = Render<MarketSortOrderPage>();
 
             cut.WaitForAssertion(() => Assert.Contains("Match Result", cut.Markup));
 

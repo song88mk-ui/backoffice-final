@@ -18,7 +18,7 @@ namespace Backoffice.Web.Tests.Administration
     // Page tests for Client Site Config, covering the GM-697 QA finding: a client without an
     // existing config (or with a config that has no Layout data) must still preload the full
     // form, including the Themes section with the known platform-web layouts (AL, EL2).
-    public class ClientSiteConfigPageTests : TestContext
+    public class ClientSiteConfigPageTests : BunitTestContext
     {
         private static readonly Guid ClientGuid = Guid.Parse("11111111-2222-3333-4444-555555555555");
 
@@ -87,7 +87,7 @@ namespace Backoffice.Web.Tests.Administration
                 .Setup(s => s.GetClientFeatureFlags(It.IsAny<string>()))
                 .ReturnsAsync(response);
 
-            var cut = RenderComponent<ClientSiteConfigPage>();
+            var cut = Render<ClientSiteConfigPage>();
             cut.Find("select").Change(ClientGuid.ToString().ToUpper());
             return cut;
         }
