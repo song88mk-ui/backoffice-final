@@ -99,7 +99,7 @@ Primary REST API gateway for all backoffice operations. Orchestrates data access
 - Newtonsoft.Json (legacy) + System.Text.Json
 - RabbitMQ.Client 5.2.0
 - Serilog 4.3.0
-- OpenTelemetry 1.5.0
+- OpenTelemetry 1.15.3 (via Infra.Extensions.Telemetry 0.1.1-5)
 
 ### Startup Configuration
 
@@ -448,7 +448,7 @@ Shared library containing all domain models, database contexts, utilities, and m
 - MongoDB.Driver 3.12.0
 - RabbitMQ.Client 5.2.0
 - Entity Framework Core 10.0.11
-- OpenTelemetry.Api 1.5.0
+- OpenTelemetry.Api 1.15.3
 - System.Runtime.Caching 7.0.0
 - Newtonsoft.Json 13.0.1
 

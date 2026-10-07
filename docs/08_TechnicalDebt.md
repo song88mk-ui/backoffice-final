@@ -950,7 +950,8 @@ services.AddHealthChecks();
 | EPPlus | 5.8.2 | Utility | Legacy 5.x. Its transitive System.Drawing.Common 5.0.0 (NU1904 critical advisory GHSA-rxg9-xrhp-64gj) is overridden by a direct 5.0.3 reference (BO-116); keep it on 5.0.x because 6.x+ throws on Linux |
 | MongoDB.Driver | 3.12.0 | Shared | Resolved (BO-117/BO-118): upgraded from 3.7.1, which pulled SharpCompress 0.30.1 (NU1902) and Snappier 1.0.0 (NU1903 high, GHSA-pggp-6c3x-2xmx); 3.12.0 brings Snappier 1.3.1 and SharpCompress 0.48.1 |
 | System.IdentityModel.Tokens.Jwt | 7.7.1 | Web | Resolved (BO-119): upgraded from 6.26.0 (NU1902 advisory GHSA-59j7-ghrg-fj52), matching the 7.7.1 the other projects already resolve. No code change needed. Every patched version (6.34.0+) rejects HS256 keys under 32 bytes with IDX10720, so `Metabase:SsoSecretKey` must be at least 32 bytes |
-| Infra.Extensions.Telemetry | 0.0.1-1 | all services | Pins OpenTelemetry 1.14.0 transitively (multiple NU1902 advisories); needs a new package release |
+| Infra.Extensions.Telemetry | 0.1.1-5 | all services | Resolved: 0.1.1-5 brings OpenTelemetry 1.15.3, with no audit warnings (was 0.0.1-1, which pinned OpenTelemetry 1.14.0 with multiple NU1902 advisories) |
+| OpenTelemetry.Api | 1.15.3 | Shared | Resolved (BO-121): direct reference upgraded from 1.5.0 (NU1902 advisory GHSA-g94r-2vxg-569j). The services already resolved 1.15.3 through Infra.Extensions.Telemetry, so there is no runtime change |
 | Swashbuckle.AspNetCore | 6.4.0 | API | Old but functional on net10; upgrade when convenient |
 | bunit | 2.11.3 | Web.Tests | Resolved (BO-120): upgraded from 1.40.0, which pulled AngleSharp 1.2.0 (NU1902 advisory GHSA-pgww-w46g-26qg). A direct AngleSharp override does not work: bunit 1.x is binary-incompatible with AngleSharp 1.5.0+ (`MissingMethodException` on `IHtmlCollection<T>.get_Item`). bunit 2 brings AngleSharp 1.8.1; tests use `BunitTestContext` for async disposal under xUnit 2.x |
 

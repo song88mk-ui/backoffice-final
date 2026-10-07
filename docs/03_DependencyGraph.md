@@ -86,7 +86,7 @@ Serilog (4.3.0)
 ├─ Serilog.Settings.Configuration (10.0.0)
 └─ Serilog.Sinks.Console (6.1.1)
 
-OpenTelemetry (1.5.0)
+OpenTelemetry (1.15.3)
 ├─ OpenTelemetry.Api
 ├─ OpenTelemetry.Instrumentation.AspNetCore
 ├─ OpenTelemetry.Exporter (implied)
