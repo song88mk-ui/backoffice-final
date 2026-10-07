@@ -949,7 +949,7 @@ services.AddHealthChecks();
 | WindowsAzure.Storage | 9.3.3 | Utility | Deprecated; successor is Azure.Storage.Blobs |
 | EPPlus | 5.8.2 | Utility | Legacy 5.x. Its transitive System.Drawing.Common 5.0.0 (NU1904 critical advisory GHSA-rxg9-xrhp-64gj) is overridden by a direct 5.0.3 reference (BO-116); keep it on 5.0.x because 6.x+ throws on Linux |
 | MongoDB.Driver | 3.12.0 | Shared | Resolved (BO-117/BO-118): upgraded from 3.7.1, which pulled SharpCompress 0.30.1 (NU1902) and Snappier 1.0.0 (NU1903 high, GHSA-pggp-6c3x-2xmx); 3.12.0 brings Snappier 1.3.1 and SharpCompress 0.48.1 |
-| System.IdentityModel.Tokens.Jwt | 6.26.0 | Web | NU1902 advisory GHSA-59j7-ghrg-fj52; 7.x/8.x renames namespaces |
+| System.IdentityModel.Tokens.Jwt | 7.7.1 | Web | Resolved (BO-119): upgraded from 6.26.0 (NU1902 advisory GHSA-59j7-ghrg-fj52), matching the 7.7.1 the other projects already resolve. No code change needed. Every patched version (6.34.0+) rejects HS256 keys under 32 bytes with IDX10720, so `Metabase:SsoSecretKey` must be at least 32 bytes |
 | Infra.Extensions.Telemetry | 0.0.1-1 | all services | Pins OpenTelemetry 1.14.0 transitively (multiple NU1902 advisories); needs a new package release |
 | Swashbuckle.AspNetCore | 6.4.0 | API | Old but functional on net10; upgrade when convenient |
 

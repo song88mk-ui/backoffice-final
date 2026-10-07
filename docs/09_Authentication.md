@@ -380,6 +380,15 @@ public async Task<IActionResult> UpdateConfig()
 4. **No Caching** - Token not cached, re-validated each time
 5. **No Local Verification** - Could verify signature locally instead
 
+### Outbound JWTs (Metabase SSO)
+
+`Backoffice.Web` signs one JWT of its own: `MetabaseService.GetSsoToken` (HS256, signed with
+`Metabase:SsoSecretKey`), served by `/sso/metabase` in `Program.cs`. Since BO-119
+(`System.IdentityModel.Tokens.Jwt` 7.7.1) the key must be at least 32 bytes: a shorter key throws
+`IDX10720` and the endpoint returns 500. The deployed keys are 64 characters.
+`CommonService.GenerateToken` (Tableau JWT) has no callers; the Tableau embed uses trusted
+tickets in `TableauService`.
+
 ---
 
 ## Authorization Patterns
