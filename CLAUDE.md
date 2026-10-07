@@ -157,7 +157,7 @@ emit greenfield defaults; use these facts instead:
 - **Auth:** custom filters, not ASP.NET auth middleware: `Backoffice.API/ActionFilter/ApiKeyFilter.cs`
   and `Backoffice.API/ActionFilter/AuthorizeAttribute.cs`.
 - **Data:** EF Core 10.0.11, four SQL Server DbContexts in `Backoffice.Shared/Data`; MongoDB.Driver
-  3.7.1, read-only.
+  3.12.0, read-only.
 - **Messaging/caching:** raw RabbitMQ.Client 5.2.0; in-process `IMemCache`. No Wolverine,
   MassTransit, outbox, HybridCache or Redis.
 - **Tests:** xUnit 2.4.2 (not v3), Moq 4.18.4, EF Core InMemory, bUnit 1.40.0. No Testcontainers,

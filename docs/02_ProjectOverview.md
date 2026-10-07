@@ -445,7 +445,7 @@ Shared library containing all domain models, database contexts, utilities, and m
 - Custom utilities
 
 ### Dependencies
-- MongoDB.Driver 3.7.1
+- MongoDB.Driver 3.12.0
 - RabbitMQ.Client 5.2.0
 - Entity Framework Core 10.0.11
 - OpenTelemetry.Api 1.5.0

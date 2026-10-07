@@ -66,7 +66,7 @@ RabbitMQ.Client (5.2.0)
 
 ### Data Access
 ```
-MongoDB.Driver (3.7.1)
+MongoDB.Driver (3.12.0)
 ├─ Connection pooling
 ├─ LINQ provider
 ├─ Collection operations
