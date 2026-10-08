@@ -29,4 +29,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 
 COPY --from=build /source/Backoffice.WebSocket.API/publish .
+USER app
 CMD ["/usr/bin/dotnet", "Backoffice.WebSocket.API.dll"]

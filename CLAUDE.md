@@ -48,9 +48,9 @@ hot table, restarting a service mid-message-processing, publishing an `OnDeleteC
 `r.oe.cachesync.*` (it clears caches in downstream services; `IMemCache` itself is in-process), publishing a message that cascades to the OddsEngine.
 
 **Secrets.** Never commit real connection strings, API keys, JWT secrets or RabbitMQ credentials.
-Committed settings files (notably `Backoffice.API/appsettings.json`) currently contain real
-credentials, a known leak pending rotation; do not add more. Real values go in git-ignored
-Development overlays, env vars or a secrets manager. Before any operation touching
+Committed `appsettings.json` files hold `${...}` placeholders since DEVOPS-371; the real values
+they used to contain are still in git history and pending rotation (`docs/08_TechnicalDebt.md`
+#2). Deployed values come from argocd; local values go in env vars, never in a committed file. Before any operation touching
 external infrastructure, verify which environment the active connection string targets. **Never
 log a secret value in plaintext either.** A sibling repo (platform-final, GM-880, 2026-09-30) found
 `_logger.LogError` printing an OG private API key on every failed bet placement, visible in PRD

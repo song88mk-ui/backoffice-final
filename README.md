@@ -56,8 +56,12 @@ Each runnable project has its own `appsettings.json` plus an
 the default launch profiles). Values can also be overridden with environment
 variables using the standard double-underscore separator (e.g. `Security__ApiKey`).
 
-Never commit real secrets. Reference of the important keys (names only - supply
-your own local values):
+Never commit real secrets. The committed `appsettings.json` files hold placeholders
+(`${DB_PASSWORD}` inside connection strings, `${API_KEY}`, `${JWT_KEY}`,
+`${RABBITMQ_PASSWORD}`, ...). .NET does not expand them, so set the real value as an
+environment variable (e.g. `ConnectionStrings__Backoffice`, `Security__ApiKey`).
+Deployed environments get these from argocd. Reference of the important keys
+(names only - supply your own local values):
 
 ### Backoffice.API
 - `ConnectionStrings:Backoffice|Sportsbook|Trading|Translation` - SQL Server databases
@@ -72,7 +76,7 @@ your own local values):
 - `API:Backoffice:Uri` + `API:Backoffice:Security:APIKey` - which Backoffice.API instance the UI calls (point at `https://localhost:5001` for a fully local stack)
 - `API:HubAPI` - the WebSocket hub URL, ending in `/bohub` (point at `http://localhost:5190/bohub` locally)
 - `Region` - `HK` or `SA`
-- `Sportsbook:PlatformApi:*`, `Tableau:*`, `Metabase:*`, `SlackWebHook`, `Telemetry:*`
+- `Tableau:*`, `Metabase:*`, `SlackWebHook`, `Telemetry:*`
 
 ### Worker services (WebSocket.Service, Config.Service, Utility)
 - `MessageBroker:*` - RabbitMQ host, credentials, virtual host, exchange, queue, routing key
@@ -178,7 +182,10 @@ restore on `Infra.Extensions.Telemetry`.
 
 The checked-in `appsettings.json` files point SQL, Mongo and the upstream APIs at
 shared staging hosts (`stg-song88-mssql-server...rds.amazonaws.com`,
-`bo-api.stg.song88.com`, `platform-api.stg.song88.com`, ...). Two caveats:
+`bo-api.stg.song88.com`, `platform-api.stg.song88.com`, ...). The passwords and API
+keys in them are placeholders: export the real staging values as environment
+variables first (they live in AWS SSM Parameter Store under `/stg/apps/...`, the
+same parameters the argocd ExternalSecrets read). Two more caveats:
 
 - Those hosts are network-restricted. From a machine without VPN / IP-allowlist
   access, requests to them time out (verified 2026-08: `curl
@@ -544,8 +551,9 @@ the test suite - so run tests locally before pushing.
 
 - `scripts/Test-BackofficeAPIs.ps1` - health-checks the external APIs consumed by
   the solution (Platform API, Trading API) using the configuration in
-  `Backoffice.API/appsettings.json`. Run it before debugging Web errors to rule
-  out upstream failures. Supports `-Region HK|SA`.
+  `Backoffice.API/appsettings.json`. The API key there is a placeholder, so set
+  `API__PlatformAPI__HK__APIKey` (or `__SA__`) first. Run it before debugging Web
+  errors to rule out upstream failures. Supports `-Region HK|SA`.
 - `scripts/New-ReleaseTag.ps1` - creates an incremental GitHub Release
   (`vMAJOR.MINOR.PATCH-stg|prd`) to trigger the CI deployment; a plain git tag
   does not deploy.

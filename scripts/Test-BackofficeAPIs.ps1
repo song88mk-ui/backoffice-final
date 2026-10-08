@@ -56,6 +56,14 @@ $config  = $rawJson | ConvertFrom-Json
 
 $platformUri = $config.API.PlatformAPI.$Region.Uri.TrimEnd("/")
 $platformKey  = $config.API.PlatformAPI.$Region.APIKey
+# appsettings.json only holds a placeholder; the real key comes from the environment,
+# using the same variable name .NET reads (API__PlatformAPI__HK__APIKey).
+$envKey = [Environment]::GetEnvironmentVariable("API__PlatformAPI__$($Region)__APIKey")
+if ($envKey) { $platformKey = $envKey }
+if (-not $platformKey -or $platformKey -like '${*}') {
+    Write-Host "[ERROR] Set API__PlatformAPI__$($Region)__APIKey to the Platform API key." -ForegroundColor Red
+    exit 1
+}
 # Trading API removed 2026-06 — $tradingUri / $tradingKey no longer used
 
 # ---------------------------------------------------------------------------

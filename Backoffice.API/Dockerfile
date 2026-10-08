@@ -31,4 +31,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 
 COPY --from=build /app/publish .
+USER app
 CMD ["dotnet", "BackOffice.API.dll"]

@@ -207,6 +207,22 @@ app.UseDeveloperExceptionPage();  // ALWAYS ENABLED
 - Update CI/CD to use environment variables
 - Audit access logs
 
+**Status (DEVOPS-371, 2026-10):** removed from the working tree, **not rotated**.
+- Every committed `appsettings.json` now holds placeholders instead of real values:
+  `Password=${DB_PASSWORD}` in connection strings, `${API_KEY}`, `${JWT_KEY}`,
+  `${RABBITMQ_PASSWORD}`, `${AZURE_STORAGE_CONNECTION_STRING}`, `${METABASE_SSO_SECRET_KEY}`.
+  .NET does not expand these; they only document that the value is injected.
+- Deployed values come from argocd (`../argocd/apps/corp-apps/<service>/<env>.yaml`): ExternalSecrets
+  from AWS SSM Parameter Store for the connection strings, JWT key, RabbitMQ credentials and the
+  Metabase SSO key; plain `env:` entries for the API keys and the Azure Storage connection string.
+- The unused `Sportsbook:PlatformApi` block was removed from `Backoffice.Web/appsettings.json`
+  (nothing reads it).
+- Still open: the old values are in git history and must be rotated (stg/prd RDS `admin`, the old
+  `sa` password, RabbitMQ `fcadmin`, the Azure `prodstoragecdn` account key, the API keys, the JWT
+  key and the Metabase SSO key). The argocd `env:` blocks also carry API keys and the Azure Storage
+  key in plaintext and should move to ExternalSecrets.
+- Local runs: supply real values through environment variables (see README "Running locally").
+
 **Related pattern to watch for:** a sibling repo (platform-final, GM-880, 2026-09-30) found a
 different but adjacent leak, the OG private API key was printed in plaintext via `_logger.LogError`
 on every failed bet placement, visible in PRD Loki logs. Not found in this repo as of 2026-10-02,
