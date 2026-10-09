@@ -26,6 +26,10 @@ namespace Backoffice.API.Repositories
 {
     public class SportsbookRepository : ISportsbookRepository
     {
+        // ActivityLog2.Page of every League Sorting audit entry, the same value the Web logs dialog filters on.
+        private static readonly string OddstableLeagueSortingLogPage = SportsbookClientPermission.SBC_OE_LeagueSorting.ToString().Replace('_', '.');
+        private const string OddstableAuditWarning = " The change was saved but its audit log could not be written.";
+
         private static IMongoDatabase _db;
         private static IMongoCollection<MarketLookup> _marketLookupCollection;
         private static IMongoCollection<SportLookup> _sportLookupCollection;
@@ -801,6 +805,390 @@ namespace Backoffice.API.Repositories
                 StatusCode = StatusCode.Success,
                 Message = StatusCode.Success.ToString(),
                 Result = list.OrderByDescending(o => o.ClientName).ToList()
+            };
+        }
+
+        public async Task<BaseResponse<List<ClientOddstableLeagueOrderListResponse>>> GetClientOddstableLeagueOrderList(ClientOddstableLeagueOrderListRequest request)
+        {
+            var clientList = (await _platformRepository.GetClients("HK")).Result ?? new List<PlatformClientResponse>();
+
+            var clients = clientList
+                .Where(c => string.IsNullOrEmpty(request.ClientCode) || c.ClientCode == request.ClientCode)
+                .ToList();
+
+            if (!clients.Any())
+                return new BaseResponse<List<ClientOddstableLeagueOrderListResponse>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new List<ClientOddstableLeagueOrderListResponse>(),
+                };
+
+            var clientIds = clients.Select(c => c.ClientId).ToList();
+
+            var list = await _sportsbookContext.ClientOddstableLeagueOrder.AsNoTracking()
+                .Where(c => clientIds.Contains(c.ClientId) && (request.SportId == 0 || c.SportId == request.SportId))
+                .Select(s => new ClientOddstableLeagueOrderListResponse()
+                {
+                    ClientId = s.ClientId,
+                    SportId = s.SportId,
+                    SportName = s.SportName,
+                    SegmentId = s.SegmentId,
+                    SegmentName = s.SegmentName,
+                    LeagueId = s.LeagueId,
+                    LeagueName = s.LeagueName,
+                    SortOrder = s.SortOrder,
+                })
+                .ToListAsync();
+
+            list.ForEach(a =>
+            {
+                var client = clients.First(c => c.ClientId == a.ClientId);
+                a.ClientCode = client.ClientCode;
+                a.ClientName = client.ClientName;
+            });
+
+            return new BaseResponse<List<ClientOddstableLeagueOrderListResponse>>
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = list.OrderBy(o => o.ClientName).ThenBy(o => o.SportId).ThenBy(o => o.SortOrder).ToList()
+            };
+        }
+
+        public async Task<BaseResponse<ClientOddstableLeagueSettingResponse>> AddOrUpdateClientOddstableLeagueSettings(ClientOddstableLeagueSettingRequest request)
+        {
+            if (string.IsNullOrEmpty(request.ClientCode))
+                return InvalidOddstableLeagueSetting("Invalid Client Code");
+
+            if (request.SportId == 0)
+                return InvalidOddstableLeagueSetting("Invalid Sport");
+
+            if (request.Leagues == null || !request.Leagues.Any())
+                return InvalidOddstableLeagueSetting("No Client League Order to be updated");
+
+            if (request.Leagues.Any(l => l.SportId != request.SportId || l.SegmentId == 0 || l.LeagueId == 0 || l.SortOrder == 0))
+                return InvalidOddstableLeagueSetting("Error! All fields cannot be empty. Please fill in accordingly or remove the empty row");
+
+            if (request.Leagues.GroupBy(l => new { l.SegmentId, l.LeagueId }).Any(g => g.Count() > 1))
+                return InvalidOddstableLeagueSetting("Duplicate client league found");
+
+            var client = ((await _platformRepository.GetClients("HK")).Result ?? new List<PlatformClientResponse>())
+                .FirstOrDefault(c => c.ClientCode == request.ClientCode);
+
+            if (client == null)
+                return InvalidOddstableLeagueSetting("No client found");
+
+            var auditWritten = true;
+
+            try
+            {
+                var previous = await ReplaceClientOddstableLeagueOrder(client.ClientId, request.SportId, request.Leagues);
+                await _sportsbookContext.SaveChangesAsync();
+
+                var current = request.Leagues.OrderBy(l => l.SortOrder).ToList();
+                var logs = new List<OnActivityLogMessage>();
+
+                if (!IsSameOddstableOrder(previous, current))
+                {
+                    var sportName = request.Leagues.Select(l => l.SportName).FirstOrDefault(n => !string.IsNullOrEmpty(n));
+
+                    logs.Add(BuildOddstableLeagueSortingLog(client.ClientCode, ClassifyOddstableLeagueChange(previous, current), request.SportId, sportName,
+                        previous, current, null, request.UserId, request.UserName, request.TimeStamp));
+                }
+
+                auditWritten = await TryWriteOddstableLeagueSortingLogs(logs);
+
+                await PublishOddstableLeagueSortOrderChange(client.ClientId, client.ClientCode);
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ClientOddstableLeagueSettingResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = StatusCode.Error.ToString(),
+                    Result = new ClientOddstableLeagueSettingResponse()
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"Error: {ex.Message}"
+                    }
+                };
+            }
+
+            return new BaseResponse<ClientOddstableLeagueSettingResponse>
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = new ClientOddstableLeagueSettingResponse()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = "Success! Client League Order has been successfully saved." + (auditWritten ? string.Empty : OddstableAuditWarning)
+                }
+            };
+        }
+
+        public async Task<BaseResponse<ClientOddstableLeagueSettingResponse>> CopyClientOddstableLeagueSettings(CopyClientOddstableLeagueSettingRequest request)
+        {
+            if (string.IsNullOrEmpty(request.SourceClientCode))
+                return InvalidOddstableLeagueSetting("Invalid Source Client Code");
+
+            if (request.SportId == 0)
+                return InvalidOddstableLeagueSetting("Invalid Sport");
+
+            var targetCodes = (request.TargetClientCodes ?? new List<string>())
+                .Where(c => !string.IsNullOrEmpty(c))
+                .Distinct()
+                .ToList();
+
+            if (!targetCodes.Any())
+                return InvalidOddstableLeagueSetting("No target client selected");
+
+            if (targetCodes.Contains(request.SourceClientCode))
+                return InvalidOddstableLeagueSetting("Source client cannot be a copy target");
+
+            var clientList = (await _platformRepository.GetClients("HK")).Result ?? new List<PlatformClientResponse>();
+            var source = clientList.FirstOrDefault(c => c.ClientCode == request.SourceClientCode);
+            var targets = clientList.Where(c => targetCodes.Contains(c.ClientCode)).ToList();
+
+            if (source == null || targets.Count != targetCodes.Count)
+                return InvalidOddstableLeagueSetting("No client found");
+
+            var auditWritten = true;
+
+            try
+            {
+                var sourceRows = await _sportsbookContext.ClientOddstableLeagueOrder.AsNoTracking()
+                    .Where(c => c.ClientId == source.ClientId && c.SportId == request.SportId)
+                    .ToListAsync();
+
+                if (!sourceRows.Any())
+                    return InvalidOddstableLeagueSetting("Source client has no league sorting to copy");
+
+                var leagues = sourceRows.Select(r => new OddstableLeagueSortOrder()
+                {
+                    SportId = r.SportId,
+                    SportName = r.SportName,
+                    SegmentId = r.SegmentId,
+                    SegmentName = r.SegmentName,
+                    LeagueId = r.LeagueId,
+                    LeagueName = r.LeagueName,
+                    SortOrder = r.SortOrder,
+                }).ToList();
+
+                var previousByTarget = new Dictionary<Guid, List<OddstableLeagueSortOrder>>();
+
+                foreach (var target in targets)
+                    previousByTarget[target.ClientId] = await ReplaceClientOddstableLeagueOrder(target.ClientId, request.SportId, leagues);
+
+                await _sportsbookContext.SaveChangesAsync();
+
+                var sportName = leagues.Select(l => l.SportName).FirstOrDefault(n => !string.IsNullOrEmpty(n));
+
+                auditWritten = await TryWriteOddstableLeagueSortingLogs(targets
+                    .Select(t => BuildOddstableLeagueSortingLog(t.ClientCode, "Copy", request.SportId, sportName,
+                        previousByTarget[t.ClientId], leagues, source.ClientCode, request.UserId, request.UserName, request.TimeStamp))
+                    .ToList());
+
+                foreach (var target in targets)
+                    await PublishOddstableLeagueSortOrderChange(target.ClientId, target.ClientCode);
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ClientOddstableLeagueSettingResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = StatusCode.Error.ToString(),
+                    Result = new ClientOddstableLeagueSettingResponse()
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"Error: {ex.Message}"
+                    }
+                };
+            }
+
+            return new BaseResponse<ClientOddstableLeagueSettingResponse>
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = new ClientOddstableLeagueSettingResponse()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = "Success! Client League Order has been successfully copied." + (auditWritten ? string.Empty : OddstableAuditWarning)
+                }
+            };
+        }
+
+        public Task<BaseResponse<ActivityLogResponse>> GetOddstableLeagueSortingLogs(OddstableLeagueSortingLogRequest request)
+        {
+            return _activityLogRepository.GetPagedActivityLogs(
+                OddstableLeagueSortingLogPage,
+                request.ClientCode,
+                request.DateFrom == default ? DateTime.UtcNow.AddDays(-30) : request.DateFrom,
+                request.MetaData);
+        }
+
+        // Rows are updated in place rather than deleted and re-added: EF cannot track a removed and a
+        // re-added row with the same key in one SaveChanges, and a single SaveChanges keeps the replace atomic.
+        // Returns the order as it was before the replace, for the audit log.
+        private async Task<List<OddstableLeagueSortOrder>> ReplaceClientOddstableLeagueOrder(Guid clientId, int sportId, List<OddstableLeagueSortOrder> leagues)
+        {
+            var existing = await _sportsbookContext.ClientOddstableLeagueOrder
+                .Where(c => c.ClientId == clientId && c.SportId == sportId)
+                .ToListAsync();
+
+            var previous = existing
+                .OrderBy(e => e.SortOrder)
+                .Select(e => new OddstableLeagueSortOrder()
+                {
+                    SportId = e.SportId,
+                    SportName = e.SportName,
+                    SegmentId = e.SegmentId,
+                    SegmentName = e.SegmentName,
+                    LeagueId = e.LeagueId,
+                    LeagueName = e.LeagueName,
+                    SortOrder = e.SortOrder,
+                })
+                .ToList();
+
+            var existingByKey = existing.ToDictionary(e => (e.SegmentId, e.LeagueId));
+            var requestedKeys = leagues.Select(l => (l.SegmentId, l.LeagueId)).ToHashSet();
+
+            _sportsbookContext.ClientOddstableLeagueOrder.RemoveRange(existing.Where(e => !requestedKeys.Contains((e.SegmentId, e.LeagueId))));
+
+            foreach (var league in leagues)
+            {
+                if (existingByKey.TryGetValue((league.SegmentId, league.LeagueId), out var row))
+                {
+                    row.SportName = league.SportName;
+                    row.SegmentName = league.SegmentName;
+                    row.LeagueName = league.LeagueName;
+                    row.SortOrder = league.SortOrder;
+                }
+                else
+                {
+                    _sportsbookContext.ClientOddstableLeagueOrder.Add(new ClientOddstableLeagueOrder()
+                    {
+                        ClientId = clientId,
+                        SportId = sportId,
+                        SportName = league.SportName,
+                        SegmentId = league.SegmentId,
+                        SegmentName = league.SegmentName,
+                        LeagueId = league.LeagueId,
+                        LeagueName = league.LeagueName,
+                        SortOrder = league.SortOrder,
+                    });
+                }
+            }
+
+            return previous;
+        }
+
+        private static (int SegmentId, int LeagueId) OddstableLeagueKey(OddstableLeagueSortOrder league) =>
+            (league.SegmentId, league.LeagueId);
+
+        // Same leagues in the same order. Renamed leagues do not count as a change.
+        private static bool IsSameOddstableOrder(List<OddstableLeagueSortOrder> previous, List<OddstableLeagueSortOrder> current) =>
+            previous.OrderBy(l => l.SortOrder).Select(OddstableLeagueKey)
+                .SequenceEqual(current.OrderBy(l => l.SortOrder).Select(OddstableLeagueKey));
+
+        // Add: there was no order before. Reorder: the same leagues in another order. Edit: leagues added, removed or replaced.
+        private static string ClassifyOddstableLeagueChange(List<OddstableLeagueSortOrder> previous, List<OddstableLeagueSortOrder> current)
+        {
+            if (!previous.Any())
+                return "Add";
+
+            return previous.Select(OddstableLeagueKey).ToHashSet().SetEquals(current.Select(OddstableLeagueKey))
+                ? "Reorder"
+                : "Edit";
+        }
+
+        private static OnActivityLogMessage BuildOddstableLeagueSortingLog(
+            string clientCode, string activity, int sportId, string sportName,
+            List<OddstableLeagueSortOrder> previous, List<OddstableLeagueSortOrder> current,
+            string sourceClientCode, string userId, string userName, DateTime timeStamp)
+        {
+            return new OnActivityLogMessage
+            {
+                Page = OddstableLeagueSortingLogPage,
+                Payload = clientCode,
+                Activity = activity,
+                From = JsonSerializer.Serialize(ToOddstableLeagueSortingAudit(sportId, sportName, previous, null)),
+                To = JsonSerializer.Serialize(ToOddstableLeagueSortingAudit(sportId, sportName, current, sourceClientCode)),
+                UserId = userId,
+                UserName = userName,
+                TimeStamp = timeStamp == default ? DateTime.UtcNow : timeStamp
+            };
+        }
+
+        private static OddstableLeagueSortingAudit ToOddstableLeagueSortingAudit(
+            int sportId, string sportName, List<OddstableLeagueSortOrder> leagues, string sourceClientCode)
+        {
+            return new OddstableLeagueSortingAudit
+            {
+                SportId = sportId,
+                SportName = sportName,
+                SourceClientCode = sourceClientCode,
+                Leagues = leagues
+                    .OrderBy(l => l.SortOrder)
+                    .Select(l => new OddstableLeagueSortingAuditLeague
+                    {
+                        SegmentId = l.SegmentId,
+                        SegmentName = l.SegmentName,
+                        LeagueId = l.LeagueId,
+                        LeagueName = l.LeagueName,
+                        SortOrder = l.SortOrder
+                    })
+                    .ToList()
+            };
+        }
+
+        // The change is already saved when this runs, so a failed audit write is logged and reported as a
+        // warning instead of turning the whole request into an error.
+        private async Task<bool> TryWriteOddstableLeagueSortingLogs(List<OnActivityLogMessage> logs)
+        {
+            if (!logs.Any())
+                return true;
+
+            try
+            {
+                await _activityLogRepository.ProcessActivityLog(new OnActivityLogListMessage { OnActivityLogMessages = logs });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "League Sorting audit log could not be written for {ClientCodes}", string.Join(",", logs.Select(l => l.Payload)));
+                return false;
+            }
+        }
+
+        private Task PublishOddstableLeagueSortOrderChange(Guid clientId, string clientCode)
+        {
+            return _rabbitMqRepository.Publish(new MessageRequest
+            {
+                Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                {
+                    CacheType = CacheType.OddstableLeagueSortOrder,
+                    ClientId = clientId,
+                    ClientCode = clientCode,
+                    CacheKey = string.Empty
+                }),
+                CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                MessageType = "OnOddstableLeagueSortOrderChange",
+                RoutingKey = "r.oe.cachesync.onoddstableleaguesortorderchange"
+            });
+        }
+
+        private static BaseResponse<ClientOddstableLeagueSettingResponse> InvalidOddstableLeagueSetting(string message)
+        {
+            return new BaseResponse<ClientOddstableLeagueSettingResponse>
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = new ClientOddstableLeagueSettingResponse()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = message,
+                }
             };
         }
 

@@ -1,0 +1,82 @@
+<div class="modal-body">
+    <p class="text-muted ls-logs-note">@_translationState.GetValue("Showing the changes of the last 30 days, newest first.")</p>
+
+    @if (_isPreloader)
+    {
+        <Preloader />
+    }
+    else if (!string.IsNullOrEmpty(_error))
+    {
+        <div class="alert alert-danger" role="alert">@_error</div>
+    }
+    else if (_rows.Any())
+    {
+        <table class="table table-bordered table-hover ls-logs-table">
+            <thead>
+                <tr>
+                    <th class="th-date">@_translationState.GetValue("Date")</th>
+                    <th class="th-client">@_translationState.GetValue("Client")</th>
+                    <th class="th-action">@_translationState.GetValue("Action")</th>
+                    <th class="th-changes">@_translationState.GetValue("Changes From")</th>
+                    <th class="th-changes">@_translationState.GetValue("Changes To")</th>
+                    <th class="th-updated-by">@_translationState.GetValue("Updated By")</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in _rows)
+                {
+                    <tr>
+                        <td>
+                            @row.Timestamp.ToString("MM/dd/yyyy") <br />
+                            @row.Timestamp.ToString("hh:mm:ss tt")
+                        </td>
+                        <td>
+                            @row.ClientName
+                            @if (!string.IsNullOrEmpty(row.SportName))
+                            {
+                                <div class="text-muted small">@row.SportName</div>
+                            }
+                        </td>
+                        <td>
+                            @row.Action
+                            @if (!string.IsNullOrEmpty(row.CopiedFromClientName))
+                            {
+                                <div class="text-muted small">@_translationState.GetValue("From") @row.CopiedFromClientName</div>
+                            }
+                        </td>
+                        <td>@LeagueList(row.PreviousLeagues)</td>
+                        <td>@LeagueList(row.NewLeagues)</td>
+                        <td>@row.UpdatedBy</td>
+                    </tr>
+                }
+            </tbody>
+            <Pagination MetaData="_metaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
+        </table>
+    }
+    else
+    {
+        <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
+    }
+</div>
+<div class="modal-footer mx-4">
+    <button type="button" class="btn btn-cancel" @onclick="OnCloseClickEvent">@_translationState.GetValue("Close")</button>
+</div>
+
+@code {
+    // The leagues of one side of a log entry, numbered in sort order.
+    private RenderFragment<List<string>> LeagueList => leagues => @<text>
+        @if (leagues.Any())
+        {
+            <ol class="mb-0 ps-3">
+                @foreach (var league in leagues)
+                {
+                    <li>@league</li>
+                }
+            </ol>
+        }
+        else
+        {
+            <span>-</span>
+        }
+    </text>;
+}

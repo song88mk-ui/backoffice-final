@@ -50,6 +50,8 @@ namespace Backoffice.Web.Extensions
                 options.AddPolicy("sbc-config-canedit", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_Config.ToString().Replace('_', '.')}", $"{(int)Access.Edit}"));
                 options.AddPolicy("sbc-sports-setting", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
                 options.AddPolicy("sbc-sports-setting-canedit", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace('_', '.')}", $"{(int)Access.Edit}"));
+                options.AddPolicy("sbc-league-sorting", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_LeagueSorting.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
+                options.AddPolicy("sbc-league-sorting-canedit", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_LeagueSorting.ToString().Replace('_', '.')}", $"{(int)Access.Edit}"));
                 options.AddPolicy("sbc-market-sortorder", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_MarketSetting_SortOrder.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
                 options.AddPolicy("sbc-market-sortorder-canedit", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_MarketSetting_SortOrder.ToString().Replace('_', '.')}", $"{(int)Access.Edit}"));
                 options.AddPolicy("sbc-market-selectortemplates", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_MarketSetting_SelectorTemplates.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));

@@ -1,0 +1,104 @@
+.ls-filter-panel {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(180px, 1fr) minmax(220px, 1.2fr) auto;
+    gap: 0.5rem 1.5rem;
+    align-items: end;
+    padding: 0.75rem 1rem;
+    border: 1px solid #DEE2E6;
+    border-radius: 4px;
+    background-color: #FAFAFA;
+}
+
+.ls-filter-panel .form-label {
+    margin-bottom: 0.25rem;
+}
+
+.ls-filter-search .input-group-text {
+    background-color: #FFF;
+}
+
+.btn-logs {
+    border: 1px solid #C7C1C1;
+    border-radius: 3px;
+    background-color: #FFF;
+    white-space: nowrap;
+}
+
+button.form-select {
+    background-color: #fff;
+    text-align: left;
+    border: 1px solid #ced4da;
+    width: 100%;
+}
+
+button.form-select:focus {
+    border-color: unset;
+    outline: unset;
+    box-shadow: unset;
+}
+
+.dropdown-toggle::after {
+    content: unset;
+}
+
+.table > tbody > tr:nth-child(2n) > td, .table > tbody > tr:nth-child(2n) > th {
+    background-color: #F5F5F5;
+}
+
+.table-head {
+    background-color: #354156;
+    color: #fff;
+}
+
+.table thead th, .table tbody td, ::deep .table tfoot td {
+    font-size: 0.9rem;
+    font-weight: inherit;
+    vertical-align: middle;
+    text-align: center;
+}
+
+table thead th:first-child {
+    border-top-left-radius: 3px;
+}
+
+table thead th:last-child {
+    border-top-right-radius: 3px;
+}
+
+.th-number {
+    width: 10%;
+}
+
+.th-client {
+    width: 25%;
+}
+
+.th-leagues {
+    width: 50%;
+}
+
+.th-action {
+    width: 15%;
+}
+
+.ls-league-pill {
+    background-color: #9AA0AB;
+    color: #FFF;
+    width: fit-content;
+}
+
+.ls-link {
+    color: #1F1F1F;
+    font-size: 1rem;
+}
+
+.ls-link-disabled {
+    color: #979797;
+    font-size: 1rem;
+}
+
+@media (max-width: 991.98px) {
+    .ls-filter-panel {
+        grid-template-columns: 1fr;
+    }
+}

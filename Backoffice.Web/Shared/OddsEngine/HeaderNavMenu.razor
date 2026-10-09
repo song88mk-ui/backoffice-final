@@ -55,7 +55,39 @@
             </div>
         }
 
-        @if (_userState.Model.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace("_", ".")}") ?? false)
+        @{
+            var hasSportsSettings = _userState.Model.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace("_", ".")}") ?? false;
+            var hasLeagueSorting = _userState.Model.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_LeagueSorting.ToString().Replace("_", ".")}") ?? false;
+        }
+
+        @if (hasLeagueSorting)
+        {
+            <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.SportSettings || _menu == OeNavMenu.LeagueSorting ? "active" : "")">
+                <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="HandleSportsSettingsClick">
+                    @_translationState.GetValue("Sports Settings")
+                    <i class="fa fa-chevron-@(_showSportsSettingsMenu ? "up" : "down")"></i>
+                </a>
+                @if (_showSportsSettingsMenu)
+                {
+                    <ul class="sub-menu-container rounded mt-2">
+                        @if (hasSportsSettings)
+                        {
+                            <li class="py-2">
+                                <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/sport-settings">
+                                    @_translationState.GetValue("Sports Settings")
+                                </a>
+                            </li>
+                        }
+                        <li class="py-2">
+                            <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/league-sorting">
+                                @_translationState.GetValue("League Sorting")
+                            </a>
+                        </li>
+                    </ul>
+                }
+            </div>
+        }
+        else if (hasSportsSettings)
         {
             <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.SportSettings ? "active" : "")">
                 <a class="header-link text-decoration-none" href="@_address/sport-settings">

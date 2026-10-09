@@ -582,10 +582,11 @@ window.getCurrentSortOrder = (id) => {
     return data;
 }
 
-// Selector Market Templates: drag rows via the .drag-handle column. On drop the DOM move is
-// reverted (sortable('cancel')) and the new order is pushed to Blazor, which re-renders the
-// keyed rows and renumbers the sort orders - keeps the DOM and the render tree in sync.
-window.enableSelectorTemplateSort = (tableSelector, dotnetRef) => {
+// Selector Market Templates and League Sorting: drag rows via the .drag-handle column. On drop the
+// DOM move is reverted (sortable('cancel')) and the new order is pushed to Blazor, which re-renders
+// the keyed rows and renumbers the sort orders - keeps the DOM and the render tree in sync.
+// methodName is the [JSInvokable] to call on dotnetRef, Selector Market Templates by default.
+window.enableSelectorTemplateSort = (tableSelector, dotnetRef, methodName = 'UpdateSelectorTemplateOrder') => {
     var tbody = tableSelector + ' > tbody';
 
     $(tbody).sortable({
@@ -600,7 +601,7 @@ window.enableSelectorTemplateSort = (tableSelector, dotnetRef) => {
 
             $(this).sortable('cancel');
 
-            dotnetRef.invokeMethodAsync('UpdateSelectorTemplateOrder', rowKeys);
+            dotnetRef.invokeMethodAsync(methodName, rowKeys);
         },
     });
 }

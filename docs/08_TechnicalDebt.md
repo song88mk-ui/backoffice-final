@@ -152,6 +152,33 @@ Deliberately mirrors, rather than upgrades, Static Translation's existing "Expor
 
 ---
 
+## League Sorting (BO-107) - Oddstable Order Is Written but Not Yet Honored Downstream
+
+**Date noted:** October 8, 2026
+
+**Issue:** BO-107 adds a per-client, per-sport Oddstable league order (`Sportsbook.dbo.ClientOddstableLeagueOrder`, independent from the Sport Tree's `ClientLeagueOrder`). Backoffice writes it and publishes `OnOddstableLeagueSortOrderChange` (`r.oe.cachesync.onoddstableleaguesortorderchange`), but nothing downstream reads the table or consumes the message yet, so saving an order has no visible effect on the Oddstable until the sibling-repo work below lands. Found while scoping BO-107 across `platform-final`, `odds-engine-2` and `platform-web` (read against each repo's `origin/main`).
+
+**Gaps in the sibling repos (each needs its own change and PR):**
+
+| Where | Gap |
+|-------|-----|
+| `platform-final` `Platform.CacheSync.Service/Worker.cs` | The message-type `switch` has no case for `OnOddstableLeagueSortOrderChange` and no `default`, so the message is logged and dropped (harmless to publish early, but it does nothing) |
+| `platform-final` `Platform.Shared/Enums/CacheType.cs` | Needs `OddstableLeagueSortOrder = 9`. `Platform.Shared.Test/Contracts/enum-contracts.approved.txt` snapshot-tests every enum, so the approved file must be updated in the same PR |
+| `platform-final` `Platform.Sportsbook.API` | `GetClientFixtureSortOrder` (`v1/sportsbook/fixturesortorder`) currently just returns the Sport Tree's `ClientLeagueOrder`; it has to read the new table. The `SportSortOrder` purge also calls `DeleteCache("seo")`/`("leo")` against per-client keys (`seo-{clientId}`/`leo-{clientId}`), so only the `"so"` purge matches and segment/league order can stay stale for up to 24 hours |
+| `platform-final` `CacheSyncRepository` | Only `ProcessMarketSortOrderChange` republishes onward to `r.oe.sb.engine.*`; a sport/league order change never reaches the engine |
+| `odds-engine-2` `OE.Websocket.Service` | No handler for a league order change (only `OnMarketSortOrderChange` has one), and the per-league `fso` cache is refreshed only at startup and for newly discovered clients. The `SoOr` field is already streamed in every live odds-change message and `platform-web` already consumes it, so `platform-web` needs no change |
+| `CacheType` enum | Hand-copied in three repos with no shared package. `odds-engine-2`'s copy already lacks `StaticTranslation = 8`; `OddstableLeagueSortOrder = 9` has to be added to each copy by hand |
+
+**Audit log:** `SportsbookRepository` writes the audit entries itself, right after the save (one entry for a save that changed something, none for a save that changed nothing, one per target client for a copy), so a UI path cannot skip them and the previous order is read at write time. `ActivityLog2` lives in the Backoffice database and the order table in Sportsbook, so the two writes cannot share a transaction: if only the audit write fails the change stays saved, the failure is logged (`League Sorting audit log could not be written`) and the response carries a warning. The Logs dialog deliberately does not use the shared `GetActivityLogs` read (`BackOfficeRepository.cs:297`): it depends on a stored procedure that is not versioned in `infrastructure/flyway` and is recorded as missing in DEV (CLAUDE.md, BO-113), so it reads `ActivityLog2` with a plain query instead. Import and Export are not built yet, so their audit actions are not written.
+
+**Permission and table rows (infrastructure repo):** the page is gated on the claim `SBC.OE.LeagueSorting`, which only exists once a `Permission` row with that `ClaimType` is in the Auth database of the environment (`CategoryId = 1`, so Super Admin receives it automatically at its next login, see "Dedicated Translation Permission" below). Manage Users and Manage User Groups build their permission tree from those rows (`Backoffice.Web/Components/Common/Permission.razor.cs`), so no BO code is needed for it to appear under Odds Engine > Sports Settings. The row ships as flyway migrations in the infrastructure repo: `V14__AddLeagueSortingPermission` for dev and stg and `V13__AddLeagueSortingPermission` for prd (idempotent, and the DEV bootstrap seed `R__Seed_010_Auth_Permissions.sql` carries the same row), applied by hand with `just migrate <env>` from `flyway/`. The order table is `V13__CreateClientOddstableLeagueOrder` for dev and stg and `V12__CreateClientOddstableLeagueOrder` for prd (additive and idempotent, so it is safe to apply ahead of the release). Each environment applies the table first and the permission second. Until the permission row is applied nobody sees the page or the new Sports Settings dropdown, and until the table exists saving fails.
+
+**Deployment order when the downstream work is done:** `platform-final` (enum + CacheSync case + read path) before enabling the feature for clients; Backoffice can ship first because publishing the new message type early is safely ignored.
+
+**Status:** open. Backoffice side tracked under BO-107; the sibling-repo changes need their own tickets.
+
+---
+
 ## Critical Issues (Fix Immediately)
 
 ### 1. Developer Exception Page Always Enabled

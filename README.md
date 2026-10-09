@@ -489,6 +489,10 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 | POST | `sportsbook/client/sportorder/audit/list` | Sport order audit list |
 | POST | `sportsbook/client/segmentorder/list` | Client segment order list |
 | POST | `sportsbook/client/leagueorder/list` | Client league order list |
+| POST | `sportsbook/client/oddstableleagueorder/list` | Client Oddstable league order list (BO-107), filtered by client and sport |
+| POST | `sportsbook/client/oddstableleaguesettings` | Replace a client's Oddstable league order for one sport (BO-107) |
+| POST | `sportsbook/client/oddstableleaguesettings/copy` | Copy one client's Oddstable league order for a sport to other clients (BO-107) |
+| POST | `sportsbook/client/oddstableleaguesettings/logs` | League Sorting audit entries from `ActivityLog2`, newest first, paged (BO-107) |
 | POST | `sportsbook/client/tier/leagueorder/list` | Tier league order list |
 | GET | `sportsbook/client/markettemplate/{clientCode}/{sportId}/{fixtureStatusId}` | Client market templates |
 | POST | `sportsbook/client/markettemplate` | Add or update market template order |

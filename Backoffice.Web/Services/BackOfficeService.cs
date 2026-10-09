@@ -3150,6 +3150,40 @@ namespace Backoffice.Web.Services
                 };
             }
         }
+        public Task<BaseResponse<List<ClientOddstableLeagueOrderListResponse>>> GetClientOddstableLeagueOrderList(ClientOddstableLeagueOrderListRequest request)
+            => PostOddstableLeagueSorting<ClientOddstableLeagueOrderListRequest, List<ClientOddstableLeagueOrderListResponse>>("sportsbook/client/oddstableleagueorder/list", request);
+        public Task<BaseResponse<ClientOddstableLeagueSettingResponse>> AddOrUpdateClientOddstableLeagueSettings(ClientOddstableLeagueSettingRequest request)
+            => PostOddstableLeagueSorting<ClientOddstableLeagueSettingRequest, ClientOddstableLeagueSettingResponse>("sportsbook/client/oddstableleaguesettings", request);
+        public Task<BaseResponse<ClientOddstableLeagueSettingResponse>> CopyClientOddstableLeagueSettings(CopyClientOddstableLeagueSettingRequest request)
+            => PostOddstableLeagueSorting<CopyClientOddstableLeagueSettingRequest, ClientOddstableLeagueSettingResponse>("sportsbook/client/oddstableleaguesettings/copy", request);
+        public Task<BaseResponse<ActivityLogResponse>> GetOddstableLeagueSortingLogs(OddstableLeagueSortingLogRequest request)
+            => PostOddstableLeagueSorting<OddstableLeagueSortingLogRequest, ActivityLogResponse>("sportsbook/client/oddstableleaguesettings/logs", request);
+        private async Task<BaseResponse<TResponse>> PostOddstableLeagueSorting<TRequest, TResponse>(string path, TRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync(path, new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
+                    return JsonSerializer.Deserialize<BaseResponse<TResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+
+                return new BaseResponse<TResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                };
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, ex.Message);
+
+                return new BaseResponse<TResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
         public async Task<BaseResponse<List<TierLeagueOrderModel>>> GetTierLeagueOrder()
         {
             try

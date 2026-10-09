@@ -1,0 +1,29 @@
+<div class="league-select-backdrop" @onclick="OnClose"></div>
+<div class="league-select-menu rounded shadow-sm">
+    <input type="text" class="form-control form-control-sm mb-2" placeholder="@_translationState.GetValue("Search")"
+           @bind="_filter" @bind:event="oninput" />
+    <div class="league-select-list">
+        @if (!VisibleSegments.Any())
+        {
+            <div class="text-muted px-2 py-1">@_translationState.GetValue("No Record Found")</div>
+        }
+        @foreach (var segment in VisibleSegments)
+        {
+            <div class="league-select-segment" @key="segment.SegmentId">
+                <button type="button" class="league-select-segment-toggle" @onclick="() => ToggleSegment(segment.SegmentId)">
+                    <i class="fa fa-chevron-@(IsExpanded(segment) ? "down" : "right") me-2"></i>@segment.SegmentName
+                </button>
+                @if (IsExpanded(segment))
+                {
+                    @foreach (var league in AvailableLeagues(segment))
+                    {
+                        <div class="league-select-league" @key="league.LeagueId" @onclick="() => OnLeagueClick(segment, league)">
+                            <input class="form-check-input" type="radio" checked="@IsSelected(segment, league)" />
+                            <label class="form-check-label">@league.LeagueName</label>
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>
+</div>

@@ -16,6 +16,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         private bool _showPriceBoostMenu;
         private bool _showMarketSettingsMenu;
         private bool _showMappingMenu;
+        private bool _showSportsSettingsMenu;
         private bool _init = true;
         private bool _shouldRender;
         private List<Claim> _userClaims = new();
@@ -84,6 +85,20 @@ namespace Backoffice.Web.Shared.OddsEngine
             _shouldRender = true;
         }
 
+        public async Task HandleSportsSettingsClick()
+        {
+            if (!_showSportsSettingsMenu)
+            {
+                HideAllMenu();
+
+                _showSportsSettingsMenu = true;
+            }
+            else
+                _showSportsSettingsMenu = false;
+
+            _shouldRender = true;
+        }
+
         public async Task HandleMappingClick()
         {
             if (!_showMappingMenu)
@@ -125,6 +140,9 @@ namespace Backoffice.Web.Shared.OddsEngine
                     case "SPORT-SETTINGS":
                         _menu = OeNavMenu.SportSettings;
                         break;
+                    case "LEAGUE-SORTING":
+                        _menu = OeNavMenu.LeagueSorting;
+                        break;
                     case "MARKET-SETTINGS":
                     case "MARKET-SORT-ORDER":
                     case "MARKET-GROUPS":
@@ -162,6 +180,7 @@ namespace Backoffice.Web.Shared.OddsEngine
             _showPriceBoostMenu = false;
             _showMarketSettingsMenu = false;
             _showMappingMenu = false;
+            _showSportsSettingsMenu = false;
         }
 
         private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)

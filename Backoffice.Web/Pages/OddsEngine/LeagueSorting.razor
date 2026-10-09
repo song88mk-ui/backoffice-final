@@ -1,0 +1,164 @@
+@using Backoffice.Web.Components.OddsEngine.LeagueSorting
+
+@inherits BasePage
+@layout OEMonitoringLayout
+
+@page "/hk/odds-engine/league-sorting"
+
+<AuthorizeView Policy="sbc-league-sorting">
+    <Authorized>
+        <div class="d-flex flex-column">
+            <div>
+                <Breadcrumb Breadcrumbs="_breadcrumbs" />
+            </div>
+            <div>
+                <OEPageHeader PageHeaderModel="_pageHeaderModel" />
+            </div>
+            @if (_alertModel != null && !string.IsNullOrEmpty(_alertModel.Message))
+            {
+                <div class="mx-3 mb-3">
+                    <AlertMessage AlertModel="_alertModel" />
+                </div>
+            }
+
+            <div class="ls-filter-panel mx-3 mb-3">
+                <div class="ls-filter-field">
+                    <label class="form-label d-block">@_translationState.GetValue("Client")</label>
+                    <div class="dropdown">
+                        <button class="btn form-select dropdown-toggle" type="button" id="league-sorting-client-dropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">
+                            @if (_clientFilter.Count > 1)
+                            {
+                                <span>@ClientFilterLabel</span>
+                            }
+                            else
+                            {
+                                <span>@_translationState.GetValue("No Clients Available")</span>
+                            }
+                        </button>
+                        @if (_clientFilter.Count > 1)
+                        {
+                            <SelectWithCheckbox Items="_clientFilter" OnCheckboxCallback="OnClientCheckboxEvent" AriaLabel="league-sorting-client-dropdown" />
+                        }
+                    </div>
+                </div>
+                <div class="ls-filter-field">
+                    <label class="form-label d-block">@_translationState.GetValue("Sports")</label>
+                    <select class="form-select d-block" @onchange="OnSportChangedEvent">
+                        @foreach (var sport in _sports)
+                        {
+                            <option value="@sport.Value" selected="@(sport.Value == _selectedSportId)">@_translationState.GetValue(sport.Name)</option>
+                        }
+                    </select>
+                </div>
+                <div class="ls-filter-field ls-filter-search">
+                    <div class="input-group">
+                        <input type="text" class="form-control border-end-0" placeholder="@_translationState.GetValue("Search")" @bind="Search" @bind:event="oninput" />
+                        <span class="input-group-text border-start-0">
+                            @if (string.IsNullOrEmpty(_search))
+                            {
+                                <i class="fa fa-search"></i>
+                            }
+                            else
+                            {
+                                <a href="javascript:void(0);" @onclick="OnClearSearchEvent">
+                                    <i class="fa fa-remove"></i>
+                                </a>
+                            }
+                        </span>
+                    </div>
+                </div>
+                <div class="ls-filter-field">
+                    <button type="button" class="btn btn-logs" @onclick="OnLogsClickEvent">
+                        <i class="fa fa-table me-2"></i>@_translationState.GetValue("Logs")
+                    </button>
+                </div>
+            </div>
+
+            <div class="mx-3">
+                <table class="table table-hover table-borderless">
+                    <thead class="table-head">
+                        <tr>
+                            <th class="th-number py-2">@_translationState.GetValue("No.")</th>
+                            <th class="th-client py-2">@_translationState.GetValue("Client")</th>
+                            <th class="th-leagues py-2">@_translationState.GetValue("Top Leagues")</th>
+                            <th class="th-action py-2">@_translationState.GetValue("Action")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (_isPreLoader)
+                        {
+                            <tr>
+                                <td colspan="4">
+                                    <Preloader />
+                                </td>
+                            </tr>
+                        }
+                        else if (_clients.Any())
+                        {
+                            @foreach (var client in _clients)
+                            {
+                                <tr @key="client.ClientCode">
+                                    <td class="py-2">@client.RowNo</td>
+                                    <td class="py-2">@client.ClientName</td>
+                                    <td class="py-2">
+                                        <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
+                                            @foreach (var league in client.Leagues.OrderBy(l => l.SortOrder))
+                                            {
+                                                <div class="ls-league-pill m-1 py-1 rounded-2">
+                                                    <span class="px-3">@league.SegmentName > @league.LeagueName</span>
+                                                </div>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td class="py-2">
+                                        @if (_canEdit)
+                                        {
+                                            <a class="ls-link me-2" href="javascript:void(0);" @onclick="() => OnEditClickEvent(client)">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            @if (client.Leagues.Any())
+                                            {
+                                                <a class="ls-link me-2" href="javascript:void(0);" @onclick="() => OnCopyClickEvent(client)">
+                                                    <i class="fa fa-copy"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a class="ls-link-disabled me-2">
+                                                    <i class="fa fa-copy"></i>
+                                                </a>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <a class="ls-link-disabled me-2">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a class="ls-link-disabled me-2">
+                                                <i class="fa fa-copy"></i>
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4">
+                                    <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <Pagination MetaData="_metaData" Spread="3" PaginationColspan="3" SelectPageEvent="SelectPage" />
+                </table>
+            </div>
+        </div>
+
+        <CustomModal OnSaveClickCallback="OnSavedEvent" />
+    </Authorized>
+    <NotAuthorized>
+        <RedirectToPage FromPage="@SportsbookClientPermission.SBC_OE_LeagueSorting.ToString().Replace('_', '.')" />
+    </NotAuthorized>
+</AuthorizeView>

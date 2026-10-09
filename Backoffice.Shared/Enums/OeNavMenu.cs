@@ -11,6 +11,7 @@ namespace Backoffice.Shared.Enums
         PriceBoost,
         SportSettings,
         MarketSettings,
-        Mapping
+        Mapping,
+        LeagueSorting
     }
 }

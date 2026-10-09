@@ -176,8 +176,10 @@ Server-side Blazor web application providing UI for backoffice operations. Real-
 - **ICommonService / CommonService** - Business logic, formatting, claim processing
 - **ITradingService / TradingService** - Trading-specific operations
 - **MetabaseService** - Metabase SSO integration
+- **LeagueSortingHelper** - Pure row building, filtering, validation and drag-reorder logic behind the League Sorting page (BO-107)
 
 #### Features
+- **League Sorting** (BO-107) - `Pages/OddsEngine/LeagueSorting.razor`, route `/hk/odds-engine/league-sorting`, claim `SBC.OE.LeagueSorting`. Per-client, per-sport Oddstable league order: client list with a pill preview, an edit dialog (drag to reorder, searchable league picker, add/remove rows) and a multi-client copy with a confirmation step. Reached from the Sports Settings dropdown in the Odds Engine header. Data goes through `sportsbook/client/oddstableleague*` into `ClientOddstableLeagueOrder`, kept separate from the Sport Tree order. Every save and copy is audited by `SportsbookRepository` into `ActivityLog2` (`Page = SBC.OE.LeagueSorting`, `Payload` = client code, `Activity` = Add / Edit / Reorder / Copy, `From` / `To` = `OddstableLeagueSortingAudit` JSON with the previous and new order and, for a copy, the source client); the Logs dialog reads them back through `IBackofficeActivityLogRepository.GetPagedActivityLogs`. Import/Export is not built yet
 - ServerSideBlazor with DetailedErrors enabled
 - HTTP client factories for API calls
 - Local storage via Blazored.LocalStorage

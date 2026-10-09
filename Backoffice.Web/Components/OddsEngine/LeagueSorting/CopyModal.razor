@@ -1,0 +1,78 @@
+<div class="modal-body">
+    @if (!_confirming)
+    {
+        <section class="ls-copy-section mb-3">
+            <div class="d-flex gap-3">
+                <div class="ls-copy-select">
+                    <label class="form-label">@_translationState.GetValue("Clients")</label>
+                    <div class="dropdown">
+                        <button class="btn btn-client dropdown-toggle" type="button" id="league-sorting-copy-client-dropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">
+                            @if (_clients.Count > 1)
+                            {
+                                <span>@(_selected.Count == 1 ? _selected[0].Name : $"{_translationState.GetValue("Clients")} ({_selected.Count})")</span>
+                            }
+                            else
+                            {
+                                <span>@_translationState.GetValue("No Clients Available")</span>
+                            }
+                        </button>
+                        @if (_clients.Count > 1)
+                        {
+                            <SelectWithCheckbox Items="_clients" AriaLabel="league-sorting-copy-client-dropdown" OnCheckboxCallback="OnClientCheckboxEvent" />
+                        }
+                    </div>
+                </div>
+                <div class="ls-copy-selected flex-grow-1 d-flex flex-wrap align-content-start border rounded p-2">
+                    @foreach (var client in _selected)
+                    {
+                        <div class="ls-chip mx-1 mb-1 py-1 px-2" @key="client.Code">
+                            @client.Name
+                            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close" @onclick="() => OnRemoveClientEvent(client.Code)"></button>
+                        </div>
+                    }
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(_clientError))
+            {
+                <div class="alert alert-danger mt-3 mb-0" role="alert">@_clientError</div>
+            }
+        </section>
+
+        <section class="ls-copy-section">
+            <label class="form-label">@_translationState.GetValue("Leagues")</label>
+            <div class="ls-league-container d-flex flex-wrap p-3">
+                @foreach (var league in _leagues)
+                {
+                    <div class="ls-chip mx-1 mb-2 py-1 px-2" @key="league.LeagueId">@league.SegmentName > @league.LeagueName</div>
+                }
+            </div>
+        </section>
+    }
+    else
+    {
+        <div class="alert alert-warning mb-0" role="alert">
+            Copying will replace the existing League Sorting (@_sportName) of
+            <strong>@(_selected.Count == 1 ? _selected[0].Name : $"{_selected.Count} clients")</strong>
+            with the @_leagues.Count league@(_leagues.Count == 1 ? "" : "s") of <strong>@_fromClientName</strong>. Do you want to continue?
+        </div>
+    }
+
+    @if (_alert != null && !string.IsNullOrEmpty(_alert.Message))
+    {
+        <div class="mt-3">
+            <AlertMessage AlertModel="@_alert" />
+        </div>
+    }
+</div>
+<div class="modal-footer mx-4 p-0 py-3 border-0">
+    @if (!_confirming)
+    {
+        <button type="button" class="btn btn-cancel waves-effect" @onclick="OnCancelClickEvent">@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="btn btn-save waves-effect" @onclick="OnSaveClickEvent">@_translationState.GetValue("Save")</button>
+    }
+    else
+    {
+        <button type="button" class="btn btn-cancel waves-effect" disabled="@_isSaving" @onclick="OnBackClickEvent">@_translationState.GetValue("Back")</button>
+        <button type="button" class="btn btn-save waves-effect" disabled="@_isSaving" @onclick="OnConfirmClickEvent">@_translationState.GetValue("Confirm")</button>
+    }
+</div>

@@ -1,0 +1,50 @@
+.league-select-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+}
+
+.league-select-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 2;
+    padding: 0.5rem;
+    background-color: #FFF;
+    border: 1px solid #C7C1C1;
+    text-align: left;
+}
+
+.league-select-list {
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.league-select-segment-toggle {
+    display: block;
+    width: 100%;
+    padding: 0.25rem 0.5rem;
+    background: none;
+    border: 0;
+    text-align: left;
+    color: #1F1F1F;
+}
+
+.league-select-segment-toggle:hover, .league-select-league:hover {
+    background-color: #F5F5F5;
+}
+
+.league-select-league {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    cursor: pointer;
+    padding: 0.15rem 0.5rem 0.15rem 1.75rem;
+}
+
+.league-select-league .form-check-input {
+    flex-shrink: 0;
+    float: none;
+    margin: 0.3rem 0 0 0;
+}

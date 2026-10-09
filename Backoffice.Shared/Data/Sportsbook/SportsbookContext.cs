@@ -14,6 +14,7 @@ namespace OE.Shared.Data.Sportsbook
             modelBuilder.Entity<ClientSportOrder>().HasKey(k => new { k.ClientId, k.SportId });
             modelBuilder.Entity<ClientSegmentOrder>().HasKey(k => new { k.ClientId, k.SportId, k.SegmentId });
             modelBuilder.Entity<ClientLeagueOrder>().HasKey(k => new { k.ClientId, k.SportId, k.SegmentId, k.LeagueId });
+            modelBuilder.Entity<ClientOddstableLeagueOrder>().HasKey(k => new { k.ClientId, k.SportId, k.SegmentId, k.LeagueId });
             modelBuilder.Entity<MarketTemplateGroup>().HasKey(k => new { k.SportId, k.FixtureStatusId, k.Id });
             modelBuilder.Entity<TierLeagueOrder>().HasKey(k => new { k.SportId, k.SegmentId, k.LeagueId });
             modelBuilder.Entity<SelectorMarketTemplate>().HasKey(k => new { k.SportId, k.MarketTemplateId });
@@ -28,6 +29,7 @@ namespace OE.Shared.Data.Sportsbook
         public DbSet<ClientSportOrder> ClientSportOrder { get; set; }
         public DbSet<ClientSegmentOrder> ClientSegmentOrder { get; set; }
         public DbSet<ClientLeagueOrder> ClientLeagueOrder { get; set; }
+        public DbSet<ClientOddstableLeagueOrder> ClientOddstableLeagueOrder { get; set; }
         public DbSet<TierLeagueOrder> TierLeagueOrder { get; set; }
         public DbSet<SelectorMarketTemplate> SelectorMarketTemplate { get; set; }
         public DbSet<ClientMarketTemplateOrder> ClientMarketTemplateOrder { get; set; }

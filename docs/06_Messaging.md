@@ -130,6 +130,14 @@ OnMarketSortOrderChange  (payload: OnDeleteCacheMessage { CacheType = MarketSort
 └─ Platform.CacheSync.Service ──POST v1/cachepreload──▶ Platform.Sportsbook.API
    · purges "mtg2", "cmtg", "csmt" (BO-87) and the cached REST responses, then
      republishes r.oe.sb.engine.onmarketsortorderchange.{clientCode} to the engine.
+
+OnOddstableLeagueSortOrderChange  (BO-107; payload: OnDeleteCacheMessage { CacheType = OddstableLeagueSortOrder })
+├─ Route: r.oe.cachesync.onoddstableleaguesortorderchange
+├─ Published by SportsbookRepository after AddOrUpdateClientOddstableLeagueSettings
+│   (one message) and CopyClientOddstableLeagueSettings (one message per target client)
+└─ No consumer yet: Platform.CacheSync.Service has no case for this message type, so it is
+   logged and dropped. The purge, onward republish and read path are tracked in
+   docs/08_TechnicalDebt.md ("League Sorting (BO-107)").
 ```
 
 ### Translation

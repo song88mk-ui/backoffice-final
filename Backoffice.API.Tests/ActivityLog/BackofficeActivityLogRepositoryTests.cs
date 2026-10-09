@@ -1,5 +1,7 @@
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Data.Backoffice;
+using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -102,6 +104,77 @@ namespace Backoffice.API.Tests.ActivityLog
             Assert.Single(rows);
             Assert.Equal("Admin.Settlements.MarketSettlement", rows[0].Page);
             Assert.Contains("Match Winner", rows[0].To);
+        }
+
+        // ---------------------------------------------------------------
+        // GetPagedActivityLogs (plain EF read, newest first)
+        // ---------------------------------------------------------------
+
+        private static readonly DateTime Day1 = new DateTime(2026, 10, 1, 10, 0, 0, DateTimeKind.Utc);
+
+        private static async Task<BackofficeActivityLogRepository> SeededRepository(string dbName)
+        {
+            var ctx = BuildInMemoryContext(dbName);
+            var sut = new BackofficeActivityLogRepository(ctx);
+
+            await sut.ProcessActivityLog(new OnActivityLogListMessage
+            {
+                OnActivityLogMessages = new List<OnActivityLogMessage>
+                {
+                    MakeMessage("SBC.OE.LeagueSorting", "QTE-A", "a-old", Day1.AddDays(-40)),
+                    MakeMessage("SBC.OE.LeagueSorting", "QTE-A", "a-1", Day1),
+                    MakeMessage("SBC.OE.LeagueSorting", "QTE-B", "b-1", Day1.AddHours(1)),
+                    MakeMessage("SBC.OE.LeagueSorting", "QTE-A", "a-2", Day1.AddHours(2)),
+                    MakeMessage("SBC.OE.SportsSettings", "QTE-A", "other-page", Day1.AddHours(3)),
+                }
+            });
+
+            return sut;
+        }
+
+        [Fact]
+        public async Task GetPagedActivityLogs_ReturnsOnlyThatPageAndDateRange_NewestFirst()
+        {
+            var sut = await SeededRepository(nameof(GetPagedActivityLogs_ReturnsOnlyThatPageAndDateRange_NewestFirst));
+
+            var response = await sut.GetPagedActivityLogs("SBC.OE.LeagueSorting", null, Day1.AddDays(-30), new MetaData { CurrentPage = 1, PageSize = 10 });
+
+            Assert.Equal(StatusCode.Success, response.StatusCode);
+            Assert.Equal(new[] { "a-2", "b-1", "a-1" }, response.Result.ActivityLogs.Select(l => l.To));
+            Assert.Equal(3, response.Result.MetaData.TotalCount);
+            Assert.Equal(1, response.Result.MetaData.TotalPages);
+        }
+
+        [Fact]
+        public async Task GetPagedActivityLogs_FiltersByPayload()
+        {
+            var sut = await SeededRepository(nameof(GetPagedActivityLogs_FiltersByPayload));
+
+            var response = await sut.GetPagedActivityLogs("SBC.OE.LeagueSorting", "QTE-B", Day1.AddDays(-30), new MetaData { CurrentPage = 1, PageSize = 10 });
+
+            Assert.Equal(new[] { "b-1" }, response.Result.ActivityLogs.Select(l => l.To));
+        }
+
+        [Fact]
+        public async Task GetPagedActivityLogs_Pages_AndReportsTheTotals()
+        {
+            var sut = await SeededRepository(nameof(GetPagedActivityLogs_Pages_AndReportsTheTotals));
+
+            var second = await sut.GetPagedActivityLogs("SBC.OE.LeagueSorting", null, Day1.AddDays(-30), new MetaData { CurrentPage = 2, PageSize = 2 });
+
+            Assert.Equal(new[] { "a-1" }, second.Result.ActivityLogs.Select(l => l.To));
+            Assert.Equal((2, 2, 3, 2), (second.Result.MetaData.CurrentPage, second.Result.MetaData.PageSize, second.Result.MetaData.TotalCount, second.Result.MetaData.TotalPages));
+        }
+
+        [Fact]
+        public async Task GetPagedActivityLogs_WithoutMetaData_ReturnsTheFirstPageOfTen()
+        {
+            var sut = await SeededRepository(nameof(GetPagedActivityLogs_WithoutMetaData_ReturnsTheFirstPageOfTen));
+
+            var response = await sut.GetPagedActivityLogs("SBC.OE.LeagueSorting", null, Day1.AddDays(-30), null);
+
+            Assert.Equal(3, response.Result.ActivityLogs.Count);
+            Assert.Equal((1, 10), (response.Result.MetaData.CurrentPage, response.Result.MetaData.PageSize));
         }
     }
 }

@@ -255,6 +255,62 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
 
+        [HttpPost("oddstableleagueorder/list")]
+        public async Task<IActionResult> GetClientOddstableLeagueOrderList([FromBody] ClientOddstableLeagueOrderListRequest request)
+        {
+            var result = await _sportsbookRepository.GetClientOddstableLeagueOrderList(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("oddstableleaguesettings")]
+        public async Task<IActionResult> AddOrUpdateClientOddstableLeagueSettings([FromBody] ClientOddstableLeagueSettingRequest request)
+        {
+            var result = await _sportsbookRepository.AddOrUpdateClientOddstableLeagueSettings(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("oddstableleaguesettings/copy")]
+        public async Task<IActionResult> CopyClientOddstableLeagueSettings([FromBody] CopyClientOddstableLeagueSettingRequest request)
+        {
+            var result = await _sportsbookRepository.CopyClientOddstableLeagueSettings(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("oddstableleaguesettings/logs")]
+        public async Task<IActionResult> GetOddstableLeagueSortingLogs([FromBody] OddstableLeagueSortingLogRequest request)
+        {
+            var result = await _sportsbookRepository.GetOddstableLeagueSortingLogs(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpPost("tier/leagueorder/list")]
         public async Task<IActionResult> GetTierLeagueOrderList()
         {

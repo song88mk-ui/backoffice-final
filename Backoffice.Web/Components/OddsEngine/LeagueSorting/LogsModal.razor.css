@@ -1,0 +1,37 @@
+.ls-logs-table {
+    font-size: 0.9rem;
+}
+
+.ls-logs-table thead th {
+    background-color: #354156;
+    color: #fff;
+    text-align: center;
+}
+
+.th-date {
+    width: 11%;
+}
+
+.th-client {
+    width: 14%;
+}
+
+.th-action {
+    width: 10%;
+}
+
+.th-changes {
+    width: 27%;
+}
+
+.th-updated-by {
+    width: 11%;
+}
+
+.btn-cancel {
+    width: 112px;
+    height: 40px;
+    border-radius: 5px;
+    color: white;
+    background-color: #9AA0AB;
+}

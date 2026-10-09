@@ -47,6 +47,7 @@ namespace Backoffice.Web.Shared
             { "SBC.OE.FastOdds", string.Empty },
             { "SBC.OE.Config", "/config" },
             { "SBC.OE.SportsSettings", "/sport-settings" },
+            { "SBC.OE.LeagueSorting", "/league-sorting" },
             { "SBC.OE.MarketSetting.SortOrder", "/market-sort-order" },
             { "SBC.OE.MarketSetting.Group", "/market-groups" },
             { "SBC.OE.MarketSetting.SelectorTemplates", "/selector-market-templates" },

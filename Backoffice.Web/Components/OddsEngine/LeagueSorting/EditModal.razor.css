@@ -1,0 +1,95 @@
+.ls-filter-panel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(200px, 280px));
+    gap: 0.5rem 1.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #DEE2E6;
+    border-radius: 4px;
+    background-color: #FAFAFA;
+}
+
+.ls-filter-panel .form-label {
+    margin-bottom: 0.25rem;
+}
+
+.table-edit-league-sorting {
+    text-align: center;
+}
+
+.table-edit-league-sorting tbody tr:nth-child(2n+2) {
+    background-color: #F5F5F5;
+}
+
+.table-edit-league-sorting tr {
+    vertical-align: middle;
+}
+
+.table-head {
+    color: white;
+    background-color: #354156;
+}
+
+.th-no {
+    width: 10%;
+}
+
+.th-segment {
+    width: 25%;
+}
+
+.th-league {
+    width: 35%;
+}
+
+.th-status {
+    width: 15%;
+}
+
+.th-action {
+    width: 15%;
+}
+
+.actions a {
+    color: #404E67;
+    font-size: 16px;
+}
+
+.league-dropdown {
+    position: relative;
+}
+
+.btn {
+    border: 1px solid #C7C1C1;
+    border-radius: 3px;
+}
+
+.btn.dropdown-toggle {
+    background-color: #FFF;
+    text-align: left;
+}
+
+.btn.dropdown-toggle:after {
+    float: right;
+    margin-top: 0.475rem;
+}
+
+.btn-save, .btn-cancel {
+    width: 112px;
+    height: 40px;
+    border-radius: 5px;
+    color: white;
+}
+
+.btn-cancel {
+    background-color: #9AA0AB;
+}
+
+.btn-save {
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+.status-active {
+    display: inline-block;
+    color: #FFFFFF;
+    background-image: linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%);
+}
