@@ -1018,6 +1018,147 @@ namespace Backoffice.API.Repositories
             };
         }
 
+        // BO-122: imports a League Sorting file for one client and one sport. Commit = false only validates and
+        // changes nothing. The matching and merge rules live in OddstableLeagueImportPlanner; a commit saves
+        // through the same path as Edit: one SaveChanges, an audit log entry and the cache-sync publish.
+        public async Task<BaseResponse<ImportClientOddstableLeagueSettingResponse>> ImportClientOddstableLeagueSettings(ImportClientOddstableLeagueSettingRequest request)
+        {
+            if (string.IsNullOrEmpty(request.ClientCode))
+                return InvalidOddstableLeagueImport("Invalid Client Code");
+
+            if (request.SportId == 0)
+                return InvalidOddstableLeagueImport("Invalid Sport");
+
+            var client = ((await _platformRepository.GetClients("HK")).Result ?? new List<PlatformClientResponse>())
+                .FirstOrDefault(c => c.ClientCode == request.ClientCode);
+
+            if (client == null)
+                return InvalidOddstableLeagueImport("No client found");
+
+            var auditWritten = true;
+
+            try
+            {
+                var current = (await _sportsbookContext.ClientOddstableLeagueOrder.AsNoTracking()
+                        .Where(c => c.ClientId == client.ClientId && c.SportId == request.SportId)
+                        .ToListAsync())
+                    .OrderBy(c => c.SortOrder)
+                    .Select(c => new OddstableLeagueSortOrder()
+                    {
+                        SportId = c.SportId,
+                        SportName = c.SportName,
+                        SegmentId = c.SegmentId,
+                        SegmentName = c.SegmentName,
+                        LeagueId = c.LeagueId,
+                        LeagueName = c.LeagueName,
+                        SortOrder = c.SortOrder,
+                    })
+                    .ToList();
+
+                var catalog = await GetOddstableLeagueCatalog(request.SportId, request.SportName);
+                var plan = OddstableLeagueImportPlanner.Build(request.SportId, request.SportName, current, catalog, request.Rows ?? new List<ImportOddstableLeagueRow>());
+
+                var result = new ImportClientOddstableLeagueSettingResponse
+                {
+                    StatusCode = StatusCode.Success,
+                    MatchedCount = plan.MatchedCount,
+                    UnmatchedCount = plan.UnmatchedCount,
+                    RetainedCount = plan.RetainedCount,
+                    ResultCount = plan.Result.Count,
+                    Errors = plan.Errors,
+                    Rows = plan.Rows
+                };
+
+                if (plan.Errors.Any())
+                {
+                    result.StatusCode = StatusCode.Error;
+                    result.ResultCount = 0;
+                    result.Message = "The file cannot be imported. Nothing was saved.";
+
+                    return ImportOddstableLeagueResponse(result);
+                }
+
+                result.HasChanges = !IsSameOddstableOrder(current, plan.Result);
+
+                if (!request.Commit)
+                {
+                    result.Message = result.HasChanges
+                        ? "The file is valid."
+                        : "The file is valid, but the League Sorting is already in this order.";
+
+                    return ImportOddstableLeagueResponse(result);
+                }
+
+                if (!result.HasChanges)
+                {
+                    result.Message = "No changes: the League Sorting is already in this order.";
+
+                    return ImportOddstableLeagueResponse(result);
+                }
+
+                await ReplaceClientOddstableLeagueOrder(client.ClientId, request.SportId, plan.Result);
+                await _sportsbookContext.SaveChangesAsync();
+
+                var sportName = plan.Result.Select(l => l.SportName).FirstOrDefault(n => !string.IsNullOrEmpty(n));
+
+                auditWritten = await TryWriteOddstableLeagueSortingLogs(new List<OnActivityLogMessage>
+                {
+                    BuildOddstableLeagueSortingLog(client.ClientCode, "Import", request.SportId, sportName,
+                        current, plan.Result, null, request.UserId, request.UserName, request.TimeStamp)
+                });
+
+                await PublishOddstableLeagueSortOrderChange(client.ClientId, client.ClientCode);
+
+                result.Committed = true;
+                result.Message = "Success! Client League Order has been successfully imported." + (auditWritten ? string.Empty : OddstableAuditWarning);
+
+                return ImportOddstableLeagueResponse(result);
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ImportClientOddstableLeagueSettingResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = StatusCode.Error.ToString(),
+                    Result = new ImportClientOddstableLeagueSettingResponse()
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"Error: {ex.Message}"
+                    }
+                };
+            }
+        }
+
+        // The leagues a client can be given for a sport: the segments and leagues the Edit dialog offers. Virtual
+        // only so a test can supply them, because the lookups are static MongoDB collections.
+        protected virtual async Task<List<LeagueLookupResponseV2.LeagueLookupModelV2>> GetOddstableLeagueCatalog(int sportId, string sportName)
+        {
+            var segments = await GetSegmentLookup(sportId);
+            var leagues = await GetLeagueLookup(sportId, 0);
+
+            if (segments.StatusCode != StatusCode.Success || segments.Result == null
+                || leagues.StatusCode != StatusCode.Success || leagues.Result == null)
+                throw new InvalidOperationException("Unable to load the leagues of the sport.");
+
+            var segmentNames = segments.Result.SegmentLookup
+                .Where(s => s.SportId == sportId)
+                .GroupBy(s => s.SegmentId)
+                .ToDictionary(g => g.Key, g => g.First().SegmentName);
+
+            return leagues.Result.LeagueLookup
+                .Where(l => l.SportId == sportId && segmentNames.ContainsKey(l.SegmentId))
+                .Select(l => new LeagueLookupResponseV2.LeagueLookupModelV2
+                {
+                    LeagueId = l.LeagueId,
+                    LeagueName = l.LeagueName,
+                    SportId = l.SportId,
+                    SportName = sportName,
+                    SegmentId = l.SegmentId,
+                    SegmentName = segmentNames[l.SegmentId]
+                })
+                .ToList();
+        }
+
         public Task<BaseResponse<ActivityLogResponse>> GetOddstableLeagueSortingLogs(OddstableLeagueSortingLogRequest request)
         {
             return _activityLogRepository.GetPagedActivityLogs(
@@ -1190,6 +1331,25 @@ namespace Backoffice.API.Repositories
                     Message = message,
                 }
             };
+        }
+
+        private static BaseResponse<ImportClientOddstableLeagueSettingResponse> ImportOddstableLeagueResponse(ImportClientOddstableLeagueSettingResponse result)
+        {
+            return new BaseResponse<ImportClientOddstableLeagueSettingResponse>
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = result
+            };
+        }
+
+        private static BaseResponse<ImportClientOddstableLeagueSettingResponse> InvalidOddstableLeagueImport(string message)
+        {
+            return ImportOddstableLeagueResponse(new ImportClientOddstableLeagueSettingResponse
+            {
+                StatusCode = StatusCode.Error,
+                Message = message
+            });
         }
 
         public async Task<BaseResponse<List<TierLeagueOrder>>> GetTierLeagueOrderList()

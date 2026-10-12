@@ -134,7 +134,8 @@ OnMarketSortOrderChange  (payload: OnDeleteCacheMessage { CacheType = MarketSort
 OnOddstableLeagueSortOrderChange  (BO-107; payload: OnDeleteCacheMessage { CacheType = OddstableLeagueSortOrder })
 ├─ Route: r.oe.cachesync.onoddstableleaguesortorderchange
 ├─ Published by SportsbookRepository after AddOrUpdateClientOddstableLeagueSettings
-│   (one message) and CopyClientOddstableLeagueSettings (one message per target client)
+│   (one message), CopyClientOddstableLeagueSettings (one message per target client) and
+│   ImportClientOddstableLeagueSettings (BO-122; one message, only for a commit that changed the order)
 └─ No consumer yet: Platform.CacheSync.Service has no case for this message type, so it is
    logged and dropped. The purge, onward republish and read path are tracked in
    docs/08_TechnicalDebt.md ("League Sorting (BO-107)").

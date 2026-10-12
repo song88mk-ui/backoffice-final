@@ -10,7 +10,8 @@ namespace Backoffice.Web.Services
     // template. Kept dependency-free on purpose: no Excel library, mirrors the existing pattern.
     public static class GlossaryCsvHelper
     {
-        private const char Bom = (char)0xFEFF;
+        // internal: LeagueSortingCsvHelper (BO-122) reuses the escaping and the RFC4180 parser below.
+        internal const char Bom = (char)0xFEFF;
 
         public static readonly string[] ExpectedHeaders = { "StringId", "EN", "ZH", "ES", "FR" };
 
@@ -83,7 +84,7 @@ namespace Backoffice.Web.Services
 
         private static string GetCell(List<string> cells, int index) => index < cells.Count ? cells[index] : string.Empty;
 
-        private static string EscapeCsv(string? value)
+        internal static string EscapeCsv(string? value)
         {
             if (string.IsNullOrEmpty(value))
             {
@@ -102,7 +103,7 @@ namespace Backoffice.Web.Services
         // Minimal RFC4180 parser (the inverse of EscapeCsv above): handles quoted fields with
         // embedded commas, doubled-quote escaping ("") and embedded newlines, since translated
         // text can contain any of those.
-        private static List<List<string>> ParseCsvLines(string csvText)
+        internal static List<List<string>> ParseCsvLines(string csvText)
         {
             var rows = new List<List<string>>();
             if (string.IsNullOrEmpty(csvText))

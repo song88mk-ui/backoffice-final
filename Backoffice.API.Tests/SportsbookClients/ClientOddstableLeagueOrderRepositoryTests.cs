@@ -46,7 +46,8 @@ namespace Backoffice.API.Tests.SportsbookClients
             List<MessageRequest> published,
             List<OnActivityLogMessage> auditLogs = null,
             Exception auditFailure = null,
-            IBackofficeActivityLogRepository activityLogRepository = null)
+            IBackofficeActivityLogRepository activityLogRepository = null,
+            List<LeagueLookupResponseV2.LeagueLookupModelV2> catalog = null)
         {
             var platform = new Mock<IPlatformRepository>();
             platform
@@ -84,6 +85,16 @@ namespace Backoffice.API.Tests.SportsbookClients
                 })
                 .Build();
 
+            if (catalog != null)
+                return new CatalogSportsbookRepository(
+                    catalog,
+                    context,
+                    configuration,
+                    platform.Object,
+                    activityLogRepository ?? activityLog.Object,
+                    rabbitMq.Object,
+                    new Mock<IMemCache>().Object);
+
             return new SportsbookRepository(
                 context,
                 configuration,
@@ -92,6 +103,54 @@ namespace Backoffice.API.Tests.SportsbookClients
                 rabbitMq.Object,
                 new Mock<IMemCache>().Object);
         }
+
+        // The sport's segments and leagues come from static MongoDB collections, so the import tests supply them here.
+        private sealed class CatalogSportsbookRepository : SportsbookRepository
+        {
+            private readonly List<LeagueLookupResponseV2.LeagueLookupModelV2> _catalog;
+
+            public CatalogSportsbookRepository(
+                List<LeagueLookupResponseV2.LeagueLookupModelV2> catalog,
+                SportsbookContext context,
+                IConfiguration configuration,
+                IPlatformRepository platformRepository,
+                IBackofficeActivityLogRepository activityLogRepository,
+                IRabbitMqRepository rabbitMqRepository,
+                IMemCache memCache)
+                : base(context, configuration, platformRepository, activityLogRepository, rabbitMqRepository, memCache)
+            {
+                _catalog = catalog;
+            }
+
+            protected override Task<List<LeagueLookupResponseV2.LeagueLookupModelV2>> GetOddstableLeagueCatalog(int sportId, string sportName) =>
+                Task.FromResult(_catalog.Where(c => c.SportId == sportId).ToList());
+        }
+
+        private static LeagueLookupResponseV2.LeagueLookupModelV2 Available(int segmentId, int leagueId, int sportId = Football) =>
+            new LeagueLookupResponseV2.LeagueLookupModelV2
+            {
+                SportId = sportId,
+                SportName = sportId == Football ? "Football" : "Basketball",
+                SegmentId = segmentId,
+                SegmentName = $"Segment {segmentId}",
+                LeagueId = leagueId,
+                LeagueName = $"League {leagueId}"
+            };
+
+        private static ImportClientOddstableLeagueSettingRequest ImportRequest(string clientCode, int sportId, bool commit, params (int SegmentId, int LeagueId, int SortOrder)[] rows) =>
+            new ImportClientOddstableLeagueSettingRequest
+            {
+                ClientCode = clientCode,
+                SportId = sportId,
+                SportName = sportId == Football ? "Football" : "Basketball",
+                Commit = commit,
+                Rows = rows
+                    .Select((r, index) => new ImportOddstableLeagueRow { RowNo = index + 2, SegmentId = r.SegmentId, LeagueId = r.LeagueId, SortOrder = r.SortOrder })
+                    .ToList(),
+                UserId = "tester",
+                UserName = "Test User",
+                TimeStamp = DateTime.UtcNow
+            };
 
         private static ClientOddstableLeagueOrder Row(Guid clientId, int sportId, int segmentId, int leagueId, int sortOrder, string leagueName = null) =>
             new ClientOddstableLeagueOrder
@@ -650,6 +709,234 @@ namespace Backoffice.API.Tests.SportsbookClients
             AssertRejected(await sut.CopyClientOddstableLeagueSettings(CopyRequest("QTE-A", Football, "QTE-B")), "Source client has no league sorting to copy");
             Assert.Equal(new[] { (10, 109, 1) }, await Order(context, ClientBId, Football));
             Assert.Empty(published);
+        }
+
+        // ---------------------------------------------------------------
+        // ImportClientOddstableLeagueSettings (BO-122)
+        // ---------------------------------------------------------------
+
+        private static readonly List<LeagueLookupResponseV2.LeagueLookupModelV2> FootballCatalog = new List<LeagueLookupResponseV2.LeagueLookupModelV2>
+        {
+            Available(10, 100), Available(10, 101), Available(10, 102), Available(10, 103), Available(11, 110),
+            Available(20, 200, Basketball)
+        };
+
+        [Fact]
+        public async Task Import_Validate_ChangesNothing_AndPublishesAndLogsNothing()
+        {
+            using var context = BuildContext();
+            context.ClientOddstableLeagueOrder.Add(Row(ClientAId, Football, 10, 100, 1));
+            await context.SaveChangesAsync();
+            var published = new List<MessageRequest>();
+            var logs = new List<OnActivityLogMessage>();
+            var sut = BuildSut(context, published, logs, catalog: FootballCatalog);
+
+            var response = await sut.ImportClientOddstableLeagueSettings(ImportRequest("QTE-A", Football, false, (10, 101, 1)));
+
+            Assert.Equal(StatusCode.Success, response.Result.StatusCode);
+            Assert.False(response.Result.Committed);
+            Assert.True(response.Result.HasChanges);
+            Assert.Equal((1, 0, 1, 2), (response.Result.MatchedCount, response.Result.UnmatchedCount, response.Result.RetainedCount, response.Result.ResultCount));
+            Assert.Equal(new[] { (10, 100, 1) }, await Order(context, ClientAId, Football));
+            Assert.Empty(published);
+            Assert.Empty(logs);
+        }
+
+        [Fact]
+        public async Task Import_Commit_PutsTheFileLeaguesFirst_KeepsTheOthersAfterThemInTheirOrder()
+        {
+            using var context = BuildContext();
+            context.ClientOddstableLeagueOrder.AddRange(
+                Row(ClientAId, Football, 10, 100, 1),
+                Row(ClientAId, Football, 10, 101, 2),
+                Row(ClientAId, Football, 10, 102, 3));
+            await context.SaveChangesAsync();
+            var published = new List<MessageRequest>();
+            var sut = BuildSut(context, published, catalog: FootballCatalog);
+
+            var response = await sut.ImportClientOddstableLeagueSettings(ImportRequest("QTE-A", Football, true, (10, 103, 2), (10, 102, 1)));
+
+            Assert.Equal(StatusCode.Success, response.Result.StatusCode);
+            Assert.True(response.Result.Committed);
+            Assert.Equal(new[] { (10, 102, 1), (10, 103, 2), (10, 100, 3), (10, 101, 4) }, await Order(context, ClientAId, Football));
+
+            var message = Assert.Single(published);
+            Assert.Equal(OddstableRoutingKey, message.RoutingKey);
+            Assert.Equal("OnOddstableLeagueSortOrderChange", message.MessageType);
+            var payload = JsonSerializer.Deserialize<OnDeleteCacheMessage>(message.Payload);
+            Assert.Equal(CacheType.OddstableLeagueSortOrder, payload.CacheType);
+            Assert.Equal("QTE-A", payload.ClientCode);
+            Assert.Equal(ClientAId, payload.ClientId);
+        }
+
+        [Fact]
+        public async Task Import_Commit_WritesAnImportLog_WithUserSportAndBothOrders()
+        {
+            using var context = BuildContext();
+            context.ClientOddstableLeagueOrder.AddRange(
+                Row(ClientAId, Football, 10, 100, 1),
+                Row(ClientAId, Football, 10, 101, 2));
+            await context.SaveChangesAsync();
+            var logs = new List<OnActivityLogMessage>();
+            var sut = BuildSut(context, new List<MessageRequest>(), logs, catalog: FootballCatalog);
+
+            await sut.ImportClientOddstableLeagueSettings(ImportRequest("QTE-A", Football, true, (10, 101, 1)));
+
+            var log = Assert.Single(logs);
+            Assert.Equal("SBC.OE.LeagueSorting", log.Page);
+            Assert.Equal("QTE-A", log.Payload);
+            Assert.Equal("Import", log.Activity);
+            Assert.Equal("tester", log.UserId);
+            Assert.Equal("Test User", log.UserName);
+
+            var from = AuditOf(log.From);
+            var to = AuditOf(log.To);
+            Assert.Equal(new[] { 100, 101 }, from.Leagues.Select(l => l.LeagueId));
+            Assert.Equal(new[] { 101, 100 }, to.Leagues.Select(l => l.LeagueId));
+            Assert.Equal((Football, "Football"), (to.SportId, to.SportName));
+            Assert.Null(to.SourceClientCode);
+        }
+
+        [Fact]
+        public async Task Import_Commit_FirstSetupOfAClientWithoutAnOrder()
+        {
+            using var context = BuildContext();
+            var logs = new List<OnActivityLogMessage>();
+            var sut = BuildSut(context, new List<MessageRequest>(), logs, catalog: FootballCatalog);
+
+            var response = await sut.ImportClientOddstableLeagueSettings(ImportRequest("QTE-A", Football, true, (10, 100, 1), (11, 110, 2)));
+
+            Assert.True(response.Result.Committed);
+            Assert.Equal(new[] { (10, 100, 1), (11, 110, 2) }, await Order(context, ClientAId, Football));
+            Assert.Empty(AuditOf(Assert.Single(logs).From).Leagues);
+        }
+
+        [Fact]
+        public async Task Import_Commit_NamesComeFromTheLookup_NotFromTheFile()
+        {
+            using var context = BuildContext();
+            context.ClientOddstableLeagueOrder.Add(Row(ClientAId, Football, 10, 100, 1, leagueName: "Old Name"));
+            await context.SaveChangesAsync();
+            var sut = BuildSut(context, new List<MessageRequest>(), catalog: FootballCatalog);
+
+            await sut.ImportClientOddstableLeagueSettings(ImportRequest("QTE-A", Football, true, (10, 101, 1), (10, 100, 2)));
+
+            var rows = await context.ClientOddstableLeagueOrder.AsNoTracking().Where(c => c.ClientId == ClientAId).OrderBy(c => c.SortOrder).ToListAsync();
+            Assert.Equal(new[] { "League 101", "League 100" }, rows.Select(r => r.LeagueName));
+            Assert.All(rows, r => Assert.Equal(("Football", $"Segment {r.SegmentId}"), (r.SportName, r.SegmentName)));
+        }
+
+        [Fact]
+        public async Task Import_Commit_SkipsAndReportsLeaguesThatAreNotAvailableForTheSport()
+        {
+            using var context = BuildContext();
+            var sut = BuildSut(context, new List<MessageRequest>(), catalog: FootballCatalog);
+
+            var response = await sut.ImportClientOddstableLeagueSettings(
+                ImportRequest("QTE-A", Football, true, (10, 100, 1), (10, 999, 2), (20, 200, 3), (11, 100, 4)));
+
+            Assert.True(response.Result.Committed);
+            Assert.Equal((1, 3), (response.Result.MatchedCount, response.Result.UnmatchedCount));
+            Assert.Equal(new[] { (10, 100, 1) }, await Order(context, ClientAId, Football));
+            Assert.Equal(new[] { 3, 4, 5 }, response.Result.Rows.Where(r => !r.Matched).Select(r => r.RowNo));
+            Assert.All(response.Result.Rows.Where(r => !r.Matched), r => Assert.False(string.IsNullOrEmpty(r.Reason)));
+        }
+
+        [Fact]
+        public async Task Import_Commit_OnlyTouchesThatClientAndSport()
+        {
+            using var context = BuildContext();
+            context.ClientOddstableLeagueOrder.AddRange(
+                Row(ClientAId, Football, 10, 100, 1),
+                Row(ClientAId, Basketball, 20, 200, 1),
+                Row(ClientBId, Football, 10, 100, 1));
+            await context.SaveChangesAsync();
+            var published = new List<MessageRequest>();
+            var sut = BuildSut(context, published, catalog: FootballCatalog);
+
+            await sut.ImportClientOddstableLeagueSettings(ImportRequest("QTE-A", Football, true, (10, 101, 1)));
+
+            Assert.Equal(new[] { (10, 101, 1), (10, 100, 2) }, await Order(context, ClientAId, Football));
+            Assert.Equal(new[] { (20, 200, 1) }, await Order(context, ClientAId, Basketball));
+            Assert.Equal(new[] { (10, 100, 1) }, await Order(context, ClientBId, Football));
+            Assert.Single(published);
+        }
+
+        [Fact]
+        public async Task Import_Commit_WithTheSameOrderAlready_SavesPublishesAndLogsNothing()
+        {
+            using var context = BuildContext();
+            context.ClientOddstableLeagueOrder.AddRange(
+                Row(ClientAId, Football, 10, 100, 1),
+                Row(ClientAId, Football, 10, 101, 2));
+            await context.SaveChangesAsync();
+            var published = new List<MessageRequest>();
+            var logs = new List<OnActivityLogMessage>();
+            var sut = BuildSut(context, published, logs, catalog: FootballCatalog);
+
+            var response = await sut.ImportClientOddstableLeagueSettings(ImportRequest("QTE-A", Football, true, (10, 100, 1), (10, 101, 2)));
+
+            Assert.Equal(StatusCode.Success, response.Result.StatusCode);
+            Assert.False(response.Result.HasChanges);
+            Assert.False(response.Result.Committed);
+            Assert.Empty(published);
+            Assert.Empty(logs);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Import_WithProblemsInTheFile_ChangesNothing_EvenWhenCommitIsRequested(bool commit)
+        {
+            using var context = BuildContext();
+            context.ClientOddstableLeagueOrder.Add(Row(ClientAId, Football, 10, 100, 1));
+            await context.SaveChangesAsync();
+            var published = new List<MessageRequest>();
+            var logs = new List<OnActivityLogMessage>();
+            var sut = BuildSut(context, published, logs, catalog: FootballCatalog);
+
+            var response = await sut.ImportClientOddstableLeagueSettings(ImportRequest("QTE-A", Football, commit, (10, 101, 1), (10, 101, 2)));
+
+            Assert.Equal(StatusCode.Error, response.Result.StatusCode);
+            Assert.False(response.Result.Committed);
+            Assert.Single(response.Result.Errors);
+            Assert.Equal(new[] { (10, 100, 1) }, await Order(context, ClientAId, Football));
+            Assert.Empty(published);
+            Assert.Empty(logs);
+        }
+
+        [Fact]
+        public async Task Import_Rejected_WhenClientCodeMissing_SportMissing_OrClientUnknown()
+        {
+            using var context = BuildContext();
+            var published = new List<MessageRequest>();
+            var sut = BuildSut(context, published, catalog: FootballCatalog);
+
+            var noClient = await sut.ImportClientOddstableLeagueSettings(ImportRequest("", Football, true, (10, 100, 1)));
+            var noSport = await sut.ImportClientOddstableLeagueSettings(ImportRequest("QTE-A", 0, true, (10, 100, 1)));
+            var unknownClient = await sut.ImportClientOddstableLeagueSettings(ImportRequest("NOPE", Football, true, (10, 100, 1)));
+
+            Assert.Equal(new[] { "Invalid Client Code", "Invalid Sport", "No client found" },
+                new[] { noClient, noSport, unknownClient }.Select(r => r.Result.Message));
+            Assert.All(new[] { noClient, noSport, unknownClient }, r => Assert.Equal(StatusCode.Error, r.Result.StatusCode));
+            Assert.Empty(context.ClientOddstableLeagueOrder);
+            Assert.Empty(published);
+        }
+
+        [Fact]
+        public async Task Import_WhenTheAuditWriteFails_StillSaves_AndWarns()
+        {
+            using var context = BuildContext();
+            var published = new List<MessageRequest>();
+            var sut = BuildSut(context, published, auditFailure: new InvalidOperationException("audit down"), catalog: FootballCatalog);
+
+            var response = await sut.ImportClientOddstableLeagueSettings(ImportRequest("QTE-A", Football, true, (10, 100, 1)));
+
+            Assert.Equal(StatusCode.Success, response.Result.StatusCode);
+            Assert.True(response.Result.Committed);
+            Assert.Contains("audit log could not be written", response.Result.Message);
+            Assert.Equal(new[] { (10, 100, 1) }, await Order(context, ClientAId, Football));
+            Assert.Single(published);
         }
     }
 }

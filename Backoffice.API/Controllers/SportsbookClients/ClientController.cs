@@ -297,6 +297,20 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
 
+        [HttpPost("oddstableleaguesettings/import")]
+        public async Task<IActionResult> ImportClientOddstableLeagueSettings([FromBody] ImportClientOddstableLeagueSettingRequest request)
+        {
+            var result = await _sportsbookRepository.ImportClientOddstableLeagueSettings(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpPost("oddstableleaguesettings/logs")]
         public async Task<IActionResult> GetOddstableLeagueSortingLogs([FromBody] OddstableLeagueSortingLogRequest request)
         {

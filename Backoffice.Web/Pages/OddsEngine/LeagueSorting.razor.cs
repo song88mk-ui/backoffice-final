@@ -7,6 +7,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.LeagueSorting;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.ComponentModel;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -157,6 +158,29 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Leagues", client.Leagues);
 
             _modalService.Open<CopyModal>($"Copy {{{client.ClientName}}} League Sorting Settings ({{{_selectedSportName}}}) To", parameters, new ModalOptions());
+        }
+
+        // The leagues are already on the page, so the export needs no request. It works for View access too.
+        public async Task OnExportClickEvent(LeagueSortingClient client)
+        {
+            var csv = LeagueSortingCsvHelper.BuildCsv(client.ClientCode, int.Parse(_selectedSportId), client.Leagues);
+            var fileName = LeagueSortingCsvHelper.BuildFileName(client.ClientCode, _selectedSportName, DateTime.UtcNow);
+
+            await _jsRuntime.InvokeVoidAsync("downloadFileFromText", fileName, csv, "text/csv");
+        }
+
+        public void OnImportClickEvent(LeagueSortingClient client)
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalDialogClass", "modal-xl");
+            parameters.Add("ClientCode", client.ClientCode);
+            parameters.Add("ClientName", client.ClientName);
+            parameters.Add("SportId", int.Parse(_selectedSportId));
+            parameters.Add("SportName", _selectedSportName);
+            parameters.Add("CurrentLeagueCount", client.Leagues.Count);
+
+            _modalService.Open<ImportModal>($"Import League Sorting of {{{client.ClientName}}} ({{{_selectedSportName}}})", parameters, new ModalOptions());
         }
 
         public void OnLogsClickEvent()

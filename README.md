@@ -492,6 +492,7 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 | POST | `sportsbook/client/oddstableleagueorder/list` | Client Oddstable league order list (BO-107), filtered by client and sport |
 | POST | `sportsbook/client/oddstableleaguesettings` | Replace a client's Oddstable league order for one sport (BO-107) |
 | POST | `sportsbook/client/oddstableleaguesettings/copy` | Copy one client's Oddstable league order for a sport to other clients (BO-107) |
+| POST | `sportsbook/client/oddstableleaguesettings/import` | Import a League Sorting CSV for one client and sport (BO-122). `Commit = false` only validates; `Commit = true` saves, audits (`Import`) and publishes the cache-sync message. Matched leagues take the first positions in the file's `SortOrder`, the client's other leagues follow in their current order, unknown leagues are skipped and reported |
 | POST | `sportsbook/client/oddstableleaguesettings/logs` | League Sorting audit entries from `ActivityLog2`, newest first, paged (BO-107) |
 | POST | `sportsbook/client/tier/leagueorder/list` | Tier league order list |
 | GET | `sportsbook/client/markettemplate/{clientCode}/{sportId}/{fixtureStatusId}` | Client market templates |

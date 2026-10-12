@@ -3156,6 +3156,8 @@ namespace Backoffice.Web.Services
             => PostOddstableLeagueSorting<ClientOddstableLeagueSettingRequest, ClientOddstableLeagueSettingResponse>("sportsbook/client/oddstableleaguesettings", request);
         public Task<BaseResponse<ClientOddstableLeagueSettingResponse>> CopyClientOddstableLeagueSettings(CopyClientOddstableLeagueSettingRequest request)
             => PostOddstableLeagueSorting<CopyClientOddstableLeagueSettingRequest, ClientOddstableLeagueSettingResponse>("sportsbook/client/oddstableleaguesettings/copy", request);
+        public Task<BaseResponse<ImportClientOddstableLeagueSettingResponse>> ImportClientOddstableLeagueSettings(ImportClientOddstableLeagueSettingRequest request)
+            => PostOddstableLeagueSorting<ImportClientOddstableLeagueSettingRequest, ImportClientOddstableLeagueSettingResponse>("sportsbook/client/oddstableleaguesettings/import", request);
         public Task<BaseResponse<ActivityLogResponse>> GetOddstableLeagueSortingLogs(OddstableLeagueSortingLogRequest request)
             => PostOddstableLeagueSorting<OddstableLeagueSortingLogRequest, ActivityLogResponse>("sportsbook/client/oddstableleaguesettings/logs", request);
         private async Task<BaseResponse<TResponse>> PostOddstableLeagueSorting<TRequest, TResponse>(string path, TRequest request)

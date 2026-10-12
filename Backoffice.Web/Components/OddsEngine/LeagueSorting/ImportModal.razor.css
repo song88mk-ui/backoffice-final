@@ -1,0 +1,117 @@
+.ls-import-panel {
+    padding: 0.75rem 1rem;
+    border: 1px solid #DEE2E6;
+    border-radius: 4px;
+    background-color: #FAFAFA;
+}
+
+.ls-import-target {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.5rem 1.5rem;
+}
+
+.ls-import-target .form-label {
+    margin-bottom: 0.25rem;
+}
+
+.ls-import-value {
+    font-weight: 600;
+}
+
+.ls-import-hint {
+    color: #5B6270;
+    font-size: 0.85rem;
+    padding-left: 1.25rem;
+}
+
+.ls-import-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+.ls-import-tile {
+    padding: 0.5rem 1rem;
+    border: 1px solid #DEE2E6;
+    border-radius: 4px;
+    background-color: #FFF;
+    text-align: center;
+}
+
+.ls-import-tile-warn {
+    border-color: #E5A100;
+    background-color: #FFF8E1;
+}
+
+.ls-import-count {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.ls-import-caption {
+    color: #5B6270;
+    font-size: 0.8rem;
+}
+
+.ls-import-columns {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 0.75rem;
+    align-items: start;
+}
+
+.ls-import-title {
+    margin-bottom: 0.5rem;
+}
+
+.ls-import-scroll {
+    max-height: 18rem;
+    overflow-y: auto;
+    background-color: #FFF;
+}
+
+.ls-import-none {
+    color: #5B6270;
+    font-size: 0.9rem;
+}
+
+.ls-import-table thead {
+    position: sticky;
+    top: 0;
+    background-color: #354156;
+    color: #FFF;
+}
+
+.ls-import-table th, .ls-import-table td {
+    font-size: 0.9rem;
+    font-weight: inherit;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.btn-save, .btn-cancel, .btn-back {
+    width: 112px;
+    height: 40px;
+    border-radius: 5px;
+    color: white;
+}
+
+.btn-cancel, .btn-back {
+    background-color: #9AA0AB;
+}
+
+.btn-save {
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+@media (max-width: 767.98px) {
+    .ls-import-target, .ls-import-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .ls-import-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

@@ -1,0 +1,168 @@
+<div class="modal-body">
+    <section class="ls-import-panel mb-3">
+        <div class="ls-import-target">
+            <div>
+                <label class="form-label">@_translationState.GetValue("Client")</label>
+                <div class="ls-import-value">@_clientName</div>
+            </div>
+            <div>
+                <label class="form-label">@_translationState.GetValue("Sports")</label>
+                <div class="ls-import-value">@_sportName</div>
+            </div>
+            <div>
+                <label class="form-label">Current leagues</label>
+                <div class="ls-import-value">@_currentLeagueCount</div>
+            </div>
+        </div>
+    </section>
+
+    @if (_step == Step.SelectFile)
+    {
+        <section class="ls-import-panel">
+            <label class="form-label" for="ls-import-file">CSV file</label>
+            <InputFile @key="_inputKey" id="ls-import-file" class="form-control" accept=".csv" disabled="@_isBusy" OnChange="OnFileSelectedEvent" />
+
+            @if (_fileErrors.Any())
+            {
+                <div class="alert alert-danger mt-3 mb-0" role="alert">
+                    <div class="fw-bold mb-1">@(string.IsNullOrEmpty(_fileName) ? "The file cannot be read." : $"{_fileName} cannot be imported.")</div>
+                    <ul class="mb-0">
+                        @foreach (var error in _fileErrors)
+                        {
+                            <li>@error</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <ul class="ls-import-hint mt-3 mb-0">
+                <li>Use a file exported from this page and change the SortOrder column to set the order.</li>
+                <li>The leagues in the file take the first positions, in SortOrder. The leagues of the client that are not in the file follow them, in their current order.</li>
+                <li>Leagues that are not available for this sport are skipped and listed. Nothing is saved until you confirm on the next step.</li>
+            </ul>
+        </section>
+    }
+    else if (_result != null && _result.StatusCode != StatusCode.Success)
+    {
+        <div class="alert alert-danger mb-0" role="alert">
+            <div class="fw-bold mb-1">@_result.Message</div>
+            @if (_result.Errors.Any())
+            {
+                <ul class="mb-0">
+                    @foreach (var error in _result.Errors)
+                    {
+                        <li>@error</li>
+                    }
+                </ul>
+            }
+        </div>
+    }
+    else if (_result != null)
+    {
+        <section class="ls-import-summary mb-3">
+            <div class="ls-import-tile">
+                <div class="ls-import-count">@_result.MatchedCount</div>
+                <div class="ls-import-caption">In the file</div>
+            </div>
+            <div class="ls-import-tile @(_result.UnmatchedCount > 0 ? "ls-import-tile-warn" : null)">
+                <div class="ls-import-count">@_result.UnmatchedCount</div>
+                <div class="ls-import-caption">Skipped</div>
+            </div>
+            <div class="ls-import-tile">
+                <div class="ls-import-count">@_result.RetainedCount</div>
+                <div class="ls-import-caption">Kept after them</div>
+            </div>
+            <div class="ls-import-tile">
+                <div class="ls-import-count">@_result.ResultCount</div>
+                <div class="ls-import-caption">Total leagues</div>
+            </div>
+        </section>
+
+        @if (_step == Step.Review && !_result.HasChanges)
+        {
+            <div class="alert alert-info" role="alert">The League Sorting is already in this order, so there is nothing to import.</div>
+        }
+
+        <div class="ls-import-columns">
+            <section class="ls-import-panel">
+                <h6 class="ls-import-title">Leagues in the file (@_result.MatchedCount)</h6>
+                <div class="ls-import-scroll">
+                    <table class="table table-sm table-borderless ls-import-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Row</th>
+                                <th>SortOrder</th>
+                                <th class="text-start">League</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in _result.Rows.Where(r => r.Matched))
+                            {
+                                <tr @key="row.RowNo">
+                                    <td>@row.RowNo</td>
+                                    <td>@row.SortOrder</td>
+                                    <td class="text-start">@row.SegmentName > @row.LeagueName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="ls-import-panel">
+                <h6 class="ls-import-title">Skipped (@_result.UnmatchedCount)</h6>
+                @if (_result.UnmatchedCount == 0)
+                {
+                    <div class="ls-import-none">Every league in the file is available for this sport.</div>
+                }
+                else
+                {
+                    <div class="ls-import-scroll">
+                        <table class="table table-sm table-borderless ls-import-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Row</th>
+                                    <th>LeagueId</th>
+                                    <th class="text-start">Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var row in _result.Rows.Where(r => !r.Matched))
+                                {
+                                    <tr @key="row.RowNo">
+                                        <td>@row.RowNo</td>
+                                        <td>@row.LeagueId</td>
+                                        <td class="text-start">@row.Reason</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </section>
+        </div>
+    }
+
+    @if (_alert != null && !string.IsNullOrEmpty(_alert.Message))
+    {
+        <div class="mt-3">
+            <AlertMessage AlertModel="@_alert" />
+        </div>
+    }
+</div>
+<div class="modal-footer mx-4 p-0 py-3 border-0">
+    @if (_step == Step.Done)
+    {
+        <button type="button" class="btn btn-save waves-effect" @onclick="OnCloseClickEvent">Close</button>
+    }
+    else if (_step == Step.SelectFile)
+    {
+        <button type="button" class="btn btn-cancel waves-effect" disabled="@_isBusy" @onclick="OnCloseClickEvent">@_translationState.GetValue("Cancel")</button>
+    }
+    else
+    {
+        <button type="button" class="btn btn-cancel waves-effect" disabled="@_isBusy" @onclick="OnCloseClickEvent">@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="btn btn-back waves-effect" disabled="@_isBusy" @onclick="OnBackClickEvent">Other file</button>
+        <button type="button" class="btn btn-save waves-effect" disabled="@(!CanImport)" @onclick="OnImportClickEvent">Import</button>
+    }
+</div>
