@@ -1,6 +1,6 @@
 ---
 description: Create and push the next incremental staging release tag (v0.1.X-stg) to trigger a STG deployment.
-allowed-tools: Bash(pwsh:*), Bash(powershell:*), Bash(git fetch:*), Bash(git tag:*), Bash(git push:*)
+allowed-tools: Bash(git fetch:*), PowerShell(.\scripts\New-ReleaseTag.ps1 -Environment stg -DryRun)
 ---
 
 # /push-stg
@@ -11,7 +11,13 @@ Tags follow the pattern `vMAJOR.MINOR.PATCH-stg` (e.g. `v0.1.52-stg`). The next 
 
 ## Steps
 
-1. Run the release tag script from the repo root:
+1. **Confirm intent first.** Show the user the exact tag that will be created using a dry run, and ask for explicit confirmation:
+
+   ```powershell
+   .\scripts\New-ReleaseTag.ps1 -Environment stg -DryRun
+   ```
+
+2. Only after the user explicitly confirms, create the release:
 
    ```powershell
    .\scripts\New-ReleaseTag.ps1 -Environment stg
@@ -23,11 +29,11 @@ Tags follow the pattern `vMAJOR.MINOR.PATCH-stg` (e.g. `v0.1.52-stg`). The next 
    - increments the PATCH by 1
    - creates a **GitHub Release** for the new tag (target `main`), which also creates the tag and triggers the CI deploy
 
-2. Report back the exact tag/release that was created, and confirm that the STG deployment has been triggered.
+3. Report back the exact tag/release that was created, and confirm that the STG deployment has been triggered.
 
 ## Notes
 
-- Staging deploys are low-risk, so no extra confirmation is required before pushing.
+- **Never create a `-stg` release without explicit user confirmation in the conversation.** STG is shared by the whole team and the QA suites, and a `-stg` release builds and pushes all six BO images (the `ci.yml` build matrix) to the STG account.
 - The deploy is triggered by a **published GitHub Release** (`release: released` in `.github/workflows/ci.yml`), **not** by a tag push. The script creates the Release for this reason; a bare tag will not deploy.
 - The script needs either GitHub CLI (`gh auth login`) or a `GH_TOKEN`/`GITHUB_TOKEN` env var (contents:write / repo scope) to create the Release. If neither is present it stops with instructions instead of leaving a tag with no release.
 - If the script reports the tag/release already exists or no prior `-stg` tag is found, surface the error instead of retrying blindly.

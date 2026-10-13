@@ -1,6 +1,6 @@
 ---
 description: Create and push the next incremental production release tag (v0.1.X-prd) to trigger a PRD deployment.
-allowed-tools: Bash(pwsh:*), Bash(powershell:*), Bash(git fetch:*), Bash(git tag:*), Bash(git push:*)
+allowed-tools: Bash(git fetch:*), PowerShell(.\scripts\New-ReleaseTag.ps1 -Environment prd -DryRun)
 ---
 
 # /push-prd
