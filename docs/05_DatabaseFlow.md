@@ -71,7 +71,36 @@ ConfigTemplateAssigned
 ConfigTemplateAssignedMapping
 ├─ (ConfigTemplateAssignedId, ConfigTemplateId, FixtureStatusId) (PK)
 ├─ Assignment mappings
+
+ClientImportBatch                        (CSV client import/update, BO-112)
+├─ BatchId (PK, client-generated GUID so the UI can poll progress)
+├─ Environment, OperationType (Create | Update)
+├─ Status (Running | Completed | PartiallySuccessful | Failed)
+├─ StartedByUserId, StartedByUserName, StartedAt, CompletedAt
+├─ TotalRows, SucceededRows, FailedRows
+└─ Filtered unique index on Environment WHERE Status = 'Running' (one batch at a time per environment)
+
+ClientImportBatchRow
+├─ Id (PK), BatchId (FK → ClientImportBatch)
+├─ RowNumber, ClientCode, ClientName
+├─ Status (Pending | Succeeded | Failed | Skipped)
+└─ StepsCompleted, ErrorMessage (≤1000 chars), ResultClientId (Platform client GUID)
 ```
+
+**Client identifiers.** A client has three, and only one is "Client ID":
+
+| Name in UI / CSV | Column | Type | Notes |
+|---|---|---|---|
+| **Client ID** | `Platform.dbo.Client.ClientId` | `uniqueidentifier` | Assigned by Platform on create, never changes. The id every other system uses (Betting, Sportsbook, Trading, Operator tables, `clientId=` in sportsbook URLs). |
+| Client Code / Brand | `ClientInformation.Brand`, `Platform.dbo.Client.ClientCode` | text | What admins type, e.g. `NWS`. |
+| (internal) | `ClientInformation.ClientId` | `int` identity | Backoffice primary key; Platform stores it as `Client.ClientIdRef`, which is the real Backoffice↔Platform link. |
+
+The CSV update tool identifies clients by Client ID, resolved via `ClientIdRef` (falling back to Client Code for older Platform rows without it). The Client Information modal shows it read-only.
+
+Field-level change history for CSV updates is not a separate table — it is written to
+`ActivityLog2` with `Page = "Clients - Import"`, `Activity = "Update"`,
+`Payload = "{batchId}|{clientCode}|{fieldName}"`, and the old/new values in `From`/`To`.
+Batch summaries use the same Page with `Payload = "{batchId}"` (no pipe).
 
 **Key Characteristics:**
 - Dense primary keys (composite keys for margins)

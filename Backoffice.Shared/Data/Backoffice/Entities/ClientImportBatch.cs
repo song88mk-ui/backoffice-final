@@ -10,6 +10,7 @@ namespace Backoffice.Shared.Data.Backoffice.Entities
         [Key]
         public Guid BatchId { get; set; }
         public string Environment { get; set; }
+        public string OperationType { get; set; }
         public string Status { get; set; }
         public string StartedByUserId { get; set; }
         public string StartedByUserName { get; set; }

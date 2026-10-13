@@ -397,6 +397,8 @@ namespace Backoffice.Web.Components.SBC.Clients
                     TierJackpotShare = Client.TierJackpotShare,
                     TierSportsbookShare = Client.TierSportsbookShare,
                     Website = Client.Website ?? string.Empty,
+                    LimitId = Client.LimitId ?? string.Empty,
+                    Endpoint = Client.Endpoint ?? string.Empty,
                     RevenueShare = new ClientListResponse.RevenueShare
                     {
                         JackpotShare = Client.RevenueShare.JackpotShare,

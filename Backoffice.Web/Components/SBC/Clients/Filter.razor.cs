@@ -12,6 +12,9 @@ namespace Backoffice.Web.Components.SBC.Clients
         [Parameter] public EventCallback<ClientListCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<bool> OnCreateClientCallback { get; set; }
         [Parameter] public EventCallback OnImportClientsCallback { get; set; }
+        [Parameter] public EventCallback OnUpdateClientsCallback { get; set; }
+        [Parameter] public EventCallback OnExportClientsCallback { get; set; }
+        [Parameter] public EventCallback OnViewUpdateHistoryCallback { get; set; }
 
         public SearchFormModel SearchForm { get; set; }
         public int SortBy { get; set; }
@@ -87,6 +90,21 @@ namespace Backoffice.Web.Components.SBC.Clients
         public async Task OnImportClientsClickEvent()
         {
             await OnImportClientsCallback.InvokeAsync();
+        }
+
+        public async Task OnUpdateClientsClickEvent()
+        {
+            await OnUpdateClientsCallback.InvokeAsync();
+        }
+
+        public async Task OnExportClientsClickEvent()
+        {
+            await OnExportClientsCallback.InvokeAsync();
+        }
+
+        public async Task OnViewUpdateHistoryClickEvent()
+        {
+            await OnViewUpdateHistoryCallback.InvokeAsync();
         }
 
         public void Dispose()

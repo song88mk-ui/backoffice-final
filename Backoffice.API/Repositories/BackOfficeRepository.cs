@@ -442,9 +442,16 @@ namespace Backoffice.API.Repositories
 
                 var clients = query.Skip(skip).Take(request.PageSize).ToList();
 
+                var platformClients = request.IncludePlatformFields
+                    ? (await GetPlatformClients()).Result ?? new List<PlatformClientResponse>()
+                    : new List<PlatformClientResponse>();
+
                 var clientList = new List<ClientListResponse.Client>();
                 foreach (var client in clients)
                 {
+                    var platformClient = platformClients.FirstOrDefault(p => p.ClientIdRef == client.ClientId)
+                        ?? platformClients.FirstOrDefault(p => string.Equals(p.ClientCode, client.Brand, StringComparison.OrdinalIgnoreCase));
+
                     var clientResponse = new ClientListResponse.Client
                     {
                         ClientId = client.ClientId,
@@ -462,6 +469,9 @@ namespace Backoffice.API.Repositories
                         IsTierRevenue = client.IsTierRevenueShare,
                         TierJackpotShare = client.RevenueShareJackpot,
                         TierSportsbookShare = client.RevenueShareSportsbook,
+                        PlatformClientId = platformClient?.ClientId,
+                        LimitId = platformClient?.LimitId,
+                        Endpoint = platformClient?.Endpoint,
                     };
 
                     var taxConfig = string.IsNullOrEmpty(client.TaxConfig) ? new TaxConfig() : JsonSerializer.Deserialize<TaxConfig>(client.TaxConfig);
@@ -1305,8 +1315,8 @@ namespace Backoffice.API.Repositories
                             ClientCode = request.ClientCode,
                             IsActive = request.StatusId == (int)ClientStatus.Normal ? true : false,
                             ClientIdRef = (int)clientId,
-                            //LimitId = string.Empty,
-                            //EndPoint = string.Empty,
+                            LimitId = string.IsNullOrEmpty(request.LimitId) ? string.Empty : request.LimitId,
+                            Endpoint = string.IsNullOrEmpty(request.Endpoint) ? string.Empty : request.Endpoint,
                             MonthlyFee = request.MonthlyFee,
                             CurrentCompanyShare = companyRevenueShare,
                             EffectiveDate = DateTime.UtcNow,
@@ -1462,6 +1472,89 @@ namespace Backoffice.API.Repositories
             catch (Exception ex)
             {
                 return new BaseResponse<BetSettingResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<Dictionary<int, List<ClientListResponse.BetSetting>>>> GetBetSettingsBulk(List<int> clientIds)
+        {
+            try
+            {
+                var result = new Dictionary<int, List<ClientListResponse.BetSetting>>();
+                if (clientIds == null || !clientIds.Any())
+                {
+                    return new BaseResponse<Dictionary<int, List<ClientListResponse.BetSetting>>>
+                    {
+                        StatusCode = StatusCode.Success,
+                        Message = StatusCode.Success.ToString(),
+                        Result = result
+                    };
+                }
+
+                var clientIdsLong = clientIds.Select(id => (long)id).ToList();
+                var allSettings = _backofficeContext.ClientBetSetting.AsNoTracking()
+                    .Where(c => clientIdsLong.Contains(c.ClientId))
+                    .ToList();
+
+                foreach (var clientGroup in allSettings.GroupBy(s => s.ClientId))
+                {
+                    var betSettings = new List<ClientListResponse.BetSetting>();
+
+                    foreach (var currencyGroup in clientGroup.GroupBy(s => s.CurrencyCode))
+                    {
+                        var betSetting = new ClientListResponse.BetSetting
+                        {
+                            CurrencyCode = currencyGroup.Key
+                        };
+
+                        foreach (var setting in currencyGroup)
+                        {
+                            if (setting.CategoryId == (int)BetSettingCategory.Soccer)
+                            {
+                                betSetting.BetSettingSoccer = JsonSerializer.Deserialize<BetSettingSoccer>(setting.Setting);
+                            }
+                            else if (setting.CategoryId == (int)BetSettingCategory.Parlay)
+                            {
+                                betSetting.BetSettingParlay = JsonSerializer.Deserialize<BetSettingParlay>(setting.Setting);
+                            }
+                            else if (setting.CategoryId == (int)BetSettingCategory.Cricket)
+                            {
+                                betSetting.BetSettingCricket = JsonSerializer.Deserialize<BetSettingCricket>(setting.Setting);
+                            }
+                            else if (setting.CategoryId == (int)BetSettingCategory.OtherSports)
+                            {
+                                betSetting.BetSettingAllSports = JsonSerializer.Deserialize<BetSettingAllSports>(setting.Setting);
+                            }
+                            else if (setting.CategoryId == (int)BetSettingCategory.Priceboost)
+                            {
+                                betSetting.BetSettingPriceboost = JsonSerializer.Deserialize<BetSettingPriceboost>(setting.Setting);
+                            }
+                            else if (setting.CategoryId == (int)BetSettingCategory.BetBuilder)
+                            {
+                                betSetting.BetSettingBetBuilder = JsonSerializer.Deserialize<BetSettingBetBuilder>(setting.Setting);
+                            }
+                        }
+
+                        betSettings.Add(betSetting);
+                    }
+
+                    result[(int)clientGroup.Key] = betSettings;
+                }
+
+                return new BaseResponse<Dictionary<int, List<ClientListResponse.BetSetting>>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<Dictionary<int, List<ClientListResponse.BetSetting>>>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",

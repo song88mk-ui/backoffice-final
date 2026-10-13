@@ -1,0 +1,194 @@
+@using Backoffice.Web.Components.Common
+
+<div class="p-4">
+    @foreach (var alert in Alerts)
+    {
+        <AlertMessage AlertModel="@alert" />
+    }
+
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item"><span class="nav-link @(Pane == 1 ? "active fw-bold" : "disabled")">1. Upload</span></li>
+        <li class="nav-item"><span class="nav-link @(Pane == 2 ? "active fw-bold" : "disabled")">2. Review</span></li>
+        <li class="nav-item"><span class="nav-link @(Pane == 3 ? "active fw-bold" : "disabled")">3. Confirm</span></li>
+    </ul>
+
+    @if (EnvironmentDetectionFailed)
+    {
+        <div class="d-flex justify-content-end mt-3">
+            <button class="btn modalBtn modalCancel" @onclick="OnCancelClickEvent">Close</button>
+        </div>
+    }
+    else if (Pane == 1)
+    {
+        <div class="mb-3">
+            <label class="form-label d-block">Environment</label>
+            <span class="badge @EnvironmentBadgeClass px-3 py-2">@Environment</span>
+        </div>
+
+        <div class="border rounded p-4 text-center mb-3">
+            <InputFile OnChange="OnFileSelectedEvent" accept=".csv" />
+            @if (!string.IsNullOrEmpty(SelectedFileName))
+            {
+                <p class="mt-2 mb-0">
+                    <strong>@SelectedFileName</strong> — @ParsedRows.Select(r => r.ClientCode).Distinct().Count() client(s), @ParsedRows.Count row(s) parsed
+                </p>
+            }
+        </div>
+
+        <p class="text-muted small">
+            Each row is matched to an existing client by <code>ClientId</code> (shown in the client's Client Information, and included in Export CSV). Client Code must belong to that same client — it's a check against copying the wrong ID.
+            This only updates clients that already exist. CurrencyCode is optional (blank rows only change the client's top-level fields).
+            Set <code>CurrencyAction</code> to <code>Remove</code> to delete a currency; leave it blank to add or update one. A currency left out of the file entirely is not touched.
+            Use "Export CSV" to get a starting file pre-filled with existing client data, or "Download CSV" for the blank template. <code>ReferenceClientCode</code> is ignored here.
+        </p>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <button class="btn modalBtn modalCancel" @onclick="OnCancelClickEvent">Cancel</button>
+            <button class="btn modalBtn modalSave" disabled="@IsBusy" @onclick="OnParseClickEvent">
+                @(IsBusy ? "Parsing..." : "Parse file")
+            </button>
+        </div>
+    }
+    else if (Pane == 2 && ValidateResponse != null)
+    {
+        <div class="mb-3">
+            <span class="badge bg-secondary me-2">@ValidateResponse.TotalClients client(s) parsed</span>
+            <span class="badge bg-success me-2">@ValidateResponse.ReadyCount ready</span>
+            <span class="badge bg-danger">@ValidateResponse.ErrorCount can't update</span>
+        </div>
+
+        <div class="table-responsive" style="max-height: 420px;">
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>Row</th>
+                        <th>Client</th>
+                        <th>Status</th>
+                        <th>Detail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in ValidateResponse.Rows)
+                    {
+                        <tr>
+                            <td>@row.RowNumber</td>
+                            <td><strong>@row.ClientName</strong> <span class="text-muted">@row.ClientCode</span><div class="small text-muted">@row.ClientId</div></td>
+                            <td>
+                                @if (row.Status == "Ready")
+                                {
+                                    <span class="text-success fw-bold">Ready</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger fw-bold">Can't update</span>
+                                }
+                            </td>
+                            <td class="text-muted">@row.Message</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (IsBusy)
+        {
+            <div class="alert alert-info mt-3">
+                <strong>Updating — do not close this window or tab.</strong>
+                <div class="progress mt-2" style="height: 1.25rem;">
+                    @{
+                        var percent = Progress != null && Progress.TotalClients > 0
+                            ? (int)Math.Round(100.0 * Progress.ProcessedClients / Progress.TotalClients)
+                            : 0;
+                    }
+                    <div class="progress-bar" role="progressbar" style="width:@(percent)%;">@(percent)%</div>
+                </div>
+                @if (Progress != null)
+                {
+                    <div class="small text-muted mt-1">@Progress.ProcessedClients of @Progress.TotalClients client(s) processed@(Progress.FailedClients > 0 ? $" ({Progress.FailedClients} failed so far)" : "")</div>
+                }
+            </div>
+        }
+        else if (ConfirmingCommit)
+        {
+            <div class="alert @EnvironmentAlertClass mt-3">
+                <strong>You're about to update @ValidateResponse.ReadyCount client(s) in @Environment.</strong>
+                <p class="mb-2">This changes real client records — it isn't a preview. Make sure @Environment is really where you want these changes applied.</p>
+                <div class="d-flex gap-2">
+                    <button class="btn modalBtn modalCancel" @onclick="OnCancelConfirmEvent">No, go back</button>
+                    <button class="btn modalBtn modalSave" @onclick="OnConfirmCommitEvent">Yes, update @Environment</button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button class="btn modalBtn modalCancel" @onclick="OnBackClickEvent">Back</button>
+                <button class="btn modalBtn modalCancel" @onclick="OnCancelClickEvent">Cancel</button>
+                <button class="btn modalBtn modalSave" disabled="@(ValidateResponse.ReadyCount == 0)" @onclick="OnRequestCommitEvent">
+                    Update @ValidateResponse.ReadyCount ready client(s)
+                </button>
+            </div>
+        }
+    }
+    else if (Pane == 3 && CommitResponse != null)
+    {
+        <div class="alert alert-success">
+            <strong>Batch #@CommitResponse.BatchId</strong> — @CommitResponse.SucceededCount of @CommitResponse.TotalClients client(s) updated in @Environment.
+        </div>
+
+        <div class="table-responsive" style="max-height: 360px;">
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Status</th>
+                        <th>Changes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in CommitResponse.Rows)
+                    {
+                        <tr>
+                            <td><strong>@row.ClientName</strong> <span class="text-muted">@row.ClientCode</span><div class="small text-muted">@row.ClientId</div></td>
+                            <td>
+                                @if (row.Status == "Succeeded")
+                                {
+                                    <span class="text-success fw-bold">Succeeded</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger fw-bold">Failed</span>
+                                }
+                            </td>
+                            <td class="text-muted">
+                                @if (row.Status == "Failed")
+                                {
+                                    @row.Message
+                                }
+                                else if (row.Changes != null && row.Changes.Any())
+                                {
+                                    @foreach (var change in row.Changes)
+                                    {
+                                        <div><strong>@change.FieldName:</strong> @change.PreviousValue → @change.NewValue</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span>No changes</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            @if (CommitResponse.FailedCount > 0)
+            {
+                <button class="btn modalBtn modalCancel" @onclick="OnDownloadErrorReportEvent">Download error report</button>
+            }
+            <button class="btn modalBtn modalSave" @onclick="OnDoneClickEvent">Done</button>
+        </div>
+    }
+</div>

@@ -4,9 +4,11 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Components.SBC.Clients;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Globalization;
 
 namespace Backoffice.Web.Pages.SBC
@@ -17,6 +19,7 @@ namespace Backoffice.Web.Pages.SBC
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
 
 
 
@@ -134,6 +137,52 @@ namespace Backoffice.Web.Pages.SBC
 
             var options = new ModalOptions();
             ModalService.Open<ImportClientsModal>("Import Clients from CSV", parameters, options);
+
+            return Task.CompletedTask;
+        }
+
+        public Task OnUpdateClientsClickEvent()
+        {
+            Alerts.Clear();
+
+            var parameters = new ModalParameters();
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-xl");
+
+            var options = new ModalOptions();
+            ModalService.Open<UpdateClientsModal>("Update Clients from CSV", parameters, options);
+
+            return Task.CompletedTask;
+        }
+
+        public async Task OnExportClientsClickEvent()
+        {
+            Alerts.Clear();
+
+            var response = await BackofficeService.ExportClients();
+
+            if (response.StatusCode != Backoffice.Shared.Enums.StatusCode.Success || response.Result == null)
+            {
+                Alerts.Add(new AlertModel { Status = AlertStatus.Error, Message = response.Message ?? "Export failed." });
+                return;
+            }
+
+            var csvText = ClientCsvHelper.BuildExportCsv(response.Result);
+            var fileName = $"clients-export-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";
+
+            await JSRuntime.InvokeVoidAsync("downloadFileFromText", fileName, csvText, "text/csv");
+        }
+
+        public Task OnViewUpdateHistoryClickEvent()
+        {
+            Alerts.Clear();
+
+            var parameters = new ModalParameters();
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-xl");
+
+            var options = new ModalOptions();
+            ModalService.Open<ClientImportHistoryModal>("Update History", parameters, options);
 
             return Task.CompletedTask;
         }
@@ -284,7 +333,8 @@ namespace Backoffice.Web.Pages.SBC
                 Search = search,
                 Page = page,
                 PageSize = 25,
-                SortBy = (ClientSorting)sortBy
+                SortBy = (ClientSorting)sortBy,
+                IncludePlatformFields = true
             };
 
             var response = await BackofficeService.GetClientList(request);

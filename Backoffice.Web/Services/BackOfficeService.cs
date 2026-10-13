@@ -724,6 +724,106 @@ namespace Backoffice.Web.Services
             }
         }
 
+        public async Task<BaseResponse<List<ClientExportRow>>> ExportClients()
+        {
+            try
+            {
+                return await GetAsync<List<ClientExportRow>>($"sportsbook/clientimport/export") ?? new BaseResponse<List<ClientExportRow>>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<List<ClientExportRow>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ValidateClientUpdateResponse>> ValidateClientUpdate(ValidateClientUpdateRequest request)
+        {
+            try
+            {
+                return await PostAsJsonAsync<ValidateClientUpdateResponse, ValidateClientUpdateRequest>($"sportsbook/clientimport/validate-update", request) ?? new BaseResponse<ValidateClientUpdateResponse>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<ValidateClientUpdateResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<CommitClientUpdateResponse>> CommitClientUpdate(CommitClientUpdateRequest request)
+        {
+            try
+            {
+                return await PostAsJsonAsync<CommitClientUpdateResponse, CommitClientUpdateRequest>($"sportsbook/clientimport/commit-update", request) ?? new BaseResponse<CommitClientUpdateResponse>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<CommitClientUpdateResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<ClientImportBatchSummary>>> GetClientImportBatchHistory(string operationType)
+        {
+            try
+            {
+                return await GetAsync<List<ClientImportBatchSummary>>($"sportsbook/clientimport/batches?operationType={operationType}") ?? new BaseResponse<List<ClientImportBatchSummary>>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<List<ClientImportBatchSummary>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<ClientFieldChangeResponse>>> GetClientImportFieldChanges(Guid batchId)
+        {
+            try
+            {
+                return await GetAsync<List<ClientFieldChangeResponse>>($"sportsbook/clientimport/fieldchanges/{batchId}") ?? new BaseResponse<List<ClientFieldChangeResponse>>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<List<ClientFieldChangeResponse>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<ValidateClientImportResponse>> ValidateClientImport(ValidateClientImportRequest request)
         {
             try

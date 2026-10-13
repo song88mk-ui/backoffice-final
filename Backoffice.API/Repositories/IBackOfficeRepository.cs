@@ -22,6 +22,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs);
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
+        Task<BaseResponse<Dictionary<int, List<ClientListResponse.BetSetting>>>> GetBetSettingsBulk(List<int> clientIds);
         Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates();
         Task<BaseResponse<List<PlatformClientResponse>>> GetPlatformClients();
 

@@ -75,7 +75,14 @@ The Backoffice solution is a **multi-tier, event-driven microservices applicatio
   
 - **ClientController** (`sportsbook/client`)
   - Client information retrieval
-  - Client listing and filtering
+  - Client listing and filtering (`information/list` takes `IncludePlatformFields` to also return LimitId/Endpoint from Platform — opt-in, as it fetches the full Platform client list)
+
+- **ClientImportController** (`sportsbook/clientimport`) — CSV bulk client create/update (BO-112)
+  - `POST validate`, `POST commit` — create new clients from CSV
+  - `POST validate-update`, `POST commit-update` — update existing clients, identified by Client ID (the Platform `ClientId`); the row's Client Code must belong to that client. Commit re-runs validation server-side
+  - `GET export` — every client, one row per client per currency, in the update-CSV format
+  - `GET environment`, `GET running/{environment}`, `GET progress/{batchId}`
+  - `GET batches?operationType=`, `GET fieldchanges/{batchId}` — update history (reads `ActivityLog2`)
 
 ---
 

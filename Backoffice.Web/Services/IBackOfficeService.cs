@@ -31,6 +31,11 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<CommitClientImportResponse>> CommitClientImport(CommitClientImportRequest request);
         Task<BaseResponse<ClientImportProgressResponse>> GetClientImportProgress(Guid batchId);
         Task<BaseResponse<string>> GetClientImportEnvironment();
+        Task<BaseResponse<List<ClientExportRow>>> ExportClients();
+        Task<BaseResponse<ValidateClientUpdateResponse>> ValidateClientUpdate(ValidateClientUpdateRequest request);
+        Task<BaseResponse<CommitClientUpdateResponse>> CommitClientUpdate(CommitClientUpdateRequest request);
+        Task<BaseResponse<List<ClientFieldChangeResponse>>> GetClientImportFieldChanges(Guid batchId);
+        Task<BaseResponse<List<ClientImportBatchSummary>>> GetClientImportBatchHistory(string operationType);
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
         Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates();
         Task<BaseResponse<ClientTopFixtureModel>> GetClientTopFixtures(GetClientTopFixtureRequest request);

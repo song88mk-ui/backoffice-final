@@ -39,6 +39,8 @@ namespace Backoffice.Shared.Models.Response
             public bool IsEmailNotification { get; set; }
             public string Region { get; set; }
             public decimal MonthlyFee { get; set; }
+            public string LimitId { get; set; }
+            public string Endpoint { get; set; }
             public TaxConfig TaxConfig { get; set; }
             public bool IsTierRevenue { get; set; }
             public RevenueShare RevenueShare { get; set; }

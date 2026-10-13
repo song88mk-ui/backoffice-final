@@ -24,7 +24,8 @@ namespace Backoffice.Web.Helpers
         {
             var result = new ParseResult();
 
-            var lines = SplitLines(csvText);
+            // A file saved by Excel or our own export may start with a UTF-8 BOM.
+            var lines = SplitLines((csvText ?? string.Empty).TrimStart('﻿'));
             if (lines.Count == 0)
             {
                 result.Errors.Add("The file is empty.");

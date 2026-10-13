@@ -92,5 +92,78 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
+
+        [HttpGet("export")]
+        public async Task<IActionResult> Export()
+        {
+            var result = await _clientImportRepository.ExportClients();
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("validate-update")]
+        public async Task<IActionResult> ValidateUpdate([FromBody] ValidateClientUpdateRequest request)
+        {
+            var result = await _clientImportRepository.ValidateUpdateBatch(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("commit-update")]
+        public async Task<IActionResult> CommitUpdate([FromBody] CommitClientUpdateRequest request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var userName = HttpContext.Items["UserName"]?.ToString();
+
+            var result = await _clientImportRepository.CommitUpdateBatch(request, userId, userName);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("batches")]
+        public async Task<IActionResult> GetBatchHistory([FromQuery] string operationType)
+        {
+            var result = await _clientImportRepository.GetBatchHistory(operationType);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("fieldchanges/{batchId}")]
+        public async Task<IActionResult> GetFieldChanges(Guid batchId)
+        {
+            var result = await _clientImportRepository.GetFieldChanges(batchId);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
     }
 }

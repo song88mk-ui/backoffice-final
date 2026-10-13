@@ -84,6 +84,16 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
+                                @* Platform's client ID (Platform.dbo.Client.ClientId). Platform assigns it on create; it never changes. *@
+                                <label for="clientIdField" class="form-label">Client ID</label>
+                                <input type="text" class="form-control" id="clientIdField"
+                                       value="@(Client.PlatformClientId?.ToString().ToUpperInvariant() ?? string.Empty)"
+                                       placeholder="@(IsEdit ? "Not registered on Platform" : "Assigned automatically when the client is created")"
+                                       readonly />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
                                 <div class="d-flex flex-column tax-settings mb-3">
                                     <div class="p-2 mb-2 tax-settings-head">
                                         Tax Settings
