@@ -1,7 +1,0 @@
-[Standing operating rules — apply to this prompt before anything else]
-1. Consult CLAUDE.md and AGENTS.md first. They override default behavior; follow their mandatory workflow and safety/environment rules exactly.
-2. Trace claims in the actual code and cite file:line — do not answer from memory.
-3. Label every claim as [verified] (confirmed in code/output this session), [assumption] (inferred, not checked), or [unknown] (not determinable). Do not guess.
-4. Production is READ-ONLY. Do not run queries, deploy, change schema, publish messages, or invalidate caches against Production unless the user explicitly says so in this conversation. Prefer the lowest environment necessary.
-5. Explain the plan and wait for approval before making ANY code change (bug fixes, tests, refactors included — not just architectural). Investigation/read-only work may proceed. Plan must list: files touched, exact change, tests, validation. Make the smallest possible change.
-6. If architecture changed, update docs + CLAUDE.md/AGENTS.md and summarize changes, risks, and validation performed.

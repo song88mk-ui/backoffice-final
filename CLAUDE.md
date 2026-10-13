@@ -1,22 +1,55 @@
-## ⚠️ Standing Operating Rules (read first, every prompt)
+# CLAUDE.md — backoffice-final
 
-> **These are the first instruction. They apply to every task and override convenience or time pressure. A `UserPromptSubmit` hook re-injects them on every prompt.**
+<!-- song88:standing-rules:begin -->
+## Standing rules (every prompt, before anything else)
 
-1. **Consult CLAUDE.md and AGENTS.md first.** Follow their mandatory workflow and the Safety & Environment Rules exactly.
-2. **Fetch latest before investigating.** Run `git fetch origin` and compare against `origin/main` (`git log HEAD..origin/main --oneline`) for this repo and any sibling repo you read from, before citing file contents or repo/deployment state as fact. A local checkout can be stale by hundreds of commits — read via `git show origin/main:<path>` when you can't or shouldn't pull, and say so explicitly if you didn't check.
-3. **Trace claims in the actual code and cite `file:line`** — do not answer from memory.
-4. **Label every claim** as `[verified]` (confirmed in code/output this session), `[assumption]` (inferred, not checked), or `[unknown]` (not determinable). Do not guess.
-5. **Production is READ-ONLY.** Do not run queries, deploy, change schema, publish messages, or invalidate caches against Production unless the user explicitly says so in this conversation. Prefer the lowest environment necessary (Local → Development → Staging → Production).
-6. **Explain the plan and wait for approval before making any code change** — bug fixes, new tests, and refactors included. Investigation (reading code, read-only queries) may proceed without approval. The plan must state: files to be touched, the exact change, tests to be added, validation steps. Make the smallest possible change.
-7. **Document every change,** not only when architecture changed, update `docs/*.md` + CLAUDE.md/AGENTS.md and summarize the changes, risks, and validation performed. (Already the rule under "Change rules" below for every code change; this restates it so it isn't missed at the top.)
+Shared by every song88 repo. The canonical text is `../song88-claude/standing-rules/STANDING-RULES.md`:
+edit it there and run `../song88-claude/standing-rules/sync_standing_rules.py`, never edit this block by hand. A `UserPromptSubmit`
+hook in `.claude/settings.json` re-injects these rules on every prompt.
 
----
+1. **Read this repo's CLAUDE.md and AGENTS.md first.**
+2. **Fetch latest before investigating.** Run `git fetch origin` and compare with origin/main for this repo and every sibling repo you read, before citing file contents or repo or deployment state as fact. A local checkout can be hundreds of commits behind. When you cannot or should not pull, read files with `git show origin/main:<path>`, and say so explicitly if you did not check.
+3. **Trace in the code, never from memory.** Search the repo and its docs, trace the feature end to end, and cite `file:line`.
+4. **Label every claim verified, assumption or unknown.** Never guess.
+5. **Explain the plan and wait for approval before any code change.** Then make the smallest change that does the job.
+6. **Production is read-only.** Do not run queries, deploy, change schema or invalidate caches unless explicitly instructed.
+7. **Update docs and README in the same change** whenever the change affects what they describe.
+8. **Every SQL script must be idempotent.** Re-running it is a no-op with the same end state.
+9. **Do not modify a sibling repo as a side effect of work here.** Siblings are read-only references unless the user asks for a change in that repo.
+10. **Never print, log or commit a secret.** Mask it if it must appear in a log line.
+11. **A new project or service ships with tests** in the repo's existing test framework.
+12. **Commit, push or open a PR only when explicitly asked.** "Implement it" authorizes local edits only.
+<!-- song88:standing-rules:end -->
 
-# Backoffice
+Guidance for Claude Code in **backoffice-final**, the back-office / admin platform of the song88
+sportsbook. It is **live production infrastructure processing real financial transactions**. This
+file is the quick operating manual; `docs/` is the deep reference (start at `docs/00_INDEX.md`).
 
-.NET 10 | 5 backend services + Blazor Server web + shared library (7 projects, 2 xUnit test projects) | event-driven | **live production infrastructure processing real financial transactions**
+## What this repo is
 
-## Commands
+- **.NET 10 | 5 backend services + Blazor Server web + shared library** (7 projects, 2 xUnit test
+  projects) | event-driven.
+- Brownfield layered services, not VSA/Clean/DDD/Modular Monolith. Do not restructure. Kit skills
+  emit greenfield defaults; use the facts below instead.
+
+## Tech stack
+
+Overrides dotnet-claude-kit defaults:
+
+- **.NET 10** (since August 2026, GM-743), all projects `net10.0`. Several dependencies remain on
+  legacy majors — RabbitMQ.Client 5.2.0, WindowsAzure.Storage 9.3.3, EPPlus 5.8.2 — and NuGet
+  audit flags vulnerable transitives. See `docs/08_TechnicalDebt.md`.
+- **Data:** EF Core 10.0.11, four SQL Server DbContexts in `Backoffice.Shared/Data`; MongoDB.Driver
+  3.12.0, read-only.
+- **Messaging/caching:** raw RabbitMQ.Client 5.2.0; in-process `IMemCache`. No Wolverine,
+  MassTransit, outbox, HybridCache or Redis.
+- **Tests:** xUnit 2.4.2 (not v3), Moq 4.18.4, EF Core InMemory, bUnit 2.11.3. No Testcontainers,
+  WebApplicationFactory, Verify or FluentAssertions. bUnit test classes inherit
+  `Backoffice.Web.Tests/BunitTestContext.cs`, not `BunitContext`: it disposes the container
+  asynchronously, without which `HubService` (`IAsyncDisposable` only) throws on dispose.
+- **Packages:** pinned inline per project file; no central package management.
+
+## Build / test
 
 ```
 dotnet build backoffice-final.sln
@@ -27,79 +60,7 @@ dotnet test Backoffice.Web.Tests/Backoffice.Web.Tests.csproj
 CI (`.github/workflows/ci.yml`) runs the test job **only on pull requests** — a push to `main`
 runs no tests. Restore needs `NUGET_PASSWORD` for the private GitHub feed.
 
-## Safety rules — permanent, not overridable
-
-**Production protection.** Never connect to, query, or interact with Production unless explicitly
-instructed in the current conversation. Any ambiguity about whether a target is Production — stop
-and ask. "It looks like dev" is not confirmation; verify the connection string, hostname and env
-var explicitly.
-
-Read-only Production access (logs, metrics, `SELECT`) still needs confirmation. **Never** modify
-Production state without approval for that specific action: DB writes, schema changes,
-`dotnet ef database update`, cache invalidation, service restarts, k8s/ArgoCD/Helm operations,
-AWS changes, deployments, or publishing to a production exchange.
-
-**Troubleshoot in this order** before proposing any operational change: code analysis → logs →
-metrics → read-only queries (`AsNoTracking()`, read replica if available).
-
-**Availability & integrity gate.** If an action could affect Production availability, data
-integrity or completeness — even indirectly — stop and get confirmation. Triggers: migrating a
-hot table, restarting a service mid-message-processing, publishing an `OnDeleteCacheMessage` on
-`r.oe.cachesync.*` (it clears caches in downstream services; `IMemCache` itself is in-process), publishing a message that cascades to the OddsEngine.
-
-**Secrets.** Never commit real connection strings, API keys, JWT secrets or RabbitMQ credentials.
-Committed `appsettings.json` files hold `${...}` placeholders since DEVOPS-371; the real values
-they used to contain are still in git history and pending rotation (`docs/08_TechnicalDebt.md`
-#2). Deployed values come from argocd; local values go in env vars, never in a committed file. Before any operation touching
-external infrastructure, verify which environment the active connection string targets. **Never
-log a secret value in plaintext either.** A sibling repo (platform-final, GM-880, 2026-09-30) found
-`_logger.LogError` printing an OG private API key on every failed bet placement, visible in PRD
-Loki; mask a secret (keep only the last few characters, blank the rest) before it reaches a log
-line, rather than passing the raw value as a template argument.
-
-**RabbitMQ isolation.** Messages on the OddsEngine exchange (`r.oe.*`) are indistinguishable from
-production events once they leave the broker — local code against a production broker triggers
-real config changes on the live OddsEngine. Confirm `RabbitMQ:Host` is non-production before
-running anything that publishes. Use Staging, with confirmation, if a real publish is required.
-
-**Schema changes.** This repo has no EF Core migrations (no `Migrations` folder and no
-`Microsoft.EntityFrameworkCore.Design`/`Tools` package); schema is managed by flyway scripts in
-`../infrastructure/flyway`. Confirm the target host before running any script, never run one that
-drops columns or changes types without a reviewed rollback plan, and get explicit written approval
-in the current conversation before any production schema change.
-
-**`Backoffice.Shared` is referenced by all 6 other projects (5 services + Web).** Any change to its models, message classes
-or DbContext definitions is a cross-service breaking change if deployed to one service alone.
-Document deployment order and rollback sequence before shipping a Shared change to Production.
-
-**No GUI writes to Production.** SSMS, Azure Data Studio and MongoDB Compass bypass
-application-layer validation, activity logging and cache invalidation. Production data changes go
-through the API layer. Even read-only GUI access to Production needs confirmation.
-
-## Change rules
-
-**Documentation.** Every code change updates the relevant `docs/*.md`: new message type →
-`docs/06_Messaging.md`; new project or major component → `docs/02_ProjectOverview.md`; debt
-introduced or resolved → `docs/08_TechnicalDebt.md`. Update `README.md` in the same change
-whenever it affects anything the README documents. PR descriptions state what changed, which
-services are affected, and what needs testing.
-
-**Focused commits — one domain per commit.** Mixed-purpose commits make bugs harder to isolate and
-rollbacks harder to scope. Split multi-domain work into an ordered commit sequence.
-**Mandatory message format:** `[{ticket}] {Message}` — e.g.
-`[BO-76] Fixed sub user auto disabling when editing sub user`. The ticket is usually encoded in the branch name. If none
-exists, ask for one rather than committing without it.
-
-**SQL idempotency.** Every SQL script (data fixes, seeds, hand-run or flyway migrations) must
-produce the same end state on re-run. Guard `INSERT` with `NOT EXISTS`/`MERGE`, schema changes
-with `IF NOT EXISTS`/`OBJECT_ID(...) IS NULL`, and write `UPDATE`/`DELETE` as target-state rather
-than incremental. Say so in the script header. Applies to the sibling repos too.
-
-**Testability.** Keep logic out of constructors and static initializers; accept injected
-dependencies rather than `new`-ing inside methods. Document intentionally untestable code (e.g.
-legacy static MongoDB init) in `docs/08_TechnicalDebt.md`.
-
-## Testing requirements (mandatory)
+## Testing requirements
 
 Code is not "complete" until validation is performed, or its absence explicitly documented.
 Every implementation summary must report: **Build Status**, **Unit Tests**, **Integration Tests**,
@@ -115,17 +76,56 @@ publishes (routing key and payload), not only the database state. Every glossary
 `OnTranslationChange` delta must set `SrcTx` to the row's SOURCE_TEXT (GM-852). Those tests fail if
 a publish site drops it (GM-874).
 
-## Critical constraints
+## The 30-second architecture
 
-1. **.NET 10** (since August 2026, GM-743), all projects `net10.0`. Several dependencies remain on
-   legacy majors — RabbitMQ.Client 5.2.0, WindowsAzure.Storage 9.3.3, EPPlus 5.8.2 — and NuGet
-   audit flags vulnerable transitives. See `docs/08_TechnicalDebt.md`.
-2. **Single-instance WebSocket** — `BackofficeHub` uses a static dictionary, not distributed.
-3. **No idempotency** — duplicate messages cause duplicate processing.
-4. **Fire-and-forget publishing** — failures are neither detected nor retried.
-5. **In-process cache** — not shared across instances.
-6. **Monolithic repositories** — 2000+ lines, hard to test.
-7. **Never put quotes around `FromSql` interpolations.** `FromSql($"Proc '{x}'")` turns `{x}` into
+- **Shape:** MVC controllers call repositories in `Backoffice.API/Repositories`, hosted via
+  `Backoffice.API/Startup.cs`. The only Minimal API endpoint is in `Backoffice.Web/Program.cs`.
+- **Auth:** custom filters, not ASP.NET auth middleware: `Backoffice.API/ActionFilter/ApiKeyFilter.cs`
+  and `Backoffice.API/ActionFilter/AuthorizeAttribute.cs`.
+- **Single-instance WebSocket** — `BackofficeHub` uses a static dictionary, not distributed.
+- **No idempotency** — duplicate messages cause duplicate processing.
+- **Fire-and-forget publishing** — failures are neither detected nor retried.
+- **In-process cache** — not shared across instances.
+- **Monolithic repositories** — 2000+ lines, hard to test.
+
+## Critical rules
+
+1. **Production targets.** Any ambiguity about whether a target is Production — stop and ask. "It
+   looks like dev" is not confirmation; verify the connection string, hostname and env var
+   explicitly. Read-only Production access (logs, metrics, `SELECT`) still needs confirmation.
+   Production state changes needing approval for that specific action include: DB writes, schema
+   changes, `dotnet ef database update`, cache invalidation, service restarts, k8s/ArgoCD/Helm
+   operations, AWS changes, deployments, and publishing to a production exchange.
+2. **Availability & integrity gate.** If an action could affect Production availability, data
+   integrity or completeness — even indirectly — stop and get confirmation. Triggers: migrating a
+   hot table, restarting a service mid-message-processing, publishing an `OnDeleteCacheMessage` on
+   `r.oe.cachesync.*` (it clears caches in downstream services; `IMemCache` itself is in-process),
+   publishing a message that cascades to the OddsEngine.
+3. **RabbitMQ isolation.** Messages on the OddsEngine exchange (`r.oe.*`) are indistinguishable from
+   production events once they leave the broker — local code against a production broker triggers
+   real config changes on the live OddsEngine. Confirm `RabbitMQ:Host` is non-production before
+   running anything that publishes. Use Staging, with confirmation, if a real publish is required.
+4. **No GUI writes to Production.** SSMS, Azure Data Studio and MongoDB Compass bypass
+   application-layer validation, activity logging and cache invalidation. Production data changes
+   go through the API layer. Even read-only GUI access to Production needs confirmation.
+5. **Schema changes.** This repo has no EF Core migrations (no `Migrations` folder and no
+   `Microsoft.EntityFrameworkCore.Design`/`Tools` package); schema is managed by flyway scripts in
+   `../infrastructure/flyway`. Confirm the target host before running any script, never run one
+   that drops columns or changes types without a reviewed rollback plan, and get explicit written
+   approval in the current conversation before any production schema change.
+6. **`Backoffice.Shared` is referenced by all 6 other projects (5 services + Web).** Any change to
+   its models, message classes or DbContext definitions is a cross-service breaking change if
+   deployed to one service alone. Document deployment order and rollback sequence before shipping
+   a Shared change to Production.
+7. **Secrets.** Committed `appsettings.json` files hold `${...}` placeholders since DEVOPS-371; the
+   real values they used to contain are still in git history and pending rotation
+   (`docs/08_TechnicalDebt.md` #2). Deployed values come from argocd; local values go in env vars,
+   never in a committed file. Before any operation touching external infrastructure, verify which
+   environment the active connection string targets. A sibling repo (platform-final, GM-880,
+   2026-09-30) found `_logger.LogError` printing an OG private API key on every failed bet
+   placement, visible in PRD Loki; mask a secret (keep only the last few characters, blank the
+   rest) before it reaches a log line, rather than passing the raw value as a template argument.
+8. **Never put quotes around `FromSql` interpolations.** `FromSql($"Proc '{x}'")` turns `{x}` into
    a SQL parameter, so the quotes send the literal text `'@p0'` instead of the value. Write
    `FromSql($"Proc {x}")`. Confirmed via direct `EXEC` against Staging (BO-113, 2026-10-02): the
    quoted form throws `Msg 241: Conversion failed when converting date and/or time from character
@@ -133,47 +133,40 @@ a publish site drops it (GM-874).
    the literal text `'@p2'`. The repository's catch-all swallows this into `StatusCode.Error`, and
    every "View Logs" modal in Backoffice.Web then shows it identically to a genuine empty result
    ("No Record Found!"), so the bug reads as "logs are empty" rather than "logs are broken."
-   All five known offenders are fixed as of BO-113 (2026-10-02): `BackOfficeRepository.cs:179`
-   (`GetPriceboostActivityLogs`), `:246` (`GetManualBetSettlementHistoryLogs`), `:311` (the generic
-   `GetActivityLogs(ActivityLogRequest)` - shared by every "View Logs" modal in Backoffice.Web:
-   Client Site Config, OddsEngine templates/market groups/boosted settings/sport settings, user
-   groups, message settlement, cancel bet history), and
-   `Backoffice.Utility/Repository/BackofficeRepository.cs:627` and `:695`. The `GetActivityLogs`
-   stored procedure is also confirmed missing entirely in DEV (not only PRD as previously noted
-   here) - calling it there throws instead of returning empty, caught by the same catch-all
-   (GM-134, BO-113).
-8. **bo-web DataProtection keys are in memory only.** `Backoffice.Web/Program.cs` has no
+   All five known offenders are fixed as of BO-113 (2026-10-02): in
+   `Backoffice.API/Repositories/BackOfficeRepository.cs`, `GetPriceboostActivityLogs`,
+   `GetManualBetSettlementHistoryLogs` and the generic `GetActivityLogs(ActivityLogRequest)` (shared
+   by every "View Logs" modal in Backoffice.Web: Client Site Config, OddsEngine templates/market
+   groups/boosted settings/sport settings, user groups, message settlement, cancel bet history);
+   in `Backoffice.Utility/Repository/BackofficeRepository.cs`, `GetActivityLogs` and
+   `GetManualBetSettlementActivityLogs`. The `GetActivityLogs` stored procedure is also confirmed
+   missing entirely in DEV (not only PRD as previously noted here) - calling it there throws
+   instead of returning empty, caught by the same catch-all (GM-134, BO-113).
+9. **bo-web DataProtection keys are in memory only.** `Backoffice.Web/Program.cs` has no
    `AddDataProtection()` or `PersistKeysTo*`, so after a pod restart the logs show
    `The key {...} was not found in the key ring` (`ErrorUnprotectingCookie`) and antiforgery
    decrypt errors (BO-114). These errors come from the missing key ring, not from the session code.
 
-## Architecture and stack (overrides dotnet-claude-kit defaults)
+## How this team writes code
 
-Brownfield layered services, not VSA/Clean/DDD/Modular Monolith. Do not restructure. Kit skills
-emit greenfield defaults; use these facts instead:
+- **Focused commits — one domain per commit.** Mixed-purpose commits make bugs harder to isolate
+  and rollbacks harder to scope. Split multi-domain work into an ordered commit sequence.
+  **Mandatory message format:** `[{ticket}] {Message}` — e.g.
+  `[BO-76] Fixed sub user auto disabling when editing sub user`. The ticket is usually encoded in
+  the branch name. If none exists, ask for one rather than committing without it.
+- **Which doc to update.** New message type → `docs/06_Messaging.md`; new project or major
+  component → `docs/02_ProjectOverview.md`; debt introduced or resolved →
+  `docs/08_TechnicalDebt.md`. PR descriptions state what changed, which services are affected,
+  and what needs testing.
+- **SQL scripts.** Guard `INSERT` with `NOT EXISTS`/`MERGE`, schema changes with
+  `IF NOT EXISTS`/`OBJECT_ID(...) IS NULL`, and write `UPDATE`/`DELETE` as target-state rather than
+  incremental. Say so in the script header. Applies to the sibling repos too.
+- **Detailed conventions live in `docs/`**, read on demand. Repository, service, MongoDB, SQL,
+  cache, translation, API and logging conventions were inlined here until 2026-09-21. The database
+  ones are in `docs/05_DatabaseFlow.md`, messaging in `docs/06_Messaging.md`, caching in
+  `docs/07_Caching.md`, and the rest in `docs/01_Architecture.md`.
 
-- **Shape:** MVC controllers call repositories in `Backoffice.API/Repositories`, hosted via
-  `Backoffice.API/Startup.cs`. The only Minimal API endpoint is in `Backoffice.Web/Program.cs`.
-- **Auth:** custom filters, not ASP.NET auth middleware: `Backoffice.API/ActionFilter/ApiKeyFilter.cs`
-  and `Backoffice.API/ActionFilter/AuthorizeAttribute.cs`.
-- **Data:** EF Core 10.0.11, four SQL Server DbContexts in `Backoffice.Shared/Data`; MongoDB.Driver
-  3.12.0, read-only.
-- **Messaging/caching:** raw RabbitMQ.Client 5.2.0; in-process `IMemCache`. No Wolverine,
-  MassTransit, outbox, HybridCache or Redis.
-- **Tests:** xUnit 2.4.2 (not v3), Moq 4.18.4, EF Core InMemory, bUnit 2.11.3. No Testcontainers,
-  WebApplicationFactory, Verify or FluentAssertions. bUnit test classes inherit
-  `Backoffice.Web.Tests/BunitTestContext.cs`, not `BunitContext`: it disposes the container
-  asynchronously, without which `HubService` (`IAsyncDisposable` only) throws on dispose.
-- **Packages:** pinned inline per project file; no central package management.
-
-## Before modifying code, ask
-
-Multiple projects? Migration needed? Other services consuming the message? Cache-invalidation
-implications? Breaks an API contract or backward compatibility? Performance implications?
-
-## Conventions — see docs/
-
-Detailed conventions live in `docs/` and are read on demand, not inlined here:
+## Where things live
 
 | Topic | Doc |
 |---|---|
@@ -194,12 +187,51 @@ Detailed conventions live in `docs/` and are read on demand, not inlined here:
 | Sibling repositories | `docs/15_ReferenceRepositories.md` |
 | BO API access, curl recipe | `docs/16_BoApiAccess.md` |
 
-Repository, service, MongoDB, SQL, cache, translation, API and logging conventions were inlined
-here until 2026-09-21. The database ones are in `docs/05_DatabaseFlow.md`, messaging in
-`docs/06_Messaging.md`, caching in `docs/07_Caching.md`, and the rest in
-`docs/01_Architecture.md`. `docs/00_INDEX.md` lists everything.
+## External systems
 
-## Sibling repositories
+**Observability**
+
+- **Grafana:** https://grafana.stg.song88.com/ and https://grafana.prd.song88.com/ — Google OAuth
+  with an `@song88.com` account. Loki for logs, Prometheus for metrics.
+- **Loki labels:** bo-api and bo-web run in namespace `corp-apps` as `app="bo-api"` /
+  `app="bo-web"`. The STG cluster also hosts the `dev` namespace. Log lines are Serilog JSON:
+  `@l` (level), `@mt` (template), `@x` (exception), `RequestPath`, and `commandText` for EF SQL.
+- The OAuth browser flow does not work for API calls; generate a service account token from
+  Grafana Administration for REST access.
+
+**BO API access (local / ad-hoc debugging)**
+
+Staging or DEV only unless Production is explicitly authorised in the current conversation.
+Most endpoints need **two** headers: `x-api-key` (`Security:ApiKey`) **and**
+`Authorization: Bearer <JWT>`. Get the JWT from
+`POST {BO_API_BASE}/api/authentication/login`. Credentials live in a git-ignored
+`.env.bo-api.local` at the repo root, if present. **DEV:** the same file works against DEV
+by overriding `BO_API_BASE=https://bo-api.dev.song88.com` (dev `bo-api` uses the staging Auth
+API and API key); do not create a separate DEV env file. DEV SQL Server and MongoDB are reached
+directly with `sqlcmd` / `mongosh`, allow-listed in the git-ignored `.claude/settings.local.json`.
+Full procedure: `docs/16_BoApiAccess.md`.
+
+## Development workflow
+
+1. Investigate freely: reading code and read-only queries need no approval.
+2. Before any code change — bug fixes, new tests and refactors included — the plan states the
+   files to be touched, the exact change, the tests to be added and the validation steps.
+3. The plan also answers: Multiple projects? Migration needed? Other services consuming the
+   message? Cache-invalidation implications? Breaks an API contract or backward compatibility?
+   Performance implications?
+4. After approval, implement, validate per **Testing requirements**, update the matching `docs/`
+   file, and summarize the changes, risks and validation performed.
+
+## Engineering principles
+
+- **Prefer the lowest environment necessary:** Local → Development → Staging → Production.
+- **Troubleshoot in this order** before proposing any operational change: code analysis → logs →
+  metrics → read-only queries (`AsNoTracking()`, read replica if available).
+- **Testability.** Keep logic out of constructors and static initializers; accept injected
+  dependencies rather than `new`-ing inside methods. Document intentionally untestable code (e.g.
+  legacy static MongoDB init) in `docs/08_TechnicalDebt.md`.
+
+## Scope & build reminders
 
 Siblings of `backoffice-final` in the same parent. Use relative paths, never absolute.
 
@@ -214,27 +246,18 @@ Siblings of `backoffice-final` in the same parent. Use relative paths, never abs
 | `../argocd/` | Kubernetes / ArgoCD deployment configs |
 | `../infrastructure/` | helmfile, terraform, flyway migrations |
 
-The workspace root `../CLAUDE.md` and `../INTEGRATION-MAP.md` describe the cross-repo couplings
-(the shared `e.central` exchange, shared databases, the HTTP mesh).
+## Assets in this repo
 
-## Observability
+- **`docs/`** — the knowledge base; `docs/00_INDEX.md` lists everything.
+- **`.claude/commands/`** — analyze, api, bug, cache, compare, implement, mongodb, performance,
+  push-prd, push-stg, refactor, review, sql, translation.
+- **`.claude/skills/`** — 16 skills: domain (backoffice, oddsengine, sportsbook), workflow
+  (feature-implementation, bug-fixing-workflow, code-review-checklist), technical (api-development,
+  caching, messaging, mongodb-best-practices, sql-best-practices, repository-pattern,
+  performance-optimization, translation-system, enterprise-architecture) and jira-updates.
 
-- **Grafana:** https://grafana.stg.song88.com/ and https://grafana.prd.song88.com/ — Google OAuth
-  with an `@song88.com` account. Loki for logs, Prometheus for metrics.
-- **Loki labels:** bo-api and bo-web run in namespace `corp-apps` as `app="bo-api"` /
-  `app="bo-web"`. The STG cluster also hosts the `dev` namespace. Log lines are Serilog JSON:
-  `@l` (level), `@mt` (template), `@x` (exception), `RequestPath`, and `commandText` for EF SQL.
-- The OAuth browser flow does not work for API calls; generate a service account token from
-  Grafana Administration for REST access.
+## See also
 
-## BO API access (local / ad-hoc debugging)
-
-Staging or DEV only unless Production is explicitly authorised in the current conversation.
-Most endpoints need **two** headers: `x-api-key` (`Security:ApiKey`) **and**
-`Authorization: Bearer <JWT>`. Get the JWT from
-`POST {BO_API_BASE}/api/authentication/login`. Credentials live in a git-ignored
-`.env.bo-api.local` at the repo root, if present. **DEV:** the same file works against DEV
-by overriding `BO_API_BASE=https://bo-api.dev.song88.com` (dev `bo-api` uses the staging Auth
-API and API key); do not create a separate DEV env file. DEV SQL Server and MongoDB are reached
-directly with `sqlcmd` / `mongosh`, allow-listed in the git-ignored `.claude/settings.local.json`.
-Full procedure: `docs/16_BoApiAccess.md`.
+[AGENTS.md](AGENTS.md) · [README.md](README.md) · `docs/00_INDEX.md` · the workspace root
+`../CLAUDE.md` and `../INTEGRATION-MAP.md`, which describe the cross-repo couplings (the shared
+`e.central` exchange, shared databases, the HTTP mesh).

@@ -192,7 +192,7 @@ same parameters the argocd ExternalSecrets read). Two more caveats:
   https://bo-api.stg.song88.com/healthz` times out while general internet access
   works). None of that stops the local processes from starting.
 - Staging is shared. Treat it as read-only browsing; do not exercise write
-  endpoints against it (see `CLAUDE.md` Safety & Environment Rules).
+  endpoints against it (see `CLAUDE.md` Critical rules).
 
 ```powershell
 # Terminal 1 - REST gateway (starts with zero infrastructure)
