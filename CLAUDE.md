@@ -254,7 +254,7 @@ Siblings of `backoffice-final` in the same parent. Use relative paths, never abs
 ## Assets in this repo
 
 - **`docs/`** — the knowledge base; `docs/00_INDEX.md` lists everything.
-- **`.claude/README.md`** — agent catalogue.
+- **`.claude/README.md`** — index of commands and skills, and the agent catalogue.
 - **`.claude/commands/`** — analyze, api, bug, cache, compare, implement, mongodb, performance,
   push-prd, push-stg, refactor, review, sql, translation.
 - **`.claude/skills/`** — 16 skills: domain (backoffice, oddsengine, sportsbook), workflow

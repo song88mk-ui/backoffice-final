@@ -2,7 +2,25 @@
 
 This directory holds the Claude Code assets for backoffice-final: `settings.json` (permissions and
 the standing-rules hook), `commands/` (slash commands) and `skills/`. Read [../CLAUDE.md](../CLAUDE.md)
-and [../AGENTS.md](../AGENTS.md) first; this file only describes the agent roles below.
+and [../AGENTS.md](../AGENTS.md) first; this file indexes the commands and skills, then describes the agent roles.
+
+## commands/
+/analyze · /api · /bug · /cache · /compare · /implement · /mongodb · /performance · /push-prd
+· /push-stg · /refactor · /review · /sql · /translation
+
+## skills/
+api-development · backoffice-domain · bug-fixing-workflow · caching · code-review-checklist
+· enterprise-architecture · feature-implementation · jira-updates · messaging · mongodb-best-practices
+· oddsengine-domain · performance-optimization · repository-pattern · sportsbook-domain
+· sql-best-practices · translation-system
+
+## Rules and synced files
+
+Workflow and rules: [../CLAUDE.md](../CLAUDE.md) (standing rules, § Development workflow, § Engineering principles).
+
+The `jira-updates` skill and [`.github/pull_request_template.md`](../.github/pull_request_template.md) are
+generated from `song88-claude` by `sync_standing_rules.py`. Do not edit them here; change them in
+`song88-claude`.
 
 ## Agent catalogue
 
