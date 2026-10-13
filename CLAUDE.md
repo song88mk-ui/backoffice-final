@@ -254,6 +254,7 @@ Siblings of `backoffice-final` in the same parent. Use relative paths, never abs
 ## Assets in this repo
 
 - **`docs/`** — the knowledge base; `docs/00_INDEX.md` lists everything.
+- **`.claude/README.md`** — agent catalogue.
 - **`.claude/commands/`** — analyze, api, bug, cache, compare, implement, mongodb, performance,
   push-prd, push-stg, refactor, review, sql, translation.
 - **`.claude/skills/`** — 16 skills: domain (backoffice, oddsengine, sportsbook), workflow
@@ -263,6 +264,6 @@ Siblings of `backoffice-final` in the same parent. Use relative paths, never abs
 
 ## See also
 
-[AGENTS.md](AGENTS.md) · [README.md](README.md) · `docs/00_INDEX.md` · the workspace root
-`../CLAUDE.md` and `../INTEGRATION-MAP.md`, which describe the cross-repo couplings (the shared
-`e.central` exchange, shared databases, the HTTP mesh).
+[AGENTS.md](AGENTS.md) · `.claude/README.md` · [README.md](README.md) ·
+`docs/00_INDEX.md` · the workspace root `../CLAUDE.md` and `../INTEGRATION-MAP.md`, which describe
+the cross-repo couplings (the shared `e.central` exchange, shared databases, the HTTP mesh).
