@@ -19,6 +19,8 @@ hook in `.claude/settings.json` re-injects these rules on every prompt.
 10. **Never print, log or commit a secret.** Mask it if it must appear in a log line.
 11. **A new project or service ships with tests** in the repo's existing test framework.
 12. **Commit, push or open a PR only when explicitly asked.** "Implement it" authorizes local edits only.
+13. **Report validation with every change:** build, unit tests, integration tests, manual checks and remaining risks. If something could not be validated, say what and why, name the tests to run before deployment, and mark the work Implementation Complete – Validation Pending, never Completed.
+14. **If a workflow step does not apply, say so** instead of skipping it silently.
 <!-- song88:standing-rules:end -->
 
 Guidance for Claude Code in **backoffice-final**, the back-office / admin platform of the song88
@@ -62,13 +64,7 @@ runs no tests. Restore needs `NUGET_PASSWORD` for the private GitHub feed.
 
 ## Testing requirements
 
-Code is not "complete" until validation is performed, or its absence explicitly documented.
-Every implementation summary must report: **Build Status**, **Unit Tests**, **Integration Tests**,
-**Manual Verification**, **Remaining Risks**.
-
-If testing is not possible: state what could not be validated and why, recommend the exact tests
-to run before deployment, and mark the work **Implementation Complete – Validation Pending**,
-never **Completed**.
+Standing rule 13 sets the validation report and the "Validation Pending" status. Specific to this repo:
 
 `Backoffice.API.Tests/Translation/TranslationRepositoryTests.cs` has a `BuildSut` overload that
 records every `IRabbitMqRepository.Publish` call. Use it to assert what a repository method
@@ -165,6 +161,15 @@ a publish site drops it (GM-874).
   cache, translation, API and logging conventions were inlined here until 2026-09-21. The database
   ones are in `docs/05_DatabaseFlow.md`, messaging in `docs/06_Messaging.md`, caching in
   `docs/07_Caching.md`, and the rest in `docs/01_Architecture.md`.
+- **Logging rules** (shared with odds-engine-2):
+  - Pass the exception as the first argument: `_logger.LogError(ex, "... {Payload}", payload)`.
+    Never put `ex.Message` or `ex.StackTrace` in the message text, and never pass the exception
+    as a template argument.
+  - Use PascalCase placeholders (`{Message}`, `{Payload}`).
+  - Keep operational log lines (start, connecting, connected, progress). Do not remove or merge
+    them to satisfy SonarQube S6664.
+  - Many existing calls pass `ex` first but keep `{ex.Message}` in their text, left unchanged when
+    the exception argument was added (`docs/01_Architecture.md:232-236`). Do not copy that into new calls.
 
 ## Where things live
 
