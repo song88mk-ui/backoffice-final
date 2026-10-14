@@ -578,6 +578,35 @@ using the same values as `ConfirmCancelBetModal.razor.css`. The footer buttons n
 
 ---
 
+## Concurrent Token Validation (Fixed)
+
+### Bug #20: A forged JWT was authorized when it ran alongside a valid one (BO-123)
+
+**Location:** `Backoffice.API/ActionFilter/AuthorizeAttribute.cs` (`Authenticate`)
+
+**Issue:** `Authenticate` set each request's token on the shared
+`_httpClient.DefaultRequestHeaders.Authorization`, then posted to the Auth API's
+`v1/authentication/access`. ASP.NET Core reuses one filter attribute instance, and so one
+`HttpClient`, for every request to an action. Concurrent requests therefore overwrote each other's
+token, and a request could be validated with another request's token. The local checks before that
+call (`ReadToken`, issuer, expiry) do not verify the signature, and the claims are then read
+unverified. An unsigned token with the right issuer and a future expiry, sent alongside a valid
+one, was authorized in 20-45% of rounds in a unit test reproduction.
+
+**Risk:** 🔴 HIGH (authorization bypass; the forged token's claims also set the access level)
+
+**Fix:** the token is set on a per-call `HttpRequestMessage`, never on `DefaultRequestHeaders`.
+The shared `x-api-key` default header is still set once, in the constructor.
+
+**Not fixed here:** local JWT signature validation, `async void OnAuthorization` blocking on
+`.Result` (Bug #4) and the per-attribute `new HttpClient()` (Bug #12).
+
+**Tests:** `Backoffice.API.Tests/ActionFilter/AuthorizeAttributeTests.cs`
+(`OnAuthorization_ForgedTokenConcurrentWithValidToken_IsNeverAuthorized` fails on the old code in
+every run, with 36-122 of 200 forged tokens authorized)
+
+---
+
 ## Potential Runtime Errors Summary
 
 | Bug # | Issue | Type | Severity | Impact |

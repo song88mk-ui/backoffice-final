@@ -141,8 +141,14 @@ namespace Backoffice.API.ActionFilter
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.PostAsync($"v1/authentication/access", new StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json"));
+                // Set the token per request, not on DefaultRequestHeaders: this attribute instance and its
+                // HttpClient are shared by concurrent requests, which would overwrite each other's token (BO-123).
+                using var request = new HttpRequestMessage(HttpMethod.Post, "v1/authentication/access")
+                {
+                    Content = new StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json")
+                };
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                var response = await _httpClient.SendAsync(request);
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<TokenModel>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive)
