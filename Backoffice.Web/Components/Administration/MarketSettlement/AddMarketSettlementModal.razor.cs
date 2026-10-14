@@ -30,6 +30,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
         public bool IsPreLoader { get; set; }
         public bool ShowDiscardConfirm { get; set; }
+        public bool IsFooterDisabled => IsPreLoader || ShowDiscardConfirm;
 
         #endregion
 

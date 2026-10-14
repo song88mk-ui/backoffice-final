@@ -126,6 +126,6 @@
     }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelModal" disabled="@IsPreLoader">@_translationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn btn-settle" @onclick="OnMarketSettlement" disabled="@IsPreLoader">Settle Market</button>
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelModal" disabled="@IsFooterDisabled">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn btn-settle" @onclick="OnMarketSettlement" disabled="@IsFooterDisabled">Settle Market</button>
 </div>

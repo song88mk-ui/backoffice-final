@@ -550,6 +550,34 @@ lower/mixed-case forms) return that client's logs.
 
 ---
 
+## Market Settlement Cancel Confirmation (Fixed)
+
+### Bug #19: Discard prompt's Cancel/Confirm buttons were invisible (BO-102)
+
+**Location:** `Backoffice.Web/Components/Administration/MarketSettlement/AddMarketSettlementModal.razor(.css/.cs)`
+
+**Issue:** BO-18 added an inline "You have unsaved changes" prompt to the Add Market Settlement
+modal, with `btn modal-btn modal-close` / `modal-apply` buttons. The component's scoped CSS sets
+`.modal-btn { color: white; }` but never defined `.modal-close` / `.modal-apply`. Those classes
+only exist in other components' scoped CSS, which does not apply here. The prompt therefore
+showed its text with white-on-white buttons, so after pressing Cancel there seemed to be no way
+to confirm or back out. The first BO-102 fix (#187) only hid the header X and did not address
+this. QA reopened the ticket on 2026-10-13. Separately, the footer Cancel / Settle Market buttons
+stayed active while the prompt was open.
+
+**Risk:** ⚠️ LOW (usability; no data impact)
+
+**Fix:** added `.modal-close` / `.modal-apply` rules to `AddMarketSettlementModal.razor.css`,
+using the same values as `ConfirmCancelBetModal.razor.css`. The footer buttons now bind to
+`IsFooterDisabled` (`IsPreLoader || ShowDiscardConfirm`).
+
+**Gotcha:** Blazor CSS isolation is per component, so a class styled in one component's
+`.razor.css` is unstyled in any other component that uses it.
+
+**Tests:** `Backoffice.Web.Tests/Administration/MarketSettlementCancelConfirmationTests.cs`
+
+---
+
 ## Potential Runtime Errors Summary
 
 | Bug # | Issue | Type | Severity | Impact |

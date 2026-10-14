@@ -107,5 +107,58 @@ namespace Backoffice.Web.Tests.Administration
             Assert.False(modal.ShowDiscardConfirm);
             modalService.Verify(m => m.Cancel(), Times.Once);
         }
+
+        [Fact]
+        public async Task IsFooterDisabled_WhileDiscardConfirmationShown_IsTrue_AndClearsWhenPromptCancelled()
+        {
+            var modal = new AddMarketSettlementModal
+            {
+                ModalService = new Mock<IModalService>().Object,
+                AddMarketSettlement = new AddMarketSettlementModel()
+            };
+            modal.AddMarketSettlement.AddMarketSettlementSelections.Add(new AddMarketSettlementSelectionModel
+            {
+                RowCount = 1,
+                ToStatus = (int)Backoffice.Shared.Enums.BetStatus.Won,
+                Reason = string.Empty
+            });
+
+            Assert.False(modal.IsFooterDisabled);
+
+            await modal.OnCancelModal();
+            Assert.True(modal.IsFooterDisabled);
+
+            await modal.OnCancelDiscardChanges();
+            Assert.False(modal.IsFooterDisabled);
+        }
+
+        [Fact]
+        public void IsFooterDisabled_WhilePreLoading_IsTrue()
+        {
+            var modal = new AddMarketSettlementModal { IsPreLoader = true };
+
+            Assert.True(modal.IsFooterDisabled);
+        }
+
+        // Scoped CSS sets .modal-btn to white text, so unstyled prompt buttons vanish on the white modal body.
+        [Fact]
+        public void ScopedCss_StylesDiscardPromptButtons()
+        {
+            var cssPath = Path.Combine(FindRepoRoot(), "Backoffice.Web", "Components", "Administration",
+                "MarketSettlement", "AddMarketSettlementModal.razor.css");
+            var css = File.ReadAllText(cssPath);
+
+            Assert.Contains(".modal-close {", css);
+            Assert.Contains(".modal-apply {", css);
+        }
+
+        private static string FindRepoRoot()
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir != null && !File.Exists(Path.Combine(dir.FullName, "backoffice-final.sln")))
+                dir = dir.Parent;
+
+            return dir?.FullName ?? throw new DirectoryNotFoundException("backoffice-final.sln not found above the test output directory.");
+        }
     }
 }
