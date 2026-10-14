@@ -131,6 +131,21 @@ namespace Backoffice.Web.Components.Administration.ClientSiteConfig
         #endregion
 
         #region Utilities
+        // BO-104: the log row stores only the client GUID (in Payload), while the Client column
+        // shows "Name (Code)". Resolve the search text to the GUIDs of matching clients so the API
+        // can match them against Payload.
+        private List<string> GetMatchingClientIds(string searchText)
+        {
+            if (string.IsNullOrWhiteSpace(searchText))
+                return new List<string>();
+
+            return _clients
+                .Where(c => (c.ClientName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
+                         || (c.ClientCode?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false))
+                .Select(c => c.ClientId.ToString())
+                .ToList();
+        }
+
         private async Task GetContent()
         {
             if (!_isPreLoader)
@@ -146,7 +161,8 @@ namespace Backoffice.Web.Components.Administration.ClientSiteConfig
                 MetaData = _metaData,
                 DateFrom = _dateFrom,
                 DateTo = _dateTo,
-                SearchText = _searchForm.SearchText
+                SearchText = _searchForm.SearchText,
+                PayloadSearchTerms = GetMatchingClientIds(_searchForm.SearchText)
             });
 
             if (response.StatusCode == StatusCode.Success && response.Result != null)

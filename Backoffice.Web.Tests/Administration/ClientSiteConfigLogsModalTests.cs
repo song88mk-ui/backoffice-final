@@ -261,5 +261,112 @@ namespace Backoffice.Web.Tests.Administration
 
             _backofficeService.Verify(s => s.GetActivityLogs(It.Is<ActivityLogRequest>(r => r.SearchText == "john")), Times.Once);
         }
+
+        // BO-104 (reopened): the Client column shows "Name (Code)" but the log row only stores the
+        // client GUID in Payload, so searching a client name/code matched nothing. The modal must
+        // resolve the typed text to matching client GUIDs and send them as PayloadSearchTerms.
+        [Theory]
+        [InlineData("acme")]
+        [InlineData("ACM")]
+        public void Search_ByClientNameOrCode_SendsMatchingClientIdsAsPayloadSearchTerms(string searchText)
+        {
+            var otherClientGuid = Guid.Parse("99999999-8888-7777-6666-555555555555");
+
+            _backofficeService
+                .Setup(s => s.GetActivityLogs(It.IsAny<ActivityLogRequest>()))
+                .ReturnsAsync(new BaseResponse<ActivityLogResponse>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new ActivityLogResponse() { ActivityLogs = new List<ActivityLogModel>(), MetaData = new MetaData() { CurrentPage = 1, PageSize = 10 } }
+                });
+
+            var parameters = new ModalParameters();
+            parameters.Add("Clients", new List<PlatformClientResponse>()
+            {
+                new PlatformClientResponse() { ClientId = ClientGuid, ClientName = "Acme Sports", ClientCode = "ACME" },
+                new PlatformClientResponse() { ClientId = otherClientGuid, ClientName = "Other Bet", ClientCode = "OTH" }
+            });
+
+            var cut = Render<ClientSiteConfigLogsModal>(ps => ps.AddCascadingValue(parameters));
+
+            cut.Find("#search").Change(searchText);
+            cut.Find(".input-group-text").Click();
+
+            _backofficeService.Verify(s => s.GetActivityLogs(It.Is<ActivityLogRequest>(r =>
+                r.SearchText == searchText &&
+                r.PayloadSearchTerms.Count == 1 &&
+                r.PayloadSearchTerms[0] == ClientGuid.ToString())), Times.Once);
+        }
+
+        // BO-104: name and code are matched independently, case-insensitively, on any substring.
+        // Name "GIMLI" and code "G02" share only "G", so name-only and code-only matches are each
+        // proven, and "Other Bet"/"OTH" must never be returned.
+        [Theory]
+        [InlineData("IM")]
+        [InlineData("GIM")]
+        [InlineData("LI")]
+        [InlineData("IMLI")]
+        [InlineData("GIMLI")]
+        [InlineData("02")]
+        [InlineData("G02")]
+        [InlineData("gimli")]
+        [InlineData("imli")]
+        [InlineData("g02")]
+        [InlineData("GiMlI")]
+        public void Search_ByPartialClientNameOrCode_IsCaseInsensitive(string searchText)
+        {
+            var otherClientGuid = Guid.Parse("99999999-8888-7777-6666-555555555555");
+
+            _backofficeService
+                .Setup(s => s.GetActivityLogs(It.IsAny<ActivityLogRequest>()))
+                .ReturnsAsync(new BaseResponse<ActivityLogResponse>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new ActivityLogResponse() { ActivityLogs = new List<ActivityLogModel>(), MetaData = new MetaData() { CurrentPage = 1, PageSize = 10 } }
+                });
+
+            var parameters = new ModalParameters();
+            parameters.Add("Clients", new List<PlatformClientResponse>()
+            {
+                new PlatformClientResponse() { ClientId = ClientGuid, ClientName = "GIMLI", ClientCode = "G02" },
+                new PlatformClientResponse() { ClientId = otherClientGuid, ClientName = "Other Bet", ClientCode = "OTH" }
+            });
+
+            var cut = Render<ClientSiteConfigLogsModal>(ps => ps.AddCascadingValue(parameters));
+
+            cut.Find("#search").Change(searchText);
+            cut.Find(".input-group-text").Click();
+
+            _backofficeService.Verify(s => s.GetActivityLogs(It.Is<ActivityLogRequest>(r =>
+                r.SearchText == searchText &&
+                r.PayloadSearchTerms.Count == 1 &&
+                r.PayloadSearchTerms[0] == ClientGuid.ToString())), Times.Once);
+        }
+
+        [Fact]
+        public void Search_WithNoMatchingClient_SendsNoPayloadSearchTerms()
+        {
+            _backofficeService
+                .Setup(s => s.GetActivityLogs(It.IsAny<ActivityLogRequest>()))
+                .ReturnsAsync(new BaseResponse<ActivityLogResponse>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new ActivityLogResponse() { ActivityLogs = new List<ActivityLogModel>(), MetaData = new MetaData() { CurrentPage = 1, PageSize = 10 } }
+                });
+
+            var parameters = new ModalParameters();
+            parameters.Add("Clients", new List<PlatformClientResponse>()
+            {
+                new PlatformClientResponse() { ClientId = ClientGuid, ClientName = "Acme Sports", ClientCode = "ACME" }
+            });
+
+            var cut = Render<ClientSiteConfigLogsModal>(ps => ps.AddCascadingValue(parameters));
+
+            cut.Find("#search").Change("jane");
+            cut.Find(".input-group-text").Click();
+
+            _backofficeService.Verify(s => s.GetActivityLogs(It.Is<ActivityLogRequest>(r =>
+                r.SearchText == "jane" && r.PayloadSearchTerms.Count == 0)), Times.Once);
+        }
     }
 }

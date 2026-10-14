@@ -517,6 +517,39 @@ of overwriting the `Clients` parameter.
 
 ---
 
+## Activity Log Search (Fixed)
+
+### Bug #18: Client Site Config logs search never matched a client (BO-104)
+
+**Location:** `Backoffice.API/Repositories/BackOfficeRepository.cs` (`GetActivityLogs` →
+`FilterActivityLogsBySearch`), `Backoffice.Web/Components/Administration/ClientSiteConfig/ClientSiteConfigLogsModal.razor.cs`
+
+**Issue:** the shared View Logs search filter only matched `From`, `To` and `UserName`. A Client
+Site Config log row stores the client only as a GUID in `Payload` (`"{userName}.{clientGuid}"`);
+the modal's "Client" column ("Name (Code)") is resolved in the browser from that GUID. Searching a
+client name or code therefore matched nothing and showed "No Record Found". The first BO-104 fix
+(#188) only made the search icon submit the form. Separately, the filter called `.ToUpper()` on
+each field, so a single row with a null `From`/`To`/`UserName` threw into the repository's
+catch-all and every View Logs modal rendered the error as "No Record Found".
+
+**Risk:** ⚠️ MEDIUM (usability: the search couldn't find a specific client's changes)
+
+**Fix:** `ActivityLogRequest.PayloadSearchTerms` (additive, defaults to empty). The modal resolves
+the search text to the GUIDs of clients whose name or code contains it, and the filter also
+matches those against `Payload`. Raw `SearchText` is still never matched against `Payload`, so
+other modals behave as before. The filter is now null-safe and case-insensitive via
+`OrdinalIgnoreCase`.
+
+**Expected behaviour:** name and code are each matched on any substring, case-insensitively. For
+client name `GIMLI` / code `G02`, all of `IM`, `GIM`, `LI`, `IMLI`, `GIMLI`, `02`, `G02` (and their
+lower/mixed-case forms) return that client's logs.
+
+**Tests:** `Backoffice.API.Tests/ActivityLog/ActivityLogSearchFilterTests.cs`,
+`Backoffice.Web.Tests/Administration/ClientSiteConfigLogsModalTests.cs`
+(`Search_ByPartialClientNameOrCode_IsCaseInsensitive` covers the examples above)
+
+---
+
 ## Potential Runtime Errors Summary
 
 | Bug # | Issue | Type | Severity | Impact |

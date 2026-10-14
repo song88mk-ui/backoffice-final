@@ -17,6 +17,10 @@ namespace Backoffice.Shared.Models.Requests
         public DateTime TimeStamp { get; set; }
         public MetaData MetaData { get; set; }
         public string SearchText { get; set; } = "";
+        // BO-104: extra values matched against Payload when SearchText is set. The Client Site
+        // Config logs modal resolves a typed client name/code to client GUIDs here, because the
+        // log row stores only "{userName}.{clientGuid}" in Payload.
+        public List<string> PayloadSearchTerms { get; set; } = new List<string>();
     }
 
     public class PriceboostActivityLogRequest : ActivityLogRequest

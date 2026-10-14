@@ -324,10 +324,7 @@ namespace Backoffice.API.Repositories
                         TimeStamp = s.TimeStamp,
                     }).ToList();
 
-                if (!string.IsNullOrEmpty(request.SearchText))
-                {
-                    activityLogs = activityLogs.Where(x => x.From.ToUpper().Contains(request.SearchText.ToUpper()) || x.To.ToUpper().Contains(request.SearchText.ToUpper()) || x.UserName.ToUpper().Contains(request.SearchText.ToUpper())).ToList();
-                }
+                activityLogs = FilterActivityLogsBySearch(activityLogs, request);
 
                 if (metaData == null)
                 {
@@ -2481,6 +2478,30 @@ namespace Backoffice.API.Repositories
             var cache = _memCache.GetCache($"sp-tr-{langCode.ToString().ToUpper()}", async () => await _tradingRepository.GetSportLookup(langCode.ToString().ToUpper()), 1);
 
             return cache.Result?.Result?.SportLookup ?? null;
+        }
+
+        // Shared by every "View Logs" modal. Null-safe so a single row with a null From/To/UserName
+        // cannot throw into GetActivityLogs' catch-all, which the modals render as "No Record Found".
+        // PayloadSearchTerms (BO-104) lets a caller match values that only exist in Payload, e.g. the
+        // client GUID behind a client name typed into the Client Site Config logs search.
+        public static List<ActivityLogModel> FilterActivityLogsBySearch(List<ActivityLogModel> activityLogs, ActivityLogRequest request)
+        {
+            if (string.IsNullOrEmpty(request.SearchText))
+                return activityLogs;
+
+            var payloadTerms = (request.PayloadSearchTerms ?? new List<string>())
+                .Where(t => !string.IsNullOrEmpty(t))
+                .ToList();
+
+            bool Matches(string value, string term) =>
+                value != null && value.Contains(term, StringComparison.OrdinalIgnoreCase);
+
+            return activityLogs.Where(x =>
+                    Matches(x.From, request.SearchText) ||
+                    Matches(x.To, request.SearchText) ||
+                    Matches(x.UserName, request.SearchText) ||
+                    payloadTerms.Any(t => Matches(x.Payload, t)))
+                .ToList();
         }
 
         private static ManualBetDetails TryParseManualBetDetails(string json)
