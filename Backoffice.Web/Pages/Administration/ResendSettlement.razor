@@ -65,6 +65,10 @@
                                                 <div class="form-floating">
                                                     <textarea class="form-control input-reason" placeholder="Reason" @bind="@item.Bet.Reason" disabled="@IsActionDisabled"></textarea>
                                                 </div>
+                                                @if (_showReasonValidation && string.IsNullOrWhiteSpace(item.Bet.Reason))
+                                                {
+                                                    <span class="text-danger small d-block mt-1">Reason is required</span>
+                                                }
                                             </td>
                                             <td>
                                                 <button type="button" class="btn link-delete" @onclick="() => OnDeleteReference(item)" disabled="@(ResendSettlementModel.Count == 1 ? true: false)">

@@ -29,6 +29,11 @@ namespace Backoffice.Web.Pages.Administration
 
         private PageHeaderModel _pageHeaderModel;
 
+        // Platform reports cashed-out bets as BetStatusId 8000; Backoffice.Shared's BetStatus enum has no member for it.
+        private const int CashedOutStatusId = 8000;
+
+        private bool _showReasonValidation;
+
         #region Methods
 
         protected override async Task OnInitializedAsync()
@@ -137,9 +142,28 @@ namespace Backoffice.Web.Pages.Administration
         {
             if (ResendSettlementModel != null && ResendSettlementModel.Any())
             {
+                _showReasonValidation = true;
+
+                if (ResendSettlementModel.Any(x => string.IsNullOrWhiteSpace(x.Bet.Reason)))
+                {
+                    Alerts = new List<AlertModel>
+                    {
+                        new AlertModel()
+                        {
+                            Status = AlertStatus.Error,
+                            Message = "Reason is required",
+                            Opacity = 1.0m
+                        }
+                    };
+
+                    Guid = Guid.NewGuid();
+                    return;
+                }
+
                 if (ResendSettlementModel.Any(x => x.Bet.BetStatusId == (int)BetStatus.Cancelled
                                                  || x.Bet.BetStatusId == (int)BetStatus.Rejected
                                                  || x.Bet.BetStatusId == (int)BetStatus.Waiting
+                                                 || x.Bet.BetStatusId == CashedOutStatusId
                                                  || x.Bet.IsCashout))
                 {
                     Alerts.Add(new AlertModel()
@@ -176,6 +200,7 @@ namespace Backoffice.Web.Pages.Administration
         public async Task ResetSettlementEntries()
         {
             ResendSettlementModel = new List<ResendSettlementBetDetailModel>() { new ResendSettlementBetDetailModel() };
+            _showReasonValidation = false;
         }
 
         public async Task OnBetDelete(ResendSettlementBetDetailModel bet)
