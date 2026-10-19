@@ -552,7 +552,7 @@ lower/mixed-case forms) return that client's logs.
 
 ## Market Settlement Cancel Confirmation (Fixed)
 
-### Bug #19: Discard prompt's Cancel/Confirm buttons were invisible (BO-102)
+### Bug #19: Market Settlement discard prompt was unusable (BO-102)
 
 **Location:** `Backoffice.Web/Components/Administration/MarketSettlement/AddMarketSettlementModal.razor(.css/.cs)`
 
@@ -567,14 +567,24 @@ stayed active while the prompt was open.
 
 **Risk:** ⚠️ LOW (usability; no data impact)
 
-**Fix:** added `.modal-close` / `.modal-apply` rules to `AddMarketSettlementModal.razor.css`,
-using the same values as `ConfirmCancelBetModal.razor.css`. The footer buttons now bind to
-`IsFooterDisabled` (`IsPreLoader || ShowDiscardConfirm`).
+**Fix:** the first follow-up (#230) styled the inline buttons and disabled the footer while the
+prompt was open. It worked, but the in-body prompt with a second "Cancel" next to a disabled footer
+read poorly. It was replaced by `Components/Common/ConfirmDialog`, a confirmation dialog in the
+Sport Settings style (warning icon, centred message) that appears over the modal with its own
+backdrop (`z-index` 1060/1059, above `CustomModal`'s 1050/1049). The buttons are **Keep Editing**
+(grey, returns to the form) and **Discard** (red, closes the modal). This covers BO-18's
+"Confirm and discard / Cancel and continue" behaviour with clearer labels.
+
+**Why not `ModalService`:** it holds a single modal. Opening a confirmation through it replaces
+the Add Market Settlement modal and loses the entered data. `ConfirmDialog` is rendered by its
+host component instead, so the form stays mounted underneath. Reuse it for any modal that needs
+to ask before closing.
 
 **Gotcha:** Blazor CSS isolation is per component, so a class styled in one component's
 `.razor.css` is unstyled in any other component that uses it.
 
-**Tests:** `Backoffice.Web.Tests/Administration/MarketSettlementCancelConfirmationTests.cs`
+**Tests:** `Backoffice.Web.Tests/Administration/MarketSettlementCancelConfirmationTests.cs`,
+`Backoffice.Web.Tests/Common/ConfirmDialogTests.cs`
 
 ---
 
