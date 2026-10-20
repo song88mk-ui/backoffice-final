@@ -967,6 +967,42 @@ namespace Backoffice.API.Repositories
             }
         }
 
+        // BO-125: resend a Cancelled bet's status to the provider (Bet Genius / GTS). ResendSettlement cannot do
+        // this, since for a Cancelled bet it replays the cancellation to the operator only. The Platform API
+        // re-reads each bet's status and refuses any bet that is not Cancelled; it answers 400 with a per-bet
+        // result when any bet fails, which is passed through like ResendSettlement does.
+        public async Task<BaseResponse<ResendSettlementResponse>> ResendProviderCancellation(ResendProviderCancellationRequest request, string region)
+        {
+            try
+            {
+                var response = await GetHttpClient(region).PostAsync($"v1/bet/resendprovidercancellation", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonConvert.DeserializeObject<BaseResponse<ResendSettlementResponse>>(await response.Content.ReadAsStringAsync());
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonConvert.DeserializeObject<BaseResponse<ResendSettlementResponse>>(await response.Content.ReadAsStringAsync());
+                    else
+                    {
+                        return new BaseResponse<ResendSettlementResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ResendSettlementResponse>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<BetModifyResponse>> CancelBet(BetModifyRequest request, string region)
         {
             try

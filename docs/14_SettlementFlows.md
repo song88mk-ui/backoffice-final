@@ -17,6 +17,7 @@ Three settlement workflows exist in the Backoffice. All ultimately converge on t
 | **Market Settlement** | Market Settlement page | Backoffice DB (`ActivityLog2`) | `r.uof.onbetsettlement` → OE.Adapter.Service → `r.oe.bet.settlement` (requires OE.Adapter.Service `r.uof.#` subscription) |
 | **Manual Bet Settlement** | Manual Bet Settlement page | Platform DB | Platform API (`v1/bet/manualsettlement`) |
 | **Resend Settlement** | Resend Settlement page | Platform DB | Platform API (`v1/bet/resendsettlement`) |
+| **Resend Cancellation to Bet Genius** (BO-125) | Resend Settlement page, second button | Platform DB | Platform API (`v1/bet/resendprovidercancellation`), see the section below |
 
 ---
 
@@ -180,6 +181,50 @@ OE.Sportsbook.Service
         └─ On Failure:
             RetryBetSettlement() with exponential backoff
 ```
+
+---
+
+## Resend Cancellation to Bet Genius (BO-125)
+
+**Problem.** A bet cancelled at placement (the operator declined it or errored) was reported to the provider
+(Bet Genius, "GTS" in platform-final) as Open when the placement was validated, and the Cancelled update never
+followed. PRD bet `07AAA196-0010-499C-3E01-08DF245EDA48` was Cancelled in the Betting database and still open at
+Bet Genius, who asked for the cancellation to be sent again. Resend Settlement cannot do this: the page refuses
+Cancelled bets, and for a Cancelled bet the Platform API only replays the cancellation to the **operator**
+(`PlatformRepository.ResendSettlement`, `cancelledBets` branch in platform-final).
+
+**Flow.**
+
+```
+Resend Settlement page, "Resend Cancellation to Bet Genius" button -> ConfirmationModal (IsProviderCancellation)
+  -> BackOfficeService.ResendProviderCancellation -> POST api/bet/resendprovidercancellation (BetController)
+  -> PlatformRepository.ResendProviderCancellation -> Platform API POST v1/bet/resendprovidercancellation
+       reads each bet from the Betting database, refuses any bet that is not Cancelled,
+       builds an OnBetSettlement (IsAudit = true) and publishes it as OnBetCancellation on r.bet.cancellation
+       (through Betting.API ResendSettlement, which now accepts an optional RoutingKey)
+  -> Provider.Service OnBetCancellation handler: cancels the reservation, then SendBet with status Cancelled to GTS
+```
+
+**Rules.**
+- The button is enabled only when every listed bet is loaded and Cancelled. A Reason is required, as for Resend
+  Settlement (it is validated on the page and, as there, not sent). The request carries only the bet ids.
+- The status shown on the page can lag the database when the bet also sits in the settlement retry queue (the
+  details lookup then reads the queued message), so the Platform API re-reads the status and has the final say.
+- It uses the existing `admin-settlement-resend` permission. No permission or menu entry was added.
+- `r.bet.cancellation` is bound by `provider-service` only, whereas `r.bet.operator` is bound by both
+  `operator-service` and `provider-service` (ArgoCD `apps/platform`). The provider-only key is what keeps a
+  second cancellation from reaching the operator. Betting.API refuses any routing key other than these two.
+- A success message means the cancellation was **queued**. `Provider.Service` delivers it to GTS and does not
+  retry or report a failure back (`GTSBetProvider.ProcessSettlement`, `//TODO: Send to retry if failed`), so check
+  that the bet now shows Cancelled at Bet Genius, or look at the `Provider.Service` logs.
+
+**Deployment order.** platform-final Betting.API, then Platform.API, then bo-api, then bo-web. If Platform.API
+goes out before Betting.API, the old Betting.API ignores `RoutingKey` and publishes on `r.bet.operator`, which also
+delivers the cancellation to the operator. Rolling back is the reverse order, and an unused endpoint is harmless.
+
+**Status.** Verified in code and by unit tests in both repos. Not observed against a real Bet Genius yet, and
+whether GTS accepts a Cancelled update for a bet it holds as open is unknown. The message keeps `ChannelTypeId` at
+its default, like the other resend paths, so a bet placed through the MTS channel is not told apart.
 
 ---
 

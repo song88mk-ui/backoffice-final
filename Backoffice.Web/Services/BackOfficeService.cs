@@ -1858,6 +1858,43 @@ namespace Backoffice.Web.Services
             }
         }
 
+        // BO-125: resend a Cancelled bet's status to the provider (Bet Genius / GTS).
+        public async Task<BaseResponse<ResendSettlementResponse>> ResendProviderCancellation(ResendProviderCancellationRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"api/bet/resendprovidercancellation", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ResendSettlementResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ResendSettlementResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                    else
+                    {
+                        return new BaseResponse<ResendSettlementResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<ResendSettlementResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<BetModifyResponse>> CancelBet(BetModifyRequest request)
         {
             try

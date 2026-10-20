@@ -84,6 +84,7 @@
                     <div class="col-md-12">
                         <div class="d-flex flex-row-reverse mx-3 pt-4 border-top">
                             <button type="button" class="btn btn-settlement px-4 py-2" @onclick="OnResendSettlementClickEvent" disabled="@((ResendSettlementModel.Any() && !ResendSettlementModel.Any(x => !x.Bet.BetSelections.Any())) ? false : true)">Resend Settlement</button>
+                            <button type="button" class="btn btn-settlement btn-resend-provider-cancellation me-3 px-4 py-2" title="Sends the cancellation to Bet Genius. Only Cancelled bets can be sent." @onclick="OnResendProviderCancellationClickEvent" disabled="@(!CanResendProviderCancellation)">Resend Cancellation to Bet Genius</button>
                             <button type="button" class="btn btn-reset me-3 px-4 py-2" @onclick="OnResetSettlementClickEvent">@_translationState.GetValue("Reset")</button>
                         </div>
                     </div>

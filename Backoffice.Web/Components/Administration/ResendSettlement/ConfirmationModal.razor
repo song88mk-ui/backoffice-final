@@ -6,7 +6,14 @@
         <div class="text-center">
             Do you wish to proceed?
             <br />
-            Please confirm to settle all reference IDs added.
+            @if (IsProviderCancellation)
+            {
+                <text>Please confirm to send the cancellation of all reference IDs added to Bet Genius.</text>
+            }
+            else
+            {
+                <text>Please confirm to settle all reference IDs added.</text>
+            }
         </div>
     </div>
 </div>

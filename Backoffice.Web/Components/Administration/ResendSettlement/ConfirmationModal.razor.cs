@@ -20,6 +20,10 @@ namespace Backoffice.Web.Components.Administration.ResendSettlement
         private List<ResendSettlementBetDetailModel> ResendSettlementModel { get; set; }
         private EventCallback<BaseResponse<ResendSettlementResponse>> OnResendSettlementCallback { get; set; }
 
+        // BO-125: the same dialog confirms "Resend Cancellation to Bet Genius", which sends the bet ids to the
+        // provider-cancellation endpoint instead of resending the settlement to the operator.
+        private bool IsProviderCancellation { get; set; }
+
         #endregion
 
         #region Methods
@@ -28,6 +32,7 @@ namespace Backoffice.Web.Components.Administration.ResendSettlement
         {
             ResendSettlementModel = ModalParameters.TryGet<List<ResendSettlementBetDetailModel>>("ResendSettlementModel");
             OnResendSettlementCallback = ModalParameters.TryGet<EventCallback<BaseResponse<ResendSettlementResponse>>>("OnResendSettlementCallback");
+            IsProviderCancellation = ModalParameters.TryGet<bool>("IsProviderCancellation");
         }
 
         public async Task OnModalCancel()
@@ -39,15 +44,20 @@ namespace Backoffice.Web.Components.Administration.ResendSettlement
         {
             if (ResendSettlementModel.Any())
             {
-                var response = await BackofficeService.ResendSettlement(new ResendSettlementRequest()
-                {
-                    Bets = ResendSettlementModel.Select(s =>
-                        new ResendSettlementRequest.ResendSettlementRequestData()
-                        {
-                            BetId = s.Bet.BetId.Value.ToString(),
-                            CurrentStatus = (BetStatus)s.Bet.BetStatusId
-                        }).ToList()
-                });
+                var response = IsProviderCancellation
+                    ? await BackofficeService.ResendProviderCancellation(new ResendProviderCancellationRequest()
+                    {
+                        BetIds = ResendSettlementModel.Select(s => s.Bet.BetId.Value.ToString()).ToList()
+                    })
+                    : await BackofficeService.ResendSettlement(new ResendSettlementRequest()
+                    {
+                        Bets = ResendSettlementModel.Select(s =>
+                            new ResendSettlementRequest.ResendSettlementRequestData()
+                            {
+                                BetId = s.Bet.BetId.Value.ToString(),
+                                CurrentStatus = (BetStatus)s.Bet.BetStatusId
+                            }).ToList()
+                    });
 
                 ModalService.Cancel();
 

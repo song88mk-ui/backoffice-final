@@ -91,6 +91,22 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
+        [HttpPost("resendprovidercancellation")]
+        public async Task<IActionResult> ResendProviderCancellation([FromBody] ResendProviderCancellationRequest request)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _platformRepository.ResendProviderCancellation(request, region);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpPost("cancel")]
         public async Task<IActionResult> CancelBet([FromBody] BetModifyRequest request)
         {

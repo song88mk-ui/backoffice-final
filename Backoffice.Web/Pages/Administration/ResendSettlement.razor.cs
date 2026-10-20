@@ -34,6 +34,17 @@ namespace Backoffice.Web.Pages.Administration
 
         private bool _showReasonValidation;
 
+        // BO-125: "Resend Cancellation to Bet Genius" is offered only when every bet listed is loaded and
+        // Cancelled. Resend Settlement refuses Cancelled bets and replays to the operator, so a Cancelled bet
+        // that Bet Genius still shows as open needs this separate action. The displayed status can lag the
+        // database when the bet also sits in the settlement retry queue, so the Platform API re-checks it.
+        private bool CanResendProviderCancellation =>
+            ResendSettlementModel != null
+            && ResendSettlementModel.Any()
+            && ResendSettlementModel.All(x => x.Bet.BetId.HasValue
+                                              && x.Bet.BetSelections.Any()
+                                              && x.Bet.BetStatusId == (int)BetStatus.Cancelled);
+
         #region Methods
 
         protected override async Task OnInitializedAsync()
@@ -188,6 +199,39 @@ namespace Backoffice.Web.Pages.Administration
             }
         }
 
+        public async Task OnResendProviderCancellationClickEvent()
+        {
+            if (!CanResendProviderCancellation)
+                return;
+
+            _showReasonValidation = true;
+
+            if (ResendSettlementModel.Any(x => string.IsNullOrWhiteSpace(x.Bet.Reason)))
+            {
+                Alerts = new List<AlertModel>
+                {
+                    new AlertModel()
+                    {
+                        Status = AlertStatus.Error,
+                        Message = "Reason is required",
+                        Opacity = 1.0m
+                    }
+                };
+
+                Guid = Guid.NewGuid();
+                return;
+            }
+
+            var parameters = new ModalParameters();
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("OnResendSettlementCallback", EventCallback.Factory.Create<BaseResponse<ResendSettlementResponse>>(this, OnResendProviderCancellationCallback));
+            parameters.Add("ResendSettlementModel", ResendSettlementModel);
+            parameters.Add("IsProviderCancellation", true);
+
+            var options = new ModalOptions();
+            ModalService.Open<ConfirmationModal>("Resend Cancellation to Bet Genius", parameters, options);
+        }
+
         public async Task OnResetSettlementClickEvent()
         {
             var parameters = new ModalParameters();
@@ -248,6 +292,54 @@ namespace Backoffice.Web.Pages.Administration
 
             await InvokeAsync(StateHasChanged);
             await Task.Delay(3500);
+        }
+
+        // A successful answer means the cancellation was queued for the provider service, which delivers it to
+        // Bet Genius and does not report a delivery failure back, so the wording says "queued", not "sent".
+        public async Task OnResendProviderCancellationCallback(BaseResponse<ResendSettlementResponse> response)
+        {
+            Alerts = new List<AlertModel>();
+
+            var results = response?.Result?.Data ?? new List<ResendSettlementResponse.ResendSettlementResponseData>();
+            var failed = results.Where(d => d.StatusCode != StatusCode.Success).ToList();
+
+            if (!results.Any())
+            {
+                Alerts.Add(new AlertModel()
+                {
+                    Status = AlertStatus.Error,
+                    Message = string.IsNullOrWhiteSpace(response?.Message)
+                        ? StatusCode.Resend_Attempt_Not_Successful_Please_Try_Again.ToString().Replace('_', ' ')
+                        : response.Message,
+                    Opacity = 1.0m
+                });
+            }
+            else if (failed.Any())
+            {
+                var details = string.Join("; ", failed.Select(d => d.BetId == System.Guid.Empty ? d.Message : $"{d.BetId.ToString().ToUpper()}: {d.Message}"));
+
+                Alerts.Add(new AlertModel()
+                {
+                    Status = AlertStatus.Error,
+                    Message = failed.Count < results.Count
+                        ? $"{results.Count - failed.Count} of {results.Count} queued for Bet Genius. Failed: {details}"
+                        : details,
+                    Opacity = 1.0m
+                });
+            }
+            else
+            {
+                Alerts.Add(new AlertModel()
+                {
+                    Status = AlertStatus.Success,
+                    Message = $"Cancellation of {results.Count} bet(s) queued for sending to Bet Genius",
+                    Opacity = 1.0m
+                });
+            }
+
+            Guid = Guid.NewGuid();
+
+            await InvokeAsync(StateHasChanged);
         }
 
         public void Dispose()

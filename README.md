@@ -341,6 +341,7 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 | POST | `api/bet/manualsettlement` | Manually settle a bet |
 | POST | `api/bet/resendsettlement/details` | Bet details for resend-settlement |
 | POST | `api/bet/resendsettlement` | Resend a bet settlement |
+| POST | `api/bet/resendprovidercancellation` | Send the Cancelled status of cancelled bets to the provider (Bet Genius), BO-125 |
 | POST | `api/bet/cancel` | Cancel a bet (no `x-region`: runs HK, plus SA when not staging) |
 
 #### AdminConfigController - `api/config` (x-api-key + JWT claim `Admin.Maintenance`)

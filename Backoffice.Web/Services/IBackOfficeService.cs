@@ -60,6 +60,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ManualBetSettlementResponse>> ManualSettlement(ManualBetSettlementRequest request);
         Task<BaseResponse<ResendSettlementBetDetailModel>> GetResendSettlementBetDetails(ResendSettlementBetDetailRequest request);
         Task<BaseResponse<ResendSettlementResponse>> ResendSettlement(ResendSettlementRequest request);
+        Task<BaseResponse<ResendSettlementResponse>> ResendProviderCancellation(ResendProviderCancellationRequest request);
         Task<BaseResponse<BetModifyResponse>> CancelBet(BetModifyRequest request);
         Task<BaseResponse<bool>> DeactivateFixtureMarkets(DeactivateFixtureMarketRequest request);
         Task<BaseResponse<AnnouncementResponse>> GetAnnouncements(AnnouncementRequest request, CancellationToken cancellationToken);
