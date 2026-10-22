@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Backoffice.API.Repositories
 {
@@ -21,6 +22,18 @@ namespace Backoffice.API.Repositories
 
         private static readonly string English = LanguageCode.EN.ToString();
         private static readonly CultureInfo Invariant = CultureInfo.InvariantCulture;
+
+        // The match fixtures a picker lists: up to the given status, of the given type, and in the given sport, segment
+        // and league (0 means all). The Trading API also required a client code on the fixture (ClCo), meaning the
+        // fixture is offered to at least one client. That condition is left out on purpose: nothing in the v2 pipeline
+        // stamps ClCo yet, so with it every list was empty. Once ClCo is populated from the sportsbook Mongo again,
+        // add `&& !string.IsNullOrEmpty(c.ClCo)` to this predicate to list only the fixtures offered to a client.
+        public static Expression<Func<Fixture, bool>> MatchFixturePredicate(int lastStatusId, int fixtureTypeId, int sportId, int segmentId, int leagueId) =>
+            c => c.FiStId <= lastStatusId
+                && c.FiTyId == fixtureTypeId
+                && (sportId == 0 || c.SpId == sportId)
+                && (segmentId == 0 || c.SegId == segmentId)
+                && (leagueId == 0 || c.LeId == leagueId);
 
         // Match fixtures, earliest first, each with its markets and selections.
         public static List<MarketFixtureResponse.FixtureModel> BuildMatchFixtures(

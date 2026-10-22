@@ -417,7 +417,7 @@ Most of these routes forward to the OddsEngine Trading API (`API:TradingAPI:{HK|
 | GET | `api/trading/fixtures/market/{fixtureTypeId}/{sportId}/{segmentId}/{leagueId}/{marketTemplateId}` | Fixtures for one market template |
 | GET | `api/trading/fixtures/market/selections/{fixtureTypeId}/{providerFixtureId}/{providerMarketId}/{providerSelectionId}` | Fixture market selections |
 | GET | `api/trading/fixtures2/market/details/{providerFixtureId}` | Fixture market details |
-| POST | `api/trading/sportsbook/fixtures` | Match fixtures with their markets and selections, English names, earliest first (read from the sportsbook Mongo; `AllFixtureStatus` includes started and closed fixtures) |
+| POST | `api/trading/sportsbook/fixtures` | Match fixtures with their markets and selections, English names, earliest first (read from the sportsbook Mongo; `AllFixtureStatus` includes started and closed fixtures; a fixture is listed whether or not it carries a client code, `ClCo`) |
 | POST | `api/trading/sportsbook/outrightfixtures` | Prematch outright fixtures with their markets and selections, in league tier order (read from the sportsbook Mongo) |
 | POST | `api/trading/priceboost` | Add or update price boost configs (a different selection of the same market replaces the saved one; zero or empty odds delete it) |
 | POST | `api/trading/priceboost/list` | Price boost config list with the live fixture, market and odds of each boost (also deletes the boosts of fixtures that ended) |

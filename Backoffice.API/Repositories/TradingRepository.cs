@@ -768,18 +768,9 @@ namespace Backoffice.API.Repositories
             {
                 // all statuses up to Closed when asked, else the fixtures that have not started
                 var lastStatus = request.AllFixtureStatus ? (int)FixtureStatus.Closed : (int)FixtureStatus.Prematch;
-                var fixtureTypeId = request.FixtureTypeId;
-                var sportId = request.SportId;
-                var segmentId = request.SegmentId;
-                var leagueId = request.LeagueId;
 
                 var fixtures = await fixtureCollection
-                    .Find(Builders<Fixture>.Filter.Where(c => c.FiStId <= lastStatus
-                        && c.FiTyId == fixtureTypeId
-                        && (sportId == 0 || c.SpId == sportId)
-                        && (segmentId == 0 || c.SegId == segmentId)
-                        && (leagueId == 0 || c.LeId == leagueId)
-                        && !string.IsNullOrEmpty(c.ClCo)))
+                    .Find(Builders<Fixture>.Filter.Where(SportsbookFixtureBuilder.MatchFixturePredicate(lastStatus, request.FixtureTypeId, request.SportId, request.SegmentId, request.LeagueId)))
                     .ToListAsync();
 
                 if (fixtures.Count == 0)

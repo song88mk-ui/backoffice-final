@@ -1,5 +1,8 @@
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Data.Sportsbook.Collections;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 using OE.Shared.Data.Sportsbook.SQLEntities;
 using System;
 using System.Collections.Generic;
@@ -263,6 +266,72 @@ namespace Backoffice.API.Tests.SportsbookFixtures
 
             var fixture = Assert.Single(result);
             Assert.Single(fixture.Markets);
+        }
+
+        // ---------------------------------------------------------------
+        // Match fixture filter
+        // ---------------------------------------------------------------
+
+        private static List<long> ListedIds(IEnumerable<Fixture> fixtures, int lastStatus = 0, int type = 0, int sport = 0, int segment = 0, int league = 0) =>
+            fixtures.Where(SportsbookFixtureBuilder.MatchFixturePredicate(lastStatus, type, sport, segment, league).Compile()).Select(f => f.FiId).ToList();
+
+        // The Trading API listed only fixtures with a client code (ClCo), which the v2 pipeline never fills.
+        [Fact]
+        public void AFixtureIsListed_WhetherOrNotItCarriesAClientCode()
+        {
+            var noCode = AFixture(1);
+            noCode.ClCo = null;
+            var emptyCode = AFixture(2);
+            emptyCode.ClCo = string.Empty;
+            var withCode = AFixture(3);
+            withCode.ClCo = "G02,TSO";
+
+            Assert.Equal(new long[] { 1, 2, 3 }, ListedIds(new[] { noCode, emptyCode, withCode }));
+        }
+
+        [Fact]
+        public void OnlyFixturesUpToTheLastStatus_OfTheRequestedType_AreListed()
+        {
+            var prematch = AFixture(1);
+            var live = AFixture(2);
+            live.FiStId = 1;
+            var closed = AFixture(3);
+            closed.FiStId = 4;
+            var outright = AFixture(4, type: 1);
+            var all = new[] { prematch, live, closed, outright };
+
+            Assert.Equal(new long[] { 1 }, ListedIds(all, lastStatus: 0));
+            Assert.Equal(new long[] { 1, 2, 3 }, ListedIds(all, lastStatus: 4));
+            Assert.Equal(new long[] { 4 }, ListedIds(all, type: 1));
+        }
+
+        [Fact]
+        public void ASportSegmentOrLeagueOfZeroMeansAll_AndAValueNarrowsTheList()
+        {
+            var premierLeague = AFixture(1, segment: 1, league: 100);
+            var championship = AFixture(2, segment: 2, league: 200);
+            var tennis = AFixture(3, segment: 3, league: 300);
+            tennis.SpId = 24;
+            var all = new[] { premierLeague, championship, tennis };
+
+            Assert.Equal(new long[] { 1, 2, 3 }, ListedIds(all));
+            Assert.Equal(new long[] { 1, 2 }, ListedIds(all, sport: 10));
+            Assert.Equal(new long[] { 2 }, ListedIds(all, sport: 10, segment: 2));
+            Assert.Equal(new long[] { 1 }, ListedIds(all, league: 100));
+        }
+
+        // The repository hands this predicate to the Mongo driver, so it has to render to a filter there.
+        [Fact]
+        public void TheFilterRendersUnderTheMongoDriver_WithoutAClientCodeCondition()
+        {
+            var filter = Builders<Fixture>.Filter.Where(SportsbookFixtureBuilder.MatchFixturePredicate(0, 0, 10, 1, 100));
+
+            var json = filter.Render(new RenderArgs<Fixture>(BsonSerializer.LookupSerializer<Fixture>(), BsonSerializer.SerializerRegistry)).ToJson();
+
+            Assert.Contains("FiStId", json);
+            Assert.Contains("FiTyId", json);
+            Assert.Contains("SpId", json);
+            Assert.DoesNotContain("ClCo", json);
         }
     }
 }
