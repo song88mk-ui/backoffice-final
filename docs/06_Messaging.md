@@ -69,6 +69,22 @@ OnActivityLogListMessage
 └─ Destination: Utility service
 ```
 
+### Boosted Settings Notification (BO-42)
+```
+OnNewNotification
+├─ Published by TradingRepository.AddOrUpdateBoostedSettings after the % cap is saved
+├─ Route: r.oe.bm.engine.notifications
+├─ Payload: NotificationsDetailsModel (UserId = the user who saved, Type = BoostedSettings)
+└─ Consumer: Backoffice.WebSocket.Service, which pushes it to that user's browser as a toast
+```
+It is not stored (nothing writes the `Notifications` table in this flow), a publish failure is only
+logged and never undoes the save, and no message is sent without a valid user id because a
+notification without a user would reach everyone. The price boost routes of the Trading controller
+used to publish `LogActivityList` and `OnNewNotification` on `r.oe.util.*` through the Trading API;
+nothing deployed consumes those keys, and the Web writes the price boost activity logs itself.
+`r.uof.onpriceboost` is still published by the Web (through `api/trading/publish`, now the broker API
+of this service) and has no consumer in the deployed Odds Engine v2.
+
 ### Configuration Updates
 ```
 OnUpdateClientMarketConfigMessage

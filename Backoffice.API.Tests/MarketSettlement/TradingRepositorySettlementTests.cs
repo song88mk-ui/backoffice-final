@@ -1,13 +1,17 @@
 using Backoffice.API.Repositories;
+using Backoffice.Shared.Data.Trading;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using OE.Shared.Data.Sportsbook;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -78,7 +82,9 @@ namespace Backoffice.API.Tests.MarketSettlement
                 activityLog ?? new Mock<IBackofficeActivityLogRepository>().Object,
                 new Mock<IMemCache>().Object,
                 NullLogger<TradingRepository>.Instance,
-                rabbitMq);
+                rabbitMq,
+                new TradingContext(new DbContextOptionsBuilder<TradingContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options),
+                new SportsbookContext(new DbContextOptionsBuilder<SportsbookContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options));
         }
 
         // ---------------------------------------------------------------

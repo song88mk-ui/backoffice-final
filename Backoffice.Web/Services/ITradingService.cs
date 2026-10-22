@@ -9,7 +9,6 @@ namespace Backoffice.Web.Services
     public interface ITradingService
     {
         string Region { get; set; }
-        Task<BaseResponse<SportsTreeModel>> GetSports(int fixtureTypeId);
         Task<BaseResponse<List<ClientInformationModel>>> GetClientList(CancellationToken cancellationToken = default);
         Task<BaseResponse<List<PriceBoostConfigModel>>> GetPriceBoostConfig(PriceBoostConfigRequest request);
         Task<BaseResponse<List<BoostedSettingsModel>>> GetBoostedSettings(BoostedSettingsRequest request, CancellationToken cancellationToken = default);

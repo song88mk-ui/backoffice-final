@@ -7,19 +7,24 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Newtonsoft.Json;
+using OE.Shared.Data.Sportsbook;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Transactions;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using TierLeagueOrder = OE.Shared.Data.Sportsbook.SQLEntities.TierLeagueOrder;
 
 namespace Backoffice.API.Repositories
 {
@@ -31,18 +36,22 @@ namespace Backoffice.API.Repositories
         private readonly IMemCache _memCache;
         private readonly IRabbitMqRepository _rabbitMqRepository;
         private readonly ILogger<TradingRepository> _logger;
+        private readonly TradingContext _tradingContext;
+        private readonly SportsbookContext _sportsbookContext;
 
         private static IMongoCollection<Fixture> fixtureCollection;
         private static IMongoCollection<Market> marketCollection;
         private static IMongoCollection<Selection> selectionCollection;
 
-        public TradingRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache, ILogger<TradingRepository> logger, IRabbitMqRepository rabbitMqRepository)
+        public TradingRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache, ILogger<TradingRepository> logger, IRabbitMqRepository rabbitMqRepository, TradingContext tradingContext, SportsbookContext sportsbookContext)
         {
             _configuration = configuration;
             _activityLogRepository = activityLogRepository;
             _memCache = memCache;
             _logger = logger;
             _rabbitMqRepository = rabbitMqRepository;
+            _tradingContext = tradingContext;
+            _sportsbookContext = sportsbookContext;
 
             if (_db == null)
             {
@@ -751,30 +760,59 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Sportsbook
+        // BO-42: read from the sportsbook Mongo here, no longer through the Trading API. The region argument stays
+        // so the controller and interface do not change.
         public async Task<BaseResponse<MarketFixtureResponse>> GetFixtures(MarketFixtureRequest request, string region)
         {
             try
             {
-                var response = await GetHttpClient(region).PostAsync($"sportsbook/fixtures", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                // all statuses up to Closed when asked, else the fixtures that have not started
+                var lastStatus = request.AllFixtureStatus ? (int)FixtureStatus.Closed : (int)FixtureStatus.Prematch;
+                var fixtureTypeId = request.FixtureTypeId;
+                var sportId = request.SportId;
+                var segmentId = request.SegmentId;
+                var leagueId = request.LeagueId;
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                else
+                var fixtures = await fixtureCollection
+                    .Find(Builders<Fixture>.Filter.Where(c => c.FiStId <= lastStatus
+                        && c.FiTyId == fixtureTypeId
+                        && (sportId == 0 || c.SpId == sportId)
+                        && (segmentId == 0 || c.SegId == segmentId)
+                        && (leagueId == 0 || c.LeId == leagueId)
+                        && !string.IsNullOrEmpty(c.ClCo)))
+                    .ToListAsync();
+
+                if (fixtures.Count == 0)
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                    else
+                    return new BaseResponse<MarketFixtureResponse>
                     {
-                        return new BaseResponse<MarketFixtureResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
+                        StatusCode = StatusCode.Success,
+                        Message = StatusCode.Success.ToString(),
+                        Result = new MarketFixtureResponse()
+                    };
                 }
+
+                var marketStatusIds = new List<int> { (int)MarketStatus.Active, (int)MarketStatus.Suspended };
+
+                if (request.AllFixtureStatus)
+                    marketStatusIds.Add((int)MarketStatus.Settled);
+
+                var data = await GetFixtureMarketData(fixtures.Select(f => f.FiId).Distinct().ToList(), marketStatusIds);
+
+                return new BaseResponse<MarketFixtureResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new MarketFixtureResponse
+                    {
+                        Fixtures = SportsbookFixtureBuilder.BuildMatchFixtures(fixtures, data.Markets, data.Selections)
+                    }
+                };
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "GetFixtures failed for sport {SportId}, segment {SegmentId}, league {LeagueId}", request?.SportId, request?.SegmentId, request?.LeagueId);
+
                 return new BaseResponse<MarketFixtureResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -787,26 +825,46 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var response = await GetHttpClient(region).PostAsync($"sportsbook/outrightfixtures", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var sportId = request.SportId;
+                var segmentId = request.SegmentId;
+                var leagueId = request.LeagueId;
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                else
+                var fixtures = await fixtureCollection
+                    .Find(Builders<Fixture>.Filter.Where(c => c.FiStId == (int)FixtureStatus.Prematch
+                        && c.FiTyId == (int)FixtureType.Outright
+                        && (sportId == 0 || c.SpId == sportId)
+                        && (segmentId == 0 || c.SegId == segmentId)
+                        && (leagueId == 0 || c.LeId == leagueId)))
+                    .ToListAsync();
+
+                if (fixtures.Count == 0)
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                    else
+                    return new BaseResponse<MarketFixtureResponse>
                     {
-                        return new BaseResponse<MarketFixtureResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
+                        StatusCode = StatusCode.Success,
+                        Message = StatusCode.Success.ToString(),
+                        Result = new MarketFixtureResponse()
+                    };
                 }
+
+                var marketStatusIds = new List<int> { (int)MarketStatus.Active, (int)MarketStatus.Suspended };
+
+                var data = await GetFixtureMarketData(fixtures.Select(f => f.FiId).Distinct().ToList(), marketStatusIds);
+
+                return new BaseResponse<MarketFixtureResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new MarketFixtureResponse
+                    {
+                        Fixtures = SportsbookFixtureBuilder.BuildOutrightFixtures(fixtures, data.Markets, data.Selections, GetTierLeagueOrder(), request.SportId)
+                    }
+                };
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "GetOutrightFixtures failed for sport {SportId}, segment {SegmentId}, league {LeagueId}", request?.SportId, request?.SegmentId, request?.LeagueId);
+
                 return new BaseResponse<MarketFixtureResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -814,33 +872,182 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+
+        // The markets and selections of the fixtures in the given statuses, with only the English translation of
+        // each name.
+        private async Task<(List<MarketFilter> Markets, List<SelectionFilter> Selections)> GetFixtureMarketData(List<long> fixtureIds, List<int> marketStatusIds)
+        {
+            var english = LanguageCode.EN.ToString();
+
+            var marketFilter = Builders<Market>.Filter.Where(c => fixtureIds.Contains(c.FiId) && marketStatusIds.Contains(c.MaStId));
+            var marketProjection = Builders<Market>.Projection.Include(c => c.FiId).Include(c => c.MaTeId).Include(c => c.MaId).Include(c => c.MaNa).Include(c => c.Li).Include(c => c.MaStId).Include(c => c.MaStNa).Include(c => c.IsBo).Include(c => c.MaNaTr).ElemMatch(c => c.MaNaTr, cc => cc.LaCo == english);
+            var markets = marketCollection.Find(marketFilter).Project<MarketFilter>(marketProjection).ToListAsync();
+
+            var selectionFilter = Builders<Selection>.Filter.Where(c => fixtureIds.Contains(c.FiId) && marketStatusIds.Contains(c.MaStId));
+            var selectionProjection = Builders<Selection>.Projection.Include(c => c.FiId).Include(c => c.MaId).Include(c => c.SeTeId).Include(c => c.SeId).Include(c => c.SeNa).Include(c => c.SeSp).Include(c => c.Od).Include(c => c.IsAc).Include(c => c.SeSoOr).Include(c => c.CoId).Include(c => c.SeNaTr).ElemMatch(c => c.SeNaTr, cc => cc.LaCo == english);
+            var selections = selectionCollection.Find(selectionFilter).Project<SelectionFilter>(selectionProjection).ToListAsync();
+
+            await Task.WhenAll(markets, selections);
+
+            return (markets.Result, selections.Result);
+        }
+
+        // The league order of the outright lists, cached 24 hours under the key the sportsbook repository uses.
+        private List<TierLeagueOrder> GetTierLeagueOrder()
+        {
+            return _memCache.GetCache("tlo", () => _sportsbookContext.TierLeagueOrder.AsNoTracking().ToList(), 24) ?? new List<TierLeagueOrder>();
+        }
         #endregion
 
         #region Priceboost
+        // BO-42: served from the Trading DB and the sportsbook Mongo here, no longer through the Trading API.
+        // The region argument stays so the controller and interface do not change.
         public async Task<BaseResponse<PriceBoostConfigResponse>> AddOrUpdatePriceBoost(List<PriceBoostConfigModel> request, string region)
         {
             try
             {
-                var response = await GetHttpClient(region).PostAsync($"priceboost", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                else
+                if (request == null || !request.Any())
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                    else
+                    return new BaseResponse<PriceBoostConfigResponse>
                     {
-                        return new BaseResponse<PriceBoostConfigResponse>()
+                        StatusCode = StatusCode.Success,
+                        Result = new PriceBoostConfigResponse
                         {
                             StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
+                            Message = "No price boost config to be updated",
+                            IsBoosted = false
+                        }
+                    };
                 }
+
+                var existingPriceBoostConfigs = new List<PriceBoostConfigModel>();
+
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    // A client boosts one selection per market: saving a different selection of the market replaces
+                    // the saved one (the table has no key to enforce this). The Trading API only replaced when both the
+                    // selection template and the selection specifier differed, which left two selections in one market
+                    // when just one of them differed. The replaced boosts are returned so the Web can log them.
+                    foreach (var priceBoost in request)
+                    {
+                        var replaced = await _tradingContext.PriceBoostConfig
+                            .Where(c => c.ClientCode == priceBoost.ClientCode
+                                && c.SportId == priceBoost.SportId
+                                && c.SegmentId == priceBoost.SegmentId
+                                && c.LeagueId == priceBoost.LeagueId
+                                && c.FixtureTypeId == priceBoost.FixtureTypeId
+                                && c.ProviderFixtureId == priceBoost.ProviderFixtureId
+                                && c.MarketTemplateId == priceBoost.MarketTemplateId
+                                && c.MarketSpecifier == priceBoost.MarketSpecifier
+                                && (c.SelectionTemplateId != priceBoost.SelectionTemplateId
+                                    || c.SelectionSpecifier != priceBoost.SelectionSpecifier))
+                            .ToListAsync();
+
+                        if (replaced.Any())
+                        {
+                            existingPriceBoostConfigs.AddRange(replaced.Select(ToPriceBoostConfigModel));
+                            _tradingContext.PriceBoostConfig.RemoveRange(replaced);
+                            await _tradingContext.SaveChangesAsync();
+                        }
+                    }
+
+                    foreach (var newPriceBoost in request)
+                    {
+                        // odds are cut, not rounded, to 2 decimals
+                        newPriceBoost.BoostedOdds = string.IsNullOrEmpty(newPriceBoost.BoostedOddsStr)
+                            ? 0
+                            : Math.Truncate(100 * Convert.ToDecimal(newPriceBoost.BoostedOddsStr, CultureInfo.InvariantCulture)) / 100;
+
+                        var translations = JsonSerializer.Serialize(newPriceBoost.BoostedSelectionTranslations);
+
+                        var current = await _tradingContext.PriceBoostConfig
+                            .Where(c => c.ClientCode == newPriceBoost.ClientCode
+                                && c.SportId == newPriceBoost.SportId
+                                && c.SegmentId == newPriceBoost.SegmentId
+                                && c.LeagueId == newPriceBoost.LeagueId
+                                && c.FixtureTypeId == newPriceBoost.FixtureTypeId
+                                && c.ProviderFixtureId == newPriceBoost.ProviderFixtureId
+                                && c.MarketTemplateId == newPriceBoost.MarketTemplateId
+                                && c.SelectionTemplateId == newPriceBoost.SelectionTemplateId
+                                && c.MarketSpecifier == newPriceBoost.MarketSpecifier
+                                && c.SelectionSpecifier == newPriceBoost.SelectionSpecifier)
+                            .FirstOrDefaultAsync();
+
+                        if (current != null)
+                        {
+                            if (newPriceBoost.BoostedOdds == 0)
+                            {
+                                _tradingContext.PriceBoostConfig.Remove(current);
+                            }
+                            else if (newPriceBoost.BoostedOdds != current.BoostedOdds
+                                || !string.Equals(translations, current.BoostedSelectionTranslation, StringComparison.OrdinalIgnoreCase)
+                                || !string.Equals(newPriceBoost.SelectionName, current.BoostedSelectionName, StringComparison.OrdinalIgnoreCase)
+                                || !string.Equals(newPriceBoost.BoostedSelectionName, current.BoostedSelectionName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                current.BoostedOdds = newPriceBoost.BoostedOdds;
+                                current.UserId = newPriceBoost.UserId;
+                                current.UserName = newPriceBoost.UserName;
+                                current.TimeStamp = newPriceBoost.TimeStamp;
+                                current.BoostedSelectionName = newPriceBoost.BoostedSelectionName;
+                                current.BoostedSelectionTranslation = translations;
+                                current.MarketSpecifier = newPriceBoost.MarketSpecifier;
+                            }
+                        }
+                        else if (newPriceBoost.BoostedOdds != 0)
+                        {
+                            _tradingContext.PriceBoostConfig.Add(new PriceBoostConfig
+                            {
+                                ClientCode = newPriceBoost.ClientCode,
+                                SportId = newPriceBoost.SportId,
+                                SegmentId = newPriceBoost.SegmentId,
+                                LeagueId = newPriceBoost.LeagueId,
+                                FixtureTypeId = newPriceBoost.FixtureTypeId,
+                                ProviderFixtureId = newPriceBoost.ProviderFixtureId,
+                                MarketTemplateId = newPriceBoost.MarketTemplateId,
+                                SelectionTemplateId = newPriceBoost.SelectionTemplateId,
+                                SelectionSpecifier = newPriceBoost.SelectionSpecifier,
+                                BoostedOdds = newPriceBoost.BoostedOdds,
+                                UserId = newPriceBoost.UserId,
+                                UserName = newPriceBoost.UserName,
+                                TimeStamp = newPriceBoost.TimeStamp,
+                                BoostedSelectionName = newPriceBoost.BoostedSelectionName,
+                                BoostedSelectionTranslation = translations,
+                                MarketSpecifier = newPriceBoost.MarketSpecifier
+                            });
+                        }
+                    }
+
+                    await _tradingContext.SaveChangesAsync();
+
+                    scope.Complete();
+                }
+
+                // which clients now boost this fixture, and its market, for the Web to tell the engine about
+                var providerFixtureId = request.Select(s => s.ProviderFixtureId).FirstOrDefault();
+                var marketTemplateId = request.Select(s => s.MarketTemplateId).FirstOrDefault();
+
+                var boosted = await _tradingContext.PriceBoostConfig.AsNoTracking()
+                    .Where(p => p.ProviderFixtureId == providerFixtureId && p.BoostedOdds != 0)
+                    .Select(p => new { p.ClientCode, p.MarketTemplateId })
+                    .ToListAsync();
+
+                return new BaseResponse<PriceBoostConfigResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new PriceBoostConfigResponse
+                    {
+                        IsBoosted = boosted.Any(),
+                        ExistingPriceBoostConfigs = existingPriceBoostConfigs,
+                        ClientBoosted = string.Join("|", boosted.Select(s => s.ClientCode).Distinct()),
+                        ClientMarketBoosted = string.Join("|", boosted.Where(s => s.MarketTemplateId == marketTemplateId).Select(s => s.ClientCode).Distinct())
+                    }
+                };
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "AddOrUpdatePriceBoost failed for {Count} price boost configs", request?.Count ?? 0);
+
                 return new BaseResponse<PriceBoostConfigResponse>()
                 {
                     StatusCode = StatusCode.Error,
@@ -848,30 +1055,67 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        // The saved boosts that match the request, with the live fixture, market and odds of each. A boost whose
+        // fixture is no longer in Mongo has ended: it is not listed and it is deleted here (a write on a read, as
+        // the Trading API did).
         public async Task<BaseResponse<List<PriceBoostConfigModel>>> GetPriceBoostConfig(PriceBoostConfigRequest request, string region)
         {
             try
             {
-                var response = await GetHttpClient(region).PostAsync($"priceboost/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var sportId = ParseIdFilter(request.SportId);
+                var segmentId = ParseIdFilter(request.SegmentId);
+                var leagueId = ParseIdFilter(request.LeagueId);
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<PriceBoostConfigModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                else
+                var saved = await _tradingContext.PriceBoostConfig.AsNoTracking()
+                    .Where(c => (string.IsNullOrEmpty(request.ClientCode) || c.ClientCode == request.ClientCode)
+                        && (sportId == null || c.SportId == sportId)
+                        && (segmentId == null || c.SegmentId == segmentId)
+                        && (leagueId == null || c.LeagueId == leagueId)
+                        && (string.IsNullOrEmpty(request.ProviderFixtureId) || c.ProviderFixtureId == request.ProviderFixtureId)
+                        && (string.IsNullOrEmpty(request.MarketTemplateId) || c.MarketTemplateId == request.MarketTemplateId)
+                        && (string.IsNullOrEmpty(request.MarketSpecifier) || c.MarketSpecifier == request.MarketSpecifier)
+                        && (string.IsNullOrEmpty(request.SelectionTemplateId) || c.SelectionTemplateId == request.SelectionTemplateId)
+                        && c.BoostedOdds != 0)
+                    .ToListAsync();
+
+                var priceBoost = saved.Select(ToPriceBoostConfigModel).ToList();
+
+                // nothing saved yet: look up the requested fixture and market so an empty row can be offered
+                var providerFixtureIds = priceBoost.Select(s => s.ProviderFixtureId).Distinct().ToList();
+                if (!providerFixtureIds.Any())
+                    providerFixtureIds.Add(request.ProviderFixtureId ?? string.Empty);
+
+                var marketTemplateIds = priceBoost.Select(s => s.MarketTemplateId).Distinct().ToList();
+                if (!marketTemplateIds.Any())
+                    marketTemplateIds.Add(request.MarketTemplateId ?? string.Empty);
+
+                var mongo = await GetPriceBoostMongoData(providerFixtureIds, marketTemplateIds);
+
+                PriceBoostListBuilder.NormalizeOutrightSelections(mongo.Fixtures, mongo.Selections);
+
+                var clients = await _tradingContext.Client.AsNoTracking().ToListAsync();
+
+                var clientCodes = string.IsNullOrEmpty(request.ClientCode)
+                    ? clients.Select(c => c.ClientCode).ToList()
+                    : priceBoost.Select(c => c.ClientCode).Distinct().ToList();
+
+                var markets = PriceBoostListBuilder.BuildMarkets(mongo.Markets, mongo.Selections, clientCodes, GetPlayerPropMarketTemplateIds());
+
+                var result = PriceBoostListBuilder.Build(priceBoost, request, clients, mongo.Fixtures, mongo.Selections, markets, out var endedProviderFixtureIds);
+
+                await DeleteEndedPriceBoost(endedProviderFixtureIds);
+
+                return new BaseResponse<List<PriceBoostConfigModel>>
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<PriceBoostConfigModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                    else
-                    {
-                        return new BaseResponse<List<PriceBoostConfigModel>>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "GetPriceBoostConfig failed for client {ClientCode}", request?.ClientCode);
+
                 return new BaseResponse<List<PriceBoostConfigModel>>
                 {
                     StatusCode = StatusCode.Error,
@@ -879,30 +1123,43 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        // Every client of the request with the cap saved for it (0 when none), optionally filtered by name.
         public async Task<BaseResponse<List<BoostedSettingsModel>>> GetBoostedSettings(BoostedSettingsRequest request, string region)
         {
             try
             {
-                var response = await GetHttpClient(region).PostAsync($"priceboost/settings/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var clientCodes = request?.ClientCodes ?? new List<string>();
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<BoostedSettingsModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                else
+                var settings = await _tradingContext.BoostedSettings.AsNoTracking()
+                    .Where(c => clientCodes.Contains(c.ClientCode))
+                    .ToListAsync();
+
+                var clients = await _tradingContext.Client.AsNoTracking()
+                    .Where(c => clientCodes.Contains(c.ClientCode))
+                    .ToListAsync();
+
+                var result = clients.Select(c => new BoostedSettingsModel
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<BoostedSettingsModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                    else
-                    {
-                        return new BaseResponse<List<BoostedSettingsModel>>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
+                    ClientCode = c.ClientCode,
+                    ClientName = c.ClientName,
+                    ClientId = c.ClientId,
+                    Cap = settings.Where(s => s.ClientId == c.ClientId).Select(s => s.Cap).FirstOrDefault()
+                }).ToList();
+
+                if (!string.IsNullOrWhiteSpace(request?.Search))
+                    result = result.Where(c => (c.ClientName ?? string.Empty).Contains(request.Search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                return new BaseResponse<List<BoostedSettingsModel>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "GetBoostedSettings failed");
+
                 return new BaseResponse<List<BoostedSettingsModel>>
                 {
                     StatusCode = StatusCode.Error,
@@ -910,68 +1167,179 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        // Saves the % cap of one client (as a fraction, 0.05 is 5%, cut to 4 decimals), then tells the user who
+        // saved it with a notification. The activity log is written by the Web.
         public async Task<BaseResponse<bool>> AddOrUpdateBoostedSettings(BoostedSettingsModel request, string userId, string region)
         {
             try
             {
-                var response = await GetHttpClient(region).PostAsync($"priceboost/settings?userId={userId}", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var cap = Math.Round(request.Cap, 4, MidpointRounding.ToZero);
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                else
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                    var setting = await _tradingContext.BoostedSettings.FirstOrDefaultAsync(c => c.ClientId == request.ClientId);
+
+                    if (setting == null)
+                    {
+                        _tradingContext.BoostedSettings.Add(new BoostedSettings
+                        {
+                            ClientId = request.ClientId,
+                            ClientCode = request.ClientCode,
+                            ClientName = request.ClientName,
+                            Cap = cap
+                        });
+                    }
                     else
                     {
-                        return new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
+                        setting.ClientCode = request.ClientCode;
+                        setting.ClientName = request.ClientName;
+                        setting.Cap = cap;
                     }
+
+                    await _tradingContext.SaveChangesAsync();
+
+                    scope.Complete();
                 }
+
+                await PublishBoostedSettingsNotification(request, cap, userId);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = true
+                };
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "AddOrUpdateBoostedSettings failed for client {ClientCode}", request?.ClientCode);
+
                 return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = false
                 };
             }
         }
-        public async Task<BaseResponse<List<PriceBoostConfigAuditModel>>> GetPriceBoostAuditList(PriceBoostConfigRequest request, string region)
+
+        // The toast Backoffice.WebSocket.Service pushes to the user who saved the cap. A publish failure must not
+        // undo the save, so it is only logged. Without a valid user id nothing is sent: a notification without a
+        // user would reach everyone.
+        private async Task PublishBoostedSettingsNotification(BoostedSettingsModel request, decimal cap, string userId)
         {
             try
             {
-                var response = await GetHttpClient(region).PostAsync($"priceboost/audit/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                if (!Guid.TryParse(userId, out var notifyUserId))
+                    return;
 
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<PriceBoostConfigAuditModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                else
+                var notification = new NotificationsDetailsModel
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<PriceBoostConfigAuditModel>>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                    else
-                    {
-                        return new BaseResponse<List<PriceBoostConfigAuditModel>>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
+                    Id = Guid.NewGuid(),
+                    Page = "Boosted Settings",
+                    ClientCode = request.ClientCode,
+                    SportsId = null,
+                    Details = $"<b>New Boosted Settings</b> for <b>{request.ClientName}</b> - {(cap * 100).ToString("N2", CultureInfo.InvariantCulture)}%.",
+                    PageRedirect = "/hk/odds-engine/boosted-settings",
+                    UserId = notifyUserId,
+                    ClaimType = SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace('_', '.'),
+                    Type = (int)NotificationType.BoostedSettings
+                };
+
+                await _rabbitMqRepository.Publish(new MessageRequest
+                {
+                    CorrelationId = Guid.NewGuid().ToString(),
+                    MessageType = "OnNewNotification",
+                    RoutingKey = "r.oe.bm.engine.notifications",
+                    Payload = JsonSerializer.Serialize(notification)
+                });
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<PriceBoostConfigAuditModel>>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
+                _logger.LogError(ex, "Boosted settings notification was not published for client {ClientCode}", request.ClientCode);
             }
         }
+
+        // The fixtures of the saved boosts that are not over yet, with the markets and selections of the boosted
+        // market templates.
+        private async Task<(List<Fixture> Fixtures, List<MarketFilter> Markets, List<SelectionFilter> Selections)> GetPriceBoostMongoData(List<string> providerFixtureIds, List<string> marketTemplateIds)
+        {
+            var fixtures = await fixtureCollection
+                .Find(Builders<Fixture>.Filter.Where(c => providerFixtureIds.Contains(c.PrFiId) && c.FiStId <= (int)FixtureStatus.Live))
+                .ToListAsync();
+
+            var fixtureIds = fixtures.Select(s => s.FiId).Distinct().ToList();
+
+            var marketFilter = Builders<Market>.Filter.Where(c => fixtureIds.Contains(c.FiId) && marketTemplateIds.Contains(c.MaTeId));
+            var marketProjection = Builders<Market>.Projection.Include(c => c.FiId).Include(c => c.MaTeId).Include(c => c.MaId).Include(c => c.MaNa).Include(c => c.Li).Include(c => c.MaStId).Include(c => c.MaStNa).Include(c => c.ClCo).Include(c => c.ClCoMa).Include(c => c.IsBo);
+            var markets = marketCollection.Find(marketFilter).Project<MarketFilter>(marketProjection).ToListAsync();
+
+            var selectionFilter = Builders<Selection>.Filter.Where(c => fixtureIds.Contains(c.FiId) && marketTemplateIds.Contains(c.MaTeId));
+            var selectionProjection = Builders<Selection>.Projection.Include(c => c.FiId).Include(c => c.MaId).Include(c => c.SeTeId).Include(c => c.SeId).Include(c => c.SeNa).Include(c => c.MaTeId).Include(c => c.Od).Include(c => c.IsAc).Include(c => c.SeSoOr).Include(c => c.SeSp).Include(c => c.SeNaTr).Include(c => c.ClBoSeNa).Include(c => c.ClBoSeNaTr).Include(c => c.CoId);
+            var selections = selectionCollection.Find(selectionFilter).Project<SelectionFilter>(selectionProjection).ToListAsync();
+
+            await Task.WhenAll(markets, selections);
+
+            return (fixtures, markets.Result, selections.Result);
+        }
+
+        // Deletes the boosts of fixtures that have ended.
+        private async Task DeleteEndedPriceBoost(List<string> providerFixtureIds)
+        {
+            if (providerFixtureIds == null || !providerFixtureIds.Any())
+                return;
+
+            using (var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var ended = await _tradingContext.PriceBoostConfig
+                    .Where(c => providerFixtureIds.Contains(c.ProviderFixtureId))
+                    .ToListAsync();
+
+                if (ended.Any())
+                {
+                    _tradingContext.PriceBoostConfig.RemoveRange(ended);
+                    await _tradingContext.SaveChangesAsync();
+                }
+
+                scope.Complete();
+            }
+        }
+
+        // The market templates whose odds are player props (priced from the client margin alone).
+        private HashSet<string> GetPlayerPropMarketTemplateIds()
+        {
+            var rows = _memCache.GetCache("mtpp", () => _sportsbookContext.MarketTemplatePlayerProps.AsNoTracking().ToList(), 24);
+
+            if (rows == null)
+                return new HashSet<string>();
+
+            return rows.SelectMany(r => (r.MarketTemplates ?? string.Empty).Split(',')).ToHashSet();
+        }
+
+        private static int? ParseIdFilter(string value) => string.IsNullOrEmpty(value) ? null : Convert.ToInt32(value);
+
+        private static PriceBoostConfigModel ToPriceBoostConfigModel(PriceBoostConfig s) => new PriceBoostConfigModel
+        {
+            ClientCode = s.ClientCode,
+            SportId = s.SportId,
+            SegmentId = s.SegmentId,
+            LeagueId = s.LeagueId,
+            FixtureTypeId = s.FixtureTypeId,
+            ProviderFixtureId = s.ProviderFixtureId,
+            MarketTemplateId = s.MarketTemplateId,
+            MarketSpecifier = s.MarketSpecifier,
+            SelectionTemplateId = s.SelectionTemplateId,
+            SelectionSpecifier = s.SelectionSpecifier,
+            BoostedOdds = s.BoostedOdds,
+            BoostedOddsStr = s.BoostedOdds.ToString("0.00", CultureInfo.InvariantCulture),
+            UserId = s.UserId,
+            UserName = s.UserName,
+            TimeStamp = s.TimeStamp,
+            BoostedSelectionName = s.BoostedSelectionName,
+            BoostedSelectionTranslations = string.IsNullOrEmpty(s.BoostedSelectionTranslation)
+                ? new List<BoostedSelectionTranslation>()
+                : JsonSerializer.Deserialize<List<BoostedSelectionTranslation>>(s.BoostedSelectionTranslation)
+        };
         #endregion
 
         #region BET
@@ -1481,38 +1849,10 @@ namespace Backoffice.API.Repositories
         }
         #endregion
 
+        // BO-42: published through the broker API of this service, no longer forwarded to the Trading API.
         public async Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region)
         {
-            try
-            {
-                var response = await GetHttpClient(region).PostAsync($"publish", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                    else
-                    {
-                        return new BaseResponse<MessageResponse>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Publish: {ex.Message}-{ex.InnerException?.Message}");
-
-                return new BaseResponse<MessageResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
+            return await _rabbitMqRepository.Publish(request, region);
         }
 
         public async Task<BaseResponse<BookmakerConfigurationResponse>> GetBookmakers(string region)

@@ -9,6 +9,24 @@ The Backoffice solution has **solid architectural foundations** but exhibits sev
 
 ---
 
+## Price Boost Moved Off the Trading API, and What Is Still Missing (BO-42)
+
+**Date noted:** October 22, 2026
+
+**Issue:** Every Trading controller route is forwarded to the OddsEngine Trading API (`API:TradingAPI:{HK|SA}:Uri`, `http://api.oddsengine.svc:3000` in argocd `bo-api` dev, stg and prd). On DEV and STG that host does not resolve (`Name or service not known`), so Manage Boost, Boosted Settings, `publish` and the fixture lists all failed with HTTP 400 that the Web showed as empty lists or "No Record Found!". argocd has no `api` app under `apps/oddsengine` and nothing in infrastructure provides the service: the Trading API is `OE.API` of the retired `oddsengine` (v1) repo, which is built there as `oe-api` but not deployed. Whether PRD still has it is unknown.
+
+**Resolved (BO-42):** the four price boost routes, the two fixture lists and `publish` no longer call it. `TradingRepository` now reads and writes `PriceBoostConfig` and `BoostedSettings` in the Trading DB (`TradingContext`, registered since before but never used until now), reads fixtures, markets and selections from the sportsbook Mongo, and sends `publish` through `IRabbitMqRepository`. The pure logic is `PriceBoostListBuilder` and `SportsbookFixtureBuilder` (unit tested). The unused `priceboost/audit/list` route was removed. Routes and payloads are unchanged, so the Web is not touched. The fixture lists feed the Add Boosted Odds dialog and the Market Settlement and Message Settlement filters; they leave out what those screens do not read (bet stop, live stream, client margins, market counts) and show English names only. The outright list keeps the league tier order (`TierLeagueOrder`, cached 24 hours under the key `tlo` shared with `SportsbookRepository`).
+
+**Still open:**
+- About 50 other Trading routes still forward to the Trading API (client config, mapping, settlement lists, notifications, market lookups, bets).
+- Nothing deployed applies a boost or watches the cap. `odds-engine-2` has no code that reads `PriceBoostConfig` or `BoostedSettings` or sets the Mongo `IsBo`/`ClBo` flags the player site reads; that lived in the v1 adapters and in `OE.BoostedOddsCap` (cap threshold notification and email), none of which is deployed. A cap job is planned in `odds-engine-2`.
+- `GetPriceBoostConfig` deletes the boosts of fixtures that are no longer in Mongo (a write on a read, as the Trading API did). In an environment whose Mongo does not hold the fixtures, such as DEV, listing deletes every boost.
+- `Trading.dbo.PriceBoostConfig` has no primary key and the EF model keys it on the market (client, sport, segment, league, fixture type, fixture, market template, market specifier), not the selection. A different selection of the same market now always replaces the saved one; the Trading API replaced only when both the template and the specifier differed, which could leave two selections in one market. A row whose `MarketSpecifier` is NULL cannot be updated or deleted through EF.
+- The Mongo reads of `GetPriceBoostConfig`, `GetFixtures` and `GetOutrightFixtures` sit behind the static Mongo init of `TradingRepository` (see "MongoDB Static Connection" below) and have no unit test; the SQL, the merge rules and the shaping rules are covered, and the Mongo filters and projections were checked to render under the driver.
+- Price boost activity logs are written by the Web only. The Trading API also published them to `r.oe.util.logs`, which nothing consumes.
+
+---
+
 ## CSV Client Update Tool — Silent Data Corruption on Blank Cells and Currency Edits (BO-112)
 
 **Date noted:** October 8, 2026 (fixed same date, found during code review before merge); second review round October 9, 2026 (see below)

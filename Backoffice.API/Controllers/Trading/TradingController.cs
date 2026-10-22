@@ -337,21 +337,6 @@ namespace Backoffice.API.Controllers.Trading
                     return BadRequest(result);
             }
         }
-        [HttpPost("priceboost/audit/list")]
-        public async Task<IActionResult> GetPriceBoostAuditList([FromBody] PriceBoostConfigRequest request)
-        {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
-
-            var result = await _tradingRepository.GetPriceBoostAuditList(request, region);
-
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
         #endregion
 
         #region Client

@@ -401,6 +401,8 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 
 #### TradingController - `api/trading` (x-api-key + Bearer JWT; most read `x-region`)
 
+Most of these routes forward to the OddsEngine Trading API (`API:TradingAPI:{HK|SA}`). Since BO-42 the price boost routes (`priceboost`, `priceboost/list`, `priceboost/settings`, `priceboost/settings/list`) and the fixture lists (`sportsbook/fixtures`, `sportsbook/outrightfixtures`) are served by `TradingRepository` itself from the Trading DB (`ConnectionStrings:Trading`) and the sportsbook Mongo, and `publish` goes through the broker API of this service (`API:RabbitMqApi`).
+
 | Method | Route | Purpose |
 |---|---|---|
 | GET | `api/trading/sports/{fixtureTypeId}` | Sports for a fixture type |
@@ -415,13 +417,12 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 | GET | `api/trading/fixtures/market/{fixtureTypeId}/{sportId}/{segmentId}/{leagueId}/{marketTemplateId}` | Fixtures for one market template |
 | GET | `api/trading/fixtures/market/selections/{fixtureTypeId}/{providerFixtureId}/{providerMarketId}/{providerSelectionId}` | Fixture market selections |
 | GET | `api/trading/fixtures2/market/details/{providerFixtureId}` | Fixture market details |
-| POST | `api/trading/sportsbook/fixtures` | Sportsbook fixtures |
-| POST | `api/trading/sportsbook/outrightfixtures` | Sportsbook outright fixtures |
-| POST | `api/trading/priceboost` | Add or update price boost configs |
-| POST | `api/trading/priceboost/list` | Price boost config list |
+| POST | `api/trading/sportsbook/fixtures` | Match fixtures with their markets and selections, English names, earliest first (read from the sportsbook Mongo; `AllFixtureStatus` includes started and closed fixtures) |
+| POST | `api/trading/sportsbook/outrightfixtures` | Prematch outright fixtures with their markets and selections, in league tier order (read from the sportsbook Mongo) |
+| POST | `api/trading/priceboost` | Add or update price boost configs (a different selection of the same market replaces the saved one; zero or empty odds delete it) |
+| POST | `api/trading/priceboost/list` | Price boost config list with the live fixture, market and odds of each boost (also deletes the boosts of fixtures that ended) |
 | POST | `api/trading/priceboost/settings/list` | Boosted settings list |
-| POST | `api/trading/priceboost/settings` | Add or update boosted settings (`?userId=`) |
-| POST | `api/trading/priceboost/audit/list` | Price boost audit list |
+| POST | `api/trading/priceboost/settings` | Add or update the % cap of a client (`?userId=`), then notifies that user with a toast |
 | GET | `api/trading/client` | Leftover route attribute: its action is commented out, so it binds to the same action as `client/config/all` (expects a body; see controller) |
 | POST | `api/trading/client/config/all` | Get client config (all) |
 | POST | `api/trading/v2/client/config` | Get client config (v2) |
@@ -440,7 +441,7 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 | POST | `api/trading/manual/messagesettlement` | Add manual message settlements |
 | POST | `api/trading/manual/messagesettlement/list` | Message settlement audit |
 | GET | `api/trading/marketlookup/{fixtureTypeId}/{sportId}` | Market lookup |
-| POST | `api/trading/publish` | Publish a message to the engine (see controller) |
+| POST | `api/trading/publish` | Publish a message through the broker API (`API:RabbitMqApi`, see controller) |
 | GET | `api/trading/bookmakers` | Bookmaker list |
 | POST | `api/trading/notifications` | Query notifications |
 | POST | `api/trading/markettemplateplayerprops` | Market template player props |

@@ -41,7 +41,7 @@ The consuming repos (platform-final, odds-engine-2) keep **their own copies** of
 
 There are 16 awaited call sites in `Backoffice.API/Repositories/` (SportsbookRepository 7, BackOfficeRepository 5, PlatformRepository 2, TradingRepository 1, WebPropsRepository 1). None assigns or reads the result, so a failed publish is invisible to the caller.
 
-A second HTTP route exists: Web `TradingService.Publish` (`Backoffice.Web/Services/TradingService.cs:974`, POST at :978) posts to the API's `api/trading/publish` (`Backoffice.API/Controllers/Trading/TradingController.cs:803-807`, region from the `x-region` header), which forwards via `TradingRepository.Publish` (`TradingRepository.cs:1484-1488`) to the Trading API `api/v1/trading/publish` (base URL at :2419). Web uses this for `r.uof.onpriceboost`, `r.uof.onleagueconfig`, `r.uof.onmarketconfig` and `r.oe.web.config.oncopyclientsettings2`; the API itself uses it for `r.bo.mapping.onbulkupdate` (`TradingRepository.cs:2384-2390`).
+A second HTTP route exists: Web `TradingService.Publish` (`Backoffice.Web/Services/TradingService.cs:974`, POST at :978) posts to the API's `api/trading/publish` (`Backoffice.API/Controllers/Trading/TradingController.cs:788`, region from the `x-region` header), which hands it via `TradingRepository.Publish` (`TradingRepository.cs:1853`, BO-42) to `IRabbitMqRepository.Publish` (the broker API `v1/broker/publish`); it used to be forwarded to the Trading API. Web uses this for `r.uof.onpriceboost`, `r.uof.onleagueconfig`, `r.uof.onmarketconfig` and `r.oe.web.config.oncopyclientsettings2`; the API itself uses it for `r.bo.mapping.onbulkupdate` (`TradingRepository.cs:2724-2730`). The Boosted Settings save also publishes `OnNewNotification` on `r.oe.bm.engine.notifications` (`TradingRepository.PublishBoostedSettingsNotification`, BO-42).
 
 Real example, `Backoffice.API/Repositories/BackOfficeRepository.cs:2102-2108`:
 
@@ -72,10 +72,10 @@ No single format, and not all lowercase. Prefixes seen in live code:
 |---|---|---|
 | `r.oe.cachesync.*` | `onmarketsortorderchange`, `onsportsortorderchange`, `onclientchange`, `onparlaybonuschange`, `ontranslationchange`, `onstatictranslationchange`, `{messagetype}` via `CachePreload` (`BackOfficeRepository.cs:2548-2554`) | API |
 | `r.oe.cachesync.onwebpropschange.{x}` | see note below | API `WebPropsRepository.cs:173-182` |
-| `r.oe.web.config.*` | `OnUpdateClientMarketConfig`, `OnUpdateClientLeagueConfig`, `ongetmarginspreadsheet3`, `oncopyclientsettings2` | Config.Service, Utility, Web (via Trading API) |
+| `r.oe.web.config.*` | `OnUpdateClientMarketConfig`, `OnUpdateClientLeagueConfig`, `ongetmarginspreadsheet3`, `oncopyclientsettings2` | Config.Service, Utility, Web (via the API's `api/trading/publish`) |
 | `r.bo.config.*` | `updateclientmargin`, `deleteconfigtemplate` | API `BackOfficeRepository.cs:1805-1811,2102-2108` |
-| `r.bo.mapping.onbulkupdate` | message type `OnSportBulkUpdate`, `OnSegmentBulkUpdate`, `OnLeagueBulkUpdate`, `OnFixtureBulkUpdate` (`TradingRepository.cs:2369-2372`) | API via Trading API |
-| `r.uof.*` | `onbetsettlement`, `onpriceboost`, `onleagueconfig`, `onmarketconfig` | API `TradingRepository.cs:1279-1285`, Web |
+| `r.bo.mapping.onbulkupdate` | message type `OnSportBulkUpdate`, `OnSegmentBulkUpdate`, `OnLeagueBulkUpdate`, `OnFixtureBulkUpdate` (`TradingRepository.cs:2709-2712`) | API via the broker API |
+| `r.uof.*` | `onbetsettlement`, `onpriceboost`, `onleagueconfig`, `onmarketconfig` | API `TradingRepository.cs:1651`, Web |
 
 Casing is inconsistent: Config.Service publishes `r.oe.web.config.OnUpdateClientMarketConfig` and `r.oe.web.config.OnUpdateClientLeagueConfig` with capitals (`BackofficeRepository.cs:90,118`), while `MessageBroker` lowercases keys only when *binding* (`MessageBroker.cs:300-301`). Topic matching is case-sensitive. The string `r.oe.web.config` appears nowhere in the workspace outside backoffice-final; Unverified whether any consumer binds it through a wildcard.
 

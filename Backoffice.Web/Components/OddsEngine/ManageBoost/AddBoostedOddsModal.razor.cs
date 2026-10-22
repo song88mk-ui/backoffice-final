@@ -20,7 +20,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public FixtureType SelectedFixtureType { get; set; }
         public AddPriceBoostFilterModel Model { get; set; }
-        public SportsTreeModel Sports { get; set; }
         public MarketFixtureResponse MarketFixtureResponse { get; set; }
         private string Region { get; set; }
 
@@ -50,7 +49,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         protected override async Task OnParametersSetAsync()
         {
-            Model.Sports = await GetSports(SelectedFixtureType);
+            Model.Sports = await GetSports();
         }
 
         public async Task OnMatchTypeChanged(FixtureType fixtureType)
@@ -59,7 +58,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             SelectedFixtureType = fixtureType;
 
             Model = new AddPriceBoostFilterModel();
-            Model.Sports = await GetSports(SelectedFixtureType);
+            Model.Sports = await GetSports();
 
             IsPreloader = false;
         }
@@ -178,10 +177,18 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             IsPreloader = true;
             Model.SportId = int.Parse(e.Value.ToString());
-            Model.SportName = Model.Sports.Where(s => s.Value == Model.SportId).FirstOrDefault().Name;
+            ClearBelow(Level.Sport);
 
-            Model.Segments = new List<SelectListItemModel<int>>();
-            Model.Leagues = new List<SelectListItemModel<int>>();
+            if (Model.SportId == 0)
+            {
+                Model.SportName = string.Empty;
+
+                IsPreloader = false;
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            Model.SportName = Model.Sports.Where(s => s.Value == Model.SportId).FirstOrDefault().Name;
 
             Model.Segments = await GetSegments(Model.SportId);
             if (Model.Segments.Count > 0)
@@ -233,8 +240,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             {
                 Model.SegmentId = int.Parse(e.Value.ToString());
                 Model.SegmentName = Model.Segments.Where(s => s.Value == Model.SegmentId).FirstOrDefault().Name;
-
-                Model.Leagues = new List<SelectListItemModel<int>>();
+                ClearBelow(Level.Segment);
 
                 Model.Leagues = await GetLeagues(Model.SportId, Model.SegmentId) ?? new List<SelectListItemModel<int>>();
                 if (Model.Leagues.Any())
@@ -269,10 +275,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             }
             else
             {
-                Model.Leagues = new List<SelectListItemModel<int>>();
-                Model.Fixtures = new List<SelectListItemModel<string>>();
-                Model.Markets = new List<SelectListItemModel<string>>();
-                Model.Selections = new List<SelectListItemModel<string>>();
+                Model.SegmentId = 0;
+                Model.SegmentName = string.Empty;
+                ClearBelow(Level.Segment);
             }
 
             IsPreloader = false;
@@ -305,9 +310,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             }
             else
             {
-                Model.Fixtures = new List<SelectListItemModel<string>>();
-                Model.Markets = new List<SelectListItemModel<string>>();
-                Model.Selections = new List<SelectListItemModel<string>>();
+                Model.LeagueId = 0;
+                Model.LeagueName = string.Empty;
+                ClearBelow(Level.League);
             }
 
             IsPreloader = false;
@@ -336,8 +341,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             }
             else
             {
-                Model.Markets = new List<SelectListItemModel<string>>();
-                Model.Selections = new List<SelectListItemModel<string>>();
+                Model.ProviderFixtureId = string.Empty;
+                Model.FixtureName = string.Empty;
+                ClearBelow(Level.Fixture);
             }
 
             IsPreloader = false;
@@ -362,7 +368,10 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             }
             else
             {
-                Model.Selections = new List<SelectListItemModel<string>>();
+                Model.MarketTemplateId = string.Empty;
+                Model.MarketSpecifier = string.Empty;
+                Model.MarketName = string.Empty;
+                ClearBelow(Level.Market);
             }
 
             IsPreloader = false;
@@ -378,6 +387,12 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 Model.SelectionSpecifier = e.Value.ToString().Split('|')[1] ?? string.Empty;
                 Model.SelectionName = string.IsNullOrEmpty(Model.SelectionTemplateId) ? "" : Model.Selections.Where(c => c.Value == $"{Model.SelectionTemplateId}|{Model.SelectionSpecifier}").FirstOrDefault().Name;
             }
+            else
+            {
+                Model.SelectionTemplateId = string.Empty;
+                Model.SelectionSpecifier = string.Empty;
+                Model.SelectionName = string.Empty;
+            }
         }
 
         public void Dispose()
@@ -389,68 +404,106 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         #region Utilities
 
-        private async Task<List<SelectListItemModel<int>>> GetSports(FixtureType fixtureType)
+        private enum Level
         {
-            Sports = new SportsTreeModel();
+            Sport,
+            Segment,
+            League,
+            Fixture,
+            Market
+        }
 
-            var sportResponse = await TradingService.GetSports((int)fixtureType);
+        // Empties every dropdown below the one that changed, with its chosen value, so a choice that is no longer
+        // visible cannot still be submitted with Next.
+        private void ClearBelow(Level changed)
+        {
+            if (changed < Level.Segment)
+            {
+                Model.Segments = new List<SelectListItemModel<int>>();
+                Model.SegmentId = 0;
+                Model.SegmentName = string.Empty;
+            }
 
-            Sports = sportResponse.Result;
+            if (changed < Level.League)
+            {
+                Model.Leagues = new List<SelectListItemModel<int>>();
+                Model.LeagueId = 0;
+                Model.LeagueName = string.Empty;
+            }
 
-            if (Sports == null)
+            if (changed < Level.Fixture)
+            {
+                Model.Fixtures = new List<SelectListItemModel<string>>();
+                Model.ProviderFixtureId = string.Empty;
+                Model.FixtureName = string.Empty;
+            }
+
+            if (changed < Level.Market)
+            {
+                Model.Markets = new List<SelectListItemModel<string>>();
+                Model.MarketTemplateId = string.Empty;
+                Model.MarketSpecifier = string.Empty;
+                Model.MarketName = string.Empty;
+            }
+
+            Model.Selections = new List<SelectListItemModel<string>>();
+            Model.SelectionTemplateId = string.Empty;
+            Model.SelectionSpecifier = string.Empty;
+            Model.SelectionName = string.Empty;
+        }
+
+        private async Task<List<SelectListItemModel<int>>> GetSports()
+        {
+            var response = await BackofficeService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
+
+            var sportsLookup = response.Result;
+            if (sportsLookup == null)
                 return new List<SelectListItemModel<int>>();
 
-            var sports = Sports.Sports?.Select(s => new SelectListItemModel<int>()
+            return sportsLookup.SportLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.SportId,
                 Name = s.SportName
-            }).Distinct().ToList();
-
-            return sports;
+            }).ToList();
         }
 
         private async Task<List<SelectListItemModel<int>>> GetSegments(int sportId)
         {
-            if (Sports == null)
+            var response = await BackofficeService.GetSegmentLookup(sportId, _translationState.ActiveLanguageCode);
+
+            var segmentsLookup = response.Result;
+            if (segmentsLookup == null)
                 return new List<SelectListItemModel<int>>();
 
-            var result = Sports.Sports.Where(s => s.SportId == sportId).FirstOrDefault();
-            if (result == null)
-                return new List<SelectListItemModel<int>>();
-
-            var segments = result.Segments.Select(s => new SelectListItemModel<int>()
+            return segmentsLookup.SegmentLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.SegmentId,
                 Name = s.SegmentName
             }).ToList();
-
-            return segments;
         }
 
         private async Task<List<SelectListItemModel<int>>> GetLeagues(int sportId, int segmentId)
         {
-            if (Sports == null)
+            var response = await BackofficeService.GetLeagueLookup(sportId, segmentId, _translationState.ActiveLanguageCode);
+
+            var leaguesLookup = response.Result;
+            if (leaguesLookup == null)
                 return new List<SelectListItemModel<int>>();
 
-            var sportResult = Sports.Sports.Where(s => s.SportId == sportId).FirstOrDefault();
-            if (sportResult == null)
-                return new List<SelectListItemModel<int>>();
-
-            var segmentResult = sportResult.Segments.Where(s => s.SegmentId == segmentId).FirstOrDefault();
-            if (segmentResult == null)
-                return new List<SelectListItemModel<int>>();
-
-            var leagues = segmentResult.Leagues.Select(s => new SelectListItemModel<int>()
+            return leaguesLookup.LeagueLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.LeagueId,
                 Name = s.LeagueName
             }).ToList();
-
-            return leagues;
         }
 
         private async Task<List<SelectListItemModel<string>>> GetFixtures(int sportId, int segmentId, int leagueId)
         {
+            MarketFixtureResponse = null;
+
+            if (leagueId == 0)
+                return new List<SelectListItemModel<string>>();
+
             if (SelectedFixtureType == FixtureType.Match)
             {
                 MarketFixtureResponse = (await TradingService.GetSportsBookFixtures(new MarketFixtureRequest
@@ -474,8 +527,11 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             }
 
-            if (MarketFixtureResponse == null)
+            if (MarketFixtureResponse?.Fixtures == null)
+            {
+                MarketFixtureResponse = null;
                 return new List<SelectListItemModel<string>>();
+            }
 
             if (MarketFixtureResponse.Fixtures.Count > 0)
                 MarketFixtureResponse.Fixtures = MarketFixtureResponse.Fixtures.Where(f => f.FixtureStatusId < 1).ToList();
@@ -506,7 +562,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             {
                 Value = s.Key,
                 Name = GetMarketName(s.FirstOrDefault().MarketName, s.FirstOrDefault().MarketSpecifier)
-            }).Distinct().ToList();
+            }).Distinct().ToList() ?? new List<SelectListItemModel<string>>();
 
             return markets.OrderBy(m => m.Name).ToList();
         }
