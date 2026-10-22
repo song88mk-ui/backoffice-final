@@ -265,33 +265,89 @@ app.MapHealthChecks("/healthz");
 app.UseStaticFiles();
 app.UseRouting();
 app.MapBlazorHub(o => { o.Transports = HttpTransportType.WebSockets; });
-app.MapGet("/sso/metabase", ...);   // Metabase full-app embedding SSO redirect (see below)
+app.MapGet("/sso/metabase", ...);   // JWT provider for the embedded Metabase dashboard (see below)
 app.MapFallbackToPage("/_Host");
 app.Run();
 ```
 
-### Metabase full-app embedding SSO (`GET /sso/metabase`)
+### Metabase embedded dashboard SSO (`GET /sso/metabase`)
 
-The dashboard pages (`/dashboard`, `/admin/dashboard`) embed Metabase via an `<iframe src="/sso/metabase">`.
-Because the BO access token lives in the cookie-backed server session (`HttpContext.Session["UserToken"]`),
-the same-origin iframe navigation carries the session cookie, so the endpoint can identify the user:
+The dashboard pages (`/dashboard`, `/admin/dashboard`) render a `<metabase-dashboard>` web component from Metabase's
+`embed.js`. On the first render the page calls `initMetabaseDashboard` (`wwwroot/js/metabaseInterop.v2.js`), which loads
+`{Metabase:SiteUrl}/app/embed.js` with `jwtProviderUri = /sso/metabase`. Whenever the embed needs a Metabase session it calls
+that endpoint with the browser's cookies:
 
-1. Read `Session["UserToken"]`; if absent → redirect to `/login`.
-2. Seed `UserState` from the token and resolve the user's client codes via `MetabaseService.ResolveClientCodesAsync()`
-   (admins/super admins → `GetClientList`; others → their `GetClientsV2` sportsbook clients — the same queries the
-   dashboard used before).
-3. Sign a Metabase JWT (`MetabaseService.BuildFullAppEmbedSsoUrl`) with claims `email`, `first_name`, `last_name`
-   (all synthesized from the username as `{username}@clients.song88.com`), `clientcode` (CSV of the resolved codes),
-   `groups = ["Clients"]`, `iat`, `exp`, signed HS256 with `Metabase:FullAppEmbedKey`.
-4. `302` redirect to `{Metabase:SiteUrl}/auth/sso?jwt=…&return_to=/dashboard/{DashboardId}?client=…`.
+1. The page resolves the user's client codes (Admin and Super Admin roles: every client from `GetClientList`; everyone else:
+   their sportsbook clients) and caches them in `IMemCache` under `metabase-clients:{userId}` for 12 hours.
+2. The endpoint reads `Session["UserToken"]` (401 when it is missing), takes `TokenName` and `UserId` from the BO token, and
+   reads the client codes from that cache, falling back to the token's `ClientCodes` claim.
+3. `MetabaseService.GetSsoToken` signs an HS256 JWT with `Metabase:SsoSecretKey`: `email` = `{username}@{Metabase:EmailDomain}`,
+   `first_name` and `last_name` = the username, `clientcode` = the array of codes, `groups = ["Clients"]`, `iat` and an `exp`
+   one hour later. The endpoint returns `{ "jwt": "..." }`.
 
-**Config (`Metabase` section):** `SiteUrl`, `DashboardId`, `TokenLifetimeMinutes`, and `FullAppEmbedKey`
-(the JWT shared secret — placeholder in `appsettings.json`; the real value is supplied via git-ignored config /
-secrets, 1Password `metabase:stg:fullappembed:key`). Metabase must have interactive embedding enabled, JWT auth
-configured with the same shared secret, and the BO origin allowed as an embedding origin.
+Every BO user therefore becomes one Metabase account in the "Clients" group, created on the first login. Metabase bills
+every account that has not been deactivated, used or not.
 
-> Replaces the previous static `email`-only `GET /api/metabase/sso-token` + embed.js `<metabase-dashboard>` flow,
-> which authenticated every BO user as one shared Metabase identity and filtered clients only via hidden URL params.
+**Config (`Metabase` section):** `SiteUrl`, `SsoSecretKey` (placeholder in `appsettings.json`, real value injected from
+the environment), `DashboardId`, `EmailDomain`. Metabase needs JWT authentication configured with the same shared secret.
+
+### Metabase idle account cleanup (GM-987)
+
+`MetabaseIdleUserCleanupService` (a `BackgroundService` in `Backoffice.Web`, registered in `AddServices`) deactivates the
+Metabase accounts of the "Clients" group that have not logged in for a while, so the bill follows the accounts in use at
+the same time instead of everyone who ever opened the dashboard. Metabase reactivates a deactivated account on its next
+SSO login, which is the `/sso/metabase` flow above, so the user sees no interruption.
+
+It is **off by default**. Settings, all under `Metabase:IdleCleanup` (environment variables use `__`, for example
+`Metabase__IdleCleanup__Enabled`):
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `Enabled` | `false` | With `false` the job logs once that it is disabled and makes no Metabase calls |
+| `IdleHours` | `3` | A member whose last login is older than this is deactivated (decimal, so STG can test in minutes; at most 8784) |
+| `IntervalMinutes` | `15` | Time between rounds (0.001 to 1440) |
+| `StartupDelaySeconds` | `30` | Pause before the first round (0 to 3600) |
+| `GroupName` | `Clients` | The only group the job touches, matched by exact name |
+
+It also needs `Metabase:SiteUrl` and `Metabase:ApiKey`. If either is missing, still a `${...}` placeholder, or a setting is out
+of range or cannot be read, the job logs one error and does not run; the app keeps running.
+
+**What Metabase has to provide:**
+- A **JWT user provisioning** setting that is on (`jwt-user-provisioning-enabled`, `MB_JWT_USER_PROVISIONING_ENABLED`,
+  default `true`). It is what makes the next JWT login of a deactivated user reactivate the account, per Metabase's docs
+  ("users who log in via JWT will automatically get a Metabase account if they don't have one, or get their existing account
+  reactivated"). With it off a deactivated user could not sign back in and this job would lock people out of the dashboard.
+- An **API key in the Administrators group**, sent as `X-API-Key`. A key has the permissions of its group, and deactivating
+  a user needs superuser rights.
+
+Each round (`RunRoundAsync`): find the group, list its active members page by page, then deactivate every member whose
+`last_login` is older than `IdleHours`. It never touches a superuser, an account with no `last_login`, or an account that is
+not in the group. If Metabase does not report `group_ids`, `last_login` or `is_superuser` for an account (a sign that the key
+is not an administrator key, or that the API differs from what was checked), the round fails with an error and changes
+nothing: an account that cannot be classified is never guessed at. A failed deactivation is logged and the rest continue; a
+failed round is logged and retried at the next interval (the whole round is wrapped, because an unhandled exception in a
+hosted service stops the web host). Deactivations are sequential and rounds never overlap.
+
+Log lines to search in Loki (`app="bo-web"`), all starting with `Metabase idle user cleanup`: `deactivated user {UserId}`
+for each deactivation and `round finished: Group, Members, Deactivated, KeptActive, SkippedSuperuser, SkippedNoLogin,
+Failed, DurationMs` once per round. The API key is never logged.
+
+Things to know before enabling it:
+- **Single replica only.** The job runs inside every `bo-web` replica, so a scaled-out deployment would run it once per
+  replica. Deleting an already deactivated user is not an error in Metabase, so this is only wasted calls, but turn it on for
+  one replica only. The other `bo-web` state (in-memory DataProtection keys, in-process cache) already assumes one instance.
+- **DEV and STG share a Metabase.** `Metabase:SiteUrl` defaults to `https://metabase.stg.song88.com` and only the PRD argocd
+  file overrides it, so `bo-web` in DEV and in STG both use the STG Metabase. Enable the job in one of them only, and expect it
+  to deactivate accounts the other environment's users also use (they come back on their next login).
+- `last_login` is when the account last logged in, not its last activity. A user who has been working for more than
+  `IdleHours` is deactivated and comes back on the next `/sso/metabase` call. The member list is read once per round, so a user
+  who logs in after it was read can still be deactivated that round; the next login brings them back the same way.
+- The Metabase calls were checked against the Metabase 0.50 source for GM-987: `GET /api/user` returns
+  `{data, total, limit, offset}` (an administrator's list has `id`, `email`, `last_login`, `is_superuser`, `is_active` and
+  `group_ids`, and `limit` has no cap), `DELETE /api/user/{id}` needs a superuser and sets `is_active` to false, and
+  `GET /api/permissions/group` lists the groups with `id` and `name`. Confirm them against the Metabase version you run.
+- To switch it off, set `Metabase__IdleCleanup__Enabled` to `false` and restart the pod. Accounts deactivated in the meantime
+  come back on their next login, or from the Deactivated tab of Metabase's People page.
 
 ---
 

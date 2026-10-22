@@ -100,6 +100,10 @@ namespace Backoffice.Web.Extensions
         public static WebApplicationBuilder AddServices(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<MetabaseService>();
+            builder.Services.Configure<MetabaseIdleCleanupOptions>(builder.Configuration.GetSection(MetabaseIdleCleanupOptions.SectionName));
+            builder.Services.AddSingleton(TimeProvider.System);
+            builder.Services.AddSingleton<IMetabaseAdminClient, MetabaseAdminClient>();
+            builder.Services.AddHostedService<MetabaseIdleUserCleanupService>();
             builder.Services.AddScoped<IModalService, ModalService>();
             builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
 
@@ -148,6 +152,7 @@ namespace Backoffice.Web.Extensions
             });
 
             builder.Services.AddHttpClient("metabase");
+            builder.Services.AddHttpClient(MetabaseAdminClient.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(30));
             //builder.Services.AddHttpClient<IBackofficeService, BackofficeService>(client =>
             //{
             //    client.BaseAddress = new Uri(builder?.Configuration["API:Backoffice:Uri"] ?? string.Empty);

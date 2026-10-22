@@ -176,6 +176,8 @@ Server-side Blazor web application providing UI for backoffice operations. Real-
 - **ICommonService / CommonService** - Business logic, formatting, claim processing
 - **ITradingService / TradingService** - Trading-specific operations
 - **MetabaseService** - Metabase SSO integration
+- **MetabaseIdleUserCleanupService** (GM-987) - `BackgroundService` that deactivates idle Metabase accounts of the "Clients" group so the Metabase bill follows concurrent use; off unless `Metabase:IdleCleanup:Enabled` is true (see `docs/04_StartupFlow.md`)
+- **MetabaseAdminClient / IMetabaseAdminClient** (GM-987) - the three Metabase admin API calls the cleanup needs (find group, list active members, deactivate), authenticated with `Metabase:ApiKey`
 - **LeagueSortingHelper** - Pure row building, filtering, validation and drag-reorder logic behind the League Sorting page (BO-107)
 - **LeagueSortingCsvHelper** - Builds and parses the League Sorting export/import CSV (BO-122); reuses the escaping and RFC4180 parser of `GlossaryCsvHelper`
 

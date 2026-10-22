@@ -76,7 +76,9 @@ Deployed environments get these from argocd. Reference of the important keys
 - `API:Backoffice:Uri` + `API:Backoffice:Security:APIKey` - which Backoffice.API instance the UI calls (point at `https://localhost:5001` for a fully local stack)
 - `API:HubAPI` - the WebSocket hub URL, ending in `/bohub` (point at `http://localhost:5190/bohub` locally)
 - `Region` - `HK` or `SA`
-- `Tableau:*`, `Metabase:*`, `SlackWebHook`, `Telemetry:*`
+- `Metabase:SiteUrl`, `Metabase:SsoSecretKey`, `Metabase:DashboardId`, `Metabase:EmailDomain` - the embedded dashboard and its JWT SSO
+- `Metabase:ApiKey` + `Metabase:IdleCleanup:*` (`Enabled`, `IdleHours`, `IntervalMinutes`, `StartupDelaySeconds`, `GroupName`) - the job that deactivates idle Metabase accounts of the "Clients" group (GM-987). Off unless `Metabase:IdleCleanup:Enabled` is `true`. `Metabase:ApiKey` must be an API key in Metabase's Administrators group, and Metabase's JWT user provisioning must be on (it is by default) so the next login reactivates a deactivated user; supply the key as the environment variable `Metabase__ApiKey`, never in a committed file. Run it on one `bo-web` replica only, and note that DEV and STG `bo-web` share the STG Metabase
+- `Tableau:*`, `SlackWebHook`, `Telemetry:*`
 
 ### Worker services (WebSocket.Service, Config.Service, Utility)
 - `MessageBroker:*` - RabbitMQ host, credentials, virtual host, exchange, queue, routing key

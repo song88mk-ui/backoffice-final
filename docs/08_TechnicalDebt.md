@@ -302,7 +302,8 @@ app.UseDeveloperExceptionPage();  // ALWAYS ENABLED
 **Status (DEVOPS-371, 2026-10):** removed from the working tree, **not rotated**.
 - Every committed `appsettings.json` now holds placeholders instead of real values:
   `Password=${DB_PASSWORD}` in connection strings, `${API_KEY}`, `${JWT_KEY}`,
-  `${RABBITMQ_PASSWORD}`, `${AZURE_STORAGE_CONNECTION_STRING}`, `${METABASE_SSO_SECRET_KEY}`.
+  `${RABBITMQ_PASSWORD}`, `${AZURE_STORAGE_CONNECTION_STRING}`, `${METABASE_SSO_SECRET_KEY}`, `${METABASE_API_KEY}`
+  (GM-987; the key is not deployed yet and the job that uses it is off by default).
   .NET does not expand these; they only document that the value is injected.
 - Deployed values come from argocd (`../argocd/apps/corp-apps/<service>/<env>.yaml`): ExternalSecrets
   from AWS SSM Parameter Store for the connection strings, JWT key, RabbitMQ credentials and the

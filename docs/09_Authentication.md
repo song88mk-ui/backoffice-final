@@ -389,6 +389,12 @@ public async Task<IActionResult> UpdateConfig()
 `CommonService.GenerateToken` (Tableau JWT) has no callers; the Tableau embed uses trusted
 tickets in `TableauService`.
 
+Separately, the Metabase idle account cleanup (GM-987) calls the Metabase admin API with an API key
+(`Metabase:ApiKey`, sent as `x-api-key`), not with a JWT. The key must belong to a Metabase administrator
+because deactivating a user needs superuser rights, so treat it like the SSO secret: inject it from the
+environment, never commit it and never log it (`MetabaseAdminClient` adds it to each request and never to a
+shared client or an exception message).
+
 ---
 
 ## Authorization Patterns
