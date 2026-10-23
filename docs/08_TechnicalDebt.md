@@ -1070,6 +1070,13 @@ services.AddHealthChecks();
 
 **Resolved:** All 9 projects (7 production + 2 test) upgraded from mixed targets (netcoreapp3.1 / net7.0 / net8.0) to `net10.0`, with framework-aligned packages bumped to 10.0.11 (EF Core, SignalR clients, MessagePack protocol, Mvc.NewtonsoftJson, System.Runtime.Caching, Configuration.Binder). Dockerfiles build/run on `sdk:10.0`/`aspnet:10.0`; CI test job uses `dotnet-version: 10.0.x` (the libssl1.1 workaround for the 3.1 test host was removed). Code changes were limited to `Backoffice.API/Repositories/MaintenanceRepository.cs`, which had accidentally used the `Join` extension from `Microsoft.EntityFrameworkCore.Internal` (removed in newer EF) — replaced with `string.Join`. `System.Text.Json` package reference removed from Shared (framework-provided on net10). bunit bumped 1.26.64 → 1.40.0 (1.26 depended on `IJSUnmarshalledRuntime`, removed from Microsoft.JSInterop in .NET 10).
 
+**NuGet vulnerability follow-up:** the SignalR client, client core and MessagePack protocol packages
+moved to 10.0.13 (GHSA-334f-vvp4-7g6p, GHSA-86xp-94pg-8r6r; this also lifts MessagePack to 2.5.303,
+GHSA-qhrr-8q5h-9q3h). `System.Security.Cryptography.Pkcs` is pinned to 9.0.21 in BackOffice.API,
+Config.Service and Utility over the 9.0.11 that Microsoft.Data.SqlClient 6.1.x pulls in
+(GHSA-846f-f764-76mx; even SqlClient 6.1.7 still depends on 9.0.11). Remove the pin once SqlClient
+depends on a patched version.
+
 **Remaining debt (out of scope for GM-743, each needs its own coordinated change):**
 
 | Package | Version | Where | Issue |
