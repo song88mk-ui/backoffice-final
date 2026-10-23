@@ -31,6 +31,10 @@ library.
 - .NET 10 SDK. Since GM-743 (August 2026) every project targets `net10.0`, so a
   single .NET 10 SDK builds and runs everything. The Dockerfiles build on
   `mcr.microsoft.com/dotnet/sdk:10.0` and run on `aspnet:10.0`.
+  With Nix (flakes enabled) and direnv hooked into your shell (`eval "$(direnv hook bash)"`),
+  run `direnv allow` once and `.envrc` loads the shared `dotnet` shell from the
+  `FlyingCockatoo/nix-flakes` repo on `cd`. Without direnv:
+  `nix develop git+ssh://git@github.com/FlyingCockatoo/nix-flakes#dotnet`.
 - Access to the private GitHub Packages NuGet feed. Every runnable project
   references `Infra.Extensions.Telemetry`, which is served from
   `https://nuget.pkg.github.com/FlyingCockatoo/index.json`. Configure the source
