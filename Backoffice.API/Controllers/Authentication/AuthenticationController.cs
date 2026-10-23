@@ -358,7 +358,7 @@ namespace Backoffice.API.Controllers.Authentication
             }
         }
         [HttpPost("activitylog/list/{userId}")]
-        public async Task<IActionResult> GetActivityLogList([FromRoute] string userId, [FromBody] MetaData metaData, [FromQuery] string? search = "")
+        public async Task<IActionResult> GetActivityLogList([FromRoute] string userId, [FromBody] MetaData metaData, [FromQuery] string search = "")
         {
             var result = new BaseResponse<LogInActivityLogResponse>()
             {

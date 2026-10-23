@@ -10,7 +10,6 @@ namespace Backoffice.Web.Shared.OddsEngine
 
         private string _title = "";
         private string _iconClass = "";
-        private bool _showLanguageDropdown;
 
         //private int counter;
 

@@ -24,7 +24,6 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         private string _mainMarketName = string.Empty;
         private bool _isBetStop = false;
-        private bool _hasLine;
 
 
         private bool _init = true;

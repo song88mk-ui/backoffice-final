@@ -18,7 +18,6 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Segment
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter] private CustomModal Modal { get; set; }
-        private bool _isSportMappingFound = false;
         private AlertModel _alertModel;
         private string _leagueId;
         private List<MappingProviderItemModel> _providers = new List<MappingProviderItemModel>();

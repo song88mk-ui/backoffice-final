@@ -1535,7 +1535,7 @@ namespace Backoffice.API.Repositories
                             @"INSERT INTO ClientMarketTemplateGroup (ClientId, SportId, FixtureStatusId, Name, SortOrder, IsActive, MarketTemplates)
                               VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6})",
                             request.CopyToClientId, request.CopyToSportId, request.CopyToFixtureStatusId,
-                            group.Name, group.SortOrder, group.IsActive, (object?)group.MarketTemplates ?? DBNull.Value);
+                            group.Name, group.SortOrder, group.IsActive, (object)group.MarketTemplates ?? DBNull.Value);
                     }
 
                     scope.Complete();

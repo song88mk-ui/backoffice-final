@@ -9,23 +9,6 @@
 
 @inject IHttpContextAccessor _httpContextAccessor
 
-@{
-    var host = $"{Request?.Scheme}://{Request?.Host.Value}" ?? string.Empty;
-
-    string GetCustomDomain()
-    {
-        var baseUri = host;
-
-        if (!baseUri.Contains("localhost"))
-            baseUri = baseUri.Replace("http:", "https:");
-
-        if (baseUri.EndsWith("/"))
-            baseUri = baseUri.TrimEnd('/');
-
-        return $"{baseUri}/_blazor";
-    }
-}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>

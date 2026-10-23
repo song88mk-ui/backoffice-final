@@ -162,7 +162,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
                 NewTopLeagues.Insert(count, newTopLeague);
 
-                SortOrderRow();
+                _ = SortOrderRow();
             }
         }
 
@@ -178,7 +178,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 });
             }
             else
-                SortOrderRow();
+                _ = SortOrderRow();
         }
 
         private async Task SortOrderRow()

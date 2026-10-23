@@ -2470,7 +2470,7 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        private List<SportLookupModel>? GetSportsLookup(LanguageCode langCode)
+        private List<SportLookupModel> GetSportsLookup(LanguageCode langCode)
         {
             if (langCode == LanguageCode.EN)
                 return null;

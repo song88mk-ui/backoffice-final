@@ -50,7 +50,6 @@ namespace Backoffice.Web.Components.SBC.Clients
         #region Fields
 
         const decimal maxInputVal = 100;
-        private decimal inputWinnings;
 
         private string[] cryptoCurrencies = new string[] { Currency.BTC.ToString(), Currency.ETH.ToString() };
 

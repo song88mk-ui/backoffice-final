@@ -12,8 +12,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
 
         private int _userAction; // 0 - cancel, 1 - save update
-        private bool IsUpdating;
-        private bool IsPreLoader;
+        private bool IsUpdating = false;
+        private bool IsPreLoader = false;
         private string _buttonYesDisplay;
         protected override async Task OnInitializedAsync()
         {

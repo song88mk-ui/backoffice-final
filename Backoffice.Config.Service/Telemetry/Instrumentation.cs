@@ -16,7 +16,7 @@ namespace Backoffice.Config.Service.Telemetry
 
         public Instrumentation()
         {
-            string? version = "latest";
+            string version = "latest";
             this.ActivitySource = new ActivitySource(ActivitySourceName, version);
             this.meter = new Meter(MeterName, version);
         }

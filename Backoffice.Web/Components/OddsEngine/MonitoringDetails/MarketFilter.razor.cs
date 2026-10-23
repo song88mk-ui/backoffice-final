@@ -18,7 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
         private bool _init = true;
         private bool _shouldRender = true;
-        private LanguageCode _languageCode;
+        private LanguageCode _languageCode = default;
 
         #endregion
 

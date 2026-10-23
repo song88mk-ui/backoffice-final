@@ -23,8 +23,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         private string _selectedClientCode;
 
-        private int _counter;
-        private LanguageCode _languageCode;
         private List<PlatformClientResponse> _clientListReference = new List<PlatformClientResponse>();
 
         protected override async Task OnInitializedAsync()

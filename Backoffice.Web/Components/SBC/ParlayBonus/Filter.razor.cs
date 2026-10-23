@@ -86,7 +86,7 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
 
         public async Task FilterAddBtnOnMouseover()
         {
-            FilterAddButtonElementReference.FocusAsync();
+            _ = FilterAddButtonElementReference.FocusAsync();
         }
 
         public async Task ValidateParlayBonusMinOdds(ChangeEventArgs e)

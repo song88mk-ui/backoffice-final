@@ -10,7 +10,6 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         [Parameter] public bool IsBetStop { get; set; }
 
         private string _ctrlCode = "CTRL";
-        private bool _hasLine;
         private int _marketStatusId;
         private string _clientMargin = "-.-";
         private bool _isBetStop;

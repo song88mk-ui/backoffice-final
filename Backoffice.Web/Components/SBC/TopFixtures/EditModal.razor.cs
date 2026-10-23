@@ -99,7 +99,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
             SportsTree = model.Sports;
 
-            SortOrderRow();
+            _ = SortOrderRow();
         }
 
         public async Task OnDropdownSelect(int index)
@@ -142,7 +142,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
             IsDisabled = NewTopFixture.TopFixtures.Any() && NewTopFixture.TopFixtures.Count >= 50 ? true : false;
 
-            SortOrderRow();
+            _ = SortOrderRow();
         }
 
         public async Task OnDeleteRow(ClientTopFixtureModel.TopFixture fixture)

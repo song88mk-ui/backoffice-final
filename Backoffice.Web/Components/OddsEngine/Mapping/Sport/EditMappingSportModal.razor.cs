@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.Sport
 {
     public partial class EditMappingSportModal : IDisposable
     {
-        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] public new IJSRuntime JSRuntime { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter] private CustomModal Modal { get; set; }

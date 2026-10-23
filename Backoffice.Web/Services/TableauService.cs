@@ -38,41 +38,6 @@ namespace Backoffice.Web.Services
         public async Task<string> GetTableauUrl(string reportName)
         {
             return string.Empty; // TODO: enable when there is tableau
-
-            using (var activity = _activitySource.StartActivity("gettableauurl"))
-            {
-                try
-                {
-                    Stopwatch? duration = _tableauTrustedCallDurationHistogram.Enabled ? Stopwatch.StartNew() : null;
-
-                    var response = await _httpClient.PostAsync($"trusted?username={_configuration["Tableau:UserName"]}&target_site={_configuration["Tableau:SiteId"]}", null);
-
-                    if (duration != null)
-                        _tableauTrustedCallDurationHistogram.Record(duration.Elapsed.TotalMilliseconds,
-                            new KeyValuePair<string, object?>("report", reportName));
-
-                    var ticket = await response.Content.ReadAsStringAsync();
-
-                    if (ticket.Equals("-1"))
-                    {
-                        activity?.SetStatus(ActivityStatusCode.Error, "disabled");
-                        _getTableauUrlFailureCounter.Add(1);
-                        return string.Empty;
-                    }
-
-                    activity?.SetStatus(ActivityStatusCode.Ok);
-                    _getTableauUrlSuccessCounter.Add(1);
-
-                    return $"{_configuration["Tableau:Uri"]}/trusted/{ticket}/t/{_configuration["Tableau:SiteId"]}/views/{reportName}";
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogInformation(ex, "error getting tableau url: {exception}, stacktrace: {@stacktrace}", ex.Message, ex.StackTrace);
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    _getTableauUrlFailureCounter.Add(1);
-                    return string.Empty;
-                }
-            }
         }
 
         public void Dispose()

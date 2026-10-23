@@ -308,7 +308,7 @@ namespace Backoffice.Shared.Utilities
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

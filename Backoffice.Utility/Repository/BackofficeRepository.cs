@@ -41,7 +41,7 @@ namespace Backoffice.Utility.Repository
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(new Uri(configuration["Custom:Hub"]))
                 .Build();
-            Subscribe();
+            _ = Subscribe();
 
             _logger = logger;
         }

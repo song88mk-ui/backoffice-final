@@ -30,7 +30,7 @@ namespace Backoffice.Web.States
             LanguageCodes = new List<LanguageCode> { LanguageCode.EN, LanguageCode.ZH, LanguageCode.KO };
 
             if (!Model.Any())
-                SetLanguageCode(LanguageCode.EN);
+                _ = SetLanguageCode(LanguageCode.EN);
         }
 
         #endregion

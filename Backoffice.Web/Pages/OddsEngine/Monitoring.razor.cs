@@ -25,7 +25,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Parameter] public int LeagueId { get; set; }
 
         private string _region = "hk";
-        private HubConnection _hubConnection;
+        private HubConnection _hubConnection = null;
         private int _sportId;
         private int _segmentId;
         private int _leagueId;
@@ -42,7 +42,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private List<Client> _clients = new();
         private AlertModel _alertModel = new();
         private int _colCtr = 3;
-        private bool _fixtureMarketPreLoader;
+        private bool _fixtureMarketPreLoader = false;
         private long _selectedSportsUnix;
 
         private MonitoringCallbackModel _monitoringCallbackModel = new();

@@ -27,7 +27,7 @@ namespace Backoffice.API.Repositories
         private readonly ActivitySource _activitySource;
         private readonly ILogger<MaintenanceRepository> _logger;
 
-        private readonly List<string>? _maintenanceApps;
+        private readonly List<string> _maintenanceApps;
 
 
         public MaintenanceRepository(HttpClient httpClient, IConfiguration configuration, IPlatformRepository platformRepository,

@@ -82,7 +82,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
             _languages = new LanguageOptionsModel
             {
-                Languages = Enum.GetValues<LanguageCode>().Select(s => new LanguageOptions { Language = s, ClickAction = (_ => OnLanguageClicked(s)) }).ToList()
+                Languages = Enum.GetValues<LanguageCode>().Select(s => new LanguageOptions { Language = s, ClickAction = (e => _ = OnLanguageClicked(s)) }).ToList()
             };
 
             _selectedLanguage = _announcement.LanguageCode;

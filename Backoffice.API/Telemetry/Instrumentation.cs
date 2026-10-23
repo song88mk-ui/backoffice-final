@@ -16,7 +16,7 @@ namespace Backoffice.API.Telemetry
 
         public Instrumentation()
         {
-            string? version = "latest";
+            string version = "latest";
             this.ActivitySource = new ActivitySource(ActivitySourceName, version);
             this.meter = new Meter(MeterName, version);
             this.PublishedMessagesCounter = this.meter.CreateCounter<long>("published.messages", "count", "Number of published messages.");

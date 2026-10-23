@@ -10,7 +10,7 @@ namespace Backoffice.Web.Components.OddsEngine.Mapping.League
 {
     public partial class UnmappedLeague
     {
-        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] public new IJSRuntime JSRuntime { get; set; }
 
         protected override async Task OnInitializedAsync()
         {

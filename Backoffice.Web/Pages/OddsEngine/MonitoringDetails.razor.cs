@@ -41,7 +41,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isPreLoader;
         private bool _isMatchSelectionPreLoad;
         private PageHeaderModel _pageHeaderModel;
-        private bool _isPlayerProps;
+        private bool _isPlayerProps = false;
         private List<Client>? _clients;
         private LanguageCode _languageCode;
         private string _id;

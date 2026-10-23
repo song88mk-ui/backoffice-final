@@ -11,7 +11,7 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
         [Parameter] public EventCallback<bool> OnHasChange { get; set; }
 
         private string _searchField = "";
-        private string _selectionCss;
+        private string _selectionCss = null;
         private List<MaintenanceSelectListItemWithCheckboxModel> _activeClients = new();
         private bool _init = true;
         private bool _shouldRender = true;

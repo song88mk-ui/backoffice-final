@@ -17,7 +17,7 @@ namespace Backoffice.API.Hubs
             Console.WriteLine("Connected");
         }
 
-        public override Task OnDisconnectedAsync(Exception? exception)
+        public override Task OnDisconnectedAsync(Exception exception)
         {
             var connection = CurrentConnections.FirstOrDefault(x => x == Context.ConnectionId);
 

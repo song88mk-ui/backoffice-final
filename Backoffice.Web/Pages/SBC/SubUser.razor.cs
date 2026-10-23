@@ -36,7 +36,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             PageState.Page = this;
 
-            JSRuntime.InvokeVoidAsync("console.log", "SubUser - OnInitializedAsync");
+            _ = JSRuntime.InvokeVoidAsync("console.log", "SubUser - OnInitializedAsync");
 
             _pageHeaderModel = new()
             {
@@ -62,7 +62,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public async Task OnInitEvent(SubUserCallbackModel model)
         {
-            JSRuntime.InvokeVoidAsync("console.log", "SubUser - OnInitEvent");
+            _ = JSRuntime.InvokeVoidAsync("console.log", "SubUser - OnInitEvent");
 
             CallbackModel = model;
             SubUsers = await GetSubUsers(1, model.SearchText);

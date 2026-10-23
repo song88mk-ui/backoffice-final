@@ -11,7 +11,7 @@ namespace Backoffice.Web.Pages.OddsEngine.Base
     public abstract class BaseMappingPage : BasePage
     {
         public List<BreadcrumbModel> BreadcrumbModel { get; set; }
-        public PageHeaderModel PageHeaderModel { get; set; }
+        public new PageHeaderModel PageHeaderModel { get; set; }
         public MappingTab ActiveTab { get; set; }
         public string PageHeaderTitle { get; set; }
         public string BreadcrumbsMappingLabel { get; set; }

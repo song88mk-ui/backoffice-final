@@ -23,7 +23,6 @@ namespace Backoffice.Web.Pages.Administration
         private bool _hasAccess = false;
         private bool _metabaseInitialized = false;
         private string _currentLocale;
-        private string _parametersJson;
 
         private PageHeaderModel _pageHeaderModel;
 

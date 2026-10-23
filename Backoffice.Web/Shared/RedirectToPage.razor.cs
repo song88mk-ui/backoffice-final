@@ -26,7 +26,7 @@ namespace Backoffice.Web.Shared
                 if (prefix == null)
                     return;
 
-                JSRuntime.InvokeVoidAsync("console.log", $"Redirection from {FromPage}");
+                _ = JSRuntime.InvokeVoidAsync("console.log", $"Redirection from {FromPage}");
 
                 var claim = userClaims.FirstOrDefault(c => c.Type.Contains($"{prefix}."));
 
@@ -35,7 +35,7 @@ namespace Backoffice.Web.Shared
                     if (FromPage != null && FromPage == SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.'))
                     {
                         var subUserClaim = userClaims.FirstOrDefault(c => c.Type == FromPage);
-                        JSRuntime.InvokeVoidAsync("console.log", $"Redirection claim {subUserClaim.Type} - {subUserClaim.Value}");
+                        _ = JSRuntime.InvokeVoidAsync("console.log", $"Redirection claim {subUserClaim.Type} - {subUserClaim.Value}");
                     }
 
                     var menu = MenuHelper.GetMenu(claim, FromPage ?? string.Empty);

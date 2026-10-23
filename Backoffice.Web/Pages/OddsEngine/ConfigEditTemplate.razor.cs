@@ -27,10 +27,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private ConfigTemplateMarginModel _configTemplateMargin;
         private EditConfigTemplateFilterModel _editConfigTemplateFilterModel;
-        private int _selectedClientCount;
-        private string _selectedClientName;
-        private int _selectedLeagueCount;
-        private string _selectedLeagueName;
         private string _sportIcon;
         private string _configTemplateName;
         private string _sportName;

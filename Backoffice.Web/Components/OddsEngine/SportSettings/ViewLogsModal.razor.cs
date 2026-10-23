@@ -24,7 +24,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         //private List<ClientSportOrderAuditResponse> _clientSportOrderAudit;
         private List<SportSettingsActivityLog> _clientSportOrderAudit;
         private MetaData _metaData;
-        private int _selectedPage;
         private bool _isPreloader;
 
         #endregion

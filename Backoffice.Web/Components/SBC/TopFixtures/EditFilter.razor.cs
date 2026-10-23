@@ -122,7 +122,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
         public async void OnGameChangedEvent(ChangeEventArgs e)
         {
-            SelectedGameFilter = SelectedLeague.Fixtures.FirstOrDefault(c => c.FixtureId == e.Value);
+            SelectedGameFilter = SelectedLeague.Fixtures.FirstOrDefault(c => c.FixtureId == e.Value.ToString());
             if (SelectedGameFilter == null)
                 SelectedGameFilter = new FixtureModel();
 

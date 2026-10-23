@@ -26,7 +26,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isSelectedLeagueShowing;
         private string _pageTitle;
         private MetaData _metaData = new();
-        private string _iconClass = "";
         private bool _isPreloader = true;
         private bool _init = true;
 

@@ -12,8 +12,8 @@ namespace Backoffice.Web.Shared.OddsEngine
     public partial class OEMonitoringLayout
     {
         #region Properties
-        [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackofficeService { get; set; }
+        [Inject] public new ITradingService TradingService { get; set; }
+        [Inject] public new IBackofficeService BackofficeService { get; set; }
 
         private HeaderNavMenu _headerNavMenuReference;
         private SportClickCallbackModel _selectedSport;

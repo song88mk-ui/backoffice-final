@@ -6,7 +6,6 @@ namespace Backoffice.Web.Components.Common
     public partial class ToastComponent2 : IDisposable
     {
         [Inject] private AlertToastService? _toasterService { get; set; }
-        private string _message;
         private bool _isLoad;
 
         private void ToastChanged(object? sender, EventArgs e)

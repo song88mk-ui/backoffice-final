@@ -12,7 +12,7 @@ namespace Backoffice.Shared.Extensions
         {
             var key = word.Replace(" ", "_").ToLower();
             var placeHolders = ExtractPlaceholders(ref key);
-            var translated = model.TryGetValue(key, out string? value) ? value : word;
+            var translated = model.TryGetValue(key, out string value) ? value : word;
 
             if (placeHolders.Any() && translated.Contains("{&}"))
                 return TransformPlaceHolder(translated, "{&}", placeHolders.ToArray());

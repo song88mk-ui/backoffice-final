@@ -7,6 +7,7 @@ using ExcelDataReader;
 using Serilog;
 using System.Data;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -321,12 +322,11 @@ namespace Backoffice.Web.Services
 
         private void SendNotification(SlackMessage message, string url)
         {
-            using (WebClient webClient = new WebClient())
-            {
-                webClient.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
-                byte[] request = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
-                webClient.UploadData(url, "POST", request);
-            }
+            using var httpClient = new HttpClient();
+            using var content = new ByteArrayContent(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message)));
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
+            using var response = httpClient.Send(new HttpRequestMessage(HttpMethod.Post, url) { Content = content });
+            response.EnsureSuccessStatusCode();
         }
 
         public sealed class SlackMessage

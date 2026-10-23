@@ -249,7 +249,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 {
                     AppId = (int)Application2.BO,
                     AppName = Application2.BO.ToString(),
-                    UserIdRef = 0l,
+                    UserIdRef = 0L,
                     Email = UserRegister.Email,
                     MainUserId = "",
                     NickName = UserRegister.NickName,

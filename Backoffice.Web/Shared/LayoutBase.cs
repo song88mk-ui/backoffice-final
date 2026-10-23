@@ -28,7 +28,7 @@ namespace Backoffice.Web.Shared
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
         [Inject] public TranslationState TranslationState { get; set; }
         [Inject] public ToastService ToasterService { get; set; }
-        [Inject] public PageState PageState { get; set; }
+        [Inject] private PageState PageState { get; set; }
         [Inject] public UserState UserState { get; set; }
         [Inject] public HubService HubService { get; set; }
 

@@ -26,7 +26,6 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
         //private TopLeaguesFilterModel DefaultFilter { get; set; }
 
-        private bool _init = true;
 
         #endregion
 

@@ -25,7 +25,6 @@ namespace Backoffice.Web.Pages.SBC
         private bool _hasAccess = false;
         private bool _metabaseInitialized = false;
         private string _currentLocale;
-        private string _parametersJson;
         private List<string> _clientCodes { get; set; } = new List<string>();
 
         #endregion

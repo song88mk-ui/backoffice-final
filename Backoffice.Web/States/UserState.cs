@@ -13,7 +13,7 @@ namespace Backoffice.Web.States
     {
         #region Properties
 
-        public UserModel Model => base.Model;
+        public new UserModel Model => base.Model;
         public TimeSpan TimeZoneOffset { get; set; }
         public string ConnectionId { get; set; }
 
