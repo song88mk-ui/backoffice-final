@@ -14,7 +14,6 @@ namespace Backoffice.Shared.Data.Trading
         {
             modelBuilder.Entity<ActivityLog>().HasKey(k => new { k.Id });
             modelBuilder.Entity<BoostedSettings>().HasKey(k => new { k.ClientId });
-            modelBuilder.Entity<Client>().HasKey(k => new { k.ClientCode });
             modelBuilder.Entity<ClientLeagueConfig>().HasKey(k => new { k.ClientCode, k.SportId, k.SegmentId, k.LeagueId });
             modelBuilder.Entity<ClientMarketConfig>().HasKey(k => new { k.ClientCode, k.SportId, k.SegmentId, k.LeagueId, k.MarketTemplateId, k.FixtureTypeId });
             modelBuilder.Entity<PriceBoostConfig>().HasKey(k => new { k.ClientCode, k.SportId, k.SegmentId, k.LeagueId, k.FixtureTypeId, k.ProviderFixtureId, k.MarketTemplateId, k.MarketSpecifier });
@@ -48,7 +47,6 @@ namespace Backoffice.Shared.Data.Trading
         }
 
         public DbSet<ActivityLog> ActivityLog { get; set; }
-        public DbSet<Client> Client { get; set; }
         public DbSet<ClientLeagueConfig> ClientLeagueConfig { get; set; }
         public DbSet<ClientMarketConfig> ClientMarketConfig { get; set; }
         public DbSet<PriceBoostConfig> PriceBoostConfig { get; set; }

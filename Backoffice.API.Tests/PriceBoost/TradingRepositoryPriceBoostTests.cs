@@ -26,6 +26,7 @@ namespace Backoffice.API.Tests.PriceBoost
     public class TradingRepositoryPriceBoostTests
     {
         private static readonly Guid QteId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        private static readonly Guid KrjId = Guid.Parse("22222222-2222-2222-2222-222222222222");
         private static readonly Guid UserId = Guid.Parse("22222222-2222-2222-2222-222222222222");
         private static readonly DateTime Stamp = new DateTime(2026, 10, 22, 8, 0, 0, DateTimeKind.Utc);
 
@@ -37,12 +38,14 @@ namespace Backoffice.API.Tests.PriceBoost
         {
             public TradingContext Trading { get; }
             public Mock<IRabbitMqRepository> Rabbit { get; } = new Mock<IRabbitMqRepository>();
+            public Mock<IPlatformRepository> Platform { get; } = new Mock<IPlatformRepository>();
             public List<MessageRequest> Published { get; } = new List<MessageRequest>();
             public TradingRepository Sut { get; }
 
             public Harness()
             {
                 Trading = new TradingContext(new DbContextOptionsBuilder<TradingContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+                SetPlatformClients();
 
                 Rabbit
                     .Setup(r => r.Publish(It.IsAny<MessageRequest>(), It.IsAny<string>()))
@@ -59,8 +62,15 @@ namespace Backoffice.API.Tests.PriceBoost
                     NullLogger<TradingRepository>.Instance,
                     Rabbit.Object,
                     Trading,
-                    new SportsbookContext(new DbContextOptionsBuilder<SportsbookContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options));
+                    new SportsbookContext(new DbContextOptionsBuilder<SportsbookContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options),
+                    Platform.Object);
             }
+
+            // The clients the Platform API lists (the only client source of the price boost lists).
+            public void SetPlatformClients(params PlatformClientResponse[] clients) =>
+                Platform
+                    .Setup(p => p.GetClients(It.IsAny<string>()))
+                    .ReturnsAsync(new BaseResponse<List<PlatformClientResponse>> { StatusCode = StatusCode.Success, Result = clients.ToList() });
 
             public List<PriceBoostConfig> SavedBoosts() => Trading.PriceBoostConfig.AsNoTracking().ToList();
         }
@@ -288,10 +298,11 @@ namespace Backoffice.API.Tests.PriceBoost
         private static async Task<Harness> WithClients()
         {
             var harness = new Harness();
-            harness.Trading.Client.AddRange(
-                new Client { ClientId = QteId, ClientCode = "QTE", ClientName = "Qte Sports" },
-                new Client { ClientId = Guid.NewGuid(), ClientCode = "KRJ", ClientName = "Krj Games" },
-                new Client { ClientId = Guid.NewGuid(), ClientCode = "GSA", ClientName = "Gsa Bets" });
+            harness.SetPlatformClients(
+                new PlatformClientResponse { ClientId = QteId, ClientCode = "QTE", ClientName = "Qte Sports", IsActive = true },
+                new PlatformClientResponse { ClientId = KrjId, ClientCode = "KRJ", ClientName = "Krj Games", IsActive = true },
+                new PlatformClientResponse { ClientId = Guid.NewGuid(), ClientCode = "GSA", ClientName = "Gsa Bets", IsActive = true },
+                new PlatformClientResponse { ClientId = Guid.NewGuid(), ClientCode = "OGE", ClientName = "OG Sports", IsActive = true });
             harness.Trading.BoostedSettings.Add(new BoostedSettings { ClientId = QteId, ClientCode = "QTE", ClientName = "Qte Sports", Cap = 0.05m });
             await harness.Trading.SaveChangesAsync();
             return harness;
@@ -307,6 +318,31 @@ namespace Backoffice.API.Tests.PriceBoost
             Assert.Equal(StatusCode.Success, result.StatusCode);
             Assert.Equal(new[] { ("KRJ", 0m), ("QTE", 0.05m) }, result.Result.OrderBy(c => c.ClientCode).Select(c => (c.ClientCode, c.Cap)));
             Assert.Equal(QteId, result.Result.Single(c => c.ClientCode == "QTE").ClientId);
+        }
+
+        // The clients come from the Platform API list, not from a table of the Trading database that held only some of them.
+        [Fact]
+        public async Task Settings_ListAClientThatOnlyThePlatformListKnows_WithNoCap()
+        {
+            var harness = await WithClients();
+
+            var result = await harness.Sut.GetBoostedSettings(new BoostedSettingsRequest { ClientCodes = new List<string> { "QTE", "OGE" } }, "HK");
+
+            Assert.Equal(new[] { ("OGE", "OG Sports", 0m), ("QTE", "Qte Sports", 0.05m) }, result.Result.OrderBy(c => c.ClientCode).Select(c => (c.ClientCode, c.ClientName, c.Cap)));
+        }
+
+        [Fact]
+        public async Task Settings_FailInsteadOfListingNothing_WhenThePlatformClientListCannotBeRead()
+        {
+            var harness = await WithClients();
+            harness.Platform
+                .Setup(p => p.GetClients(It.IsAny<string>()))
+                .ReturnsAsync(new BaseResponse<List<PlatformClientResponse>> { StatusCode = StatusCode.Error, Message = "Platform down" });
+
+            var result = await harness.Sut.GetBoostedSettings(new BoostedSettingsRequest { ClientCodes = new List<string> { "QTE" } }, "HK");
+
+            Assert.Equal(StatusCode.Error, result.StatusCode);
+            Assert.Null(result.Result);
         }
 
         [Fact]
@@ -338,7 +374,7 @@ namespace Backoffice.API.Tests.PriceBoost
         public async Task SavingTheCap_CreatesItForAClientWithoutOne_CutToFourDecimals()
         {
             var harness = await WithClients();
-            var krjId = harness.Trading.Client.Single(c => c.ClientCode == "KRJ").ClientId;
+            var krjId = KrjId;
 
             var result = await harness.Sut.AddOrUpdateBoostedSettings(new BoostedSettingsModel { ClientId = krjId, ClientCode = "KRJ", ClientName = "Krj Games", Cap = 0.123456m }, UserId.ToString(), "HK");
 

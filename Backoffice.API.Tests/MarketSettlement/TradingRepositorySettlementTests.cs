@@ -84,7 +84,8 @@ namespace Backoffice.API.Tests.MarketSettlement
                 NullLogger<TradingRepository>.Instance,
                 rabbitMq,
                 new TradingContext(new DbContextOptionsBuilder<TradingContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options),
-                new SportsbookContext(new DbContextOptionsBuilder<SportsbookContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options));
+                new SportsbookContext(new DbContextOptionsBuilder<SportsbookContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options),
+                new Mock<IPlatformRepository>().Object);
         }
 
         // ---------------------------------------------------------------

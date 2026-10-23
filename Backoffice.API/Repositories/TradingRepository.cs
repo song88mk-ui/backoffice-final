@@ -38,12 +38,13 @@ namespace Backoffice.API.Repositories
         private readonly ILogger<TradingRepository> _logger;
         private readonly TradingContext _tradingContext;
         private readonly SportsbookContext _sportsbookContext;
+        private readonly IPlatformRepository _platformRepository;
 
         private static IMongoCollection<Fixture> fixtureCollection;
         private static IMongoCollection<Market> marketCollection;
         private static IMongoCollection<Selection> selectionCollection;
 
-        public TradingRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache, ILogger<TradingRepository> logger, IRabbitMqRepository rabbitMqRepository, TradingContext tradingContext, SportsbookContext sportsbookContext)
+        public TradingRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache, ILogger<TradingRepository> logger, IRabbitMqRepository rabbitMqRepository, TradingContext tradingContext, SportsbookContext sportsbookContext, IPlatformRepository platformRepository)
         {
             _configuration = configuration;
             _activityLogRepository = activityLogRepository;
@@ -52,6 +53,7 @@ namespace Backoffice.API.Repositories
             _rabbitMqRepository = rabbitMqRepository;
             _tradingContext = tradingContext;
             _sportsbookContext = sportsbookContext;
+            _platformRepository = platformRepository;
 
             if (_db == null)
             {
@@ -1084,7 +1086,7 @@ namespace Backoffice.API.Repositories
 
                 PriceBoostListBuilder.NormalizeOutrightSelections(mongo.Fixtures, mongo.Selections);
 
-                var clients = await _tradingContext.Client.AsNoTracking().ToListAsync();
+                var clients = await GetPlatformClients();
 
                 var clientCodes = string.IsNullOrEmpty(request.ClientCode)
                     ? clients.Select(c => c.ClientCode).ToList()
@@ -1125,9 +1127,9 @@ namespace Backoffice.API.Repositories
                     .Where(c => clientCodes.Contains(c.ClientCode))
                     .ToListAsync();
 
-                var clients = await _tradingContext.Client.AsNoTracking()
+                var clients = (await GetPlatformClients())
                     .Where(c => clientCodes.Contains(c.ClientCode))
-                    .ToListAsync();
+                    .ToList();
 
                 var result = clients.Select(c => new BoostedSettingsModel
                 {
@@ -1275,6 +1277,20 @@ namespace Backoffice.API.Repositories
         }
 
         // Deletes the boosts of fixtures that have ended.
+        // BO-42: the clients of the price boost lists are the ones the Platform API lists, the same list the Web builds
+        // its client dropdowns from (BackOfficeRepository.GetPlatformClients, region HK). They used to be read from
+        // Trading.dbo.Client, a copy that held only some of them. A list that cannot be read fails the call, so the
+        // screen shows an error and not an empty list.
+        private async Task<List<PlatformClientResponse>> GetPlatformClients()
+        {
+            var response = await _platformRepository.GetClients("HK");
+
+            if (response == null || response.StatusCode != StatusCode.Success || response.Result == null)
+                throw new InvalidOperationException($"The platform client list could not be read ({response?.Message})");
+
+            return response.Result;
+        }
+
         private async Task DeleteEndedPriceBoost(List<string> providerFixtureIds)
         {
             if (providerFixtureIds == null || !providerFixtureIds.Any())

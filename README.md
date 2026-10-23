@@ -405,7 +405,7 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 
 #### TradingController - `api/trading` (x-api-key + Bearer JWT; most read `x-region`)
 
-Most of these routes forward to the OddsEngine Trading API (`API:TradingAPI:{HK|SA}`). Since BO-42 the price boost routes (`priceboost`, `priceboost/list`, `priceboost/settings`, `priceboost/settings/list`) and the fixture lists (`sportsbook/fixtures`, `sportsbook/outrightfixtures`) are served by `TradingRepository` itself from the Trading DB (`ConnectionStrings:Trading`) and the sportsbook Mongo, and `publish` goes through the broker API of this service (`API:RabbitMqApi`).
+Most of these routes forward to the OddsEngine Trading API (`API:TradingAPI:{HK|SA}`). Since BO-42 the price boost routes (`priceboost`, `priceboost/list`, `priceboost/settings`, `priceboost/settings/list`) and the fixture lists (`sportsbook/fixtures`, `sportsbook/outrightfixtures`) are served by `TradingRepository` itself from the Trading DB (`ConnectionStrings:Trading`) and the sportsbook Mongo, and `publish` goes through the broker API of this service (`API:RabbitMqApi`). The clients of the price boost list and of Boosted Settings are the ones the Platform API lists (`IPlatformRepository.GetClients`, the list the Web builds its client dropdowns from), not a copy in the Trading database.
 
 | Method | Route | Purpose |
 |---|---|---|

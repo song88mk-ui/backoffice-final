@@ -1,5 +1,4 @@
 using Backoffice.Shared.Data.Sportsbook.Collections;
-using Backoffice.Shared.Data.Trading.SQLEntities;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
@@ -199,7 +198,7 @@ namespace Backoffice.API.Repositories
         public static List<PriceBoostConfigModel> Build(
             List<PriceBoostConfigModel> priceBoost,
             PriceBoostConfigRequest request,
-            List<Client> clients,
+            List<PlatformClientResponse> clients,
             List<Fixture> fixtures,
             List<SelectionFilter> selections,
             List<MarketFixtureResponse.MarketModel> markets,

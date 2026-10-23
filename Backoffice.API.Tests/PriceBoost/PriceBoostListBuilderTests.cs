@@ -1,6 +1,5 @@
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Data.Sportsbook.Collections;
-using Backoffice.Shared.Data.Trading.SQLEntities;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -46,8 +45,8 @@ namespace Backoffice.API.Tests.PriceBoost
         private static SelectionFilter ASelection(long fixtureId, long marketId, long id, string template, string name, decimal odds, string specifier = "", bool active = true, string marketTemplate = "1") =>
             new SelectionFilter { FiId = fixtureId, MaId = marketId, SeId = id, SeTeId = template, SeNa = name, Od = odds, IsAc = active, SeSp = specifier, MaTeId = marketTemplate };
 
-        private static Client AClient(string code, string name, Guid? id = null) =>
-            new Client { ClientCode = code, ClientName = name, ClientId = id ?? Guid.NewGuid() };
+        private static PlatformClientResponse AClient(string code, string name, Guid? id = null) =>
+            new PlatformClientResponse { ClientCode = code, ClientName = name, ClientId = id ?? Guid.NewGuid(), IsActive = true };
 
         private static PriceBoostConfigModel ASavedBoost(string client = "QTE", string providerFixtureId = "pf1", string market = "1", string selection = "2", string specifier = "", decimal odds = 2.50m, string boostedName = null) =>
             new PriceBoostConfigModel
@@ -68,7 +67,7 @@ namespace Backoffice.API.Tests.PriceBoost
         // A fixture with a Match Winner market, a Home and an Away selection at 2.00 and the QTE margin at 0.
         private sealed class Scenario
         {
-            public List<Client> Clients = new List<Client> { AClient("QTE", "Qte Sports", QteId) };
+            public List<PlatformClientResponse> Clients = new List<PlatformClientResponse> { AClient("QTE", "Qte Sports", QteId) };
             public List<Fixture> Fixtures = new List<Fixture> { AFixture() };
             public List<MarketFilter> Markets = new List<MarketFilter> { AMarket(1, 10, "1", "Match Winner", "QTE:0") };
             public List<SelectionFilter> Selections = new List<SelectionFilter>
