@@ -85,17 +85,6 @@ namespace Backoffice.API.Repositories
         {
             var result = new List<MarketFixtureResponse.ClientOddsModel>();
 
-            if (string.IsNullOrEmpty(clientMarketConfig))
-                return result;
-
-            if (!clientCodes.Any(c => clientMarketConfig.Contains(c)))
-                return result;
-
-            var clients = clientMarketConfig.Split('|')
-                .Select(s => new { Code = s.Split(':').First(), Margin = decimal.Parse(s.Split(':').Last(), CultureInfo.InvariantCulture) })
-                .Where(c => clientCodes.Contains(c.Code))
-                .ToList();
-
             void Add(string clientCode, SelectionFilter selection, decimal odds) =>
                 result.Add(new MarketFixtureResponse.ClientOddsModel
                 {
@@ -104,6 +93,29 @@ namespace Backoffice.API.Repositories
                     SelectionTemplateId = selection.SeTeId,
                     SelectionId = selection.SeId
                 });
+
+            // A market published without client margins gives every client the provider odds: nothing in the v2
+            // pipeline stamps ClCoMa yet, and with no odds the Add Boosted Odds dialog could not take a boost for the
+            // client. A market that is stamped but does not name the client still leaves that client without odds.
+            // To require the margins again, return the empty result here as before.
+            if (string.IsNullOrEmpty(clientMarketConfig))
+            {
+                foreach (var clientCode in clientCodes)
+                {
+                    foreach (var selection in selections)
+                        Add(clientCode, selection, selection.Od);
+                }
+
+                return result;
+            }
+
+            if (!clientCodes.Any(c => clientMarketConfig.Contains(c)))
+                return result;
+
+            var clients = clientMarketConfig.Split('|')
+                .Select(s => new { Code = s.Split(':').First(), Margin = decimal.Parse(s.Split(':').Last(), CultureInfo.InvariantCulture) })
+                .Where(c => clientCodes.Contains(c.Code))
+                .ToList();
 
             foreach (var client in clients)
             {

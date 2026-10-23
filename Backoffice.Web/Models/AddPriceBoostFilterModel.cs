@@ -16,6 +16,8 @@ namespace Backoffice.Web.Models
             PriceBoostConfigAuditList = new List<PriceBoostConfigAuditModel>();
         }
         public string ClientCode { get; set; }
+        // The tab the choices were made on (Match or Outright), so going back from the next dialog returns to it.
+        public int FixtureTypeId { get; set; }
         public int SportId { get; set; }
 
         public string SportName { get; set; }

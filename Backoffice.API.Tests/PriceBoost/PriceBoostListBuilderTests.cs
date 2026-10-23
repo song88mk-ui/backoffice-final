@@ -165,6 +165,20 @@ namespace Backoffice.API.Tests.PriceBoost
             Assert.Empty(ClientOddsOf(markets, "QTE"));
         }
 
+        // Nothing in the v2 pipeline stamps ClCoMa yet, so a market comes without client margins.
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void ClientOdds_AreTheProviderOdds_ForEveryClient_WhenTheMarketHasNoClientMargins(string clientMargins)
+        {
+            var selections = new List<SelectionFilter> { ASelection(1, 10, 100, "1", "Home", 2.00m), ASelection(1, 10, 101, "2", "Away", 3.50m, active: false) };
+
+            var markets = PriceBoostListBuilder.BuildMarkets(new List<MarketFilter> { AMarket(1, 10, "1", "Match Winner", clientMargins) }, selections, new List<string> { "QTE", "KRJ" }, NoPlayerProps);
+
+            Assert.Equal(new[] { 2.00m, 3.50m }, ClientOddsOf(markets, "QTE"));
+            Assert.Equal(new[] { 2.00m, 3.50m }, ClientOddsOf(markets, "KRJ"));
+        }
+
         [Fact]
         public void TheMasterOddsWithAddedMargin_KeepOddsAtOrBelowOnePointZeroOne_AndAddTwoPointsOfMarginAboveIt()
         {
@@ -310,6 +324,17 @@ namespace Backoffice.API.Tests.PriceBoost
         }
 
         [Fact]
+        public void TheList_ShowsTheProviderOddsAsTheClientOdds_WhenTheMarketHasNoClientMargins()
+        {
+            var scenario = new Scenario();
+            scenario.Markets[0].ClCoMa = string.Empty;
+
+            var row = Assert.Single(Run(scenario, new List<PriceBoostConfigModel> { ASavedBoost() }, out _));
+
+            Assert.Equal((2.00m, 2.00m), (row.BROdds, row.ClientOdds));
+        }
+
+        [Fact]
         public void TheList_IsOrderedByTheLatestKickoffFirst_ThenByClient()
         {
             var scenario = new Scenario();
@@ -342,6 +367,20 @@ namespace Backoffice.API.Tests.PriceBoost
                 Assert.Equal((0m, string.Empty, "Away"), (r.BoostedOdds, r.BoostedOddsStr, r.SelectionName));
                 Assert.NotEmpty(r.ClientName);
             });
+        }
+
+        // The Add Boosted Odds dialog disables the boosted odds input of a client whose current odds are 0.
+        [Fact]
+        public void TheEmptyRowsToFillIn_CarryTheProviderOddsAsTheClientOdds_WhenTheMarketHasNoClientMargins()
+        {
+            var scenario = new Scenario();
+            scenario.Clients.Add(AClient("KRJ", "Krj Sports"));
+            scenario.Markets[0].ClCoMa = string.Empty;
+
+            var rows = Run(scenario, new List<PriceBoostConfigModel>(), out _, AFullSelectionRequest());
+
+            Assert.Equal(new[] { "KRJ", "QTE" }, rows.Select(r => r.ClientCode));
+            Assert.All(rows, r => Assert.Equal((2.00m, 2.00m), (r.BROdds, r.ClientOdds)));
         }
 
         [Fact]

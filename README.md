@@ -424,7 +424,7 @@ Most of these routes forward to the OddsEngine Trading API (`API:TradingAPI:{HK|
 | POST | `api/trading/sportsbook/fixtures` | Match fixtures with their markets and selections, English names, earliest first (read from the sportsbook Mongo; `AllFixtureStatus` includes started and closed fixtures; a fixture is listed whether or not it carries a client code, `ClCo`) |
 | POST | `api/trading/sportsbook/outrightfixtures` | Prematch outright fixtures with their markets and selections, in league tier order (read from the sportsbook Mongo) |
 | POST | `api/trading/priceboost` | Add or update price boost configs (a different selection of the same market replaces the saved one; zero or empty odds delete it) |
-| POST | `api/trading/priceboost/list` | Price boost config list with the live fixture, market and odds of each boost (also deletes the boosts of fixtures that ended) |
+| POST | `api/trading/priceboost/list` | Price boost config list with the live fixture, market and odds of each boost; a market published without client margins (`ClCoMa`) gives every client the provider odds (also deletes the boosts of fixtures that ended) |
 | POST | `api/trading/priceboost/settings/list` | Boosted settings list |
 | POST | `api/trading/priceboost/settings` | Add or update the % cap of a client (`?userId=`), then notifies that user with a toast |
 | GET | `api/trading/client` | Leftover route attribute: its action is commented out, so it binds to the same action as `client/config/all` (expects a body; see controller) |

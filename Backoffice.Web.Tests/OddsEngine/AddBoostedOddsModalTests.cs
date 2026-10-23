@@ -391,5 +391,109 @@ namespace Backoffice.Web.Tests.OddsEngine
             Assert.Equal(new[] { "Select League" }, Options(cut, "LeagueSelect"));
             Assert.Empty(_fixtureRequests);
         }
+
+        // ---------------------------------------------------------------
+        // Back from the Next dialog
+        // ---------------------------------------------------------------
+
+        private static readonly string[] AllDropdowns = { "sportSelect", "segmentSelect", "LeagueSelect", "fixtureSelect", "marketSelect", "selectionSelect" };
+
+        // The Back arrow of the Next dialog opens this dialog again with the model it was given (ManageBoost.OnCancelCallback).
+        private IRenderedComponent<AddBoostedOddsModal> RenderBackTo(AddPriceBoostFilterModel previous)
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("Region", "hk");
+            parameters.Add("AddPriceBoostFilterModel", previous);
+
+            return Render<AddBoostedOddsModal>(ps => ps.AddCascadingValue(parameters));
+        }
+
+        private AddPriceBoostFilterModel NextModelOf(IRenderedComponent<AddBoostedOddsModal> cut)
+        {
+            ClickNext(cut);
+            cut.WaitForAssertion(() => Assert.Single(_opened));
+
+            return _opened[0].TryGet<AddPriceBoostFilterModel>("AddPriceBoostFilterModel")!;
+        }
+
+        [Fact]
+        public void GoingBackFromNext_KeepsTheChoicesMadeBefore()
+        {
+            var cut = RenderWithFootballChosen();
+            Choose(cut, "segmentSelect", "2");
+            cut.WaitForAssertion(() => Assert.Equal("200", SelectedValue(cut, "LeagueSelect")));
+            var chosen = AllDropdowns.Select(id => SelectedValue(cut, id)).ToList();
+            Assert.Equal(new[] { "10", "2", "200", "F200" }, chosen.Take(4));
+            var model = NextModelOf(cut);
+
+            var back = RenderBackTo(model);
+
+            back.WaitForAssertion(() => Assert.Equal(new[] { "Select Sport", "Football", "Basketball" }, Options(back, "sportSelect")));
+            Assert.Equal(chosen, AllDropdowns.Select(id => SelectedValue(back, id)).ToList());
+            Assert.Equal(new[] { "Select League", "La Liga" }, Options(back, "LeagueSelect"));
+            Assert.Equal(new[] { "Select Fixture", "Sevilla vs Betis" }, Options(back, "fixtureSelect"));
+            Assert.True(back.Find("#matchType").HasAttribute("checked"));
+            Assert.False(back.Find("#outrights").HasAttribute("checked"));
+        }
+
+        [Fact]
+        public void GoingBackFromNext_LoadsTheFixturesAgain_SoAnotherMarketCanStillBeChosen()
+        {
+            var cut = RenderWithFootballChosen();
+            var model = NextModelOf(cut);
+            _fixtureRequests.Clear();
+
+            var back = RenderBackTo(model);
+
+            back.WaitForAssertion(() => Assert.Single(_fixtureRequests));
+            Assert.Equal((Football, 1, 100, (int)FixtureType.Match), (_fixtureRequests[0].SportId, _fixtureRequests[0].SegmentId, _fixtureRequests[0].LeagueId, _fixtureRequests[0].FixtureTypeId));
+
+            Choose(back, "marketSelect", "1|");
+
+            back.WaitForAssertion(() => Assert.Equal(new[] { "Select Selection", "Away", "Home" }, Options(back, "selectionSelect")));
+        }
+
+        [Fact]
+        public void GoingBackFromNext_ReturnsToTheOutrightsTab()
+        {
+            _tradingService
+                .Setup(s => s.GetSportsBookOutrightFixtures(It.IsAny<MarketFixtureRequest>()))
+                .Callback<MarketFixtureRequest>(r => _fixtureRequests.Add(r))
+                .ReturnsAsync((MarketFixtureRequest r) => Reply(new MarketFixtureResponse { Fixtures = FixturesOf(r.LeagueId) }));
+            var cut = Render();
+            cut.WaitForAssertion(() => Assert.Equal(3, Options(cut, "sportSelect").Count));
+            cut.Find("#outrights").Click();
+            Choose(cut, "sportSelect", Football.ToString());
+            cut.WaitForAssertion(() => Assert.Equal("F100", SelectedValue(cut, "fixtureSelect")));
+            var model = NextModelOf(cut);
+            Assert.Equal((int)FixtureType.Outright, model.FixtureTypeId);
+            _fixtureRequests.Clear();
+
+            var back = RenderBackTo(model);
+
+            back.WaitForAssertion(() => Assert.Single(_fixtureRequests));
+            Assert.Equal((int)FixtureType.Outright, _fixtureRequests[0].FixtureTypeId);
+            Assert.True(back.Find("#outrights").HasAttribute("checked"));
+            Assert.False(back.Find("#matchType").HasAttribute("checked"));
+            Assert.Equal("F100", SelectedValue(back, "fixtureSelect"));
+        }
+
+        [Fact]
+        public void GoingBackFromNext_WhenTheFixtureIsNoLongerListed_ClearsItAndTheDropdownsBelow()
+        {
+            var cut = RenderWithFootballChosen();
+            var model = NextModelOf(cut);
+            _tradingService
+                .Setup(s => s.GetSportsBookFixtures(It.IsAny<MarketFixtureRequest>()))
+                .ReturnsAsync(Reply(new MarketFixtureResponse { Fixtures = new List<MarketFixtureResponse.FixtureModel>() }));
+
+            var back = RenderBackTo(model);
+
+            back.WaitForAssertion(() => Assert.Equal(new[] { "Select Sport", "Football", "Basketball" }, Options(back, "sportSelect")));
+            Assert.Equal(("10", "1", "100"), (SelectedValue(back, "sportSelect"), SelectedValue(back, "segmentSelect"), SelectedValue(back, "LeagueSelect")));
+            Assert.Equal(new[] { "Select Fixture" }, Options(back, "fixtureSelect"));
+            Assert.Equal(new[] { "Select Market" }, Options(back, "marketSelect"));
+            Assert.Equal(new[] { "Select Selection" }, Options(back, "selectionSelect"));
+        }
     }
 }

@@ -44,6 +44,11 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             TradingService.Region = Region = ModalParameters.TryGet<string>("Region").ToUpper();
 
+            // Back from the next dialog hands the earlier choices back
+            var previous = ModalParameters.TryGet<AddPriceBoostFilterModel>("AddPriceBoostFilterModel");
+            if (previous != null)
+                await RestoreChoices(previous);
+
             IsPreloader = false;
         }
 
@@ -80,6 +85,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 return;
             }
 
+            Model.FixtureTypeId = (int)SelectedFixtureType;
             Model.PriceBoostConfigList = new List<PriceBoostConfigModel>();
 
             var clients = _userState.Model.TradingClients;
@@ -411,6 +417,25 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             League,
             Fixture,
             Market
+        }
+
+        // Puts back the choices made before Next, on the tab they were made on. The market and selection lists are read
+        // from the last fixture response, which this new dialog does not have, so the fixtures are loaded again. A
+        // fixture that is no longer listed (it started in the meantime) takes the dropdowns below it with it.
+        private async Task RestoreChoices(AddPriceBoostFilterModel previous)
+        {
+            Model = previous;
+            SelectedFixtureType = (FixtureType)previous.FixtureTypeId;
+
+            if (Model.LeagueId == 0)
+                return;
+
+            var fixtures = await GetFixtures(Model.SportId, Model.SegmentId, Model.LeagueId);
+
+            if (!fixtures.Any(f => f.Value == Model.ProviderFixtureId))
+                ClearBelow(Level.League);
+
+            Model.Fixtures = fixtures;
         }
 
         // Empties every dropdown below the one that changed, with its chosen value, so a choice that is no longer
