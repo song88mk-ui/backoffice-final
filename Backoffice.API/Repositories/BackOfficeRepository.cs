@@ -1308,6 +1308,9 @@ namespace Backoffice.API.Repositories
                         //Insert client in NewPlatformDB
                         var clientPlatform = new ClientRequest
                         {
+                            // Platform uses this only when inserting a new client (empty = Platform generates one);
+                            // an existing client's ClientId never changes.
+                            ClientId = request.RequestedPlatformClientId ?? Guid.Empty,
                             ClientName = request.Name,
                             ClientCode = request.ClientCode,
                             IsActive = request.StatusId == (int)ClientStatus.Normal ? true : false,

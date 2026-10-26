@@ -4,6 +4,8 @@ namespace Backoffice.Shared.Models.Requests
     {
         public int RowNumber { get; set; }
 
+        // Optional Platform Client ID to create the client with; blank = Platform generates one.
+        public string ClientId { get; set; }
         public string ClientCode { get; set; }
         public string ClientName { get; set; }
         public string Website { get; set; }

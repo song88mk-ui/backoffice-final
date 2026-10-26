@@ -72,6 +72,13 @@ namespace Backoffice.Web.Helpers
                     return 0m;
                 }
 
+                // ClientId is optional on create (blank = Platform generates one), and older files have no such column.
+                var clientIdRaw = columnIndex.ContainsKey("ClientId") ? Get("ClientId") : string.Empty;
+                if (!string.IsNullOrWhiteSpace(clientIdRaw) && (!Guid.TryParse(clientIdRaw, out var parsedClientId) || parsedClientId == Guid.Empty))
+                {
+                    result.Errors.Add($"Row {rowNumber}: \"{clientIdRaw}\" is not a valid Client ID. Leave it blank to have one generated, or use the format 6989B427-4234-4AC9-4791-08DEFEC92A2C.");
+                }
+
                 var currencyRaw = Get("CurrencyCode");
                 if (string.IsNullOrWhiteSpace(currencyRaw))
                 {
@@ -84,6 +91,7 @@ namespace Backoffice.Web.Helpers
 
                 result.Rows.Add(new ClientImportRowRequest
                 {
+                    ClientId = clientIdRaw,
                     RowNumber = rowNumber,
                     ClientCode = Get("ClientCode"),
                     ClientName = Get("ClientName"),

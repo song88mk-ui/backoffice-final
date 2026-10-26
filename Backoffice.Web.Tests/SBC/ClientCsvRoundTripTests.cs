@@ -154,5 +154,38 @@ namespace Backoffice.Web.Tests.SBC
             Assert.Empty(result.Errors);
             Assert.Equal("NWS", Assert.Single(result.Rows).ClientCode);
         }
+
+        // GM-1001: on create, ClientId is optional; when given it is passed through for Platform to use.
+        private static string CreateCsvWithClientId(string clientId) =>
+            "ClientId,ClientCode,ClientName,Website,Region,Email,MonthlyFee,RevenueShareSportsbook,RevenueShareJackpot,LimitId,Endpoint,ReferenceClientCode,CurrencyCode,SoccerMinPerTicket,SoccerMaxPerTicket,SoccerMaxPerGame,AllSportsMinPerTicket,AllSportsMaxPerTicket,AllSportsMaxPerGame,ParlayMinPerTicket,ParlayMaxPerTicket,ParlayMaxPayoutPerTicket,ParlayMaxWinningsBonus\n"
+            + $"{clientId},NWS,Northwind Sports,https://northwindsports.com,HK,ops@northwindsports.com,500,0.1,0.08,2535,https://operator.example.com,QTE,USD,1,5000,10000,1,5000,10000,1,2000,50000,0.02";
+
+        [Fact]
+        public void CreateParser_PassesAChosenClientIdThrough()
+        {
+            var result = ClientImportCsvParser.Parse(CreateCsvWithClientId(NwsClientId));
+
+            Assert.Empty(result.Errors);
+            Assert.Equal(NwsClientId, Assert.Single(result.Rows).ClientId);
+        }
+
+        [Fact]
+        public void CreateParser_BlankClientIdMeansGenerateOne()
+        {
+            var result = ClientImportCsvParser.Parse(CreateCsvWithClientId(""));
+
+            Assert.Empty(result.Errors);
+            Assert.True(string.IsNullOrEmpty(Assert.Single(result.Rows).ClientId));
+        }
+
+        [Theory]
+        [InlineData("not-a-guid")]
+        [InlineData("00000000-0000-0000-0000-000000000000")]
+        public void CreateParser_RejectsAnInvalidClientId(string clientId)
+        {
+            var result = ClientImportCsvParser.Parse(CreateCsvWithClientId(clientId));
+
+            Assert.Contains(result.Errors, e => e.Contains($"\"{clientId}\" is not a valid Client ID"));
+        }
     }
 }

@@ -29,6 +29,10 @@ namespace Backoffice.Shared.Models.Response
             public int ClientId { get; set; }
 
             public System.Guid? PlatformClientId { get; set; }
+
+            // Input only: the Client ID Platform should create a NEW client with (null = Platform generates).
+            // Kept separate from PlatformClientId, which AddOrUpdateClient sets only once Platform succeeds.
+            public System.Guid? RequestedPlatformClientId { get; set; }
             public string ClientCode { get; set; }
             public string Name { get; set; }
             public string Website { get; set; }

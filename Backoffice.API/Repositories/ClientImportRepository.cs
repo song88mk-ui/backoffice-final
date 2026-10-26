@@ -117,6 +117,12 @@ namespace Backoffice.API.Repositories
             var existingNames = existingClients.Select(c => c.Name?.ToUpperInvariant()).ToHashSet();
 
             var namesSeenInFile = new Dictionary<string, string>();
+            var clientIdsSeenInFile = new Dictionary<Guid, string>();
+
+            // Only needed when the file chooses Client IDs; blank = Platform generates one.
+            var platformClients = groups.Values.Any(g => g.Any(r => !string.IsNullOrWhiteSpace(r.ClientId)))
+                ? (await _backofficeRepository.GetPlatformClients()).Result ?? new List<PlatformClientResponse>()
+                : new List<PlatformClientResponse>();
 
             response.TotalClients = groups.Count;
 
@@ -134,6 +140,7 @@ namespace Backoffice.API.Repositories
                     ClientName = name,
                     Status = "Ready"
                 };
+                Guid? requestedClientId = null;
 
                 if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(name))
                 {
@@ -183,10 +190,22 @@ namespace Backoffice.API.Repositories
                     result.Status = "Error";
                     result.Message = $"Reference client \"{first.ReferenceClientCode}\" does not exist.";
                 }
+                else if (CheckRequestedClientId(group.Value, existingClients, platformClients, out requestedClientId) is string clientIdError)
+                {
+                    result.Status = "Error";
+                    result.Message = clientIdError;
+                }
+                else if (requestedClientId.HasValue && clientIdsSeenInFile.TryGetValue(requestedClientId.Value, out var codeWithSameId))
+                {
+                    result.Status = "Error";
+                    result.Message = $"Client ID {requestedClientId} is also used by Client Code \"{codeWithSameId}\" earlier in this file. Each client needs its own Client ID.";
+                }
 
                 if (result.Status == "Ready" && !string.IsNullOrWhiteSpace(name))
                 {
                     namesSeenInFile[name.ToUpperInvariant()] = code;
+                    if (requestedClientId.HasValue)
+                        clientIdsSeenInFile[requestedClientId.Value] = code;
                 }
 
                 response.Rows.Add(result);
@@ -326,7 +345,27 @@ namespace Backoffice.API.Repositories
 
             try
             {
+                Guid? requestedClientId = null;
+                if (rows.Any(r => !string.IsNullOrWhiteSpace(r.ClientId)))
+                {
+                    // Re-check at commit time: the ID may have been taken since the file was validated.
+                    var existingClients = (await _backofficeRepository.GetClientList(new GetClientListRequest
+                    {
+                        Page = 1,
+                        PageSize = int.MaxValue,
+                        SortBy = ClientSorting.SortByBusinessNameAsc
+                    })).Result?.Clients ?? new List<Backoffice.Shared.Models.Response.ClientListResponse.Client>();
+                    var currentPlatformClients = (await _backofficeRepository.GetPlatformClients()).Result ?? new List<PlatformClientResponse>();
+
+                    var clientIdError = CheckRequestedClientId(rows, existingClients, currentPlatformClients, out requestedClientId);
+                    if (clientIdError != null)
+                    {
+                        return await FailRow(row, clientIdError);
+                    }
+                }
+
                 var client = ToClientListResponseClient(rows);
+                client.RequestedPlatformClientId = requestedClientId;
                 var createResult = await _backofficeRepository.AddOrUpdateClient(client);
 
                 if (createResult.StatusCode != Backoffice.Shared.Enums.StatusCode.Success)
@@ -337,9 +376,18 @@ namespace Backoffice.API.Repositories
 
                 if (client.PlatformClientId == null)
                 {
-                    return await FailRow(row, "Client record was created in Backoffice, but Platform registration did not complete. Needs manual follow-up.");
+                    return await FailRow(row, requestedClientId.HasValue
+                        ? $"Client record was created in Backoffice, but Platform did not register it with Client ID {requestedClientId} (it may already be in use). Needs manual follow-up."
+                        : "Client record was created in Backoffice, but Platform registration did not complete. Needs manual follow-up.", stepsCompleted);
                 }
                 var newPlatformClientId = client.PlatformClientId.Value;
+
+                // An older Platform build ignores the requested ID and generates its own: stop before
+                // copying settings so nobody configures a client under an ID they didn't ask for.
+                if (requestedClientId.HasValue && newPlatformClientId != requestedClientId.Value)
+                {
+                    return await FailRow(row, $"Platform registered the client as {newPlatformClientId} instead of the requested Client ID {requestedClientId} (Platform.API may need the GM-1001 update). Needs manual follow-up.", stepsCompleted);
+                }
                 stepsCompleted.Add("Platform registration confirmed");
 
                 var platformClients = (await _backofficeRepository.GetPlatformClients()).Result ?? new List<PlatformClientResponse>();
@@ -457,6 +505,46 @@ namespace Backoffice.API.Repositories
             command.Parameters.AddWithValue("@ClientCode", clientCode);
 
             await command.ExecuteNonQueryAsync();
+        }
+
+        // Checks the optional Client ID chosen for a new client. Returns an error message, or null when the
+        // client can be created (requestedClientId = null means Platform generates one).
+        private static string CheckRequestedClientId(
+            List<ClientImportRowRequest> rows,
+            List<Backoffice.Shared.Models.Response.ClientListResponse.Client> existingClients,
+            List<PlatformClientResponse> platformClients,
+            out Guid? requestedClientId)
+        {
+            requestedClientId = null;
+
+            var given = rows.Where(r => !string.IsNullOrWhiteSpace(r.ClientId)).ToList();
+            if (!given.Any())
+                return null;
+
+            var invalid = given.FirstOrDefault(r => !Guid.TryParse(r.ClientId.Trim(), out var parsed) || parsed == Guid.Empty);
+            if (invalid != null)
+                return $"Row {invalid.RowNumber}: \"{invalid.ClientId}\" is not a valid Client ID.";
+
+            var ids = given.Select(r => Guid.Parse(r.ClientId.Trim())).Distinct().ToList();
+            if (ids.Count > 1)
+                return $"Rows {string.Join(", ", given.Select(r => r.RowNumber))} give different Client IDs for the same client. Use one Client ID (or leave the others blank).";
+
+            var id = ids[0];
+            var limitId = (rows.First().LimitId ?? string.Empty).Trim();
+
+            // Platform is the source of truth; Backoffice's own record catches clients Platform's 24h cache hasn't picked up yet.
+            var owner = platformClients.Where(c => c.ClientId == id).Select(c => new { c.ClientCode, c.LimitId })
+                .Concat(existingClients.Where(c => c.PlatformClientId == id).Select(c => new { c.ClientCode, c.LimitId }))
+                .FirstOrDefault();
+            if (owner == null)
+            {
+                requestedClientId = id;
+                return null;
+            }
+
+            return !string.Equals((owner.LimitId ?? string.Empty).Trim(), limitId, StringComparison.OrdinalIgnoreCase)
+                ? $"Client ID {id} already belongs to client \"{owner.ClientCode}\" with LimitId {owner.LimitId}, not {limitId}. Check the Client ID and LimitId."
+                : $"Client ID {id} already exists (client \"{owner.ClientCode}\"). Leave Client ID blank to have a new one generated.";
         }
 
         private static Dictionary<string, List<ClientImportRowRequest>> GroupRows(List<ClientImportRowRequest> rows)
