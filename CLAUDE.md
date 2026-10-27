@@ -60,7 +60,10 @@ dotnet test Backoffice.Web.Tests/Backoffice.Web.Tests.csproj
 ```
 
 CI (`.github/workflows/ci.yml`) runs the test job **only on pull requests** — a push to `main`
-runs no tests. Restore needs `NUGET_PASSWORD` for the private GitHub feed.
+runs no tests. Restore needs `NUGET_PASSWORD` for the private GitHub feed. Before the tests, the
+job builds the solution with `-warnaserror`, so any new compiler warning fails the PR; only the
+NuGet vulnerability audit warnings (NU1900-NU1905) stay warnings. Check locally with
+`dotnet build backoffice-final.sln -c Release -warnaserror -warnnotaserror:NU1900,NU1901,NU1902,NU1903,NU1904,NU1905`.
 
 ## Testing requirements
 

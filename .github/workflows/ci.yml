@@ -128,8 +128,11 @@ jobs:
             --store-password-in-clear-text \
             --name github "https://nuget.pkg.github.com/FlyingCockatoo/index.json"
 
+      - name: Build (warnings as errors, except NuGet vulnerability audit)
+        run: dotnet build backoffice-final.sln -c Release -warnaserror -warnnotaserror:NU1900,NU1901,NU1902,NU1903,NU1904,NU1905
+
       - name: Test
-        run: dotnet test backoffice-final.sln -c Release
+        run: dotnet test backoffice-final.sln -c Release --no-build
 
       - name: Format
         run: dotnet format backoffice-final.sln --verify-no-changes --report

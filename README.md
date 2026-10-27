@@ -557,8 +557,10 @@ dotnet test Backoffice.API.Tests     # API unit tests (Moq, EF Core InMemory)
 dotnet test Backoffice.Web.Tests     # Web component tests (bUnit) + WebSocket.Service tests
 ```
 
-CI (`.github/workflows/ci.yml`) only builds the Docker images - it does not run
-the test suite - so run tests locally before pushing.
+On pull requests, CI (`.github/workflows/ci.yml`) builds the solution with warnings as
+errors (NuGet vulnerability warnings NU1900-NU1905 excepted), then runs the test suite and
+`dotnet format --verify-no-changes`. A push to `main` runs no tests, so still run them locally
+before pushing.
 
 ## Scripts
 
