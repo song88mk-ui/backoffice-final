@@ -26,19 +26,22 @@ namespace Backoffice.API.Repositories
         private readonly IBackofficeRepository _backofficeRepository;
         private readonly IBackofficeActivityLogRepository _activityLogRepository;
         private readonly IConfiguration _configuration;
+        private readonly IRabbitMqRepository _rabbitMqRepository;
 
         public ClientImportRepository(
             BackofficeContext backofficeContext,
             SportsbookContext sportsbookContext,
             IBackofficeRepository backofficeRepository,
             IBackofficeActivityLogRepository activityLogRepository,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IRabbitMqRepository rabbitMqRepository)
         {
             _backofficeContext = backofficeContext;
             _sportsbookContext = sportsbookContext;
             _backofficeRepository = backofficeRepository;
             _activityLogRepository = activityLogRepository;
             _configuration = configuration;
+            _rabbitMqRepository = rabbitMqRepository;
         }
 
         private static readonly (string Match, string Environment)[] KnownDatabaseHosts = new[]
@@ -408,6 +411,13 @@ namespace Backoffice.API.Repositories
                 await RegisterTradingClient(newPlatformClientId, name, code);
                 stepsCompleted.Add("Trading DB registration");
 
+                // The copies above are raw SQL, so nothing told Sportsbook.API, which caches these whole tables
+                // for 24h: without this the new client gets an empty sports list and sb crashes until the cache
+                // expires or the pods restart. Sent last, so the caches reload with every row already written.
+                stepsCompleted.Add(await PublishSportsbookCacheRefresh(newPlatformClientId, code)
+                    ? "Sportsbook caches cleared"
+                    : "Sportsbook caches NOT cleared — save the client's Sport Settings once to refresh them");
+
                 row.Status = ClientImportRowStatus.Succeeded;
                 row.StepsCompleted = string.Join(" -> ", stepsCompleted);
                 row.ResultClientId = newPlatformClientId;
@@ -428,6 +438,45 @@ namespace Backoffice.API.Repositories
             }
         }
 
+        // Same messages the Sport Settings and Market Groups screens send after a save. CacheSync forwards each one
+        // to every Sportsbook.API pod: OnSportSortOrderChange clears the sport/segment/league order caches,
+        // OnMarketSortOrderChange the selector market template and market template group caches.
+        // CacheSync builds a routing key from ClientCode, so it must not be null.
+        private async Task<bool> PublishSportsbookCacheRefresh(Guid clientId, string clientCode)
+        {
+            var messages = new[]
+            {
+                (CacheType.SportSortOrder, "OnSportSortOrderChange", "r.oe.cachesync.onsportsortorderchange"),
+                (CacheType.MarketSortOrder, "OnMarketSortOrderChange", "r.oe.cachesync.onmarketsortorderchange")
+            };
+
+            var allSent = true;
+            foreach (var (cacheType, messageType, routingKey) in messages)
+            {
+                var result = await _rabbitMqRepository.Publish(new MessageRequest
+                {
+                    Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                    {
+                        CacheType = cacheType,
+                        ClientId = clientId,
+                        ClientCode = clientCode,
+                        CacheKey = string.Empty
+                    }),
+                    CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                    MessageType = messageType,
+                    RoutingKey = routingKey
+                });
+
+                if (result?.StatusCode != StatusCode.Success)
+                {
+                    allSent = false;
+                    Log.Warning("Client import: {MessageType} for {ClientCode} ({ClientId}) was not published: {Message}", messageType, clientCode, clientId, result?.Message);
+                }
+            }
+
+            return allSent;
+        }
+
         private async Task<ClientImportRowResult> FailRow(ClientImportBatchRow row, string message, List<string> stepsCompleted = null)
         {
             row.Status = ClientImportRowStatus.Failed;
@@ -445,7 +494,8 @@ namespace Backoffice.API.Repositories
             };
         }
 
-        private async Task CopySelectorMarketTemplate(Guid newClientId, Guid referenceClientId)
+        // protected virtual: raw SQL the EF InMemory test provider cannot run, so tests override these three steps.
+        protected virtual async Task CopySelectorMarketTemplate(Guid newClientId, Guid referenceClientId)
         {
             await _sportsbookContext.Database.ExecuteSqlRawAsync(
                 @"INSERT INTO [Sportsbook].[dbo].[ClientSelectorMarketTemplate2]
@@ -481,7 +531,7 @@ namespace Backoffice.API.Repositories
                 AND NOT EXISTS (SELECT 1 FROM [Sportsbook].[dbo].[ClientLeagueOrder] WHERE ClientId = {0})";
 
         // Returns how many ClientSportOrder rows were copied, so the caller can flag a reference client with none.
-        private async Task<int> CopySportSettings(Guid newClientId, Guid referenceClientId)
+        protected virtual async Task<int> CopySportSettings(Guid newClientId, Guid referenceClientId)
         {
             var sportOrderRows = await _sportsbookContext.Database.ExecuteSqlRawAsync(CopyClientSportOrderSql, newClientId, referenceClientId);
             await _sportsbookContext.Database.ExecuteSqlRawAsync(CopyClientSegmentOrderSql, newClientId, referenceClientId);
@@ -489,7 +539,7 @@ namespace Backoffice.API.Repositories
             return sportOrderRows;
         }
 
-        private async Task RegisterTradingClient(Guid clientId, string clientName, string clientCode)
+        protected virtual async Task RegisterTradingClient(Guid clientId, string clientName, string clientCode)
         {
             var connectionString = _configuration.GetConnectionString("Trading");
 

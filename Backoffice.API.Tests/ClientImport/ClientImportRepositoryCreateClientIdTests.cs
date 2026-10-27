@@ -65,7 +65,7 @@ namespace Backoffice.API.Tests.ClientImport
             var activityLog = new Mock<IBackofficeActivityLogRepository>();
             activityLog.Setup(a => a.ProcessActivityLog(It.IsAny<OnActivityLogMessage>(), It.IsAny<string>())).Returns(Task.CompletedTask);
 
-            return (new ClientImportRepository(ctx, sportsbookCtx, repo.Object, activityLog.Object, new ConfigurationBuilder().Build()), repo);
+            return (new ClientImportRepository(ctx, sportsbookCtx, repo.Object, activityLog.Object, new ConfigurationBuilder().Build(), new Mock<IRabbitMqRepository>().Object), repo);
         }
 
         private static ClientImportRowRequest Row(string code, string clientId, string limitId = "10939", int rowNumber = 2, string currency = "USD") => new ClientImportRowRequest

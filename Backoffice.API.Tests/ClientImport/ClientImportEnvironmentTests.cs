@@ -23,7 +23,8 @@ namespace Backoffice.API.Tests.ClientImport
                 new SportsbookContext(new DbContextOptionsBuilder<SportsbookContext>().UseInMemoryDatabase(nameof(ClientImportEnvironmentTests)).Options),
                 new Mock<IBackofficeRepository>().Object,
                 new Mock<IBackofficeActivityLogRepository>().Object,
-                configuration);
+                configuration,
+                new Mock<IRabbitMqRepository>().Object);
         }
 
         [Theory]
