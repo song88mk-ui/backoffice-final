@@ -408,8 +408,8 @@ namespace Backoffice.API.Repositories
                     ? "Sport settings copied (sports, segments, leagues)"
                     : $"Sport settings NOT copied — reference client \"{referenceClient.ClientCode}\" has none; set them up in Sport Settings");
 
-                await RegisterTradingClient(newPlatformClientId, name, code);
-                stepsCompleted.Add("Trading DB registration");
+                // No Trading DB step: Trading.dbo.Client is retired (BO-42 reads clients from the Platform list and
+                // flyway renames the table to Client_DELETE_AFTER_BO42), so inserting there fails the whole row.
 
                 // The copies above are raw SQL, so nothing told Sportsbook.API, which caches these whole tables
                 // for 24h: without this the new client gets an empty sports list and sb crashes until the cache
@@ -494,7 +494,7 @@ namespace Backoffice.API.Repositories
             };
         }
 
-        // protected virtual: raw SQL the EF InMemory test provider cannot run, so tests override these three steps.
+        // protected virtual: raw SQL the EF InMemory test provider cannot run, so tests override these two steps.
         protected virtual async Task CopySelectorMarketTemplate(Guid newClientId, Guid referenceClientId)
         {
             await _sportsbookContext.Database.ExecuteSqlRawAsync(
@@ -537,24 +537,6 @@ namespace Backoffice.API.Repositories
             await _sportsbookContext.Database.ExecuteSqlRawAsync(CopyClientSegmentOrderSql, newClientId, referenceClientId);
             await _sportsbookContext.Database.ExecuteSqlRawAsync(CopyClientLeagueOrderSql, newClientId, referenceClientId);
             return sportOrderRows;
-        }
-
-        protected virtual async Task RegisterTradingClient(Guid clientId, string clientName, string clientCode)
-        {
-            var connectionString = _configuration.GetConnectionString("Trading");
-
-            await using var connection = new SqlConnection(connectionString);
-            await connection.OpenAsync();
-
-            await using var command = new SqlCommand(
-                "INSERT INTO [Client] (ClientId, ClientName, ClientCode) VALUES (@ClientId, @ClientName, @ClientCode)",
-                connection);
-
-            command.Parameters.AddWithValue("@ClientId", clientId);
-            command.Parameters.AddWithValue("@ClientName", clientName);
-            command.Parameters.AddWithValue("@ClientCode", clientCode);
-
-            await command.ExecuteNonQueryAsync();
         }
 
         // Checks the optional Client ID chosen for a new client. Returns an error message, or null when the

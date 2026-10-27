@@ -27,7 +27,7 @@ namespace Backoffice.API.Tests.ClientImport
         private static readonly Guid NewClientId = Guid.Parse("0C942F91-272A-49D9-96D7-13C401BAA206");
         private static readonly Guid QteId = Guid.Parse("11111111-2222-3333-4444-555555555555");
 
-        // The three raw-SQL steps can't run on the EF InMemory provider; everything around them is real.
+        // The two raw-SQL steps can't run on the EF InMemory provider; everything around them is real.
         private sealed class SqlFreeClientImportRepository : ClientImportRepository
         {
             public SqlFreeClientImportRepository(BackofficeContext ctx, SportsbookContext sb, IBackofficeRepository repo,
@@ -36,7 +36,6 @@ namespace Backoffice.API.Tests.ClientImport
 
             protected override Task CopySelectorMarketTemplate(Guid newClientId, Guid referenceClientId) => Task.CompletedTask;
             protected override Task<int> CopySportSettings(Guid newClientId, Guid referenceClientId) => Task.FromResult(19);
-            protected override Task RegisterTradingClient(Guid clientId, string clientName, string clientCode) => Task.CompletedTask;
         }
 
         private static (ClientImportRepository Sut, List<MessageRequest> Published) Build(
@@ -105,16 +104,20 @@ namespace Backoffice.API.Tests.ClientImport
             });
         }
 
+        // Also pins that there is no Trading DB step: Trading.dbo.Client is retired (renamed by flyway under BO-42),
+        // and inserting into it failed every import on DEV with "Invalid object name 'Client'".
         [Fact]
-        public async Task CreatedClient_RecordsTheCacheStepLast()
+        public async Task CreatedClient_RunsEveryStepWithoutTradingAndClearsTheCachesLast()
         {
-            var dbName = nameof(CreatedClient_RecordsTheCacheStepLast);
+            var dbName = nameof(CreatedClient_RunsEveryStepWithoutTradingAndClearsTheCachesLast);
             var (sut, _) = Build(dbName);
 
             await sut.CommitBatch(OneClient(), "u1", "tester");
 
             var ctx = new BackofficeContext(new DbContextOptionsBuilder<BackofficeContext>().UseInMemoryDatabase(dbName).Options);
-            Assert.EndsWith("Trading DB registration -> Sportsbook caches cleared", (await ctx.ClientImportBatchRow.SingleAsync()).StepsCompleted);
+            Assert.Equal(
+                "Backoffice client record created -> Platform registration confirmed -> Selector Market Template copied -> Sport settings copied (sports, segments, leagues) -> Sportsbook caches cleared",
+                (await ctx.ClientImportBatchRow.SingleAsync()).StepsCompleted);
         }
 
         [Fact]
