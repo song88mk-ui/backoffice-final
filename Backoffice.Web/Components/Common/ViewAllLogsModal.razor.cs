@@ -33,7 +33,9 @@ namespace Backoffice.Web.Components.Common
         protected override async Task OnInitializedAsync()
         {
             _isPreLoader = true;
-            _userClients = _userState.Model.SportsbookClients.Any() ? _userState.Model.SportsbookClients.Select(s => s.ClientCode).ToList() : new List<string>();
+            // The clients Manage Boost and Boosted Settings list. SportsbookClients is narrower (sportsbook applications
+            // only), so a boost saved for any other client, OG Sports for one, never showed up in its own logs (BO-42).
+            _userClients = _userState.Model.TradingClients?.Select(c => c.ClientCode).ToList() ?? new List<string>();
             WithAdministrationPagesAccess = false;
             _boostedSettingsActivityLogs = new List<ActivityLogModel>();
 
