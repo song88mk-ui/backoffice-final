@@ -4,6 +4,7 @@ using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Services;
 using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace Backoffice.Web.Extensions
 {
@@ -159,6 +160,25 @@ namespace Backoffice.Web.Extensions
             //    client.DefaultRequestHeaders.Add("x-api-key", builder?.Configuration["API:Backoffice:Security:APIKey"]);
             //    client.DefaultRequestHeaders.Add("x-region", builder?.Configuration["API:Region"]);
             //});
+            return builder;
+        }
+
+        public const string DataProtectionSection = "DataProtection";
+        public const string DefaultDataProtectionApplicationName = "bo-web";
+
+        // Session and antiforgery cookies are encrypted with the DataProtection key ring. Without a persisted,
+        // shared key ring every pod generates its own keys, so cookies issued before a restart (or by another
+        // replica) fail with "The key {...} was not found in the key ring" (BO-114).
+        public static WebApplicationBuilder AddDataProtectionKeys(this WebApplicationBuilder builder)
+        {
+            var dataProtection = builder.Services.AddDataProtection()
+                .SetApplicationName(builder.Configuration[$"{DataProtectionSection}:ApplicationName"] ?? DefaultDataProtectionApplicationName);
+
+            // Must point at storage that outlives the pod and is shared by every replica (e.g. a mounted volume).
+            var keysPath = builder.Configuration[$"{DataProtectionSection}:KeysPath"];
+            if (!string.IsNullOrWhiteSpace(keysPath))
+                dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+
             return builder;
         }
 

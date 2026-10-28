@@ -335,7 +335,7 @@ Failed, DurationMs` once per round. The API key is never logged.
 Things to know before enabling it:
 - **Single replica only.** The job runs inside every `bo-web` replica, so a scaled-out deployment would run it once per
   replica. Deleting an already deactivated user is not an error in Metabase, so this is only wasted calls, but turn it on for
-  one replica only. The other `bo-web` state (in-memory DataProtection keys, in-process cache) already assumes one instance.
+  one replica only. The other `bo-web` state (in-process cache, and DataProtection keys unless `DataProtection:KeysPath` points at shared storage) already assumes one instance.
 - **DEV and STG share a Metabase.** `Metabase:SiteUrl` defaults to `https://metabase.stg.song88.com` and only the PRD argocd
   file overrides it, so `bo-web` in DEV and in STG both use the STG Metabase. Enable the job in one of them only, and expect it
   to deactivate accounts the other environment's users also use (they come back on their next login).

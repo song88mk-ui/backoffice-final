@@ -28,7 +28,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor()
     .AddCircuitOptions(o => o.DetailedErrors = true);
 
-// DPK TODO: configure dpk
+builder.AddDataProtectionKeys();
 
 builder.Services.AddSingleton<IMemCache, MemCache>();
 builder.Services.AddBlazoredLocalStorage();

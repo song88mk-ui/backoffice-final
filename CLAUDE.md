@@ -141,10 +141,12 @@ a publish site drops it (GM-874).
    `GetManualBetSettlementActivityLogs`. The `GetActivityLogs` stored procedure is also confirmed
    missing entirely in DEV (not only PRD as previously noted here) - calling it there throws
    instead of returning empty, caught by the same catch-all (GM-134, BO-113).
-9. **bo-web DataProtection keys are in memory only.** `Backoffice.Web/Program.cs` has no
-   `AddDataProtection()` or `PersistKeysTo*`, so after a pod restart the logs show
-   `The key {...} was not found in the key ring` (`ErrorUnprotectingCookie`) and antiforgery
-   decrypt errors (BO-114). These errors come from the missing key ring, not from the session code.
+9. **bo-web DataProtection keys only survive a restart if `DataProtection:KeysPath` is set.**
+   `AddDataProtectionKeys()` (`Backoffice.Web/Extensions/WebApplicationBuilderExtensions.cs`) fixes the
+   application name to `bo-web` and persists keys to `DataProtection:KeysPath`. Without that path (or
+   with a path that is not shared, durable storage) every pod has its own key ring, and the logs show
+   `The key {...} was not found in the key ring` (`ErrorUnprotectingCookie`) and antiforgery decrypt
+   errors after a restart (BO-114). These errors come from the key ring, not from the session code.
 
 ## How this team writes code
 
