@@ -58,6 +58,13 @@ namespace Backoffice.Web.Components.Administration.ClientSiteConfig
 
         public void OnCloseClicked() => _modalService.Cancel();
 
+        // BO-105: TimeStamp is stored in UTC (BackOfficeRepository.AddActivityLog). ToLocalTime() converted
+        // with the server's zone, which is UTC, so the column showed UTC while the date filter uses the
+        // user's own day boundaries. A change saved before 08:00 in UTC+8 then showed under the previous
+        // day, and filtering on that day left it out. Show it in the same zone the filter uses.
+        public string FormatTimeStamp(DateTime timeStamp) =>
+            (timeStamp + _userState.TimeZoneOffset).ToString("dd/MM/yy HH:mm");
+
         // Payload format written by the Client Site Config page is "{userName}.{clientGuid}";
         // the GUID contains no dots, so the last segment is always the client id.
         public string GetClientName(string payload)

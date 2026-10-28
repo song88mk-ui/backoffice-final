@@ -43,7 +43,7 @@
                         {
                             var changes = GetChanges(activityLog.From, activityLog.To);
                             <tr>
-                                <td>@activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy HH:mm")</td>
+                                <td>@FormatTimeStamp(activityLog.TimeStamp)</td>
                                 <td>@GetClientName(activityLog.Payload)</td>
                                 <td>@activityLog.Activity</td>
                                 @if (changes == null)

@@ -183,6 +183,33 @@ namespace Backoffice.Web.Tests.Administration
             Assert.Contains("jane.doe", cut.Markup);
         }
 
+        // BO-105: the Date column used ToLocalTime() on the UTC server, so it showed UTC while the
+        // date filter works in the user's zone. A change saved at 01:45 on 14 Oct in UTC+5:45 (20:00 UTC
+        // on 13 Oct) showed as 13/10, yet only a 14 Oct filter returns it. The +5:45 offset keeps the
+        // test meaningful whatever zone the test machine runs in.
+        [Fact]
+        public void Render_TimeStamp_ShownInUserTimeZone()
+        {
+            Services.GetRequiredService<UserState>().TimeZoneOffset = new TimeSpan(5, 45, 0);
+
+            var cut = Render(new List<ActivityLogModel>()
+            {
+                new ActivityLogModel()
+                {
+                    Page = "Admin.ClientSiteConfig",
+                    Activity = "Update",
+                    From = ConfigJson(darkMode: false),
+                    To = ConfigJson(darkMode: true),
+                    Payload = $"jane.doe.{ClientGuid.ToString().ToUpper()}",
+                    UserName = "jane.doe",
+                    TimeStamp = new DateTime(2026, 10, 13, 20, 0, 0)
+                }
+            });
+
+            Assert.Contains("14/10/26 01:45", cut.Markup);
+            Assert.DoesNotContain("13/10/26", cut.Markup);
+        }
+
         [Fact]
         public void Render_NoLogs_ShowsNoRecordFound()
         {
