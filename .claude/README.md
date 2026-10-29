@@ -10,9 +10,9 @@ and [../AGENTS.md](../AGENTS.md) first; this file indexes the commands and skill
 
 ## skills/
 api-development · backoffice-domain · bug-fixing-workflow · caching · code-review-checklist
-· enterprise-architecture · feature-implementation · jira-updates · messaging · mongodb-best-practices
-· oddsengine-domain · performance-optimization · repository-pattern · sportsbook-domain
-· sql-best-practices · translation-system
+· enterprise-architecture · feature-implementation · jira-ticket-attachments · jira-updates · messaging
+· mongodb-best-practices · oddsengine-domain · performance-optimization · repository-pattern
+· sportsbook-domain · sql-best-practices · translation-system
 
 ## Rules and synced files
 

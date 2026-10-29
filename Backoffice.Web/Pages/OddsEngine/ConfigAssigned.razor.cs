@@ -54,6 +54,18 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (_shouldRender)
             {
+                if (_state.HasValue && State != _state)
+                {
+                    // One instance serves both tabs, so a selection made on one tab must not show on the other.
+                    if (_isSelectedLeagueShowing)
+                    {
+                        await _jsRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+                        _isSelectedLeagueShowing = false;
+                    }
+
+                    _selectedConfigClients = new();
+                }
+
                 _languageCode = _translationState.ActiveLanguageCode;
                 _selectedClientName = string.Empty;
                 _languageCode = _translationState.ActiveLanguageCode;
@@ -247,7 +259,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             switch (_state)
             {
                 case ConfigState.Assigned:
-                    _modalService.Open<ModifyLeagueTemplateModal>($"Change Template", parameters, options);
+                    // Odds come from the provider as is, so no template (margin) can be changed on this tab.
                     break;
                 case ConfigState.UnAssigned:
                     _modalService.Open<ModifyLeagueTemplateModal>($"Assign Template", parameters, options);

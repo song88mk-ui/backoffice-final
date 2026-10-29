@@ -16,7 +16,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public ConfigClientViewModel Config { get; set; }
 
         [Parameter] public EventCallback<ConfigClientViewModel> ItemSelectionChangedEvent { get; set; }
-        [Inject] private NavigationManager NavigationManager { get; set; }
 
         private bool _IsEdit = false;
 
@@ -51,11 +50,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             Config.IsChecked = (bool)e.Value;
             await ItemSelectionChangedEvent.InvokeAsync(Config);
-        }
-
-        public async Task OnEditTemplateClickEvent(long configTemplateId)
-        {
-            NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{configTemplateId}/true");
         }
         #endregion
     }

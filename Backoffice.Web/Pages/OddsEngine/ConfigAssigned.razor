@@ -17,9 +17,9 @@
                     <p class="lbl-selection m-0">@(_translationState.GetValue((_selectedConfigClients?.Count ?? 0) >= 2 ? $"{_selectedConfigClients?.Count ?? 0} Leagues selected" : $"{_selectedConfigClients?.Count ?? 0} League selected"))</p>
                 </div>
                 <div class="d-flex h-75 justify-content-end">
-                    <button href="javascript:void(0)" @onclick="HandleSelectAllClick" class="btn btn-selection-all px-4">@_translationState.GetValue("Select All")</button>
-                    <button href="javascript:void(0)" @onclick="HandleClearSelectionClick" class="btn btn-selection-clear px-4">@_translationState.GetValue("Clear Selection")</button>
-                    <button href="javascript:void(0)" @onclick="HandleEditTemplateClick" class="btn btn-selection-modify px-4">@(_translationState.GetValue(_state == ConfigState.Assigned ? "Change template" : "Assign a template"))</button>
+                    <button href="javascript:void(0)" @onclick="HandleSelectAllClick" class="btn btn-selection-all px-4" disabled="@(_state == ConfigState.Assigned)">@_translationState.GetValue("Select All")</button>
+                    <button href="javascript:void(0)" @onclick="HandleClearSelectionClick" class="btn btn-selection-clear px-4" disabled="@(_state == ConfigState.Assigned)">@_translationState.GetValue("Clear Selection")</button>
+                    <button href="javascript:void(0)" @onclick="HandleEditTemplateClick" class="btn btn-selection-modify px-4" disabled="@(_state == ConfigState.Assigned)">@(_translationState.GetValue(_state == ConfigState.Assigned ? "Change template" : "Assign a template"))</button>
                 </div>
             </div>
         </div>

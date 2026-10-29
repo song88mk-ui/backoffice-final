@@ -2,7 +2,7 @@
     <AuthorizeView Policy="sbc-config-canedit">
         <Authorized Context="ActivateAll">
             <th class="text-center">
-                <input type="checkbox" class="form-check-input" @onchange="OnCheckboxClicked" checked="@Config.IsChecked" />
+                <input type="checkbox" class="form-check-input" @onchange="OnCheckboxClicked" checked="@Config.IsChecked" disabled="@(State == ConfigState.Assigned)" />
             </th>
         </Authorized>
     </AuthorizeView>
@@ -17,14 +17,7 @@
         }
         else
         {
-            if (State == ConfigState.UnAssigned)
-            {
-                <label>@Config.PrematchTemplateName</label>
-            }
-            else
-            {
-                <a @onclick="_ => OnEditTemplateClickEvent(Config.PrematchTemplateId)">@Config.PrematchTemplateName</a>
-            }
+            <label class="@(State == ConfigState.Assigned ? "text-muted" : "")">@Config.PrematchTemplateName</label>
         }
 
     </td>
@@ -35,14 +28,7 @@
         }
         else
         {
-            if (State == ConfigState.UnAssigned)
-            {
-                <label>@Config.LiveTemplateName</label>
-            }
-            else
-            {
-                <a @onclick="_ => OnEditTemplateClickEvent(Config.LiveTemplateId)">@Config.LiveTemplateName</a>                
-            }
+            <label class="@(State == ConfigState.Assigned ? "text-muted" : "")">@Config.LiveTemplateName</label>
         }
     </td>
 </tr>
