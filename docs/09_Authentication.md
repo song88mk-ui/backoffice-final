@@ -433,6 +433,33 @@ backoffice.reports.export
 backoffice.settlement.approve
 ```
 
+### Which API actions check a permission (BO-130)
+
+The Web hides pages with policies (`Backoffice.Web/Extensions/WebApplicationBuilderExtensions.cs`), but a
+policy only protects the screen. The API repeats the check with a method-level
+`[Authorize("<claim>", (int)Access.X)]`. The claim name is the permission enum name with `_` replaced by `.`.
+`Access.View` accepts a token value of 2 (View) or 1 (Edit). `Access.Edit` accepts only 1. A missing claim or 0
+gives 401.
+
+Stacked `[Authorize]` attributes all have to pass, so a class-level attribute must carry no claim when its
+actions need different ones (see "Dedicated Translation Permission" in `08_TechnicalDebt.md`).
+
+| Controller | Action | Claim | Access |
+|---|---|---|---|
+| BetController | `manualsettlement` | `Admin.Settlements.ManualBetSettlement` | Edit |
+| BetController | `resendsettlement/details` | `Admin.Settlements.ResendSettlement` | View |
+| BetController | `resendsettlement` | `Admin.Settlements.ResendSettlement` | Edit |
+| BetController | `resendprovidercancellation` | `Admin.Settlements.ResendSettlement` | Edit |
+| BetController | `cancel` | `Admin.CancelBets` | Edit |
+| BetController | `details` | none (login only; shared by Manual Settlement, Market Settlement and Cancel Bets) | |
+
+These three permissions have `HasReadOnly = 0`, so Manage User Groups can only switch them on (value 1) or off.
+Super Admin receives value 1 for every permission outside category 99. Before adding a claim to another
+action, check that the permission row exists in the Auth seed and is outside category 99, or Super Admin is
+locked out. Translations, OddsEngine config templates, Client Site Config, Maintenance and Market Settlement
+were already checked before BO-130. ClientImportController, ClientController, SettingsController and most of
+TradingController still check only the login.
+
 ### Pattern 3: Resource-Based Authorization
 
 ```csharp

@@ -1,4 +1,5 @@
-using Backoffice.API.ActionFilter;
+﻿using Backoffice.API.ActionFilter;
+using Backoffice.Shared.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -31,7 +32,7 @@ namespace Backoffice.API.Tests.ActionFilter
 
         // Builds the attribute with its HttpClient swapped for a stub Auth API that accepts only
         // validToken. The attribute has no injection seam, so the private _httpClient is set by reflection.
-        private static AuthorizeAttribute BuildSut(string validToken)
+        private static AuthorizeAttribute BuildSut(string validToken, AuthorizeAttribute sut = null)
         {
             var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
@@ -45,7 +46,7 @@ namespace Backoffice.API.Tests.ActionFilter
                     return Task.FromResult(response);
                 });
 
-            var sut = new AuthorizeAttribute();
+            sut ??= new AuthorizeAttribute();
             typeof(AuthorizeAttribute)
                 .GetProperty("_httpClient", BindingFlags.NonPublic | BindingFlags.Instance)
                 .SetValue(sut, new HttpClient(handler.Object) { BaseAddress = new Uri("http://auth-api.test/") });
@@ -58,10 +59,10 @@ namespace Backoffice.API.Tests.ActionFilter
 
         // Unsigned token: passes the attribute's local issuer and expiry checks, so only the
         // Auth API call can reject it.
-        private static string Token(string userId) =>
+        private static string Token(string userId, params Claim[] permissions) =>
             new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
                 issuer: Issuer,
-                claims: new[] { new Claim("UserId", userId) },
+                claims: new[] { new Claim("UserId", userId) }.Concat(permissions),
                 expires: DateTime.UtcNow.AddHours(1)));
 
         private static AuthorizationFilterContext Context(string token)
@@ -123,6 +124,45 @@ namespace Backoffice.API.Tests.ActionFilter
 
             var authorized = forgedContexts.Count(c => c.Result == null);
             Assert.Equal(0, authorized);
+        }
+
+        // BO-130: a permission claim on the attribute is checked against the token's own claims, with the
+        // values the Auth API issues (1 = Edit, 2 = View, 0 = NoAccess).
+        [Theory]
+        [InlineData(null, (int)Access.Edit, false)]
+        [InlineData("0", (int)Access.Edit, false)]
+        [InlineData("2", (int)Access.Edit, false)]
+        [InlineData("1", (int)Access.Edit, true)]
+        [InlineData(null, (int)Access.View, false)]
+        [InlineData("0", (int)Access.View, false)]
+        [InlineData("2", (int)Access.View, true)]
+        [InlineData("1", (int)Access.View, true)]
+        public void OnAuthorization_RequiredClaim_IsCheckedAgainstToken(string tokenValue, int requiredAccess, bool expectAuthorized)
+        {
+            const string claimType = "Admin.CancelBets";
+            var permissions = tokenValue == null ? Array.Empty<Claim>() : new[] { new Claim(claimType, tokenValue) };
+            var token = Token("legit-user", permissions);
+            var sut = BuildSut(token, new AuthorizeAttribute(claimType, requiredAccess));
+            var context = Context(token);
+
+            sut.OnAuthorization(context);
+
+            if (expectAuthorized)
+                Assert.Null(context.Result);
+            else
+                Assert.Equal(StatusCodes.Status401Unauthorized, Assert.IsType<JsonResult>(context.Result).StatusCode);
+        }
+
+        [Fact]
+        public void OnAuthorization_RequiredClaim_OtherPermissionDoesNotCount()
+        {
+            var token = Token("legit-user", new Claim("Admin.Settlements.ResendSettlement", "1"));
+            var sut = BuildSut(token, new AuthorizeAttribute("Admin.CancelBets", (int)Access.Edit));
+            var context = Context(token);
+
+            sut.OnAuthorization(context);
+
+            Assert.Equal(StatusCodes.Status401Unauthorized, Assert.IsType<JsonResult>(context.Result).StatusCode);
         }
     }
 }
