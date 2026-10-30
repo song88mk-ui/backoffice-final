@@ -75,10 +75,10 @@ ConfigTemplateAssignedMapping
 ClientImportBatch                        (CSV client import/update, BO-112)
 ├─ BatchId (PK, client-generated GUID so the UI can poll progress)
 ├─ Environment, OperationType (Create | Update)
-├─ Status (Running | Completed | PartiallySuccessful | Failed)
+├─ Status (Running | Completed | PartiallySuccessful | Failed | Interrupted — the API stopped mid-batch, BO-133)
 ├─ StartedByUserId, StartedByUserName, StartedAt, CompletedAt
 ├─ TotalRows, SucceededRows, FailedRows
-└─ Filtered unique index on Environment WHERE Status = 'Running' (one batch at a time per environment)
+└─ Filtered unique index UX_ClientImportBatch_RunningPerEnvironment on Environment WHERE Status = 'Running' (one batch at a time per environment; flyway V5 on dev/prd, ensured on stg by BO-133)
 
 ClientImportBatchRow
 ├─ Id (PK), BatchId (FK → ClientImportBatch)

@@ -49,6 +49,11 @@
                                     {
                                         <span class="text-danger fw-bold">Failed</span>
                                     }
+                                    else if (batch.Status == "Interrupted")
+                                    {
+                                        <span class="text-warning fw-bold" title="The Back Office API stopped during this batch. Clients not done were not changed; re-run them.">Interrupted</span>
+                                        <div class="small text-muted">@(batch.TotalRows - batch.SucceededRows - batch.FailedRows) not done</div>
+                                    }
                                     else
                                     {
                                         <span class="text-muted">@batch.Status</span>

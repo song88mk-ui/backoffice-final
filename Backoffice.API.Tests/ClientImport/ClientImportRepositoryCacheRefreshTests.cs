@@ -32,7 +32,7 @@ namespace Backoffice.API.Tests.ClientImport
         {
             public SqlFreeClientImportRepository(BackofficeContext ctx, SportsbookContext sb, IBackofficeRepository repo,
                 IBackofficeActivityLogRepository log, IRabbitMqRepository rabbit)
-                : base(ctx, sb, repo, log, new ConfigurationBuilder().Build(), rabbit) { }
+                : base(ctx, sb, repo, log, new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string> { ["ConnectionStrings:Backoffice"] = "Server=stg-song88-mssql-server;Database=Backoffice" }).Build(), rabbit) { }
 
             protected override Task CopySelectorMarketTemplate(Guid newClientId, Guid referenceClientId) => Task.CompletedTask;
             protected override Task<int> CopySportSettings(Guid newClientId, Guid referenceClientId) => Task.FromResult(19);

@@ -121,6 +121,7 @@ namespace Backoffice.API
             services.AddScoped<ITradingRepository, TradingRepository>();
             services.AddScoped<IBackofficeActivityLogRepository, BackofficeActivityLogRepository>();
             services.AddScoped<IClientImportRepository, ClientImportRepository>();
+            services.AddHostedService<ClientImportRecoveryService>();
             services.AddSingleton<IMemCache, MemCache>();
             services.AddTransient<ApiKeyFilter>();
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);

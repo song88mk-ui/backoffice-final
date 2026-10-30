@@ -74,7 +74,7 @@ namespace Backoffice.API.Tests.ClientImport
             activityLog.Setup(a => a.ProcessActivityLog(It.IsAny<OnActivityLogMessage>(), It.IsAny<string>())).Returns(Task.CompletedTask);
             activityLog.Setup(a => a.ProcessActivityLog(It.IsAny<OnActivityLogListMessage>(), It.IsAny<string>())).Returns(Task.CompletedTask);
 
-            var sut = new ClientImportRepository(ctx, sportsbookCtx, backofficeRepo.Object, activityLog.Object, new ConfigurationBuilder().Build(), new Mock<IRabbitMqRepository>().Object);
+            var sut = new ClientImportRepository(ctx, sportsbookCtx, backofficeRepo.Object, activityLog.Object, new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string> { ["ConnectionStrings:Backoffice"] = "Server=stg-song88-mssql-server;Database=Backoffice" }).Build(), new Mock<IRabbitMqRepository>().Object);
 
             return new Harness { Sut = sut, BackofficeRepo = backofficeRepo, ActivityLog = activityLog, Context = ctx };
         }

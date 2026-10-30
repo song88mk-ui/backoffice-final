@@ -87,8 +87,17 @@ Also found in the same review: the plain Edit Client modal (`CreateOrUpdateModal
 - The plain Edit Client modal still collapses "LimitId unknown" (Platform fetch failed on the Clients page) and "LimitId empty" into the same empty string, so a failed fetch there can still blank LimitId/Endpoint on save. Fixing it needs `AddOrUpdateClient` to distinguish null from empty.
 - Update history filters `ActivityLog2` by `Page`/`Activity`/`Payload` prefix; that table's indexes cover only `TimeStamp` and `UserId`, so each "View changes" click likely scans it. An index on a shared production table deserves its own ticket.
 - Lost updates: Platform, client and bet-setting data are read once at batch start, and each row then does a full overwrite — a manual edit made to the same client during a long batch is overwritten.
-- Commit endpoints are gated by `[Authorize]` with no claim requirement; the `sbc-clients-canedit` check is UI-only. `Environment` is client-supplied (as in the existing Create flow).
+- Commit endpoints are gated by `[Authorize]` with no claim requirement; the `sbc-clients-canedit` check is UI-only (BO-130). `Environment` used to be client-supplied; since BO-133 the server's own environment is used (see below).
 - History timestamps use `ToLocalTime()` on the server, so they show server time, not the viewer's.
+
+**An import interrupted by a restart locked the environment (October 29, 2026, BO-133).** `CommitBatch`/`CommitUpdateBatch` save the batch as Running and close it only in their `finally`, which never runs when the process is killed (deploy, crash, node move). The batch stayed Running and every later import/update in that environment was refused until someone edited `ClientImportBatch` by hand. Fixes in `ClientImportRepository`:
+- New status `ClientImportBatchStatus.Interrupted`. The batch's Succeeded/Failed counts are recounted from its rows; rows still `Pending` are the clients that were not done, and the Update history shows "N not done".
+- On startup, `ClientImportRecoveryService` (a `BackgroundService`, so it never delays readiness) marks every Running batch of this server's environment as Interrupted. This relies on bo-api running **one replica** (chart default, no autoscaling). If bo-api ever scales out, this would close another pod's live batch: replace it with a per-batch heartbeat column. Also note that a developer running bo-api locally against the dev database does the same for Dev.
+- Backstop: a Running batch older than `ClientImport:StaleRunningMinutes` (default 120) no longer blocks `IsImportRunning` and is marked Interrupted on the next commit. A batch still really running past the limit loses its lock, and its `finally` later overwrites the status with the real result.
+- The environment comes from `GetEnvironment()` (the Backoffice database host). A request naming another environment is refused, and the batch and the audit log `From` use the server's value.
+- Check-and-take is atomic through the filtered unique index `UX_ClientImportBatch_RunningPerEnvironment` (flyway V5 on dev/prd; stg's table predates flyway, so an idempotent infrastructure migration creates the index there if it is missing). The losing insert is caught (SQL 2601/2627) and returns the usual "already running" message instead of a 500.
+- **Deploy order:** the new `Interrupted` value lives in Backoffice.Shared; deploy bo-api before bo-web (an older bo-web shows it as plain grey text, which is harmless). Apply the stg index migration before relying on the concurrency guarantee there.
+- Tests: `Backoffice.API.Tests/ClientImport/ClientImportLockTests.cs`.
 
 ---
 

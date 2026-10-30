@@ -12,6 +12,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<ValidateClientImportResponse>> ValidateBatch(ValidateClientImportRequest request);
         Task<BaseResponse<CommitClientImportResponse>> CommitBatch(CommitClientImportRequest request, string userId, string userName);
         Task<BaseResponse<bool>> IsImportRunning(string environment);
+        Task<BaseResponse<int>> InterruptAbandonedBatches();
         Task<BaseResponse<ClientImportProgressResponse>> GetProgress(Guid batchId);
         BaseResponse<string> GetEnvironment();
 

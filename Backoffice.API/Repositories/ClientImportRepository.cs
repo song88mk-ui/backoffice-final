@@ -92,15 +92,128 @@ namespace Backoffice.API.Repositories
 
         public async Task<BaseResponse<bool>> IsImportRunning(string environment)
         {
+            // A Running batch older than the limit was left by a process that died mid-import; it must not block.
+            var staleCutoff = GetStaleCutoff();
             var isRunning = await _backofficeContext.ClientImportBatch
                 .AsNoTracking()
-                .AnyAsync(b => b.Environment == environment && b.Status == ClientImportBatchStatus.Running);
+                .AnyAsync(b => b.Environment == environment && b.Status == ClientImportBatchStatus.Running && b.StartedAt >= staleCutoff);
 
             return new BaseResponse<bool>
             {
                 StatusCode = StatusCode.Success,
                 Result = isRunning
             };
+        }
+
+        // Batches are only closed in CommitBatch/CommitUpdateBatch's finally, which never runs if the pod is
+        // killed (deploy, crash, node move). bo-api runs one replica, so at startup any Running batch in this
+        // environment belongs to a process that no longer exists.
+        public async Task<BaseResponse<int>> InterruptAbandonedBatches()
+        {
+            var environment = GetEnvironment();
+            if (environment.StatusCode != StatusCode.Success)
+            {
+                return new BaseResponse<int> { StatusCode = StatusCode.Error, Message = environment.Message };
+            }
+
+            return new BaseResponse<int>
+            {
+                StatusCode = StatusCode.Success,
+                Result = await InterruptRunningBatches(environment.Result, DateTime.UtcNow)
+            };
+        }
+
+        private DateTime GetStaleCutoff()
+        {
+            var minutes = _configuration.GetValue("ClientImport:StaleRunningMinutes", DefaultStaleRunningMinutes);
+            return DateTime.UtcNow.AddMinutes(-minutes);
+        }
+
+        private const int DefaultStaleRunningMinutes = 120;
+
+        // Marks the environment's Running batches started before the cutoff as Interrupted, with the counts
+        // taken from their rows: rows still Pending are the clients that were not done.
+        private async Task<int> InterruptRunningBatches(string environment, DateTime startedBefore)
+        {
+            var batches = await _backofficeContext.ClientImportBatch
+                .Where(b => b.Environment == environment && b.Status == ClientImportBatchStatus.Running && b.StartedAt < startedBefore)
+                .ToListAsync();
+
+            if (batches.Count == 0)
+                return 0;
+
+            var batchIds = batches.Select(b => b.BatchId).ToList();
+            var rowCounts = await _backofficeContext.ClientImportBatchRow
+                .AsNoTracking()
+                .Where(r => batchIds.Contains(r.BatchId))
+                .GroupBy(r => new { r.BatchId, r.Status })
+                .Select(g => new { g.Key.BatchId, g.Key.Status, Count = g.Count() })
+                .ToListAsync();
+
+            foreach (var batch in batches)
+            {
+                batch.Status = ClientImportBatchStatus.Interrupted;
+                batch.CompletedAt = DateTime.UtcNow;
+                batch.SucceededRows = rowCounts.Where(c => c.BatchId == batch.BatchId && c.Status == ClientImportRowStatus.Succeeded).Sum(c => c.Count);
+                batch.FailedRows = rowCounts.Where(c => c.BatchId == batch.BatchId && c.Status == ClientImportRowStatus.Failed).Sum(c => c.Count);
+
+                Log.Warning("Client import batch {BatchId} ({Environment}, started {StartedAt:o} by {UserName}) was left Running and is now marked Interrupted: {Succeeded} succeeded, {Failed} failed, {NotDone} of {Total} not done",
+                    batch.BatchId, batch.Environment, batch.StartedAt, batch.StartedByUserName, batch.SucceededRows, batch.FailedRows,
+                    batch.TotalRows - batch.SucceededRows - batch.FailedRows, batch.TotalRows);
+            }
+
+            await _backofficeContext.SaveChangesAsync();
+            return batches.Count;
+        }
+
+        // The environment always comes from the server's own database host. The request's value is only
+        // compared, so a page opened against another environment can't slip past the lock or mislabel the audit log.
+        private BaseResponse<string> ResolveCommitEnvironment(string requestedEnvironment)
+        {
+            var environment = GetEnvironment();
+            if (environment.StatusCode != StatusCode.Success)
+                return environment;
+
+            if (!string.IsNullOrWhiteSpace(requestedEnvironment)
+                && !string.Equals(requestedEnvironment.Trim(), environment.Result, StringComparison.OrdinalIgnoreCase))
+            {
+                return new BaseResponse<string>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"This server runs in {environment.Result}, but the request was for {requestedEnvironment}. Reload the page and try again."
+                };
+            }
+
+            return environment;
+        }
+
+        // Checks the lock (after closing stale batches) for this server's environment.
+        private async Task<string> TryGetLockError(string environment)
+        {
+            await InterruptRunningBatches(environment, GetStaleCutoff());
+
+            var lockResult = await IsImportRunning(environment);
+            return lockResult.Result
+                ? $"An import is already running for {environment}. Wait for it to finish before starting another."
+                : null;
+        }
+
+        // Saves the new Running batch. The filtered unique index UX_ClientImportBatch_RunningPerEnvironment
+        // (flyway V5) makes this the atomic step: when two commits pass TryGetLockError at the same moment,
+        // the second insert is rejected here. Returns false when another batch won.
+        private async Task<bool> TrySaveRunningBatch(ClientImportBatch batch)
+        {
+            _backofficeContext.ClientImportBatch.Add(batch);
+            try
+            {
+                await _backofficeContext.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 2601 or 2627 })
+            {
+                _backofficeContext.Entry(batch).State = EntityState.Detached;
+                return false;
+            }
         }
 
         public async Task<BaseResponse<ValidateClientImportResponse>> ValidateBatch(ValidateClientImportRequest request)
@@ -255,14 +368,17 @@ namespace Backoffice.API.Repositories
 
         public async Task<BaseResponse<CommitClientImportResponse>> CommitBatch(CommitClientImportRequest request, string userId, string userName)
         {
-            var lockResult = await IsImportRunning(request.Environment);
-            if (lockResult.Result)
+            var environmentResult = ResolveCommitEnvironment(request.Environment);
+            if (environmentResult.StatusCode != StatusCode.Success)
             {
-                return new BaseResponse<CommitClientImportResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"An import is already running for {request.Environment}. Wait for it to finish before starting another."
-                };
+                return new BaseResponse<CommitClientImportResponse> { StatusCode = StatusCode.Error, Message = environmentResult.Message };
+            }
+            var environment = environmentResult.Result;
+
+            var lockError = await TryGetLockError(environment);
+            if (lockError != null)
+            {
+                return new BaseResponse<CommitClientImportResponse> { StatusCode = StatusCode.Error, Message = lockError };
             }
 
             var groups = GroupRows(request.Rows);
@@ -270,7 +386,7 @@ namespace Backoffice.API.Repositories
             var batch = new ClientImportBatch
             {
                 BatchId = request.BatchId != Guid.Empty ? request.BatchId : Guid.NewGuid(),
-                Environment = request.Environment,
+                Environment = environment,
                 OperationType = ClientImportOperationType.Create,
                 Status = ClientImportBatchStatus.Running,
                 StartedByUserId = userId,
@@ -279,8 +395,14 @@ namespace Backoffice.API.Repositories
                 TotalRows = groups.Count
             };
 
-            _backofficeContext.ClientImportBatch.Add(batch);
-            await _backofficeContext.SaveChangesAsync();
+            if (!await TrySaveRunningBatch(batch))
+            {
+                return new BaseResponse<CommitClientImportResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"An import is already running for {environment}. Wait for it to finish before starting another."
+                };
+            }
 
             var response = new CommitClientImportResponse
             {
@@ -312,7 +434,7 @@ namespace Backoffice.API.Repositories
                     Page = "Clients - Import",
                     Activity = Activity.Create.ToString(),
                     Payload = batch.BatchId.ToString(),
-                    From = request.Environment,
+                    From = environment,
                     To = $"{response.SucceededCount}/{response.TotalClients} succeeded, {response.FailedCount} failed",
                     UserId = userId,
                     UserName = userName,
@@ -837,14 +959,17 @@ namespace Backoffice.API.Repositories
 
         public async Task<BaseResponse<CommitClientUpdateResponse>> CommitUpdateBatch(CommitClientUpdateRequest request, string userId, string userName)
         {
-            var lockResult = await IsImportRunning(request.Environment);
-            if (lockResult.Result)
+            var environmentResult = ResolveCommitEnvironment(request.Environment);
+            if (environmentResult.StatusCode != StatusCode.Success)
             {
-                return new BaseResponse<CommitClientUpdateResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"An import is already running for {request.Environment}. Wait for it to finish before starting another."
-                };
+                return new BaseResponse<CommitClientUpdateResponse> { StatusCode = StatusCode.Error, Message = environmentResult.Message };
+            }
+            var environment = environmentResult.Result;
+
+            var lockError = await TryGetLockError(environment);
+            if (lockError != null)
+            {
+                return new BaseResponse<CommitClientUpdateResponse> { StatusCode = StatusCode.Error, Message = lockError };
             }
 
             // Without the Platform list we can't tell what LimitId/Endpoint a client currently has,
@@ -887,7 +1012,7 @@ namespace Backoffice.API.Repositories
             var batch = new ClientImportBatch
             {
                 BatchId = request.BatchId != Guid.Empty ? request.BatchId : Guid.NewGuid(),
-                Environment = request.Environment,
+                Environment = environment,
                 OperationType = ClientImportOperationType.Update,
                 Status = ClientImportBatchStatus.Running,
                 StartedByUserId = userId,
@@ -896,8 +1021,14 @@ namespace Backoffice.API.Repositories
                 TotalRows = groups.Count
             };
 
-            _backofficeContext.ClientImportBatch.Add(batch);
-            await _backofficeContext.SaveChangesAsync();
+            if (!await TrySaveRunningBatch(batch))
+            {
+                return new BaseResponse<CommitClientUpdateResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"An import is already running for {environment}. Wait for it to finish before starting another."
+                };
+            }
 
             var response = new CommitClientUpdateResponse
             {
@@ -932,7 +1063,7 @@ namespace Backoffice.API.Repositories
                     Page = "Clients - Import",
                     Activity = Activity.Update.ToString(),
                     Payload = batch.BatchId.ToString(),
-                    From = request.Environment,
+                    From = environment,
                     To = $"{response.SucceededCount}/{response.TotalClients} succeeded, {response.FailedCount} failed",
                     UserId = userId,
                     UserName = userName,

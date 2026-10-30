@@ -6,6 +6,8 @@ namespace Backoffice.Shared.Enums
         public const string Completed = "Completed";
         public const string PartiallySuccessful = "PartiallySuccessful";
         public const string Failed = "Failed";
+        // The API process stopped mid-batch (restart, crash); rows still Pending were not done.
+        public const string Interrupted = "Interrupted";
     }
 
     public static class ClientImportRowStatus
