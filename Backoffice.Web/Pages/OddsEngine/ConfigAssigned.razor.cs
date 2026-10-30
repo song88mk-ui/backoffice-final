@@ -6,6 +6,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Config;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Serilog;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -33,6 +34,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private ConfigStateFilterModel _stateFilterModel = new();
         private SearchFormModel _searchForm = new();
         private AlertModel _alertModel = new();
+        private bool _loadFailureShown;
         private bool _shouldRender = true;
         private string _selectedClientName = string.Empty;
         private int _selectedClientCount;
@@ -149,6 +151,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task HandleModalSave(object e)
         {
             _selectedConfigClients = new();
+            _loadFailureShown = false;
             _alertModel = new();
 
             if (e is AlertModel)
@@ -322,6 +325,27 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
 
                 _configClients.ForEach(config => config.IsChecked = _selectedConfigClients?.FirstOrDefault(x => x.ClientCode == config.ClientCode && x.LeagueId == config.LeagueId && x.SportId == config.SportId)?.IsChecked ?? config.IsChecked);
+
+                if (_loadFailureShown)
+                {
+                    _alertModel = new();
+                    _loadFailureShown = false;
+                }
+            }
+            else
+            {
+                // A failed call must not look like "no leagues", and the previous list must not stay under this tab.
+                _configClients = new List<ConfigClientViewModel>();
+                _metaData = new MetaData();
+
+                Log.Warning("OE Config could not load the {State} leagues: {Message}", _state, response.Message);
+                _loadFailureShown = true;
+                _alertModel = new AlertModel
+                {
+                    Status = AlertStatus.Error,
+                    Message = "The leagues could not be loaded. Please try again, or contact support if it keeps happening.",
+                    IsAlwaysShown = true
+                };
             }
 
             _isPreloader = false;

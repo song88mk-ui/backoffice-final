@@ -67,9 +67,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 _assignedCount = ParamModel.AssignedLeaguesCount;
                 _unAssignedCount = ParamModel.UnAssignedLeaguesCount;
 
-                _myTemplateText = $"{_translationState.GetValue("My Templates")} ({(_myTemplateCount > 0 ? _myTemplateCount : _calculatingText)})";
-                _unAssignedText = $"{_translationState.GetValue("UnAssigned")} ({(_unAssignedCount > 0 ? _unAssignedCount : _calculatingText)})";
-                _assignedText = $"{_translationState.GetValue("Assigned")} ({(_assignedCount > 0 ? _assignedCount : _calculatingText)})";
+                _myTemplateText = $"{_translationState.GetValue("My Templates")} ({FormatCount(_myTemplateCount)})";
+                _unAssignedText = $"{_translationState.GetValue("UnAssigned")} ({FormatCount(_unAssignedCount)})";
+                _assignedText = $"{_translationState.GetValue("Assigned")} ({FormatCount(_assignedCount)})";
 
                 _myTemplateCss = _currentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav";
                 _unAssignedCss = _currentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav";
@@ -77,6 +77,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             }
 
             _init = false;
+        }
+
+        private string FormatCount(int count)
+        {
+            if (count == ConfigNavMenuParamModel.CountLoading)
+                return _calculatingText;
+
+            return count < 0 ? _translationState.GetValue("Error") : count.ToString();
         }
 
         protected override bool ShouldRender() => _shouldRender;

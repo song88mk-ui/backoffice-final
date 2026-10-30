@@ -367,7 +367,7 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 | POST | `api/config/template/set/{state}` | Set config state for leagues (Edit) |
 | POST | `api/config/template/delete/{id}` | Delete a config template (Edit) |
 | POST | `api/config/template/{state}` | Get config clients/leagues by state (`?templateId=`) |
-| GET | `api/config/template/count` | Template config counts (`?state=`) |
+| GET | `api/config/template/count` | Template config counts (`?state=`); HTTP 400 when the league lookup or the client list behind a count fails (BO-143), never a wrong number |
 | GET | `api/config/template/margin/{id}` | Get config template margin |
 | POST | `api/config/template/margin` | Add or update template margin (Edit) |
 | POST | `api/config/template/copy/client` | Copy a client's config |

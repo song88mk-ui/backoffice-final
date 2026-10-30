@@ -1988,31 +1988,38 @@ namespace Backoffice.API.Repositories
                         break;
                     case ConfigState.UnAssigned:
                         var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup(payload.SportId == -1 ? "" : string.Join(',', payload.SportId));
-                        if (leagueLookupResponse.Result != null)
+                        if (leagueLookupResponse.StatusCode != StatusCode.Success || leagueLookupResponse.Result == null)
                         {
-                            var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
-
-                            foreach (var client in clientList)
+                            return new BaseResponse<ConfigTemplateLeagueResponse>
                             {
-                                var userLeagues = query.Where(x => x.ClientCode == client.ClientCode).ToList();
-                                var leagues = leagueLookup.Where(x => !userLeagues.Any(u => u.SportId == x.SportId && u.SegmentId == x.SegmentId && u.LeagueId == x.LeagueId)).ToList();
+                                StatusCode = StatusCode.Error,
+                                Message = leagueLookupResponse.Message ?? "League lookup failed",
+                                Result = null
+                            };
+                        }
 
-                                if (leagues != null && leagues.Any())
+                        var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
+
+                        foreach (var client in clientList)
+                        {
+                            var userLeagues = query.Where(x => x.ClientCode == client.ClientCode).ToList();
+                            var leagues = leagueLookup.Where(x => !userLeagues.Any(u => u.SportId == x.SportId && u.SegmentId == x.SegmentId && u.LeagueId == x.LeagueId)).ToList();
+
+                            if (leagues != null && leagues.Any())
+                            {
+                                clientConfigs.AddRange(leagues.Select(x => new ConfigClientModel()
                                 {
-                                    clientConfigs.AddRange(leagues.Select(x => new ConfigClientModel()
-                                    {
-                                        Id = -1,
-                                        ClientId = client.ClientId.ToString(),
-                                        ClientCode = client.ClientCode.ToUpper(),
-                                        ClientName = client.ClientName,
-                                        SportId = x.SportId,
-                                        SportName = x.SportName,
-                                        SegmentId = x.SegmentId,
-                                        SegmentName = x.SegmentName,
-                                        LeagueId = x.LeagueId,
-                                        LeagueName = x.LeagueName
-                                    }));
-                                }
+                                    Id = -1,
+                                    ClientId = client.ClientId.ToString(),
+                                    ClientCode = client.ClientCode.ToUpper(),
+                                    ClientName = client.ClientName,
+                                    SportId = x.SportId,
+                                    SportName = x.SportName,
+                                    SegmentId = x.SegmentId,
+                                    SegmentName = x.SegmentName,
+                                    LeagueId = x.LeagueId,
+                                    LeagueName = x.LeagueName
+                                }));
                             }
                         }
 
@@ -2079,11 +2086,18 @@ namespace Backoffice.API.Repositories
                 }
                 else if (state.ToUpper() == ConfigState.UnAssigned.ToString().ToUpper())
                 {
-                    count = await GetUnAssignedCount(clientCodes);
+                    var unAssigned = await GetUnAssignedCount(clientCodes);
+                    if (unAssigned.StatusCode != StatusCode.Success)
+                        return unAssigned;
+
+                    count = unAssigned.Result;
                 }
                 else
                 {
                     var configTemplate = await GetConfigTemplatesCount();
+                    if (configTemplate.StatusCode != StatusCode.Success)
+                        return configTemplate;
+
                     count = configTemplate.Result;
                 }
 
@@ -2618,10 +2632,8 @@ namespace Backoffice.API.Repositories
 
             return result;
         }
-        private async Task<int> GetUnAssignedCount(List<string> clientCodes)
+        private async Task<BaseResponse<int>> GetUnAssignedCount(List<string> clientCodes)
         {
-            var result = -1;
-
             var query = _backofficeContext.ConfigTemplateAssigned.Select(s => new { s.ClientCode, s.LeagueId }).Distinct();
 
             if ((clientCodes.Count() == 1 && clientCodes.FirstOrDefault().ToUpper() == "ALL") == false)
@@ -2630,11 +2642,20 @@ namespace Backoffice.API.Repositories
             var leagueCount = query.Count();
             var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup("");
 
-            var clientList = (await _platformRepository.GetClients("HK")).Result;
-            if (leagueLookupResponse.StatusCode == StatusCode.Success)
-                result = (leagueLookupResponse.Result.LeagueLookup.Count * clientList.Count) - leagueCount;
+            if (leagueLookupResponse.StatusCode != StatusCode.Success || leagueLookupResponse.Result?.LeagueLookup == null)
+                return new BaseResponse<int> { StatusCode = StatusCode.Error, Message = leagueLookupResponse.Message ?? "League lookup failed", Result = -1 };
 
-            return result;
+            var clientListResponse = await _platformRepository.GetClients("HK");
+
+            if (clientListResponse.StatusCode != StatusCode.Success || clientListResponse.Result == null)
+                return new BaseResponse<int> { StatusCode = StatusCode.Error, Message = clientListResponse.Message ?? "Client list failed", Result = -1 };
+
+            return new BaseResponse<int>
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = (leagueLookupResponse.Result.LeagueLookup.Count * clientListResponse.Result.Count) - leagueCount
+            };
         }
 
         private Event GetEvent(string action, DateTime timestampStarted, DateTime timestampFinished)

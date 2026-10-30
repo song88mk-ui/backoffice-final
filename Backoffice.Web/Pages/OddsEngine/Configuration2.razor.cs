@@ -6,6 +6,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using RabbitMQ.Client.Framing.Impl;
+using Serilog;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -25,6 +26,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private ConfigContentFilterModel _contentFilterModel = new ConfigContentFilterModel();
         private ConfigNavMenuParamModel _navMenuParamModel;
         private AlertModel _alertModel;
+        private bool _loadFailureShown;
         private CancellationTokenSource? _cts;
 
         private List<BreadcrumbModel> _breadcrumbs;
@@ -115,6 +117,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void HandleCopyClientSettingsAlert(AlertModel alert)
         {
+            _loadFailureShown = false;
             _alertModel = alert;
 
             Init();
@@ -154,9 +157,15 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async void CalculateConfigCounts()
         {
-            _navMenuParamModel.MyTemplatesCount = -1;
-            _navMenuParamModel.AssignedLeaguesCount = -1;
-            _navMenuParamModel.UnAssignedLeaguesCount = -1;
+            _navMenuParamModel.MyTemplatesCount = ConfigNavMenuParamModel.CountLoading;
+            _navMenuParamModel.AssignedLeaguesCount = ConfigNavMenuParamModel.CountLoading;
+            _navMenuParamModel.UnAssignedLeaguesCount = ConfigNavMenuParamModel.CountLoading;
+
+            if (_loadFailureShown)
+            {
+                _alertModel = new AlertModel();
+                _loadFailureShown = false;
+            }
 
             _shouldRender = true;
 
@@ -171,26 +180,41 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var response = await _backofficeService.GetTemplateConfigCount(token: token);
 
                 if (response.StatusCode == StatusCode.Success)
+                {
                     _navMenuParamModel.MyTemplatesCount = response.Result;
+                }
+                else
+                {
+                    _navMenuParamModel.MyTemplatesCount = ConfigNavMenuParamModel.CountFailed;
+                    ReportLoadFailure("template count", response.Message);
+                }
 
                 _shouldRender = true;
                 StateHasChanged();
-            }, token);
+            }, token, () => _navMenuParamModel.MyTemplatesCount = ConfigNavMenuParamModel.CountFailed);
 
             await ExecuteWithCancellation(async () =>
             {
                 var response = await _backofficeService.GetTemplateConfigCount(ConfigState.Assigned.ToString(), token);
 
                 if (response.StatusCode == StatusCode.Success)
+                {
                     _navMenuParamModel.AssignedLeaguesCount = response.Result;
+                }
+                else
+                {
+                    _navMenuParamModel.AssignedLeaguesCount = ConfigNavMenuParamModel.CountFailed;
+                    ReportLoadFailure("assigned count", response.Message);
+                }
 
                 _shouldRender = true;
                 StateHasChanged();
-            }, token);
+            }, token, () => _navMenuParamModel.AssignedLeaguesCount = ConfigNavMenuParamModel.CountFailed);
 
             await ExecuteWithCancellation(async () =>
             {
                 var attempt = 0;
+                string? lastMessage = null;
                 while (attempt < 3)
                 {
                     var response = await _backofficeService.GetTemplateConfigCount(ConfigState.UnAssigned.ToString(), token);
@@ -201,15 +225,22 @@ namespace Backoffice.Web.Pages.OddsEngine
                         break;
                     }
 
+                    lastMessage = response.Message;
                     attempt++;
+                }
+
+                if (attempt == 3)
+                {
+                    _navMenuParamModel.UnAssignedLeaguesCount = ConfigNavMenuParamModel.CountFailed;
+                    ReportLoadFailure("unassigned count", lastMessage);
                 }
 
                 _shouldRender = true;
                 StateHasChanged();
-            }, token);
+            }, token, () => _navMenuParamModel.UnAssignedLeaguesCount = ConfigNavMenuParamModel.CountFailed);
         }
 
-        private async Task ExecuteWithCancellation(Func<Task> action, CancellationToken token)
+        private async Task ExecuteWithCancellation(Func<Task> action, CancellationToken token, Action? onFailure = null)
         {
             try
             {
@@ -221,9 +252,31 @@ namespace Backoffice.Web.Pages.OddsEngine
             catch (TaskCanceledException)
             {
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ReportLoadFailure("page data", ex.Message, ex);
+                onFailure?.Invoke();
+                _shouldRender = true;
+                StateHasChanged();
             }
+        }
+
+        // The Web service turns a failed call into an Error response. Show it, instead of leaving "Calculating..." or
+        // an empty list that reads as "no data". The API message goes to the log, not to the screen.
+        private void ReportLoadFailure(string what, string? apiMessage, Exception? exception = null)
+        {
+            if (exception != null)
+                Log.Error(exception, "OE Config could not load the {What}: {Message}", what, apiMessage);
+            else
+                Log.Warning("OE Config could not load the {What}: {Message}", what, apiMessage);
+
+            _loadFailureShown = true;
+            _alertModel = new AlertModel
+            {
+                Status = AlertStatus.Error,
+                Message = "Some of the Config information could not be loaded. Please try again, or contact support if it keeps happening.",
+                IsAlwaysShown = true
+            };
         }
         private async Task<List<SelectListItemModel<string>>> LoadSports()
         {
@@ -245,7 +298,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             var response = await _tradingService.GetClientList();
 
             if (response.StatusCode != StatusCode.Success)
+            {
+                ReportLoadFailure("client list", response.Message);
                 return new List<SelectListItemWithCheckboxModel<string>>();
+            }
 
             var clientsLookup = response.Result;
 

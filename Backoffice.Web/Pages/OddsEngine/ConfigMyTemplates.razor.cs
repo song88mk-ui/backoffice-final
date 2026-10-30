@@ -4,6 +4,7 @@ using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Config;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 using System.Globalization;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -20,6 +21,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private int _selectedScopeId;
         private SearchFormModel _searchForm = new();
         private AlertModel _alertModel;
+        private bool _loadFailureShown;
 
         private string _pageTitle = "My Templates";
 
@@ -183,6 +185,24 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     if (token.IsCancellationRequested)
                         return;
+
+                    // A failed call must not look like "no templates": say so, and log the API message.
+                    if (configTemplateResponse == null || configTemplateResponse.StatusCode != StatusCode.Success)
+                    {
+                        Log.Warning("OE Config could not load the templates: {Message}", configTemplateResponse?.Message);
+                        _loadFailureShown = true;
+                        _alertModel = new AlertModel
+                        {
+                            Status = AlertStatus.Error,
+                            Message = "The templates could not be loaded. Please try again, or contact support if it keeps happening.",
+                            IsAlwaysShown = true
+                        };
+                    }
+                    else if (_loadFailureShown)
+                    {
+                        _alertModel = new AlertModel();
+                        _loadFailureShown = false;
+                    }
 
                     _configTemplates = configTemplates?.Select(config => new ConfigMyTemplateModel()
                     {
