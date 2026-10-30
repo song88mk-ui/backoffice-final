@@ -1,7 +1,10 @@
 using Backoffice.WebSocket.API.Hubs;
+using Backoffice.WebSocket.API.Security;
 using Backoffice.WebSocket.API.Telemetry;
 using MessagePack;
 using MessagePack.Resolvers;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
@@ -39,7 +42,25 @@ builder.Services.AddResponseCompression(opts => opts.MimeTypes = ResponseCompres
 
 builder.Services.AddHealthChecks();
 
+// BO-131: only the internal services connect, and only WebSocket.Service may publish.
+var hubSecurity = HubSecurityOptions.FromConfiguration(builder.Configuration);
+builder.Services.AddSingleton(hubSecurity);
+builder.Services.AddAuthentication(HubApiKeyAuthenticationHandler.SchemeName)
+                .AddScheme<AuthenticationSchemeOptions, HubApiKeyAuthenticationHandler>(HubApiKeyAuthenticationHandler.SchemeName, null);
+builder.Services.AddSingleton<IAuthorizationHandler, HubAccessHandler>();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(HubPolicies.Connect, policy => policy.AddRequirements(new HubAccessRequirement()));
+    options.AddPolicy(HubPolicies.Publish, policy => policy.AddRequirements(new HubAccessRequirement(HubRoles.Publisher)));
+});
+
 var app = builder.Build();
+
+if (!hubSecurity.Enforce)
+    app.Logger.LogWarning("Hub security is in log-only mode (Security:Enforce=false): callers without a valid API key are still accepted");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapHealthChecks("/healthz");
 
@@ -50,3 +71,5 @@ app.MapHub<BackofficeHub>("/bohub", options =>
     options.Transports = HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling;
 });
 app.Run();
+
+public partial class Program;

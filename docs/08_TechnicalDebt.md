@@ -939,6 +939,8 @@ public override Task OnConnectedAsync()
 - ✗ Stale entries not cleaned up
 - ✗ No cleanup on connection error
 
+**Security (BO-131, October 29, 2026):** the hub accepted every connection with no credential, any client could call the `Publish*` methods (fake bet stops, odds changes and notification pop-ups to every Back Office screen), and the user id came unverified from `?userId=`, so a second connection could take over a user's notifications. Fixed in `Backoffice.WebSocket.API/Security/`: callers send `x-api-key` (`Security:PublisherApiKey` for WebSocket.Service, `Security:SubscriberApiKey` for the Web and Utility), the hub requires a key to connect and the publisher key to call any `Publish*` method, and the user id comes from the Auth JWT the Web sends as a Bearer token (validated locally with `API:AuthenticationAPI:JWT:Key`/`Issuer`). A notification addressed to a user who is not connected is now dropped; it used to fall through to `Clients.All`, because WebSocket.Service always sends `Gr = null`. `Security:Enforce=false` only logs callers that would be refused, for the rollout (clients first, then turn it on); `true` with a missing key or JWT setting stops the hub at startup. Tests: `Backoffice.WebSocket.API.Tests`. The scalability issues above are unchanged.
+
 **Severity:** 🟢 LOW (Low immediate risk, but limits scalability)
 
 ---
@@ -1021,7 +1023,7 @@ services.AddHealthChecks();
 | 23 | Inconsistent async | 🟡 MEDIUM | Bugs | Hangs/deadlocks |
 | 24 | No documentation | 🟡 MEDIUM | Maintenance | Hard to use |
 | 25 | Incomplete refs | 🟡 MEDIUM | Architecture | N/A queries |
-| 26 | SignalR user tracking | 🟢 LOW | Scalability | Single server only |
+| 26 | SignalR user tracking | 🟢 LOW | Scalability | Single server only (auth fixed in BO-131) |
 | 27 | Basic health checks | 🟢 LOW | Ops | Limited insight |
 | 28 | No tracing config | 🟢 LOW | Observability | Missing data |
 | 29 | Outdated comments | 🟢 LOW | Maintenance | Confusion |

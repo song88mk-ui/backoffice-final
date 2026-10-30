@@ -39,7 +39,12 @@ namespace Backoffice.Utility.Repository
             _backofficeContext = new BackofficeContext(optionsBuilder.Options);
 
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl(new Uri(configuration["Custom:Hub"]))
+                .WithUrl(new Uri(configuration["Custom:Hub"]), options =>
+                {
+                    // Subscriber key, so the hub keeps accepting this connection once it enforces keys (BO-131).
+                    if (!string.IsNullOrEmpty(configuration["Custom:HubApiKey"]))
+                        options.Headers["x-api-key"] = configuration["Custom:HubApiKey"];
+                })
                 .Build();
             _ = Subscribe();
 

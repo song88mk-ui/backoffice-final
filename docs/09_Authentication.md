@@ -539,6 +539,25 @@ Backoffice.API → Auth API
 
 **Pattern:** API-key for service identity, Bearer token for user identity
 
+### Real-time hub (Backoffice.WebSocket.API, BO-131)
+
+```
+WebSocket.Service → /bohub   x-api-key: Security:PublisherApiKey   (may call Publish*)
+Backoffice.Web    → /bohub   x-api-key: Security:SubscriberApiKey  (listen, subscribe)
+                             Authorization: Bearer <user's Auth JWT> (user id for notifications)
+Backoffice.Utility → /bohub  x-api-key: Security:SubscriberApiKey
+```
+
+- `HubApiKeyAuthenticationHandler` maps the key to the `Publisher` or `Subscriber` role and validates the
+  user JWT locally (HS256, `API:AuthenticationAPI:JWT:Key`, issuer = audience = `API:AuthenticationAPI:JWT:Issuer`),
+  the same parameters the Auth API uses. An invalid token refuses the whole connection.
+- The hub class needs the `HubConnect` policy (any valid key); every `Publish*` method needs `HubPublish`
+  (publisher key). The `?userId=` query value is ignored once `Security:Enforce` is on.
+- Client settings: Web `API:HubAPIKey`, WebSocket.Service `Custom:WebSocketAPIKey`, Utility `Custom:HubApiKey`.
+  A client without the setting connects without a key, which works only while the hub is in log-only mode.
+- Rollout: deploy the clients with their keys, check the hub logs no "would be refused" warning, then set
+  `Security__Enforce=true` on the hub. `/healthz` stays anonymous.
+
 ---
 
 ## Security Issues

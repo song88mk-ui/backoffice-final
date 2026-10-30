@@ -17,12 +17,14 @@ namespace Backoffice.Web.Services
         private HubConnection _hubConnection;
         private List<string> _channels = new List<string>();
         private string _hubUri;
+        private string _hubApiKey;
         private bool _isConnecting;
         private UserState _userState;
 
         public HubService(IConfiguration configuration, UserState userState)
         {
             _hubUri = configuration["API:HubAPI"] ?? throw new ArgumentNullException("API:HubAPI configuration is missing.");
+            _hubApiKey = configuration["API:HubAPIKey"];
             _userState = userState;
         }
 
@@ -38,11 +40,16 @@ namespace Backoffice.Web.Services
 
                 _isConnecting = true;
 
+                // The hub takes the user id from the access token (BO-131). ?userId= is kept only for hubs
+                // still in log-only mode and can be removed once Security:Enforce is on everywhere.
                 var userId = _userState.Model.Id;
                 _hubConnection = new HubConnectionBuilder()
                                 .WithUrl($"{_hubUri}?userId={userId}", options =>
                                 {
                                     options.Transports = HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling;
+                                    if (!string.IsNullOrEmpty(_hubApiKey))
+                                        options.Headers["x-api-key"] = _hubApiKey;
+                                    options.AccessTokenProvider = () => Task.FromResult(_userState.Model.AccessToken);
                                 })
                                 .AddMessagePackProtocol(options =>
                                 {

@@ -58,7 +58,13 @@ namespace Backoffice.WebSocket.Service
 
             _logger.LogInformation("Creating Hub Connection to {WebSocketApi}", configuration["Custom:WebSocketAPI"]);
             _hubConnection = new HubConnectionBuilder()
-                                .WithUrl(configuration["Custom:WebSocketAPI"], options => options.Transports = HttpTransportType.WebSockets)
+                                .WithUrl(configuration["Custom:WebSocketAPI"], options =>
+                                {
+                                    options.Transports = HttpTransportType.WebSockets;
+                                    // Publisher key: the hub only lets this service call the Publish* methods (BO-131).
+                                    if (!string.IsNullOrEmpty(configuration["Custom:WebSocketAPIKey"]))
+                                        options.Headers["x-api-key"] = configuration["Custom:WebSocketAPIKey"];
+                                })
                                 .AddMessagePackProtocol(options =>
                                 {
                                     StaticCompositeResolver.Instance.Register(
