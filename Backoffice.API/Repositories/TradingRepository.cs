@@ -24,6 +24,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Transactions;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using LeagueLookup = OE.Shared.Data.Sportsbook.Collections.LeagueLookup;
+using SegmentLookup = OE.Shared.Data.Sportsbook.Collections.SegmentLookup;
+using SportLookup = OE.Shared.Data.Sportsbook.Collections.SportLookup;
 using TierLeagueOrder = OE.Shared.Data.Sportsbook.SQLEntities.TierLeagueOrder;
 
 namespace Backoffice.API.Repositories
@@ -43,6 +46,9 @@ namespace Backoffice.API.Repositories
         private static IMongoCollection<Fixture> fixtureCollection;
         private static IMongoCollection<Market> marketCollection;
         private static IMongoCollection<Selection> selectionCollection;
+        private static IMongoCollection<SportLookup> sportLookupCollection;
+        private static IMongoCollection<SegmentLookup> segmentLookupCollection;
+        private static IMongoCollection<LeagueLookup> leagueLookupCollection;
 
         public TradingRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache, ILogger<TradingRepository> logger, IRabbitMqRepository rabbitMqRepository, TradingContext tradingContext, SportsbookContext sportsbookContext, IPlatformRepository platformRepository)
         {
@@ -63,6 +69,9 @@ namespace Backoffice.API.Repositories
                 fixtureCollection = _db.GetCollection<Fixture>("Fixture").WithReadPreference(new ReadPreference(ReadPreferenceMode.Secondary));
                 marketCollection = _db.GetCollection<Market>("Market").WithReadPreference(new ReadPreference(ReadPreferenceMode.Secondary));
                 selectionCollection = _db.GetCollection<Selection>("Selection").WithReadPreference(new ReadPreference(ReadPreferenceMode.Secondary));
+                sportLookupCollection = _db.GetCollection<SportLookup>("SportLookup").WithReadPreference(new ReadPreference(ReadPreferenceMode.PrimaryPreferred));
+                segmentLookupCollection = _db.GetCollection<SegmentLookup>("SegmentLookup").WithReadPreference(new ReadPreference(ReadPreferenceMode.PrimaryPreferred));
+                leagueLookupCollection = _db.GetCollection<LeagueLookup>("LeagueLookup").WithReadPreference(new ReadPreference(ReadPreferenceMode.PrimaryPreferred));
             }
 
         }
@@ -241,38 +250,67 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region League
+        // BO-144: read from the sportsbook Mongo here, no longer through the Trading API. The region argument stays so
+        // the callers and the interface do not change.
         public async Task<BaseResponse<LeagueLookupResponseV2>> GetAllLeagueLookup(string sportIds, string region = "")
         {
             try
             {
-                var payload = new
-                {
-                    SportIds = sportIds
-                };
-                var response = await GetHttpClient(region).PostAsync($"league/lookup", new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"));
+                var sportIdList = LeagueLookupBuilder.ParseSportIds(sportIds);
 
-                BaseResponse<LeagueLookupResponseV2> result;
-                if (response.IsSuccessStatusCode)
-                    result = JsonSerializer.Deserialize<BaseResponse<LeagueLookupResponseV2>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                else
+                var leagueFilter = sportIdList.Count == 0 ? Builders<LeagueLookup>.Filter.Empty : Builders<LeagueLookup>.Filter.In(l => l.SpId, sportIdList);
+                var segmentFilter = sportIdList.Count == 0 ? Builders<SegmentLookup>.Filter.Empty : Builders<SegmentLookup>.Filter.In(s => s.SpId, sportIdList);
+
+                var leagues = await leagueLookupCollection.Find(leagueFilter).ToListAsync();
+                var sports = await sportLookupCollection.Find(_ => true).ToListAsync();
+                var segments = await segmentLookupCollection.Find(segmentFilter).ToListAsync();
+
+                return new BaseResponse<LeagueLookupResponseV2>
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        result = JsonSerializer.Deserialize<BaseResponse<LeagueLookupResponseV2>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                    else
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new LeagueLookupResponseV2
                     {
-                        result = new BaseResponse<LeagueLookupResponseV2>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
+                        LeagueLookup = LeagueLookupBuilder.Build(leagues, sports, segments)
                     }
-                }
-
-                return result;
+                };
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "The league lookup could not be read for the sports {SportIds}", sportIds);
+
                 return new BaseResponse<LeagueLookupResponseV2>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        // BO-144: the saved league settings of the given clients (a row with IsActive = 0 restricts the league for that
+        // client). A league without a row is visible by default, so having no rows is not an error.
+        public async Task<BaseResponse<List<ClientLeagueConfig>>> GetClientLeagueConfigRows(List<string> clientCodes)
+        {
+            try
+            {
+                var codes = clientCodes ?? new List<string>();
+
+                var rows = codes.Count == 0
+                    ? new List<ClientLeagueConfig>()
+                    : await _tradingContext.ClientLeagueConfig.AsNoTracking().Where(c => codes.Contains(c.ClientCode)).ToListAsync();
+
+                return new BaseResponse<List<ClientLeagueConfig>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = rows
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "The league settings could not be read for {ClientCount} clients", clientCodes?.Count ?? 0);
+
+                return new BaseResponse<List<ClientLeagueConfig>>()
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

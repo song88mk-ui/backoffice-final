@@ -63,6 +63,7 @@ namespace Backoffice.API.Repositories
 
         #region League
         Task<BaseResponse<LeagueLookupResponseV2>> GetAllLeagueLookup(string sportIds, string region = "");
+        Task<BaseResponse<List<ClientLeagueConfig>>> GetClientLeagueConfigRows(List<string> clientCodes);
         Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string langCode, string region = "");
         Task<BaseResponse<List<TierLeagueOrderResponse>>> GetTierLeagueOrderList(string region);
         #endregion

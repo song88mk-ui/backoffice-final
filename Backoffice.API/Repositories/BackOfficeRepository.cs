@@ -2000,10 +2000,27 @@ namespace Backoffice.API.Repositories
 
                         var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
 
+                        // BO-144: a league is assigned to a client when the client has a saved setting for it (restricted
+                        // or allowed). A league without a saved setting is unassigned and visible by default.
+                        var savedRowsResponse = await _tradingRepository.GetClientLeagueConfigRows(clientList.Select(c => c.ClientCode).ToList());
+                        if (savedRowsResponse.StatusCode != StatusCode.Success || savedRowsResponse.Result == null)
+                        {
+                            return new BaseResponse<ConfigTemplateLeagueResponse>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = savedRowsResponse.Message ?? "League settings could not be read",
+                                Result = null
+                            };
+                        }
+
+                        var savedLeagueKeys = savedRowsResponse.Result
+                            .GroupBy(r => r.ClientCode ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+                            .ToDictionary(g => g.Key, g => g.Select(r => (r.SportId, r.SegmentId, r.LeagueId)).ToHashSet(), StringComparer.OrdinalIgnoreCase);
+
                         foreach (var client in clientList)
                         {
-                            var userLeagues = query.Where(x => x.ClientCode == client.ClientCode).ToList();
-                            var leagues = leagueLookup.Where(x => !userLeagues.Any(u => u.SportId == x.SportId && u.SegmentId == x.SegmentId && u.LeagueId == x.LeagueId)).ToList();
+                            savedLeagueKeys.TryGetValue(client.ClientCode, out var savedForClient);
+                            var leagues = leagueLookup.Where(x => savedForClient == null || !savedForClient.Contains((x.SportId, x.SegmentId, x.LeagueId))).ToList();
 
                             if (leagues != null && leagues.Any())
                             {
@@ -2606,40 +2623,11 @@ namespace Backoffice.API.Repositories
             //return _memCache.GetCache("tr", () => _translationContext.BackofficeStatic.AsNoTracking().ToList(), 24);
             return _translationContext.BackofficeStatic.AsNoTracking().ToList();
         }
-        private async Task<int> GetAssignedCount(List<string> clientCodes)
-        {
-            _ = _backofficeContext.ConfigTemplateAssigned.CountAsync(e => e.PrematchConfigTemplateId != -1);
-
-            _ = _backofficeContext.ConfigTemplateAssigned.CountAsync(e => e.LiveConfigTemplateId != -1);
-
-            var result = 0;
-            var assignedConfigTask = GetConfigState(clientCodes, null, ConfigState.Assigned);
-            var leagueLookupResponseTask = _tradingRepository.GetAllLeagueLookup("");
-
-            await Task.WhenAll(leagueLookupResponseTask, assignedConfigTask);
-
-            var leagueLookupResponse = leagueLookupResponseTask.Result;
-            var assignedConfig = assignedConfigTask.Result;
-
-            if (leagueLookupResponse.StatusCode == StatusCode.Success)
-            {
-                var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
-                var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
-
-                var clientList = (await _platformRepository.GetClients("HK")).Result;
-                result = (leagueLookup.Count * clientList.Count) - assignedLeagues;
-            }
-
-            return result;
-        }
+        // BO-144: unassigned = every league, for every client the user can see, minus the leagues the client has a saved
+        // setting for (restricted or allowed). A saved setting for a league that is no longer in the lookup takes nothing
+        // away from the count.
         private async Task<BaseResponse<int>> GetUnAssignedCount(List<string> clientCodes)
         {
-            var query = _backofficeContext.ConfigTemplateAssigned.Select(s => new { s.ClientCode, s.LeagueId }).Distinct();
-
-            if ((clientCodes.Count() == 1 && clientCodes.FirstOrDefault().ToUpper() == "ALL") == false)
-                query.Where(c => clientCodes.Contains(c.ClientCode));
-
-            var leagueCount = query.Count();
             var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup("");
 
             if (leagueLookupResponse.StatusCode != StatusCode.Success || leagueLookupResponse.Result?.LeagueLookup == null)
@@ -2650,11 +2638,29 @@ namespace Backoffice.API.Repositories
             if (clientListResponse.StatusCode != StatusCode.Success || clientListResponse.Result == null)
                 return new BaseResponse<int> { StatusCode = StatusCode.Error, Message = clientListResponse.Message ?? "Client list failed", Result = -1 };
 
+            var clients = clientListResponse.Result;
+
+            if ((clientCodes.Count() == 1 && clientCodes.FirstOrDefault().ToUpper() == "ALL") == false)
+                clients = clients.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+
+            var savedRowsResponse = await _tradingRepository.GetClientLeagueConfigRows(clients.Select(c => c.ClientCode).ToList());
+
+            if (savedRowsResponse.StatusCode != StatusCode.Success || savedRowsResponse.Result == null)
+                return new BaseResponse<int> { StatusCode = StatusCode.Error, Message = savedRowsResponse.Message ?? "League settings could not be read", Result = -1 };
+
+            var leagueKeys = leagueLookupResponse.Result.LeagueLookup.Select(l => (l.SportId, l.SegmentId, l.LeagueId)).ToHashSet();
+
+            var savedCount = savedRowsResponse.Result
+                .Where(r => leagueKeys.Contains((r.SportId, r.SegmentId, r.LeagueId)))
+                .Select(r => ((r.ClientCode ?? string.Empty).ToUpperInvariant(), r.SportId, r.SegmentId, r.LeagueId))
+                .Distinct()
+                .Count();
+
             return new BaseResponse<int>
             {
                 StatusCode = StatusCode.Success,
                 Message = StatusCode.Success.ToString(),
-                Result = (leagueLookupResponse.Result.LeagueLookup.Count * clientListResponse.Result.Count) - leagueCount
+                Result = (leagueKeys.Count * clients.Count) - savedCount
             };
         }
 

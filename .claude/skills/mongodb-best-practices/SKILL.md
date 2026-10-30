@@ -14,7 +14,7 @@ Only two classes in the solution talk to Mongo. Both are in `Backoffice.API/Repo
 | Repository | Collections | Read preference |
 |---|---|---|
 | `SportsbookRepository` | `SportLookup`, `SegmentLookup`, `LeagueLookup`, `MarketLookup` | `PrimaryPreferred` (SportsbookRepository.cs:56-59) |
-| `TradingRepository` | `Fixture`, `Market`, `Selection` | `Secondary` (TradingRepository.cs:52-54) |
+| `TradingRepository` | `Fixture`, `Market`, `Selection`; `SportLookup`, `SegmentLookup`, `LeagueLookup` (BO-144, for `GetAllLeagueLookup`) | `Secondary` for the first three, `PrimaryPreferred` for the lookups (the constructor of TradingRepository.cs) |
 
 `Backoffice.Utility`, `Backoffice.Config.Service`, `Backoffice.WebSocket.Service`, `Backoffice.Web` and `Backoffice.WebSocket.API` have no Mongo code. The only match in `Backoffice.Web` is a comment in `EditBoostedOddsModal.razor.cs:130`. The driver is `MongoDB.Driver` 3.7.1, referenced from `Backoffice.Shared/Backoffice.Shared.csproj:19`. The only other file that uses the driver is the test `Backoffice.API.Tests/MarketSettlement/TradingRepositorySettlementTests.cs`.
 
