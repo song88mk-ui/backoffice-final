@@ -2,7 +2,7 @@
     <AuthorizeView Policy="sbc-config-canedit">
         <Authorized Context="ActivateAll">
             <th class="text-center">
-                <input type="checkbox" class="form-check-input" @onchange="OnCheckboxClicked" checked="@Config.IsChecked" disabled="@(State == ConfigState.Assigned)" />
+                <input type="checkbox" class="form-check-input" @onchange="OnCheckboxClicked" checked="@Config.IsChecked" />
             </th>
         </Authorized>
     </AuthorizeView>
@@ -10,25 +10,14 @@
     <td class="px-4">@Config.ClientName</td>
     <td class="px-4">@_translationState.GetValue(Config.SportName)</td>
     <td class="px-4">@Config.SegmentName > @Config.LeagueName</td>
-    <td class="@(Config.PrematchTemplateId == -1 ? "template-name-italic" : "") px-4">
-        @if (Config.PrematchTemplateId == -1)
+    <td class="px-4">
+        @if (State == ConfigState.Assigned)
         {
-            <label>No template assigned</label>
+            <span class="badge @(Config.IsRestricted ? "bg-danger" : "bg-success")">@_translationState.GetValue(Config.IsRestricted ? "Restricted" : "Active")</span>
         }
         else
         {
-            <label class="@(State == ConfigState.Assigned ? "text-muted" : "")">@Config.PrematchTemplateName</label>
-        }
-
-    </td>
-    <td class="@(Config.LiveTemplateId == -1 ? "template-name-italic" : "") px-4">
-        @if (Config.LiveTemplateId == -1)
-        {
-            <label>No template assigned</label>
-        }
-        else
-        {
-            <label class="@(State == ConfigState.Assigned ? "text-muted" : "")">@Config.LiveTemplateName</label>
+            <span class="template-name-italic">@_translationState.GetValue("Not reviewed")</span>
         }
     </td>
 </tr>

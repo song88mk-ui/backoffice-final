@@ -28,6 +28,7 @@ using System.Transactions;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
 using static Backoffice.Shared.Models.Requests.AddOrUpdateBetConfigRequest;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
+using ClientLeagueConfig = Backoffice.Shared.Data.Trading.SQLEntities.ClientLeagueConfig;
 using IsolationLevel = System.Transactions.IsolationLevel;
 
 namespace Backoffice.API.Repositories
@@ -1782,76 +1783,104 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<long>() { StatusCode = StatusCode.Error, Message = ex.Message };
             }
         }
-        public async Task<BaseResponse<bool>> SetConfigState(ConfigState configState, ConfigSetLeagueStateRequest request)
+        // BO-151: assign leagues to clients as Active or Restricted, or unassign them. A league is assigned to a client
+        // when the client has a row for it in Trading.dbo.ClientLeagueConfig, and IsActive = 0 means Restricted (hidden for
+        // that client). Every change is written to the activity log with the user, the league and the old and new state.
+        public async Task<BaseResponse<bool>> SetConfigState(ConfigState configState, ConfigSetLeagueStateRequest request, List<string> userClientCodes, RequesterInfo requesterInfo)
         {
             try
             {
-                var prematchTemplateId = request.PrematchTemplateId;
-                var liveTemplateId = request.LiveTemplateId;
-                var leagueRequest = request.Leagues;
-                var configs = leagueRequest.Select(x => new ConfigTemplateAssigned()
+                var assign = configState == ConfigState.Assigned;
+                if (!assign && configState != ConfigState.UnAssigned)
+                    return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "Invalid state type" };
+
+                var leagues = request?.Leagues;
+                if (leagues == null || leagues.Count == 0)
+                    return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "No leagues selected" };
+
+                if (leagues.Any(l => string.IsNullOrWhiteSpace(l.ClientCode) || !Guid.TryParse(l.ClientId, out _)))
+                    return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = "A selected league has no valid client" };
+
+                // a user can only change the leagues of the clients they can see
+                var allowedCodes = userClientCodes ?? new List<string>();
+                var seesAllClients = allowedCodes.Count == 1 && allowedCodes[0].Equals("ALL", StringComparison.OrdinalIgnoreCase);
+                if (!seesAllClients)
                 {
-                    Id = x.Id,
-                    ClientId = Guid.Parse(x.ClientId),
-                    ClientCode = x.ClientCode,
-                    ClientName = x.ClientName,
-                    SportId = x.SportId,
-                    SportName = x.SportName,
-                    SegmentId = x.SegmentId,
-                    SegmentName = x.SegmentName,
-                    LeagueId = x.LeagueId,
-                    LeagueName = x.LeagueName,
-                    PrematchConfigTemplateId = prematchTemplateId,
-                    LiveConfigTemplateId = liveTemplateId
+                    var notAllowed = leagues
+                        .Select(l => l.ClientCode)
+                        .Where(code => !allowedCodes.Contains(code, StringComparer.OrdinalIgnoreCase))
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+
+                    if (notAllowed.Any())
+                        return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = $"Not allowed to change the leagues of {string.Join(", ", notAllowed)}" };
+                }
+
+                var rows = leagues.Select(l => new ClientLeagueConfig
+                {
+                    ClientCode = l.ClientCode.ToUpperInvariant(),
+                    ClientId = Guid.Parse(l.ClientId),
+                    SportId = l.SportId,
+                    SegmentId = l.SegmentId,
+                    LeagueId = l.LeagueId,
+                    IsActive = !request.Restricted
                 }).ToList();
 
-                using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    using (var context = _backofficeContext)
-                    {
-                        switch (configState)
-                        {
-                            case ConfigState.Assigned:
-                                foreach (var config in configs)
-                                {
-                                    var configTemplateAssigned = _backofficeContext.ConfigTemplateAssigned.Where(x => x.Id == config.Id && x.SportId == config.SportId && x.SegmentId == config.SegmentId && x.LeagueId == config.LeagueId).AsNoTracking().FirstOrDefault();
-                                    if (configTemplateAssigned == null)
-                                    {
-                                        context.ConfigTemplateAssigned.Add(new ConfigTemplateAssigned()
-                                        {
-                                            ClientId = config.ClientId,
-                                            ClientCode = config.ClientCode,
-                                            ClientName = config.ClientName,
-                                            SportId = config.SportId,
-                                            SportName = config.SportName,
-                                            SegmentId = config.SegmentId,
-                                            SegmentName = config.SegmentName,
-                                            LeagueId = config.LeagueId,
-                                            LeagueName = config.LeagueName,
-                                            PrematchConfigTemplateId = config.PrematchConfigTemplateId,
-                                            LiveConfigTemplateId = config.LiveConfigTemplateId
-                                        });
-                                    }
-                                    else
-                                    {
-                                        configTemplateAssigned.PrematchConfigTemplateId = config.PrematchConfigTemplateId;
-                                        configTemplateAssigned.LiveConfigTemplateId = config.LiveConfigTemplateId;
+                var beforeResponse = await _tradingRepository.GetClientLeagueConfigRows(rows.Select(r => r.ClientCode).Distinct().ToList());
+                if (beforeResponse.StatusCode != StatusCode.Success || beforeResponse.Result == null)
+                    return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = beforeResponse.Message ?? "League settings could not be read" };
 
-                                        context.ConfigTemplateAssigned.Update(configTemplateAssigned);
-                                    }
-                                    context.SaveChanges();
-                                }
-                                break;
-                            case ConfigState.UnAssigned:
-                                context.ConfigTemplateAssigned.RemoveRange(configs);
-                                context.SaveChanges();
-                                break;
-                        }
-                        scope.Complete();
+                var before = beforeResponse.Result.GroupBy(ConfigRowKey).ToDictionary(g => g.Key, g => g.First());
+
+                var write = assign
+                    ? await _tradingRepository.UpsertClientLeagueConfigRows(rows)
+                    : await _tradingRepository.DeleteClientLeagueConfigRows(rows);
+
+                if (write.StatusCode != StatusCode.Success)
+                    return write;
+
+                var logs = new List<ActivityLogModel>();
+                foreach (var row in rows.GroupBy(ConfigRowKey).Select(g => g.Last()))
+                {
+                    var hadRow = before.TryGetValue(ConfigRowKey(row), out var old);
+                    var from = hadRow ? ConfigStateName(old.IsActive) : "Unassigned";
+                    var to = assign ? ConfigStateName(row.IsActive) : "Unassigned";
+
+                    if (from == to)
+                        continue; // nothing changed, so nothing to log
+
+                    logs.Add(new ActivityLogModel
+                    {
+                        Page = requesterInfo?.Page ?? "Config",
+                        Payload = $"{row.ClientCode}.{row.SportId}.{row.SegmentId}.{row.LeagueId}",
+                        Activity = (!hadRow ? Shared.Enums.Activity.Create : assign ? Shared.Enums.Activity.Update : Shared.Enums.Activity.Delete).ToString(),
+                        From = from,
+                        To = to,
+                        UserId = requesterInfo?.UserId,
+                        UserName = requesterInfo?.UserName,
+                        TimeStamp = DateTime.UtcNow
+                    });
+                }
+
+                if (logs.Any())
+                {
+                    var logResponse = await AddActivityLogList(new ActivityLogListRequest { ActivityLogs = logs });
+
+                    // the leagues are saved, so a failed log is reported but does not undo or fail the change
+                    if (logResponse.StatusCode != StatusCode.Success)
+                    {
+                        Log.Error("The activity log of {LogCount} league changes could not be written: {Message}", logs.Count, logResponse.Message);
+
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Success,
+                            Message = $"Saved, but the activity log could not be written ({logResponse.Message})",
+                            Result = true
+                        };
                     }
                 }
 
-                return new BaseResponse<bool>()
+                return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Success,
                     Message = StatusCode.Success.ToString(),
@@ -1860,8 +1889,61 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                return new BaseResponse<bool>() { StatusCode = StatusCode.Error, Message = ex.Message };
+                return new BaseResponse<bool> { StatusCode = StatusCode.Error, Message = ex.Message };
             }
+        }
+
+        private static (string ClientCode, int SportId, int SegmentId, int LeagueId) ConfigRowKey(ClientLeagueConfig row) =>
+            ((row.ClientCode ?? string.Empty).ToUpperInvariant(), row.SportId, row.SegmentId, row.LeagueId);
+
+        private static string ConfigStateName(bool isActive) => isActive ? "Active" : "Restricted";
+
+        // BO-151: the leagues the clients have a saved setting for, with the names of the sportsbook league lookup. A
+        // saved league that is no longer in the lookup is still listed, so that it can be unassigned.
+        private static List<ConfigClientModel> BuildAssignedLeagues(List<ClientLeagueConfig> savedRows, List<LeagueLookupResponseV2.LeagueLookupModelV2> leagueLookup, List<PlatformClientResponse> clients, ConfigTemplateLeagueRequest payload)
+        {
+            var clientsByCode = clients
+                .GroupBy(c => c.ClientCode, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+            var leaguesByKey = leagueLookup
+                .GroupBy(l => (l.SportId, l.SegmentId, l.LeagueId))
+                .ToDictionary(g => g.Key, g => g.First());
+
+            var sportId = payload?.SportId ?? -1;
+
+            var assigned = savedRows
+                .Where(r => r.ClientCode != null && clientsByCode.ContainsKey(r.ClientCode))
+                .Where(r => sportId == -1 || r.SportId == sportId)
+                .Select(r =>
+                {
+                    var client = clientsByCode[r.ClientCode];
+                    leaguesByKey.TryGetValue((r.SportId, r.SegmentId, r.LeagueId), out var league);
+
+                    return new ConfigClientModel
+                    {
+                        Id = -1,
+                        ClientId = client.ClientId.ToString(),
+                        ClientCode = client.ClientCode.ToUpper(),
+                        ClientName = client.ClientName,
+                        SportId = r.SportId,
+                        SportName = league?.SportName ?? "-",
+                        SegmentId = r.SegmentId,
+                        SegmentName = league?.SegmentName ?? "-",
+                        LeagueId = r.LeagueId,
+                        LeagueName = league?.LeagueName ?? $"League {r.LeagueId}",
+                        IsRestricted = !r.IsActive
+                    };
+                })
+                .ToList();
+
+            if (!string.IsNullOrEmpty(payload?.SearchText))
+            {
+                var search = payload.SearchText.ToLower();
+                assigned = assigned.Where(x => x.ClientName.ToLower().Contains(search) || x.SportName.ToLower().Contains(search) || x.SegmentName.ToLower().Contains(search) || x.LeagueName.ToLower().Contains(search)).ToList();
+            }
+
+            return assigned;
         }
         public async Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string id, RequesterInfo requesterInfo)
         {
@@ -1943,31 +2025,81 @@ namespace Backoffice.API.Repositories
                     clientList = clientList.Where(x => payload.ClientCodes?.ToList()?.Contains(x.ClientCode) ?? false).ToList();
                 }
 
-                var query = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(x => clientList.Select(cl => cl.ClientCode).Contains(x.ClientCode.ToUpper()));
+                // BO-151: the Assigned and Unassigned leagues come from the saved league settings of the clients
+                // (Trading.dbo.ClientLeagueConfig) and the sportsbook league lookup. Only the dialog that lists the leagues
+                // of one template (templateId) still reads the old template assignments. Nothing else touches them: the
+                // template tables do not exist on every environment.
+                var templateAssignments = templateId != -1;
 
-                if (templateId != -1)
+                IQueryable<ConfigTemplateAssigned> query = null;
+
+                if (templateAssignments)
+                {
+                    query = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(x => clientList.Select(cl => cl.ClientCode).Contains(x.ClientCode.ToUpper()));
+
                     query = query.Where(x => x.PrematchConfigTemplateId == templateId || x.LiveConfigTemplateId == templateId);
 
-                if (payload != null && payload.SportId != -1)
-                {
-                    query = query.Where(x => x.SportId == payload.SportId);
+                    if (payload != null && payload.SportId != -1)
+                    {
+                        query = query.Where(x => x.SportId == payload.SportId);
+                    }
+
+                    if (payload != null && !string.IsNullOrEmpty(payload.SearchText))
+                    {
+                        query = query.Where(x => x.ClientName.ToLower().Contains(payload.SearchText.ToLower()) || x.SegmentName.ToLower().Contains(payload.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(payload.SearchText.ToLower()));
+                    }
                 }
 
-                if (payload != null && !string.IsNullOrEmpty(payload.SearchText))
-                {
-                    query = query.Where(x => x.ClientName.ToLower().Contains(payload.SearchText.ToLower()) || x.SegmentName.ToLower().Contains(payload.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(payload.SearchText.ToLower()));
-                }
-
-                if (query != null && query.Any())
+                if (templateAssignments && query != null && query.Any())
                 {
                     isCompleteClient = clientList.Count() == allClientsCount;
                 }
 
-                var sportsTranslationLookup = GetSportsLookup(langCode);
+                var sportsTranslationLookup = templateAssignments ? GetSportsLookup(langCode) : null;
+
+                List<LeagueLookupResponseV2.LeagueLookupModelV2> leagueLookup = null;
+                List<ClientLeagueConfig> savedRows = null;
+
+                if (!templateAssignments)
+                {
+                    var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup(payload == null || payload.SportId == -1 ? "" : payload.SportId.ToString());
+                    if (leagueLookupResponse.StatusCode != StatusCode.Success || leagueLookupResponse.Result == null)
+                    {
+                        return new BaseResponse<ConfigTemplateLeagueResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = leagueLookupResponse.Message ?? "League lookup failed",
+                            Result = null
+                        };
+                    }
+
+                    leagueLookup = leagueLookupResponse.Result.LeagueLookup;
+
+                    // BO-144: a league is assigned to a client when the client has a saved setting for it (restricted or
+                    // allowed). A league without a saved setting is unassigned and visible by default.
+                    var savedRowsResponse = await _tradingRepository.GetClientLeagueConfigRows(clientList.Select(c => c.ClientCode).ToList());
+                    if (savedRowsResponse.StatusCode != StatusCode.Success || savedRowsResponse.Result == null)
+                    {
+                        return new BaseResponse<ConfigTemplateLeagueResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = savedRowsResponse.Message ?? "League settings could not be read",
+                            Result = null
+                        };
+                    }
+
+                    savedRows = savedRowsResponse.Result;
+                }
 
                 switch (configState)
                 {
                     case ConfigState.Assigned:
+                        if (!templateAssignments)
+                        {
+                            clientConfigs = BuildAssignedLeagues(savedRows, leagueLookup, clientList, payload);
+                            break;
+                        }
+
                         clientConfigs = query.Select(x => new ConfigClientModel()
                         {
                             Id = x.Id,
@@ -1987,33 +2119,7 @@ namespace Backoffice.API.Repositories
                         }).ToList();
                         break;
                     case ConfigState.UnAssigned:
-                        var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup(payload.SportId == -1 ? "" : string.Join(',', payload.SportId));
-                        if (leagueLookupResponse.StatusCode != StatusCode.Success || leagueLookupResponse.Result == null)
-                        {
-                            return new BaseResponse<ConfigTemplateLeagueResponse>
-                            {
-                                StatusCode = StatusCode.Error,
-                                Message = leagueLookupResponse.Message ?? "League lookup failed",
-                                Result = null
-                            };
-                        }
-
-                        var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
-
-                        // BO-144: a league is assigned to a client when the client has a saved setting for it (restricted
-                        // or allowed). A league without a saved setting is unassigned and visible by default.
-                        var savedRowsResponse = await _tradingRepository.GetClientLeagueConfigRows(clientList.Select(c => c.ClientCode).ToList());
-                        if (savedRowsResponse.StatusCode != StatusCode.Success || savedRowsResponse.Result == null)
-                        {
-                            return new BaseResponse<ConfigTemplateLeagueResponse>
-                            {
-                                StatusCode = StatusCode.Error,
-                                Message = savedRowsResponse.Message ?? "League settings could not be read",
-                                Result = null
-                            };
-                        }
-
-                        var savedLeagueKeys = savedRowsResponse.Result
+                        var savedLeagueKeys = savedRows
                             .GroupBy(r => r.ClientCode ?? string.Empty, StringComparer.OrdinalIgnoreCase)
                             .ToDictionary(g => g.Key, g => g.Select(r => (r.SportId, r.SegmentId, r.LeagueId)).ToHashSet(), StringComparer.OrdinalIgnoreCase);
 
@@ -2047,6 +2153,9 @@ namespace Backoffice.API.Repositories
                         break;
 
                 }
+
+                if (!templateAssignments)
+                    isCompleteClient = clientConfigs.Any() && clientList.Count() == allClientsCount;
 
                 if (clientConfigs != null && clientConfigs.Any())
                 {
@@ -2094,12 +2203,11 @@ namespace Backoffice.API.Repositories
                 var count = 0;
                 if (state.ToUpper() == ConfigState.Assigned.ToString().ToUpper())
                 {
-                    var query = _backofficeContext.ConfigTemplateAssigned.Select(s => s.ClientCode);
+                    var assigned = await GetAssignedCount(clientCodes);
+                    if (assigned.StatusCode != StatusCode.Success)
+                        return assigned;
 
-                    if ((clientCodes.Count() == 1 && clientCodes.FirstOrDefault().ToUpper() == "ALL") == false)
-                        query.Where(c => clientCodes.Contains(c));
-
-                    count = query.Count();
+                    count = assigned.Result;
                 }
                 else if (state.ToUpper() == ConfigState.UnAssigned.ToString().ToUpper())
                 {
@@ -2633,15 +2741,12 @@ namespace Backoffice.API.Repositories
             if (leagueLookupResponse.StatusCode != StatusCode.Success || leagueLookupResponse.Result?.LeagueLookup == null)
                 return new BaseResponse<int> { StatusCode = StatusCode.Error, Message = leagueLookupResponse.Message ?? "League lookup failed", Result = -1 };
 
-            var clientListResponse = await _platformRepository.GetClients("HK");
+            var clientListResponse = await GetClientsOfUser(clientCodes);
 
-            if (clientListResponse.StatusCode != StatusCode.Success || clientListResponse.Result == null)
-                return new BaseResponse<int> { StatusCode = StatusCode.Error, Message = clientListResponse.Message ?? "Client list failed", Result = -1 };
+            if (clientListResponse.StatusCode != StatusCode.Success)
+                return new BaseResponse<int> { StatusCode = StatusCode.Error, Message = clientListResponse.Message, Result = -1 };
 
             var clients = clientListResponse.Result;
-
-            if ((clientCodes.Count() == 1 && clientCodes.FirstOrDefault().ToUpper() == "ALL") == false)
-                clients = clients.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
 
             var savedRowsResponse = await _tradingRepository.GetClientLeagueConfigRows(clients.Select(c => c.ClientCode).ToList());
 
@@ -2662,6 +2767,43 @@ namespace Backoffice.API.Repositories
                 Message = StatusCode.Success.ToString(),
                 Result = (leagueKeys.Count * clients.Count) - savedCount
             };
+        }
+
+        // BO-151: assigned = the leagues the clients the user can see have a saved setting for (restricted or allowed).
+        private async Task<BaseResponse<int>> GetAssignedCount(List<string> clientCodes)
+        {
+            var clientListResponse = await GetClientsOfUser(clientCodes);
+
+            if (clientListResponse.StatusCode != StatusCode.Success)
+                return new BaseResponse<int> { StatusCode = StatusCode.Error, Message = clientListResponse.Message, Result = -1 };
+
+            var savedRowsResponse = await _tradingRepository.GetClientLeagueConfigRows(clientListResponse.Result.Select(c => c.ClientCode).ToList());
+
+            if (savedRowsResponse.StatusCode != StatusCode.Success || savedRowsResponse.Result == null)
+                return new BaseResponse<int> { StatusCode = StatusCode.Error, Message = savedRowsResponse.Message ?? "League settings could not be read", Result = -1 };
+
+            return new BaseResponse<int>
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = savedRowsResponse.Result.Select(ConfigRowKey).Distinct().Count()
+            };
+        }
+
+        // The Platform clients the user can see: every client for ALL, else the clients of the user's client codes.
+        private async Task<BaseResponse<List<PlatformClientResponse>>> GetClientsOfUser(List<string> clientCodes)
+        {
+            var clientListResponse = await _platformRepository.GetClients("HK");
+
+            if (clientListResponse.StatusCode != StatusCode.Success || clientListResponse.Result == null)
+                return new BaseResponse<List<PlatformClientResponse>> { StatusCode = StatusCode.Error, Message = clientListResponse.Message ?? "Client list failed" };
+
+            var clients = clientListResponse.Result;
+
+            if ((clientCodes.Count() == 1 && clientCodes.FirstOrDefault().ToUpper() == "ALL") == false)
+                clients = clients.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+
+            return new BaseResponse<List<PlatformClientResponse>> { StatusCode = StatusCode.Success, Message = StatusCode.Success.ToString(), Result = clients };
         }
 
         private Event GetEvent(string action, DateTime timestampStarted, DateTime timestampFinished)

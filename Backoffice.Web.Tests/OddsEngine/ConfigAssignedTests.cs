@@ -18,8 +18,9 @@ using Xunit;
 
 namespace Backoffice.Web.Tests.OddsEngine
 {
-    // OE Config > Assigned is read-only (BO-128): the odds come from the provider as is, so no template (margin)
-    // can be opened, selected or changed from it. The Unassigned tab keeps assigning templates.
+    // OE Config > Assigned and Unassigned (BO-151): no templates or margins any more (BO-128 made the odds come from
+    // the provider as is). A league is Unassigned (not reviewed yet) or Assigned to the client as Active or Restricted.
+    // The page lists them with their state and opens one dialog to assign, change the state, or unassign.
     public class ConfigAssignedTests : BunitTestContext
     {
         private const string ToggleSelectionBar = "showSelectedLeagueCount";
@@ -99,7 +100,7 @@ namespace Backoffice.Web.Tests.OddsEngine
                 });
         }
 
-        private static ConfigClientViewModel League(long prematchTemplateId = -1, long liveTemplateId = -1) => new()
+        private static ConfigClientViewModel League(long prematchTemplateId = -1, long liveTemplateId = -1, bool isRestricted = false) => new()
         {
             ClientCode = "10BET",
             ClientName = "10Bet Crypto",
@@ -112,7 +113,8 @@ namespace Backoffice.Web.Tests.OddsEngine
             PrematchTemplateId = prematchTemplateId,
             PrematchTemplateName = prematchTemplateId > 0 ? "Soccer [Prematch][Tier 1]" : "",
             LiveTemplateId = liveTemplateId,
-            LiveTemplateName = liveTemplateId > 0 ? "Soccer [Live][Tier 1]" : ""
+            LiveTemplateName = liveTemplateId > 0 ? "Soccer [Live][Tier 1]" : "",
+            IsRestricted = isRestricted
         };
 
         private IRenderedComponent<ConfigAssigned> RenderPage(ConfigState state)
@@ -133,36 +135,50 @@ namespace Backoffice.Web.Tests.OddsEngine
         }
 
         [Fact]
-        public void AssignedRow_ShowsTheTemplateNamesAsMutedText_NotAsLinks()
+        public void AssignedRow_ShowsItsStateAsABadge()
         {
-            var cut = Render<ConfigStateRow>(ps => ps
-                .Add(p => p.State, ConfigState.Assigned)
-                .Add(p => p.Config, League(prematchTemplateId: 5, liveTemplateId: 7)));
+            var active = Render<ConfigStateRow>(ps => ps.Add(p => p.State, ConfigState.Assigned).Add(p => p.Config, League()));
+            var restricted = Render<ConfigStateRow>(ps => ps.Add(p => p.State, ConfigState.Assigned).Add(p => p.Config, League(isRestricted: true)));
 
-            Assert.Empty(cut.FindAll("a"));
-            Assert.Equal(
-                new[] { "Soccer [Prematch][Tier 1]", "Soccer [Live][Tier 1]" },
-                cut.FindAll("label.text-muted").Select(l => l.TextContent.Trim()));
+            var activeBadge = active.Find("span.badge");
+            var restrictedBadge = restricted.Find("span.badge");
+
+            Assert.Equal("Active", activeBadge.TextContent.Trim());
+            Assert.Contains("bg-success", activeBadge.ClassList);
+            Assert.Equal("Restricted", restrictedBadge.TextContent.Trim());
+            Assert.Contains("bg-danger", restrictedBadge.ClassList);
         }
 
         [Fact]
-        public void AssignedRow_HasADisabledCheckbox()
+        public void TheRows_HaveNoTemplateColumns()
         {
-            var cut = Render<ConfigStateRow>(ps => ps
-                .Add(p => p.State, ConfigState.Assigned)
-                .Add(p => p.Config, League(prematchTemplateId: 5, liveTemplateId: 7)));
+            var assigned = Render<ConfigStateRow>(ps => ps.Add(p => p.State, ConfigState.Assigned).Add(p => p.Config, League(prematchTemplateId: 5, liveTemplateId: 7)));
+            var unassigned = Render<ConfigStateRow>(ps => ps.Add(p => p.State, ConfigState.UnAssigned).Add(p => p.Config, League()));
 
-            Assert.True(cut.Find("input[type=checkbox]").HasAttribute("disabled"));
+            Assert.DoesNotContain("template", assigned.Markup.Replace("template-name-italic", string.Empty), StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("No template assigned", unassigned.Markup);
+            Assert.Equal(1, assigned.FindAll("td").Count(td => td.QuerySelector("span.badge") != null));
         }
 
         [Fact]
-        public void UnassignedRow_KeepsAnEnabledCheckbox_ThatRaisesTheSelectionEvent()
+        public void UnassignedRow_SaysTheLeagueIsNotReviewedYet()
+        {
+            var cut = Render<ConfigStateRow>(ps => ps.Add(p => p.State, ConfigState.UnAssigned).Add(p => p.Config, League()));
+
+            Assert.Equal("Not reviewed", cut.Find("td span.template-name-italic").TextContent.Trim());
+            Assert.Empty(cut.FindAll("span.badge"));
+        }
+
+        [Theory]
+        [InlineData(ConfigState.Assigned)]
+        [InlineData(ConfigState.UnAssigned)]
+        public void TheCheckbox_IsEnabledOnBothTabs_AndRaisesTheSelectionEvent(ConfigState state)
         {
             var league = League();
             ConfigClientViewModel? selected = null;
 
             var cut = Render<ConfigStateRow>(ps => ps
-                .Add(p => p.State, ConfigState.UnAssigned)
+                .Add(p => p.State, state)
                 .Add(p => p.Config, league)
                 .Add(p => p.ItemSelectionChangedEvent, EventCallback.Factory.Create<ConfigClientViewModel>(this, c => selected = c)));
 
@@ -176,51 +192,104 @@ namespace Backoffice.Web.Tests.OddsEngine
         }
 
         [Fact]
-        public void AssignedTab_DisablesEveryButtonOfTheSelectionBar()
+        public void TheTableHeader_HasAStateColumn_AndNoTemplateColumns()
         {
             var cut = RenderPage(ConfigState.Assigned);
 
-            foreach (var selector in new[] { ".btn-selection-all", ".btn-selection-clear", ".btn-selection-modify" })
-                Assert.True(cut.Find(selector).HasAttribute("disabled"), selector);
+            var headers = cut.FindAll("thead th").Select(th => th.TextContent.Trim()).Where(t => t.Length > 0).ToList();
+
+            Assert.Equal(new[] { "No.", "Client name", "Sport", "League Name", "State" }, headers);
         }
 
         [Fact]
-        public void UnassignedTab_KeepsTheButtonsOfTheSelectionBarEnabled()
+        public void AssignedTab_EnablesTheSelectionButtons_AndOffersUnassign()
         {
-            var cut = RenderPage(ConfigState.UnAssigned);
+            var cut = RenderPage(ConfigState.Assigned);
 
-            foreach (var selector in new[] { ".btn-selection-all", ".btn-selection-clear", ".btn-selection-modify" })
+            foreach (var selector in new[] { ".btn-selection-all", ".btn-selection-clear:not(.btn-selection-unassign)", ".btn-selection-unassign", ".btn-selection-modify" })
                 Assert.False(cut.Find(selector).HasAttribute("disabled"), selector);
+
+            Assert.Equal("Unassign", cut.Find(".btn-selection-unassign").TextContent.Trim());
+            Assert.Equal("Change state", cut.Find(".btn-selection-modify").TextContent.Trim());
         }
 
         [Fact]
-        public async Task ChangeTemplate_OnTheAssignedTab_OpensNoModal()
-        {
-            var cut = RenderPage(ConfigState.Assigned);
-
-            await cut.InvokeAsync(() => cut.Instance.HandleEditTemplateClick());
-
-            Assert.Empty(_modalService.Opened);
-        }
-
-        [Fact]
-        public async Task AssignTemplate_OnTheUnassignedTab_StillOpensTheModal()
+        public void UnassignedTab_OffersAssign_AndNoUnassign()
         {
             var cut = RenderPage(ConfigState.UnAssigned);
 
-            await cut.InvokeAsync(() => cut.Instance.HandleEditTemplateClick());
+            Assert.Empty(cut.FindAll(".btn-selection-unassign"));
+            Assert.Equal("Assign", cut.Find(".btn-selection-modify").TextContent.Trim());
+            Assert.False(cut.Find(".btn-selection-modify").HasAttribute("disabled"));
+        }
+
+        // ---- The dialog it opens -----------------------------------------------------------------------------
+
+        private static async Task Select(IRenderedComponent<ConfigAssigned> cut, params int[] leagueIds)
+        {
+            foreach (var id in leagueIds)
+                await cut.InvokeAsync(() => cut.Instance.HandleConfigSelectionChange(
+                    new ConfigClientViewModel { IsChecked = true, ClientCode = "10BET", SportId = 1, LeagueId = id }));
+        }
+
+        [Fact]
+        public async Task Assign_OnTheUnassignedTab_OpensTheDialog_WithTheSelectedLeagues()
+        {
+            var cut = RenderPage(ConfigState.UnAssigned);
+            await Select(cut, 100, 101);
+
+            await cut.InvokeAsync(() => cut.Instance.HandleAssignClick());
 
             var opened = Assert.Single(_modalService.Opened);
-            Assert.Equal(typeof(ModifyLeagueTemplateModal), opened.Component);
-            Assert.Equal("Assign Template", opened.Title);
+            Assert.Equal(typeof(AssignLeaguesModal), opened.Component);
+            Assert.Equal("Assign Leagues", opened.Title);
+            Assert.Equal(AssignLeaguesMode.Assign, opened.Parameters.TryGet<AssignLeaguesMode>("Mode"));
+            Assert.Equal(new[] { 100, 101 }, opened.Parameters.TryGet<List<ConfigClientViewModel>>("Leagues")!.Select(l => l.LeagueId));
+        }
+
+        [Fact]
+        public async Task ChangeState_OnTheAssignedTab_OpensTheDialog_ToChangeTheState()
+        {
+            var cut = RenderPage(ConfigState.Assigned);
+            await Select(cut, 100);
+
+            await cut.InvokeAsync(() => cut.Instance.HandleAssignClick());
+
+            var opened = Assert.Single(_modalService.Opened);
+            Assert.Equal(typeof(AssignLeaguesModal), opened.Component);
+            Assert.Equal("Change State", opened.Title);
+            Assert.Equal(AssignLeaguesMode.ChangeState, opened.Parameters.TryGet<AssignLeaguesMode>("Mode"));
+        }
+
+        [Fact]
+        public async Task Unassign_OnTheAssignedTab_OpensTheDialog_ToUnassign()
+        {
+            var cut = RenderPage(ConfigState.Assigned);
+            await Select(cut, 100);
+
+            await cut.InvokeAsync(() => cut.Instance.HandleUnassignClick());
+
+            var opened = Assert.Single(_modalService.Opened);
+            Assert.Equal("Unassign Leagues", opened.Title);
+            Assert.Equal(AssignLeaguesMode.Unassign, opened.Parameters.TryGet<AssignLeaguesMode>("Mode"));
+        }
+
+        [Fact]
+        public async Task WithNothingSelected_NoDialogOpens()
+        {
+            var cut = RenderPage(ConfigState.UnAssigned);
+
+            await cut.InvokeAsync(() => cut.Instance.HandleAssignClick());
+            await cut.InvokeAsync(() => cut.Instance.HandleUnassignClick());
+
+            Assert.Empty(_modalService.Opened);
         }
 
         [Fact]
         public async Task SwitchingTabs_DropsASelectionMadeOnTheOtherTab()
         {
             var cut = RenderPage(ConfigState.UnAssigned);
-            await cut.InvokeAsync(() => cut.Instance.HandleConfigSelectionChange(
-                new ConfigClientViewModel { IsChecked = true, ClientCode = "10BET", SportId = 1, LeagueId = 100 }));
+            await Select(cut, 100);
             Assert.Single(JSInterop.Invocations[ToggleSelectionBar]);
 
             cut.Render(ps => ps.Add(p => p.State, ConfigState.Assigned));
@@ -228,11 +297,10 @@ namespace Backoffice.Web.Tests.OddsEngine
             // The selection bar was showing, so it is toggled away on the way to the Assigned tab.
             Assert.Equal(2, JSInterop.Invocations[ToggleSelectionBar].Count);
 
-            cut.Render(ps => ps.Add(p => p.State, ConfigState.UnAssigned));
-            await cut.InvokeAsync(() => cut.Instance.HandleEditTemplateClick());
+            await cut.InvokeAsync(() => cut.Instance.HandleAssignClick());
 
-            var opened = Assert.Single(_modalService.Opened);
-            Assert.Empty(opened.Parameters.TryGet<List<ConfigClientViewModel>>("Leagues")!);
+            // Nothing is selected on this tab, so no dialog opens with the leagues of the other one.
+            Assert.Empty(_modalService.Opened);
         }
     }
 }

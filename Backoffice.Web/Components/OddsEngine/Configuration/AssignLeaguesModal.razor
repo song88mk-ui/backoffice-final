@@ -1,0 +1,58 @@
+<div class="modal-body">
+    <AlertMessage AlertClass="mb-3" AlertModel="_alertModel" />
+
+    <div class="container px-3 pb-3 mb-3 border-bottom">
+        <div class="mb-2 d-flex justify-content-between">
+            <label class="text-secondary fw-bold">@_translationState.GetValue("Leagues selected")</label>
+            @if (_leagues.Count > 3)
+            {
+                <a href="javascript:void(0)" @onclick="HandleShowAllClick">@_translationState.GetValue(_showAll ? "Show Less" : "Show All")</a>
+            }
+        </div>
+        <div class="row league-body">
+            @foreach (var item in _showAll ? _leagues : _leagues.Take(3).ToList())
+            {
+                <div class="col-12 mb-2 p-0">
+                    <div class="container border">
+                        <p class="fw-bold my-2">@item.SegmentName > @item.LeagueName</p>
+                        <p class="mb-2">@($"{item.ClientName} | {_translationState.GetValue(item.SportName)}")</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (_mode == AssignLeaguesMode.Unassign)
+    {
+        <div class="px-3 unassign-note">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <span class="fw-bold">@_translationState.GetValue("The selected leagues go back to Unassigned. Nothing is restricted for the client any more.")</span>
+        </div>
+    }
+    else
+    {
+        <fieldset class="state-panel border rounded mx-3 p-3">
+            <legend class="state-legend text-secondary fw-bold">@_translationState.GetValue("State")</legend>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="radio" name="league-state" id="state-active" checked="@(_restricted == false)" @onchange="HandleActiveSelected" disabled="@_isSaving" />
+                <label class="form-check-label" for="state-active">
+                    <span class="fw-bold">@_translationState.GetValue("Active")</span>
+                    <span class="d-block text-muted">@_translationState.GetValue("Reviewed. The leagues stay visible to the client.")</span>
+                </label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="league-state" id="state-restricted" checked="@(_restricted == true)" @onchange="HandleRestrictedSelected" disabled="@_isSaving" />
+                <label class="form-check-label" for="state-restricted">
+                    <span class="fw-bold">@_translationState.GetValue("Restricted")</span>
+                    <span class="d-block text-muted">@_translationState.GetValue("Hidden from the client. Other clients are not affected.")</span>
+                </label>
+            </div>
+        </fieldset>
+    }
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="HandleCancelClick" disabled="@_isSaving">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn btn-save" @onclick="HandleSaveClick" disabled="@(!CanSave)">@_translationState.GetValue(_mode == AssignLeaguesMode.Unassign ? "Unassign" : "Apply")</button>
+</div>

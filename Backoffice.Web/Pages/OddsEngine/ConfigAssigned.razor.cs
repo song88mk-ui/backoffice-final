@@ -238,36 +238,35 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _shouldRender = true;
         }
-        public void HandleEditTemplateClick()
+        // BO-151: on the Unassigned tab the selected leagues are assigned as Active or Restricted. On the Assigned tab the
+        // same dialog changes that state. Templates are no longer part of it.
+        public void HandleAssignClick() =>
+            OpenAssignLeaguesModal(_state == ConfigState.Assigned ? AssignLeaguesMode.ChangeState : AssignLeaguesMode.Assign);
+
+        public void HandleUnassignClick() => OpenAssignLeaguesModal(AssignLeaguesMode.Unassign);
+
+        private void OpenAssignLeaguesModal(AssignLeaguesMode mode)
         {
-            var leagues = _selectedConfigClients?.Where(x => x.IsChecked).ToList();
+            var leagues = _selectedConfigClients?.Where(x => x.IsChecked).ToList() ?? new List<ConfigClientViewModel>();
+
+            if (leagues.Count == 0)
+                return;
 
             var parameters = new ModalParameters();
 
             parameters.Add("Leagues", leagues);
-            parameters.Add("State", _state);
-            parameters.Add("SportId", _stateFilterModel.SportId);
-
-            var selectedPrematch = _configClients.Where(x => x.IsChecked && x.PrematchTemplateId > 0).Select(s => s.PrematchTemplateId).Distinct().ToList();
-            var selectedLive = _configClients.Where(x => x.IsChecked && x.LiveTemplateId > 0).Select(s => s.LiveTemplateId).Distinct().ToList();
-            ;
-
-            parameters.Add("CurrentPrematchId", selectedPrematch.Count() == 1 ? selectedPrematch.FirstOrDefault() : 0);
-            parameters.Add("CurrentLiveId", selectedLive.Count() == 1 ? selectedLive.FirstOrDefault() : 0);
-
+            parameters.Add("Mode", mode);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
-            var options = new ModalOptions();
 
-            switch (_state)
+            var title = mode switch
             {
-                case ConfigState.Assigned:
-                    // Odds come from the provider as is, so no template (margin) can be changed on this tab.
-                    break;
-                case ConfigState.UnAssigned:
-                    _modalService.Open<ModifyLeagueTemplateModal>($"Assign Template", parameters, options);
-                    break;
-            }
+                AssignLeaguesMode.Unassign => "Unassign Leagues",
+                AssignLeaguesMode.ChangeState => "Change State",
+                _ => "Assign Leagues"
+            };
+
+            _modalService.Open<AssignLeaguesModal>(title, parameters, new ModalOptions());
 
             _shouldRender = true;
         }

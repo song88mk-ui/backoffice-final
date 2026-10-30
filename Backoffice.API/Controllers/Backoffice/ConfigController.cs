@@ -87,7 +87,17 @@ namespace Backoffice.API.Controllers.Backoffice
 
             if (Enum.TryParse(state, out ConfigState confState))
             {
-                result = await _backofficeRepository.SetConfigState(confState, request);
+                // BO-151: the change is limited to the clients of the caller and is written to the activity log
+                var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList() ?? new List<string>();
+
+                var requester = new RequesterInfo()
+                {
+                    UserId = HttpContext.Items["UserId"]?.ToString(),
+                    UserName = HttpContext.Items["UserName"]?.ToString(),
+                    Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
+                };
+
+                result = await _backofficeRepository.SetConfigState(confState, request, clientCodes, requester);
             }
 
             switch (result.StatusCode)

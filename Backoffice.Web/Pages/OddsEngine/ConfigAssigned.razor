@@ -17,9 +17,13 @@
                     <p class="lbl-selection m-0">@(_translationState.GetValue((_selectedConfigClients?.Count ?? 0) >= 2 ? $"{_selectedConfigClients?.Count ?? 0} Leagues selected" : $"{_selectedConfigClients?.Count ?? 0} League selected"))</p>
                 </div>
                 <div class="d-flex h-75 justify-content-end">
-                    <button href="javascript:void(0)" @onclick="HandleSelectAllClick" class="btn btn-selection-all px-4" disabled="@(_state == ConfigState.Assigned)">@_translationState.GetValue("Select All")</button>
-                    <button href="javascript:void(0)" @onclick="HandleClearSelectionClick" class="btn btn-selection-clear px-4" disabled="@(_state == ConfigState.Assigned)">@_translationState.GetValue("Clear Selection")</button>
-                    <button href="javascript:void(0)" @onclick="HandleEditTemplateClick" class="btn btn-selection-modify px-4" disabled="@(_state == ConfigState.Assigned)">@(_translationState.GetValue(_state == ConfigState.Assigned ? "Change template" : "Assign a template"))</button>
+                    <button href="javascript:void(0)" @onclick="HandleSelectAllClick" class="btn btn-selection-all px-4">@_translationState.GetValue("Select All")</button>
+                    <button href="javascript:void(0)" @onclick="HandleClearSelectionClick" class="btn btn-selection-clear px-4">@_translationState.GetValue("Clear Selection")</button>
+                    @if (_state == ConfigState.Assigned)
+                    {
+                        <button href="javascript:void(0)" @onclick="HandleUnassignClick" class="btn btn-selection-clear btn-selection-unassign px-4">@_translationState.GetValue("Unassign")</button>
+                    }
+                    <button href="javascript:void(0)" @onclick="HandleAssignClick" class="btn btn-selection-modify px-4">@(_translationState.GetValue(_state == ConfigState.Assigned ? "Change state" : "Assign"))</button>
                 </div>
             </div>
         </div>
@@ -89,18 +93,14 @@
 
                     <AuthorizeView Policy="sbc-config-canedit">
                         <Authorized Context="ActivateAll">
-                            <th class="index" scope="col" rowspan="2"></th>
+                            <th class="index" scope="col"></th>
                         </Authorized>
                     </AuthorizeView>
-                    <th class="index" scope="col" rowspan="2">@_translationState.GetValue("No.")</th>
-                    <th class="filter" scope="col" rowspan="2">@_translationState.GetValue("Client name")</th>
-                    <th class="filter" scope="col" rowspan="2">@_translationState.GetValue("Sport")</th>
-                    <th class="template" scope="col" rowspan="2">@_translationState.GetValue("League Name")</th>
-                    <th class="template" scope="col" colspan="2">@_translationState.GetValue("Template")</th>
-                </tr>
-                <tr>
-                    <th class="template" scope="col">@_translationState.GetValue("Prematch")</th>
-                    <th class="template" scope="col">@_translationState.GetValue("Live")</th>
+                    <th class="index" scope="col">@_translationState.GetValue("No.")</th>
+                    <th class="filter" scope="col">@_translationState.GetValue("Client name")</th>
+                    <th class="filter" scope="col">@_translationState.GetValue("Sport")</th>
+                    <th class="template" scope="col">@_translationState.GetValue("League Name")</th>
+                    <th class="template" scope="col">@_translationState.GetValue("State")</th>
                 </tr>
             </thead>
 
@@ -110,12 +110,12 @@
                     <tr>
                         <AuthorizeView Policy="sbc-config-canedit">
                             <Authorized Context="ActivateAll">
-                                <td colspan="7">
+                                <td colspan="6">
                                     <Preloader />
                                 </td>
                             </Authorized>
                             <NotAuthorized>
-                                <td colspan="6">
+                                <td colspan="5">
                                     <Preloader />
                                 </td>
                             </NotAuthorized>
@@ -135,12 +135,12 @@
                         <tr>
                             <AuthorizeView Policy="sbc-config-canedit">
                                 <Authorized Context="ActivateAll">
-                                    <td colspan="7">
+                                    <td colspan="6">
                                         <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                     </td>
                                 </Authorized>
                                 <NotAuthorized>
-                                    <td colspan="6">
+                                    <td colspan="5">
                                         <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                     </td>
                                 </NotAuthorized>
@@ -149,7 +149,7 @@
                     }
                 }
             </tbody>
-            <Pagination MetaData="_metaData" Spread="5" SelectPageEvent="HandledPageSelect" PaginationColspan="7" RowInfColSpan="5" />
+            <Pagination MetaData="_metaData" Spread="5" SelectPageEvent="HandledPageSelect" PaginationColspan="6" RowInfColSpan="4" />
         </table>
     </div>
 </div>

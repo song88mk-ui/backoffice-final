@@ -337,5 +337,197 @@ namespace Backoffice.API.Tests.Config
             Assert.Contains("api.oddsengine.svc", response.Message);
             Assert.Null(response.Result);
         }
+
+        // ---- Unassigned and Assigned need no template tables -------------------------------------------------
+        // DEV has no ConfigTemplate tables at all, so a list or a count that touched them failed there with an error.
+
+        [Fact]
+        public async Task UnassignedAndAssignedLists_DoNotTouchTheTemplateTables()
+        {
+            var (sut, context, trading, platform) = Build();
+            trading.Setup(t => t.GetAllLeagueLookup(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Leagues(3));
+            platform.Setup(p => p.GetClients(It.IsAny<string>())).ReturnsAsync(Clients("S88"));
+            trading.Setup(t => t.GetClientLeagueConfigRows(It.IsAny<List<string>>())).ReturnsAsync(SavedRows(Saved("S88", 1, isActive: false)));
+            context.Dispose(); // every use of the Backoffice database now throws
+
+            var unassigned = await sut.GetConfigState(AllClients.ToList(), ListRequest("S88"), ConfigState.UnAssigned);
+            var assigned = await sut.GetConfigState(AllClients.ToList(), ListRequest("S88"), ConfigState.Assigned);
+
+            Assert.Equal(StatusCode.Success, unassigned.StatusCode);
+            Assert.Equal(2, unassigned.Result.ClientConfigs.Count);
+            Assert.Equal(StatusCode.Success, assigned.StatusCode);
+            Assert.Single(assigned.Result.ClientConfigs);
+        }
+
+        [Fact]
+        public async Task UnassignedAndAssignedCounts_DoNotTouchTheTemplateTables()
+        {
+            var (sut, context, trading, platform) = Build();
+            trading.Setup(t => t.GetAllLeagueLookup(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Leagues(3));
+            platform.Setup(p => p.GetClients(It.IsAny<string>())).ReturnsAsync(Clients("S88"));
+            trading.Setup(t => t.GetClientLeagueConfigRows(It.IsAny<List<string>>())).ReturnsAsync(SavedRows(Saved("S88", 1, isActive: false)));
+            context.Dispose();
+
+            var unassigned = await sut.GetTemplateConfigCount(AllClients.ToList(), "UnAssigned");
+            var assigned = await sut.GetTemplateConfigCount(AllClients.ToList(), "Assigned");
+
+            Assert.Equal(2, unassigned.Result);
+            Assert.Equal(1, assigned.Result);
+        }
+
+        // ---- Assigned list (BO-151) --------------------------------------------------------------------------
+
+        [Fact]
+        public async Task AssignedList_ListsTheSavedLeaguesOfTheClients_WithTheirNamesAndState()
+        {
+            var (sut, _, trading, platform) = Build();
+            trading.Setup(t => t.GetAllLeagueLookup(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Leagues(3));
+            platform.Setup(p => p.GetClients(It.IsAny<string>())).ReturnsAsync(Clients("S88", "OG"));
+            trading.Setup(t => t.GetClientLeagueConfigRows(It.IsAny<List<string>>()))
+                .ReturnsAsync(SavedRows(Saved("S88", 1, isActive: false), Saved("S88", 2, isActive: true), Saved("OG", 3, isActive: false)));
+
+            var response = await sut.GetConfigState(AllClients.ToList(), ListRequest("S88", "OG"), ConfigState.Assigned);
+
+            Assert.Equal(StatusCode.Success, response.StatusCode);
+            var rows = response.Result.ClientConfigs;
+            Assert.Equal(new[] { "OG:3:True", "S88:1:True", "S88:2:False" }, rows.Select(c => $"{c.ClientCode}:{c.LeagueId}:{c.IsRestricted}").OrderBy(s => s));
+
+            var first = rows.Single(c => c.ClientCode == "S88" && c.LeagueId == 1);
+            Assert.Equal("Soccer", first.SportName);
+            Assert.Equal("England", first.SegmentName);
+            Assert.Equal("League 1", first.LeagueName);
+            Assert.Equal("S88", first.ClientName);
+        }
+
+        [Fact]
+        public async Task AssignedList_OnlyListsTheClientsAskedFor()
+        {
+            var (sut, _, trading, platform) = Build();
+            trading.Setup(t => t.GetAllLeagueLookup(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Leagues(3));
+            platform.Setup(p => p.GetClients(It.IsAny<string>())).ReturnsAsync(Clients("S88", "OG"));
+            trading.Setup(t => t.GetClientLeagueConfigRows(It.IsAny<List<string>>())).ReturnsAsync(SavedRows(Saved("S88", 1, isActive: false), Saved("OG", 1, isActive: false)));
+
+            var response = await sut.GetConfigState(AllClients.ToList(), ListRequest("S88"), ConfigState.Assigned);
+
+            Assert.Equal("S88", Assert.Single(response.Result.ClientConfigs).ClientCode);
+        }
+
+        [Fact]
+        public async Task AssignedList_ASavedLeagueThatIsNotInTheLookupAnyMore_IsStillListed_SoItCanBeUnassigned()
+        {
+            var (sut, _, trading, platform) = Build();
+            trading.Setup(t => t.GetAllLeagueLookup(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Leagues(3));
+            platform.Setup(p => p.GetClients(It.IsAny<string>())).ReturnsAsync(Clients("S88"));
+            trading.Setup(t => t.GetClientLeagueConfigRows(It.IsAny<List<string>>())).ReturnsAsync(SavedRows(Saved("S88", 99, isActive: false)));
+
+            var response = await sut.GetConfigState(AllClients.ToList(), ListRequest("S88"), ConfigState.Assigned);
+
+            var row = Assert.Single(response.Result.ClientConfigs);
+            Assert.Equal(99, row.LeagueId);
+            Assert.Equal("League 99", row.LeagueName);
+            Assert.Equal("-", row.SportName);
+        }
+
+        [Fact]
+        public async Task AssignedList_CanBeFilteredBySport_AndSearched()
+        {
+            var (sut, _, trading, platform) = Build();
+            trading.Setup(t => t.GetAllLeagueLookup(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Leagues(3));
+            platform.Setup(p => p.GetClients(It.IsAny<string>())).ReturnsAsync(Clients("S88"));
+            var otherSport = Saved("S88", 5, isActive: false);
+            otherSport.SportId = 2;
+            trading.Setup(t => t.GetClientLeagueConfigRows(It.IsAny<List<string>>()))
+                .ReturnsAsync(SavedRows(Saved("S88", 1, isActive: false), Saved("S88", 2, isActive: false), otherSport));
+
+            var bySport = ListRequest("S88");
+            bySport.SportId = 2;
+            var searched = ListRequest("S88");
+            searched.SearchText = "league 2";
+
+            var sportResponse = await sut.GetConfigState(AllClients.ToList(), bySport, ConfigState.Assigned);
+            var searchResponse = await sut.GetConfigState(AllClients.ToList(), searched, ConfigState.Assigned);
+
+            Assert.Equal(5, Assert.Single(sportResponse.Result.ClientConfigs).LeagueId);
+            Assert.Equal(2, Assert.Single(searchResponse.Result.ClientConfigs).LeagueId);
+        }
+
+        [Fact]
+        public async Task AssignedList_WhenTheSavedSettingsCannotBeRead_IsAnError_NotAnEmptyList()
+        {
+            var (sut, _, trading, platform) = Build();
+            trading.Setup(t => t.GetAllLeagueLookup(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Leagues(3));
+            platform.Setup(p => p.GetClients(It.IsAny<string>())).ReturnsAsync(Clients("S88"));
+            trading.Setup(t => t.GetClientLeagueConfigRows(It.IsAny<List<string>>())).ReturnsAsync(SavedRowsFailure());
+
+            var response = await sut.GetConfigState(AllClients.ToList(), ListRequest("S88"), ConfigState.Assigned);
+
+            Assert.Equal(StatusCode.Error, response.StatusCode);
+            Assert.Null(response.Result);
+        }
+
+        // ---- Assigned count (BO-151) -------------------------------------------------------------------------
+
+        [Fact]
+        public async Task AssignedCount_IsTheNumberOfSavedLeaguesOfTheUsersClients()
+        {
+            var (sut, _, trading, platform) = Build();
+            platform.Setup(p => p.GetClients(It.IsAny<string>())).ReturnsAsync(Clients("S88", "OG"));
+            var allRows = new[] { Saved("S88", 1, isActive: false), Saved("S88", 2, isActive: true), Saved("OG", 1, isActive: false) };
+            trading
+                .Setup(t => t.GetClientLeagueConfigRows(It.IsAny<List<string>>()))
+                .ReturnsAsync((List<string> codes) => SavedRows(allRows.Where(r => codes.Contains(r.ClientCode, StringComparer.OrdinalIgnoreCase)).ToArray()));
+
+            var all = await sut.GetTemplateConfigCount(AllClients.ToList(), "Assigned");
+            var og = await sut.GetTemplateConfigCount(new List<string> { "og" }, "Assigned");
+
+            Assert.Equal(3, all.Result);
+            Assert.Equal(1, og.Result); // the filter by the user's clients is applied now, the old count ignored it
+        }
+
+        [Fact]
+        public async Task AssignedCount_WhenTheSavedSettingsCannotBeRead_IsAnError_WithTheReason()
+        {
+            var (sut, _, trading, platform) = Build();
+            platform.Setup(p => p.GetClients(It.IsAny<string>())).ReturnsAsync(Clients("S88"));
+            trading.Setup(t => t.GetClientLeagueConfigRows(It.IsAny<List<string>>())).ReturnsAsync(SavedRowsFailure());
+
+            var response = await sut.GetTemplateConfigCount(AllClients.ToList(), "Assigned");
+
+            Assert.Equal(StatusCode.Error, response.StatusCode);
+            Assert.Contains("Trading database", response.Message);
+        }
+
+        [Fact]
+        public async Task AssignedCount_WhenThePlatformClientListFails_IsAnError()
+        {
+            var (sut, _, _, platform) = Build();
+            platform
+                .Setup(p => p.GetClients(It.IsAny<string>()))
+                .ReturnsAsync(new BaseResponse<List<PlatformClientResponse>> { StatusCode = StatusCode.Error, Message = "Platform is down" });
+
+            var response = await sut.GetTemplateConfigCount(AllClients.ToList(), "Assigned");
+
+            Assert.Equal(StatusCode.Error, response.StatusCode);
+            Assert.Equal("Platform is down", response.Message);
+        }
+
+        // ---- The template dialog keeps its old data ----------------------------------------------------------
+
+        [Fact]
+        public async Task TheLeaguesOfOneTemplate_StillComeFromTheOldTemplateAssignments()
+        {
+            var (sut, context, trading, platform) = Build();
+            platform.Setup(p => p.GetClients(It.IsAny<string>())).ReturnsAsync(Clients("S88"));
+            var assigned = Assigned("S88", 1);
+            assigned.PrematchConfigTemplateId = 5;
+            context.ConfigTemplateAssigned.Add(assigned);
+            await context.SaveChangesAsync();
+
+            var response = await sut.GetConfigState(AllClients.ToList(), ListRequest("S88"), ConfigState.Assigned, templateId: 5);
+
+            Assert.Equal(StatusCode.Success, response.StatusCode);
+            Assert.Equal(1, Assert.Single(response.Result.ClientConfigs).LeagueId);
+            trading.Verify(t => t.GetAllLeagueLookup(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
     }
 }

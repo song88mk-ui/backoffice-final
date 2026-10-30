@@ -317,6 +317,106 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        // BO-151: assign leagues to clients. The table has one row per client and league (its key), so assigning a league
+        // that is already assigned changes its state instead of adding a second row. The rows are saved together: all or
+        // none. A client code matches ignoring case, like the column does in SQL Server.
+        public async Task<BaseResponse<bool>> UpsertClientLeagueConfigRows(List<ClientLeagueConfig> rows)
+        {
+            try
+            {
+                var wanted = DistinctLeagueRows(rows);
+                if (wanted.Count == 0)
+                    return LeagueConfigSaved();
+
+                var codes = wanted.Select(r => r.ClientCode).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                var existing = (await _tradingContext.ClientLeagueConfig.Where(c => codes.Contains(c.ClientCode)).ToListAsync())
+                    .GroupBy(LeagueRowKey)
+                    .ToDictionary(g => g.Key, g => g.First());
+
+                foreach (var row in wanted)
+                {
+                    if (existing.TryGetValue(LeagueRowKey(row), out var current))
+                    {
+                        current.IsActive = row.IsActive;
+                        current.ClientId = row.ClientId;
+                    }
+                    else
+                    {
+                        _tradingContext.ClientLeagueConfig.Add(new ClientLeagueConfig
+                        {
+                            ClientCode = row.ClientCode,
+                            ClientId = row.ClientId,
+                            SportId = row.SportId,
+                            SegmentId = row.SegmentId,
+                            LeagueId = row.LeagueId,
+                            IsActive = row.IsActive
+                        });
+                    }
+                }
+
+                await _tradingContext.SaveChangesAsync();
+
+                return LeagueConfigSaved();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "The league settings of {RowCount} leagues could not be saved", rows?.Count ?? 0);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        // BO-151: unassign leagues from clients. A league that has no row is already unassigned, so it is not an error.
+        public async Task<BaseResponse<bool>> DeleteClientLeagueConfigRows(List<ClientLeagueConfig> rows)
+        {
+            try
+            {
+                var wanted = DistinctLeagueRows(rows);
+                if (wanted.Count == 0)
+                    return LeagueConfigSaved();
+
+                var codes = wanted.Select(r => r.ClientCode).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                var keys = wanted.Select(LeagueRowKey).ToHashSet();
+
+                var existing = (await _tradingContext.ClientLeagueConfig.Where(c => codes.Contains(c.ClientCode)).ToListAsync())
+                    .Where(c => keys.Contains(LeagueRowKey(c)))
+                    .ToList();
+
+                _tradingContext.ClientLeagueConfig.RemoveRange(existing);
+                await _tradingContext.SaveChangesAsync();
+
+                return LeagueConfigSaved();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "The league settings of {RowCount} leagues could not be removed", rows?.Count ?? 0);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        private static (string ClientCode, int SportId, int SegmentId, int LeagueId) LeagueRowKey(ClientLeagueConfig row) =>
+            ((row.ClientCode ?? string.Empty).ToUpperInvariant(), row.SportId, row.SegmentId, row.LeagueId);
+
+        // The same client and league twice in one request is one row, and the last one wins.
+        private static List<ClientLeagueConfig> DistinctLeagueRows(List<ClientLeagueConfig> rows) =>
+            (rows ?? new List<ClientLeagueConfig>()).GroupBy(LeagueRowKey).Select(g => g.Last()).ToList();
+
+        private static BaseResponse<bool> LeagueConfigSaved() => new BaseResponse<bool>
+        {
+            StatusCode = StatusCode.Success,
+            Message = StatusCode.Success.ToString(),
+            Result = true
+        };
+
         public async Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string langCode, string region = "")
         {
             try
