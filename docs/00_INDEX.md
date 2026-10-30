@@ -196,10 +196,10 @@ This documentation provides a comprehensive analysis of the Backoffice platform 
 - Remediation timeline
 
 **CRITICAL Issues:**
-1. Developer exception page always enabled
+1. Developer exception page always enabled (resolved, BO-132)
 2. Database credentials in plaintext
 3. Missing global exception handler
-4. Bearer token validation missing
+4. Bearer token validation missing (description corrected, BO-132: ApiKeyFilter only checks x-api-key)
 5. CORS allows any origin
 
 **HIGH Priority Issues:**
@@ -389,7 +389,7 @@ This documentation provides a comprehensive analysis of the Backoffice platform 
 
 **CRITICAL (5):**
 - Database credentials exposed
-- Developer exception page enabled
+- Developer exception page enabled (resolved, BO-132)
 - Bearer token not validated
 - CORS misconfiguration
 - HttpClient memory leak
@@ -461,7 +461,7 @@ This documentation provides a comprehensive analysis of the Backoffice platform 
 
 ### Week 1 (Critical)
 1. [ ] Move database credentials to secrets manager
-2. [ ] Disable developer exception page
+2. [x] Disable developer exception page (BO-132)
 3. [ ] Fix CORS to specific origins
 4. [ ] Validate Bearer tokens
 5. [ ] Use Azure Key Vault / AWS Secrets Manager

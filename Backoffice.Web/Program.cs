@@ -25,8 +25,8 @@ builder.Services.AddTelemetry(new TelemetrySettings(
 // Add services to the container.
 builder.Services.AddHealthChecks();
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor()
-    .AddCircuitOptions(o => o.DetailedErrors = true);
+// CircuitOptions.DetailedErrors is bound by the framework from the DetailedErrors key (BO-132).
+builder.Services.AddServerSideBlazor();
 
 builder.AddDataProtectionKeys();
 
@@ -51,14 +51,7 @@ var app = builder.Build();
 app.UseResponseCompression();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    //app.UseExceptionHandler("/Error");
-    //app.UseHsts();
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-}
-// temp
-app.UseDeveloperExceptionPage();
+app.UseErrorPages();
 
 app.UseSession();
 

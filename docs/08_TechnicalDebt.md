@@ -272,27 +272,29 @@ Deliberately mirrors, rather than upgrades, Static Translation's existing "Expor
 
 ## Critical Issues (Fix Immediately)
 
-### 1. Developer Exception Page Always Enabled
+### 1. Developer Exception Page Always Enabled (resolved, BO-132)
 
-**Location:** `Backoffice.Web/Program.cs` line 54
+**Location:** `Backoffice.Web/Program.cs` (was line 61, under a `// temp` comment)
 ```csharp
 // temp
 app.UseDeveloperExceptionPage();  // ALWAYS ENABLED
 ```
+`AddServerSideBlazor().AddCircuitOptions(o => o.DetailedErrors = true)` also sent circuit exception text to the browser in every environment.
 
-**Severity:** 🔴 CRITICAL
+**Severity:** 🔴 CRITICAL (until BO-132)
 
-**Impact:**
-- Exposes sensitive information in production
-- Stack traces, SQL queries, internal paths visible
-- Security vulnerability (OWASP A01)
+**Impact (before the fix):** stack traces, internal paths, request headers and cookies were shown to any user who hit an error, in every environment including PRD.
 
-**Risk:**
-- Information disclosure
-- Detailed error information available to attackers
-- Configuration secrets potentially leaked
+**Fix (BO-132):** `WebApplicationExtensions.UseErrorPages` (`Backoffice.Web/Extensions/WebApplicationExtensions.cs`)
+runs the developer exception page only when the environment is Development or the `DetailedErrors` key is on;
+otherwise it runs `UseExceptionHandler("/Error")` and `UseHsts()`, and the exception is logged by the handler
+middleware (Loki). The circuit override was removed, so `CircuitOptions.DetailedErrors` follows the same key
+(the framework binds it). No argocd values file sets `ASPNETCORE_ENVIRONMENT`, so DEV, STG and PRD all run as
+Production: DEV keeps the detailed view through a `DetailedErrors: "true"` env entry in
+`argocd/apps/corp-apps/bo-web/dev.yaml`; STG and PRD must not set it. Covered by
+`Backoffice.Web.Tests/Pipeline/ErrorPagesTests.cs`.
 
-**Frequency:** Every error in production
+**Still open:** `Backoffice.API/Startup.cs` runs `UseSwagger()` / `UseSwaggerUI()` in every environment.
 
 ---
 
@@ -388,32 +390,21 @@ catch (Exception ex)
 
 ---
 
-### 4. API Key Validation Only - No Bearer Token Validation
+### 4. API Key Validation Only - No Bearer Token Validation (corrected, BO-132)
 
-**Location:** `Backoffice.API/ActionFilter/ApiKeyFilter.cs` line 23-29
-```csharp
-var token = context.HttpContext.Request.Headers[HeaderNames.Authorization]
-    .ToString().Replace("Bearer", "").Trim();
+The earlier description here (a Bearer token extracted but never validated in `ApiKeyFilter`) does not
+match the code. `Backoffice.API/ActionFilter/ApiKeyFilter.cs` reads no `Authorization` header at all: it
+only compares the `x-api-key` header with `Security:ApiKey` and rejects the request when they differ.
 
-// Token extracted but NEVER VALIDATED
-if (string.IsNullOrEmpty(apiKey) || ...)
-{
-    context.Result = new BadRequestObjectResult(...);
-}
-```
+Bearer tokens are handled by `Backoffice.API/ActionFilter/AuthorizeAttribute.cs`, which checks the issuer
+and expiry locally, then validates the token against the Authentication API (`Authenticate(token)`) and,
+when a claim is required, checks the permission claim (see `09_Authentication.md`, BO-130). An action that
+carries only `ApiKeyFilter` and no `[Authorize]` accepts any caller holding the shared API key, with no user
+identity; that is the real gap to track per controller.
 
-**Severity:** 🔴 CRITICAL
-
-**Impact:**
-- Bearer token extracted but not validated
-- Any "Bearer {anything}" passes through
-- JWT validation delegated to AuthorizeAttribute (inconsistent)
-- Security bypass possible
-
-**Risk:**
-- Unauthorized access to protected endpoints
-- Token validation inconsistency between endpoints
-- Authentication bypass
+**Severity:** not critical as originally described. Remaining smaller issues in `AuthorizeAttribute`:
+`async void OnAuthorization`, a new `HttpClient` per attribute instance, and the catch block returning
+`ex.Message` to the caller.
 
 ---
 

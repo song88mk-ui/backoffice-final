@@ -183,7 +183,7 @@ Server-side Blazor web application providing UI for backoffice operations. Real-
 
 #### Features
 - **League Sorting** (BO-107) - `Pages/OddsEngine/LeagueSorting.razor`, route `/hk/odds-engine/league-sorting`, claim `SBC.OE.LeagueSorting`. Per-client, per-sport Oddstable league order: client list with a pill preview, an edit dialog (drag to reorder, searchable league picker, add/remove rows) and a multi-client copy with a confirmation step. Reached from the Sports Settings dropdown in the Odds Engine header. Data goes through `sportsbook/client/oddstableleague*` into `ClientOddstableLeagueOrder`, kept separate from the Sport Tree order. Every save and copy is audited by `SportsbookRepository` into `ActivityLog2` (`Page = SBC.OE.LeagueSorting`, `Payload` = client code, `Activity` = Add / Edit / Reorder / Copy, `From` / `To` = `OddstableLeagueSortingAudit` JSON with the previous and new order and, for a copy, the source client); the Logs dialog reads them back through `IBackofficeActivityLogRepository.GetPagedActivityLogs`. Import/Export (BO-122): each client row has an Export icon (View and Edit access) that downloads the client's leagues for the selected sport as `LeagueSorting-{client}-{sport}-{time}.csv` (header `ClientCode,SportId,SegmentId,SegmentName,LeagueId,LeagueName,SortOrder`; a client without leagues gets a header-only template) and an Import icon (Edit access) that opens `Components/OddsEngine/LeagueSorting/ImportModal.razor`: choose the CSV, the server validates it (`POST .../oddstableleaguesettings/import` with `Commit = false`, nothing saved), the dialog lists the leagues in the file, the skipped ones with a reason and the counts, then Import commits the same rows and shows the result. A file made for another client or sport, or with a bad header or number, is refused before anything is sent. Matching is by `SegmentId` + `LeagueId` against the sport's league lookup (names in the file are ignored); the merge rule lives in `Backoffice.API/Repositories/OddstableLeagueImportPlanner.cs` (matched leagues take the first positions in the file's `SortOrder`, the client's other leagues follow in their current order, positions renumbered from 1, at most 50 leagues, duplicate league or `SortOrder` below 1 rejects the whole file). An import that leaves the order unchanged saves, audits and publishes nothing. The import audit entry uses `Activity = Import`; Export is a read of what is already on the page and is not audited
-- ServerSideBlazor with DetailedErrors enabled
+- ServerSideBlazor; circuit DetailedErrors follows the `DetailedErrors` key (BO-132)
 - HTTP client factories for API calls
 - Local storage via Blazored.LocalStorage
 - Session management
@@ -193,7 +193,7 @@ Server-side Blazor web application providing UI for backoffice operations. Real-
 #### Middleware Pipeline
 ```
 1. Response compression
-2. Developer exception page (always on)
+2. Error pages (`UseErrorPages`): developer exception page in Development or with `DetailedErrors` on (DEV); otherwise `/Error` + HSTS (STG, PRD)
 3. Session middleware
 4. Static files
 5. Routing
@@ -210,13 +210,10 @@ Server-side Blazor web application providing UI for backoffice operations. Real-
 ### Performance Characteristics
 - Server-side rendering (CPU intensive)
 - All clients share server memory
-- Circuit options: DetailedErrors=true, 3-minute retention
+- Circuit options: DetailedErrors from the `DetailedErrors` key, 3-minute retention
 - Response compression enabled
 
 ### Issues
-- `UseDeveloperExceptionPage()` hardcoded (never disabled)
-- Exception handler commented out
-- HSTS disabled
 - `// DPK TODO: configure dpk` comment left in code
 
 ---

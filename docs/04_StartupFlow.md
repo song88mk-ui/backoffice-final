@@ -232,8 +232,7 @@ builder.Services.AddTelemetry(new TelemetrySettings(...));
 ```csharp
 builder.Services.AddHealthChecks();
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor()
-    .AddCircuitOptions(o => o.DetailedErrors = true);  // WARNING: Production risk
+builder.Services.AddServerSideBlazor();  // CircuitOptions.DetailedErrors bound from the DetailedErrors key (BO-132)
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
@@ -259,7 +258,7 @@ builder.Services.AddResponseCompression(...);
 var app = builder.Build();
 
 app.UseResponseCompression();
-app.UseDeveloperExceptionPage();  // WARNING: Always enabled
+app.UseErrorPages();  // BO-132: developer page in Development or with DetailedErrors on, else /Error + HSTS
 app.UseSession();
 app.MapHealthChecks("/healthz");
 app.UseStaticFiles();
@@ -612,8 +611,7 @@ Running:
 ### Critical
 1. **No startup validation** - Errors only on first request
 2. **Database credentials in appsettings** - Security risk
-3. **Developer exception page always enabled** - Info leakage
-4. **Exception handler commented out** - No production error handling
+3. **Exception handler commented out** - No production error handling
 
 ### High Priority
 1. **Partial HttpClient configuration** - Some clients not configured
@@ -622,10 +620,9 @@ Running:
 4. **Manual DbContext creation** (Config.Service) - Not DI-friendly
 
 ### Medium Priority
-1. **DetailedErrors in production** (Blazor) - Potential info leakage
-2. **TODO comments in code** - Incomplete implementation
-3. **Mixed serialization libraries** - Potential conflicts
-4. **CORS allows any origin** - Security risk
+1. **TODO comments in code** - Incomplete implementation
+2. **Mixed serialization libraries** - Potential conflicts
+3. **CORS allows any origin** - Security risk
 
 ### Low Priority
 1. **Health checks basic** - No dependency validation
