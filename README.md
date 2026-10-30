@@ -405,7 +405,7 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 
 #### TradingController - `api/trading` (x-api-key + Bearer JWT; most read `x-region`)
 
-Most of these routes forward to the OddsEngine Trading API (`API:TradingAPI:{HK|SA}`). Since BO-42 the price boost routes (`priceboost`, `priceboost/list`, `priceboost/settings`, `priceboost/settings/list`) and the fixture lists (`sportsbook/fixtures`, `sportsbook/outrightfixtures`) are served by `TradingRepository` itself from the Trading DB (`ConnectionStrings:Trading`) and the sportsbook Mongo, and `publish` goes through the broker API of this service (`API:RabbitMqApi`). The clients of the price boost list and of Boosted Settings are the ones the Platform API lists (`IPlatformRepository.GetClients`, the list the Web builds its client dropdowns from), not a copy in the Trading database.
+Most of these routes forward to the OddsEngine Trading API (`API:TradingAPI:{HK|SA}`). Since BO-42 the price boost routes (`priceboost`, `priceboost/list`, `priceboost/settings`, `priceboost/settings/list`) and the fixture lists (`sportsbook/fixtures`, `sportsbook/outrightfixtures`) are served by `TradingRepository` itself from the Trading DB (`ConnectionStrings:Trading`) and the sportsbook Mongo, and `publish` goes through the broker API of this service (`API:RabbitMqApi`). The clients of the price boost list and of Boosted Settings are the ones the Platform API lists (`IPlatformRepository.GetClients`, the list the Web builds its client dropdowns from), not a copy in the Trading database. Since BO-141 the client list (`client`) is answered the same way, from the Platform client list filtered to the caller's client codes.
 
 | Method | Route | Purpose |
 |---|---|---|
@@ -427,7 +427,7 @@ Most of these routes forward to the OddsEngine Trading API (`API:TradingAPI:{HK|
 | POST | `api/trading/priceboost/list` | Price boost config list with the live fixture, market and odds of each boost; a market published without client margins (`ClCoMa`) gives every client the provider odds (also deletes the boosts of fixtures that ended) |
 | POST | `api/trading/priceboost/settings/list` | Boosted settings list |
 | POST | `api/trading/priceboost/settings` | Add or update the % cap of a client (`?userId=`), then notifies that user with a toast |
-| GET | `api/trading/client` | Leftover route attribute: its action is commented out, so it binds to the same action as `client/config/all` (expects a body; see controller) |
+| GET | `api/trading/client` | Client list from the Platform client list, limited to the caller's client codes (BO-141) |
 | POST | `api/trading/client/config/all` | Get client config (all) |
 | POST | `api/trading/v2/client/config` | Get client config (v2) |
 | POST | `api/trading/client/config` | Add or update client config |

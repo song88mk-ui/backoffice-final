@@ -341,28 +341,42 @@ namespace Backoffice.API.Controllers.Trading
 
         #region Client
         [HttpGet("client")]
-        //public async Task<IActionResult> GetClientList()
-        //{
-        //    using (var activity = _activitySource.StartActivity("api/trading/client"))
-        //    {
-        //        activity?.SetTag("clientCodes", HttpContext.Items["ClientCodes"]?.ToString());
-        //        var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
-        //        var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
+        public async Task<IActionResult> GetClientList()
+        {
+            using (var activity = _activitySource.StartActivity("api/trading/client"))
+            {
+                activity?.SetTag("clientCodes", HttpContext.Items["ClientCodes"]?.ToString());
+                var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList() ?? new List<string>();
 
-        //        var result = await _tradingRepository.GetClientList(region);
+                var platformClients = await _backofficeRepository.GetPlatformClients();
 
-        //        switch (result.StatusCode)
-        //        {
-        //            case Shared.Enums.StatusCode.Success:
-        //                if (clientCodes.FirstOrDefault() != "ALL")
-        //                    result.Result = result.Result.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+                if (platformClients.StatusCode != Shared.Enums.StatusCode.Success)
+                {
+                    return BadRequest(new BaseResponse<List<ClientInformationModel>>
+                    {
+                        StatusCode = platformClients.StatusCode,
+                        Message = platformClients.Message
+                    });
+                }
 
-        //                return Ok(result);
-        //            default:
-        //                return BadRequest(result);
-        //        }
-        //    }
-        //}
+                var clients = platformClients.Result ?? new List<Shared.Models.Response.PlatformClientResponse>();
+
+                if (clientCodes.FirstOrDefault() != "ALL")
+                    clients = clients.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+
+                return Ok(new BaseResponse<List<ClientInformationModel>>
+                {
+                    StatusCode = Shared.Enums.StatusCode.Success,
+                    Message = Shared.Enums.StatusCode.Success.ToString(),
+                    Result = clients.Select(c => new ClientInformationModel
+                    {
+                        ClientCode = c.ClientCode,
+                        ClientId = c.ClientId,
+                        ClientName = c.ClientName
+                    }).ToList()
+                });
+            }
+        }
         [HttpPost("client/config/all")]
         public async Task<IActionResult> GetClientConfig([FromBody] ClientConfigRequest request)
         {
