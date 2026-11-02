@@ -15,6 +15,8 @@ namespace Backoffice.Shared.Data.Trading
             modelBuilder.Entity<ActivityLog>().HasKey(k => new { k.Id });
             modelBuilder.Entity<BoostedSettings>().HasKey(k => new { k.ClientId });
             modelBuilder.Entity<ClientLeagueConfig>().HasKey(k => new { k.ClientCode, k.SportId, k.SegmentId, k.LeagueId });
+            // the column is smallint (0 or 1) and EF cannot read a smallint into a bool without this (BO-151)
+            modelBuilder.Entity<ClientLeagueConfig>().Property(k => k.IsActive).HasConversion<short>();
             modelBuilder.Entity<ClientMarketConfig>().HasKey(k => new { k.ClientCode, k.SportId, k.SegmentId, k.LeagueId, k.MarketTemplateId, k.FixtureTypeId });
             modelBuilder.Entity<PriceBoostConfig>().HasKey(k => new { k.ClientCode, k.SportId, k.SegmentId, k.LeagueId, k.FixtureTypeId, k.ProviderFixtureId, k.MarketTemplateId, k.MarketSpecifier });
             modelBuilder.Entity<PriceBoostConfigAudit>().HasKey(k => new { k.ClientCode, k.SportId, k.SegmentId, k.LeagueId, k.FixtureTypeId, k.ProviderFixtureId, k.MarketTemplateId, k.TimeStamp });
