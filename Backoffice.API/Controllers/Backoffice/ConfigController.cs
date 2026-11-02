@@ -60,6 +60,32 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
+        [HttpGet("market-groups")]
+        public async Task<IActionResult> GetConfigMarketGroups()
+        {
+            var result = await _backofficeRepository.GetConfigMarketGroups();
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpGet("markets/{fixtureTypeId}/{sportId}")]
+        public async Task<IActionResult> GetConfigMarketLookup([FromRoute] int fixtureTypeId, [FromRoute] int sportId)
+        {
+            var result = await _backofficeRepository.GetConfigMarketLookup(fixtureTypeId, sportId);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         [HttpPost("template")]
         [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> AddOrUpdateConfigTemplate([FromBody] ConfigTemplateModel request)

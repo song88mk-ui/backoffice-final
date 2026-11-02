@@ -86,6 +86,8 @@ namespace Backoffice.Web.Services
 
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId);
         Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, CancellationToken cancellationToken = default);
+        Task<BaseResponse<MarketTemplateGroupResponse>> GetConfigMarketTemplateGroups(CancellationToken cancellationToken = default);
+        Task<BaseResponse<MarketLookupResponse>> GetConfigMarketLookup(MarketLookupRequest request, CancellationToken cancellationToken = default);
         Task<BaseResponse<long>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
         Task<BaseResponse<bool>> SetLeagueState(ConfigState state, ConfigSetLeagueStateRequest payload);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(long id);

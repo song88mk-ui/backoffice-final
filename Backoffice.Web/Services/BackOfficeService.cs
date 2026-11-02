@@ -2493,6 +2493,43 @@ namespace Backoffice.Web.Services
             }
         }
 
+        // BO-142: the template editor's market groups and market list come from the BO API's Sportsbook data, not the Odds Engine Trading API.
+        public async Task<BaseResponse<MarketTemplateGroupResponse>> GetConfigMarketTemplateGroups(CancellationToken cancellationToken = default) =>
+            await GetConfigMarketData<MarketTemplateGroupResponse>("api/config/market-groups", cancellationToken);
+
+        public async Task<BaseResponse<MarketLookupResponse>> GetConfigMarketLookup(MarketLookupRequest request, CancellationToken cancellationToken = default) =>
+            await GetConfigMarketData<MarketLookupResponse>($"api/config/markets/{request.FixtureTypeId}/{request.SportId}", cancellationToken);
+
+        private async Task<BaseResponse<T>> GetConfigMarketData<T>(string path, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync(path, cancellationToken);
+
+                if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    var result = JsonSerializer.Deserialize<BaseResponse<T>>(await response.Content.ReadAsStringAsync(cancellationToken), JsonSerializerOptionsProvider.CaseInsensitive);
+
+                    if (result != null)
+                        return result;
+                }
+
+                return new BaseResponse<T>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<T>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, CancellationToken cancellationToken = default)
         {
             try

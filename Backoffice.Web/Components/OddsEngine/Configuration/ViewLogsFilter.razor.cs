@@ -11,8 +11,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class ViewLogsFilter : IDisposable
     {
         #region Properties
-        [Inject] private ITradingService TradingService { get; set; }
-
         [Parameter] public ConfigLogsFilterModel ConfigLogsFilterModel { get; set; }
         [Parameter] public EventCallback<ConfigLogsFilterModel> ConfigLogsFilterModelChanged { get; set; }
         [Parameter] public EventCallback GetContentCallback { get; set; }
@@ -170,7 +168,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private async Task<List<SelectListItemModel<int>>> GetMarketGroups(int fixtureTypeId, int sportId)
         {
-            var result = (await TradingService.GetMarketTemplateGroups(fixtureTypeId)).Result.Sports;
+            var result = (await _backofficeService.GetConfigMarketTemplateGroups()).Result?.Sports;
 
             var marketTemplateGroups = new List<MarketTemplateGroup>();
             if (sportId != 0)
@@ -192,7 +190,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private async Task<List<string>> GetMarketTemplateIds(int fixtureTypeId, int sportId, int marketGroupId)
         {
-            var result = (await TradingService.GetMarketTemplateGroups(fixtureTypeId)).Result.Sports;
+            var result = (await _backofficeService.GetConfigMarketTemplateGroups()).Result?.Sports;
 
             var marketTemplateGroups = new List<MarketTemplateGroup>();
             var response = new List<string>();
@@ -224,7 +222,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 SportId = sportId
             };
 
-            var result = (await TradingService.GetMarketLookup(request)).Result.MarketLookup;
+            var result = (await _backofficeService.GetConfigMarketLookup(request)).Result?.MarketLookup ?? new();
 
             if (marketTemplateIds != null && marketTemplateIds.Any())
                 result = result.Where(c => marketTemplateIds.Contains(c.MarketTemplateId)).ToList();

@@ -16,6 +16,8 @@ namespace OE.Shared.Data.Sportsbook
             modelBuilder.Entity<ClientLeagueOrder>().HasKey(k => new { k.ClientId, k.SportId, k.SegmentId, k.LeagueId });
             modelBuilder.Entity<ClientOddstableLeagueOrder>().HasKey(k => new { k.ClientId, k.SportId, k.SegmentId, k.LeagueId });
             modelBuilder.Entity<MarketTemplateGroup>().HasKey(k => new { k.SportId, k.FixtureStatusId, k.Id });
+            // the groups the sportsbook site uses are in MarketTemplateGroup2; the table named MarketTemplateGroup is empty and unused (BO-142)
+            modelBuilder.Entity<MarketTemplateGroup>().ToTable("MarketTemplateGroup2");
             modelBuilder.Entity<TierLeagueOrder>().HasKey(k => new { k.SportId, k.SegmentId, k.LeagueId });
             modelBuilder.Entity<SelectorMarketTemplate>().HasKey(k => new { k.SportId, k.MarketTemplateId });
             modelBuilder.Entity<ClientMarketTemplateOrder>().HasKey(k => new { k.ClientId, k.SportId, k.MarketTemplateId });

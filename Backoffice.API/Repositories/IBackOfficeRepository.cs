@@ -29,6 +29,8 @@ namespace Backoffice.API.Repositories
         #region Config
         Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplates(string searchText, List<int> sportIds = null, List<int> scopeIds = null);
         Task<BaseResponse<int>> GetConfigTemplatesCount();
+        Task<BaseResponse<MarketTemplateGroupResponse>> GetConfigMarketGroups();
+        Task<BaseResponse<MarketLookupResponse>> GetConfigMarketLookup(int fixtureTypeId, int sportId);
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long templateId);
         Task<BaseResponse<long>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
         Task<BaseResponse<bool>> SetConfigState(ConfigState configState, ConfigSetLeagueStateRequest request, List<string> userClientCodes, RequesterInfo requesterInfo);

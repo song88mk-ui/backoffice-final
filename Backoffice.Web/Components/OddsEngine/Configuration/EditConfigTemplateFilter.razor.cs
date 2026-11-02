@@ -4,6 +4,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Data.Backoffice.Entities;
 
@@ -23,6 +24,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         #region Fields
         private MarketTemplateGroupResponse _marketTemplateGroupResponse { get; set; }
+        private AlertModel _marketLoadAlert = new();
 
         #endregion
 
@@ -96,7 +98,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private async Task LoadMarkets()
         {
-            EditConfigTemplateFilterModel.MarketTemplateGroups = await GetMarketTemplateGroup(EditConfigTemplateFilterModel.ScopeId, EditConfigTemplateFilterModel.ConfigTemplate.SportId);
+            EditConfigTemplateFilterModel.MarketTemplateGroups = await GetMarketTemplateGroup(EditConfigTemplateFilterModel.ConfigTemplate.SportId);
 
             if (EditConfigTemplateFilterModel.MarketTemplateGroups.Count > 0)
             {
@@ -127,10 +129,31 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             EditConfigTemplateFilterModel.SelectedConfigStatus = EditConfigTemplateFilterModel.SelectedConfigStatusCount > 0 ? EditConfigTemplateFilterModel.ConfigStatuses.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList() : new List<string>();
         }
 
-        private async Task<List<MarketGroupNavigationModel>> GetMarketTemplateGroup(int scope, int sportId)
+        // A failed call must not look like "no markets": say so, and log the API message (BO-142).
+        private void ShowMarketLoadFailure(string what, string message)
         {
+            Log.Warning("OE Config could not load the {What}: {Message}", what, message);
+            _marketLoadAlert = new AlertModel
+            {
+                Status = AlertStatus.Error,
+                Message = "The markets could not be loaded. Please try again, or contact support if it keeps happening.",
+                IsAlwaysShown = true
+            };
+        }
+
+        private async Task<List<MarketGroupNavigationModel>> GetMarketTemplateGroup(int sportId)
+        {
+            _marketLoadAlert = new AlertModel();
+
             if (_marketTemplateGroupResponse == null)
-                _marketTemplateGroupResponse = (await _tradingService.GetMarketTemplateGroups(scope)).Result;
+            {
+                var groupsResponse = await _backofficeService.GetConfigMarketTemplateGroups();
+
+                if (groupsResponse?.StatusCode == StatusCode.Success)
+                    _marketTemplateGroupResponse = groupsResponse.Result;
+                else
+                    ShowMarketLoadFailure("market groups", groupsResponse?.Message);
+            }
 
             if (_marketTemplateGroupResponse == null)
             {
@@ -157,7 +180,16 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var marketTemplateGroupNames = tempMarketTemplateGroup.Select(s => s.MarketTemplateGroupName).Distinct().ToList();
 
             var MarketTemplateGroups = new List<MarketGroupNavigationModel>();
-            EditConfigTemplateFilterModel.MarketLookup = (await _tradingService.GetMarketLookup(new MarketLookupRequest { FixtureTypeId = (int)FixtureType.Match, SportId = sportId })).Result;
+            var lookupResponse = await _backofficeService.GetConfigMarketLookup(new MarketLookupRequest { FixtureTypeId = (int)FixtureType.Match, SportId = sportId });
+
+            if (lookupResponse?.StatusCode != StatusCode.Success)
+            {
+                ShowMarketLoadFailure("market list", lookupResponse?.Message);
+
+                return MarketTemplateGroups;
+            }
+
+            EditConfigTemplateFilterModel.MarketLookup = lookupResponse.Result ?? new MarketLookupResponse();
 
             if (EditConfigTemplateFilterModel.MarketLookup != null)
             {

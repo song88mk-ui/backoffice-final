@@ -363,6 +363,8 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 |---|---|---|
 | GET | `api/config/template/{id}` | Get config template by id |
 | GET | `api/config/templates` | Search config templates (`?searchText=&sportId=&scopeId=`) |
+| GET | `api/config/market-groups` | Market groups of every sport, Live and Prematch lists, from the Sportsbook table `MarketTemplateGroup2`; a sport with no rows has no entry. For the template editor and the My Templates Logs filter (BO-142) |
+| GET | `api/config/markets/{fixtureTypeId}/{sportId}` | Market list of a sport from the sportsbook Mongo `MarketLookup`. For the template editor and the My Templates Logs filter (BO-142) |
 | POST | `api/config/template` | Add or update a config template (Edit) |
 | POST | `api/config/template/set/{state}` | Assign leagues to their clients (`Assigned`, with `Restricted` false = Active, true = Restricted) or unassign them (`UnAssigned`) (Edit). One row per client and league in `Trading.dbo.ClientLeagueConfig` (`IsActive = 0` is Restricted); every change goes to the activity log; HTTP 400 and nothing saved if a league belongs to a client outside the caller's client codes (BO-151) |
 | POST | `api/config/template/delete/{id}` | Delete a config template (Edit) |

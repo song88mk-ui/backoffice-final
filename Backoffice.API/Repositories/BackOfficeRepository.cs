@@ -1663,6 +1663,39 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        // BO-142: the template editor's market groups and market list come from the Sportsbook data, not the Odds Engine Trading API.
+        public async Task<BaseResponse<MarketTemplateGroupResponse>> GetConfigMarketGroups()
+        {
+            try
+            {
+                return await _sportsbookRepository.GetMarketTemplateGroups();
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<MarketTemplateGroupResponse>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString()}: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<MarketLookupResponse>> GetConfigMarketLookup(int fixtureTypeId, int sportId)
+        {
+            try
+            {
+                return await _sportsbookRepository.GetMarketLookup(new MarketLookupRequest { FixtureTypeId = fixtureTypeId, SportId = sportId });
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<MarketLookupResponse>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString()}: {ex.Message}"
+                };
+            }
+        }
+
         public async Task<BaseResponse<int>> GetConfigTemplatesCount()
         {
             try

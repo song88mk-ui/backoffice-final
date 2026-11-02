@@ -1930,6 +1930,53 @@ namespace Backoffice.API.Repositories
         //, 1);
 
 
+        // BO-142: the market groups of every sport, in the shape the Odds Engine Trading API used to return, from the table the
+        // sportsbook site reads (MarketTemplateGroup2). FixtureStatusId 1 is Live and 0 is Prematch. A sport with no rows has no
+        // entry, and the Config pages then show one "All Markets" group.
+        public async Task<BaseResponse<MarketTemplateGroupResponse>> GetMarketTemplateGroups()
+        {
+            var rows = await _sportsbookContext.MarketTemplateGroup.AsNoTracking().ToListAsync();
+
+            var result = new MarketTemplateGroupResponse();
+
+            foreach (var sport in rows.GroupBy(r => r.SportId).OrderBy(g => g.Key))
+            {
+                var sportGroups = new MarketTemplateGroupResponse.SportMarketTemplateGroup { SportId = sport.Key };
+
+                foreach (var row in sport.OrderBy(r => r.SortOrder).ThenBy(r => r.Id))
+                {
+                    var group = new Backoffice.Shared.Models.MarketTemplateGroup
+                    {
+                        MarketTemplateGroupId = row.Id,
+                        MarketTemplateGroupName = row.Name,
+                        SortOrder = row.SortOrder,
+                        MarketTemplateIds = SplitMarketTemplateIds(row.MarketTemplates)
+                    };
+
+                    if (row.FixtureStatusId == (int)Scope.Live)
+                        sportGroups.Live.Add(group);
+                    else
+                        sportGroups.Prematch.Add(group);
+                }
+
+                result.Sports.Add(sportGroups);
+            }
+
+            return new BaseResponse<MarketTemplateGroupResponse>
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = result
+            };
+        }
+
+        // The column holds the ids as text with uneven spacing and sometimes a trailing comma ("7351,  14870, ").
+        private static List<string> SplitMarketTemplateIds(string marketTemplates) =>
+            (marketTemplates ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Distinct()
+                .ToList();
+
         public async Task<BaseResponse<MarketLookupResponse>> GetMarketLookup(MarketLookupRequest request, string langCode = "")
         {
             var marketLookupFilter = Builders<MarketLookup>.Filter.Where(c => c.SpId == request.SportId && c.FiTyId == request.FixtureTypeId);
