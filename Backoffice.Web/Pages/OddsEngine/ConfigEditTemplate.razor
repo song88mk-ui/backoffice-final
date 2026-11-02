@@ -81,7 +81,7 @@
 <EditConfigTemplateFilter ConfigTemplateId="@ConfigTemplateId" EditConfigTemplateFilterCallback="InitConfigEditTemplate" />
 
 <div class="d-flex justify-content-end mb-4">
-    <button type="button" class="btn btn-activate-all fw-bold" @onclick="OnAllMarketStatusClickEvent" disabled="@View">@_allMarketStatusName</button>
+    <button type="button" class="btn btn-activate-all fw-bold" @onclick="OnAllMarketStatusClickEvent" disabled="@MarginsLocked">@_allMarketStatusName</button>
 </div>
 
 <div class="col-md-12 mb-4">
@@ -95,7 +95,7 @@
         {
             foreach (var market in _marketLookupNavigation.Where(m => m.IsVisible))
             {
-                <AccordionTemplateConfiguration Market="market" IsReadOnly="View"
+                <AccordionTemplateConfiguration Market="market" IsReadOnly="MarginsLocked"
                                                 @key="@($"{_editConfigTemplateFilterModel.ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
                                                 FilterConfigStatus="@_editConfigTemplateFilterModel.SelectedConfigStatus"
                                                 Scope="@_editConfigTemplateFilterModel.ScopeId"

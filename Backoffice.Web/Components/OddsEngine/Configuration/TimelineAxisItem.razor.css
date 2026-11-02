@@ -73,6 +73,10 @@
     cursor: pointer;
 }
 
+.timeline-axis-item a.timeline-axis-item-key-container.read-only {
+    cursor: default;
+}
+
 .timeline-axis-item-key-big {
     background-color: #31bbd9;
     border-color: #31bbd9;

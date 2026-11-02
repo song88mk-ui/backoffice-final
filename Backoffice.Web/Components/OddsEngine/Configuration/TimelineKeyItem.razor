@@ -14,11 +14,11 @@
                         {
                             <span class="timeline-axis-label label-prematch">@_translationState.GetValue("Live")</span>
                         }
-                        <div title="Click to add key" class="key">
+                        <div title="@(IsReadOnly ? null : "Click to add key")" class="@(IsReadOnly ? "key read-only" : "key")">
                             @if(IsReadOnly)
                             {
-                                <a id="timeline-@setting.Time" class="waves-effect waves-light timeline-axis-item-key-container">
-                                    <span class="@settingClass" title="Click to edit key">
+                                <a id="timeline-@setting.Time" class="timeline-axis-item-key-container read-only">
+                                    <span class="@settingClass">
                                         @setting.Key
                                         <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />
                                     </span>

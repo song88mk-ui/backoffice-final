@@ -9,8 +9,8 @@
         <div class="timeline-axis-item my-3 first-axis">
             @if(IsReadOnly)
             {
-                <a id="timeline-@setting.TimeDisplay" class="waves-effect waves-light timeline-axis-item-key-container">
-                    <span class="@settingClass" title="Click to edit key">
+                <a id="timeline-@setting.TimeDisplay" class="timeline-axis-item-key-container read-only">
+                    <span class="@settingClass">
                         @setting.Key
                         <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />
                     </span>

@@ -87,6 +87,10 @@
     cursor: pointer;
 }
 
+.key.read-only {
+    cursor: default;
+}
+
 .key a {
     color: white;
     text-decoration: none;    

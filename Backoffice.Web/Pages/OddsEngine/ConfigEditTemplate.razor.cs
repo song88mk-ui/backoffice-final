@@ -21,6 +21,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Parameter] public string Action { get; set; }
         [Parameter] public bool View { get; set; }
 
+        // The margins are not editable until margin per client is enabled: the odds come from the provider by default (BO-142).
+        // The market toggles, ACTIVATE ALL and the key and time nodes are view-only, the template name and Save still work.
+        private bool MarginsLocked => true;
+
         private List<BreadcrumbModel> _breadcrumbs;
         private List<MarketLookupNavigationModel> _marketLookupNavigation;
 
