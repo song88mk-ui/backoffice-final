@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
@@ -725,11 +726,11 @@ namespace Backoffice.Web.Services
                         if (check == null)
                         {
                             if (claim.ClaimValue == "1")
-                                result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}\" disabled checked></div>";
+                                result = result + $"{MarkupHelper.Encode(claim.ClaimType.Replace(".", " "))}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{MarkupHelper.Encode(claim.ClaimType)}\" disabled checked></div>";
                             else if (claim.ClaimValue == "2")
-                                result = result + $"{claim.ClaimType.Replace(".", " ")} Read Only<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
+                                result = result + $"{MarkupHelper.Encode(claim.ClaimType.Replace(".", " "))} Read Only<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{MarkupHelper.Encode(claim.ClaimType)}readonly\" disabled checked></div>";
                             else
-                                result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled></div>";
+                                result = result + $"{MarkupHelper.Encode(claim.ClaimType.Replace(".", " "))}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{MarkupHelper.Encode(claim.ClaimType)}readonly\" disabled></div>";
                         }
                         else if (claim.ClaimValue != check.ClaimValue)
                         {
@@ -742,17 +743,17 @@ namespace Backoffice.Web.Services
                                 if (string.IsNullOrEmpty(clientStr))
                                     result = result + $"Client Access: N/A";
                                 else
-                                    result = result + $"Client Access:{clientStr}";
+                                    result = result + $"Client Access:{MarkupHelper.Encode(clientStr)}";
 
                             }
                             else
                             {
                                 if (claim.ClaimValue == "1")
-                                    result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
+                                    result = result + $"{MarkupHelper.Encode(claim.ClaimType.Replace(".", " "))}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{MarkupHelper.Encode(claim.ClaimType)}readonly\" disabled checked></div>";
                                 else if (claim.ClaimValue == "2")
-                                    result = result + $"{claim.ClaimType.Replace(".", " ")} Read Only<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
+                                    result = result + $"{MarkupHelper.Encode(claim.ClaimType.Replace(".", " "))} Read Only<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{MarkupHelper.Encode(claim.ClaimType)}readonly\" disabled checked></div>";
                                 else
-                                    result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled></div>";
+                                    result = result + $"{MarkupHelper.Encode(claim.ClaimType.Replace(".", " "))}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{MarkupHelper.Encode(claim.ClaimType)}readonly\" disabled></div>";
                             }
 
                         }
@@ -769,9 +770,9 @@ namespace Backoffice.Web.Services
                     foreach (var claim in claims)
                     {
                         if (claim.ClaimValue == "1")
-                            result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}\" disabled checked></div>";
+                            result = result + $"{MarkupHelper.Encode(claim.ClaimType.Replace(".", " "))}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{MarkupHelper.Encode(claim.ClaimType)}\" disabled checked></div>";
                         else if (claim.ClaimValue == "2")
-                            result = result + $"{claim.ClaimType.Replace(".", " ")} Read Only<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
+                            result = result + $"{MarkupHelper.Encode(claim.ClaimType.Replace(".", " "))} Read Only<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{MarkupHelper.Encode(claim.ClaimType)}readonly\" disabled checked></div>";
                         else if (claim.ClaimType == SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
                         {
                             var clients = claim.ClaimValue.Split(',');
@@ -779,7 +780,7 @@ namespace Backoffice.Web.Services
                             if (string.IsNullOrEmpty(clientStr))
                                 result = result + $"Client Access: N/A";
                             else
-                                result = result + $"Client Access:{clientStr}";
+                                result = result + $"Client Access:{MarkupHelper.Encode(clientStr)}";
                         }
                     }
                 }
@@ -835,7 +836,7 @@ namespace Backoffice.Web.Services
                 }
                 else if (!objValue.Equals(anotherValue))
                 {
-                    result = result + $"{objName}: {objValue}|";
+                    result = result + $"{objName}: {MarkupHelper.Encode(objValue)}|";
                 }
             }
 

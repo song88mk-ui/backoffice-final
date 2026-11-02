@@ -3,6 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -172,12 +173,12 @@ namespace Backoffice.Web.Pages.Administration
 
             StringBuilder builder = new StringBuilder();
 
-            builder.Append($"<span class=\"segment-league d-block\">{betSelectionDetails.LeagueName}</span>");
-            builder.Append($"<span class=\"fixture d-block\">{betSelectionDetails.FixtureName}</span>");
+            builder.Append($"<span class=\"segment-league d-block\">{MarkupHelper.Encode(betSelectionDetails.LeagueName)}</span>");
+            builder.Append($"<span class=\"fixture d-block\">{MarkupHelper.Encode(betSelectionDetails.FixtureName)}</span>");
             builder.Append($"<span class=\"start-date d-block\">{betSelectionDetails.FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()}</span>");
-            builder.Append($"<span class=\"selection-details d-block\">{betSelectionDetails.SelectionName}</span>");
-            builder.Append($"<span class=\"market-name d-block\">{betSelectionDetails.MarketName} @ {betSelectionDetails.Odds} ({oddsFormat})</span>");
-            builder.Append($"<span class=\"score d-block\">{betSelectionDetails.BetScore}, Final Score: {betSelectionDetails.SettlementScore}</span>");
+            builder.Append($"<span class=\"selection-details d-block\">{MarkupHelper.Encode(betSelectionDetails.SelectionName)}</span>");
+            builder.Append($"<span class=\"market-name d-block\">{MarkupHelper.Encode(betSelectionDetails.MarketName)} @ {betSelectionDetails.Odds} ({MarkupHelper.Encode(oddsFormat)})</span>");
+            builder.Append($"<span class=\"score d-block\">{MarkupHelper.Encode(betSelectionDetails.BetScore)}, Final Score: {MarkupHelper.Encode(betSelectionDetails.SettlementScore)}</span>");
 
 
             return builder.ToString();

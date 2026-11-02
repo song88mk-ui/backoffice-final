@@ -15,7 +15,7 @@
                 <div class="toast-body">
                     @if (toast.IsMessageMarkup)
                     {
-                        @((MarkupString)toast.Message)
+                        @((MarkupString)MarkupHelper.ToSafeMarkup(toast.Message))
                     }
                     else
                     {

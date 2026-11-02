@@ -83,31 +83,31 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var template = payloads.Count() > 2 ? payloads[2] : "";
 
             stringBuilder.Append($"<th class=\"px-4\" scope=\"row\">{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm")}</th>");
-            stringBuilder.Append($"<td class=\"px-4\">{sportName}</td>");
-            stringBuilder.Append($"<td class=\"px-4\">{scopeName}</td>");
-            stringBuilder.Append($"<td class=\"px-4\">{template}</td>");
+            stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(sportName)}</td>");
+            stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(scopeName)}</td>");
+            stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(template)}</td>");
 
             if (activityLog.Activity == Activity.Create.ToString())
             {
                 stringBuilder.Append($"<td class=\"px-4\">{_translationState.GetValue("Added New Template")}</td>");
-                stringBuilder.Append($"<td class=\"px-4\">{activityLog.From}</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(activityLog.From)}</td>");
                 var toPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.To);
-                stringBuilder.Append($"<td class=\"px-4\">{toPaylaod?.Name ?? "-"}</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(toPaylaod?.Name ?? "-")}</td>");
             }
             else if (activityLog.Activity == Activity.Copy.ToString())
             {
                 stringBuilder.Append($"<td class=\"px-4\">{_translationState.GetValue("Copied Template")}</td>");
                 var fromPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.From);
                 var toPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.To);
-                stringBuilder.Append($"<td class=\"px-4\">{fromPaylaod?.Name ?? "-"}</td>");
-                stringBuilder.Append($"<td class=\"px-4\">{toPaylaod?.Name ?? "-"}</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(fromPaylaod?.Name ?? "-")}</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(toPaylaod?.Name ?? "-")}</td>");
             }
             else if (activityLog.Activity == Activity.Delete.ToString())
             {
                 stringBuilder.Append($"<td class=\"px-4\">{_translationState.GetValue("Deleted Template")}</td>");
                 var fromPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.From);
-                stringBuilder.Append($"<td class=\"px-4\">{activityLog.To}</td>");
-                stringBuilder.Append($"<td class=\"px-4\">{fromPaylaod?.Name ?? "-"}</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(activityLog.To)}</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(fromPaylaod?.Name ?? "-")}</td>");
             }
             else
             {
@@ -132,7 +132,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             stringBuilder.Append($"<br>");
                             foreach (var client in tFromPayload.Payloads.Clients)
                             {
-                                stringBuilder.Append($"<span>{client}</span>");
+                                stringBuilder.Append($"<span>{MarkupHelper.Encode(client)}</span>");
                                 stringBuilder.Append($"<br>");
                             }
                             stringBuilder.Append($"<br>");
@@ -140,14 +140,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             foreach (var league in tFromPayload.Payloads.Leagues)
                             {
                                 stringBuilder.Append($"<br>");
-                                stringBuilder.Append($"<span>{league}</span>");
+                                stringBuilder.Append($"<span>{MarkupHelper.Encode(league)}</span>");
                             }
                             stringBuilder.Append($"</td>");
-                            stringBuilder.Append($"<td class=\"px-4\">{tFromPayload.TemplateName}</td>");
-                            stringBuilder.Append($"<td class=\"px-4\">{tToPayload.TemplateName}</td>");
+                            stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(tFromPayload.TemplateName)}</td>");
+                            stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(tToPayload.TemplateName)}</td>");
                             break;
                         case "M":
-                            stringBuilder.Append($"<td class=\"px-4\">{payloads[3]}</td>");
+                            stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(payloads[3])}</td>");
                             if (activityLog.From == "-")
                             {
                                 stringBuilder.Append($"<td class=\"px-4\">-</td>");
@@ -158,9 +158,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 var payload = JsonSerializer.Deserialize<List<ConfigMarginActivityLogModel>>(activityLog.From) ?? new List<ConfigMarginActivityLogModel>();
                                 foreach (var item in payload)
                                 {
-                                    stringBuilder.Append($"<strong>{item.MarketTemplateName}</strong>");
+                                    stringBuilder.Append($"<strong>{MarkupHelper.Encode(item.MarketTemplateName)}</strong>");
                                     stringBuilder.Append($"<br>");
-                                    stringBuilder.Append(string.Join("", item.Payload.Select(x => $"<span>{x}</span><br>").ToList()));
+                                    stringBuilder.Append(string.Join("", item.Payload.Select(x => $"<span>{MarkupHelper.Encode(x)}</span><br>").ToList()));
                                     stringBuilder.Append($"<br>");
                                 }
                                 stringBuilder.Append($"</td>");
@@ -175,9 +175,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 var payload = JsonSerializer.Deserialize<List<ConfigMarginActivityLogModel>>(activityLog.To) ?? new List<ConfigMarginActivityLogModel>();
                                 foreach (var item in payload)
                                 {
-                                    stringBuilder.Append($"<strong>{item.MarketTemplateName}</strong>");
+                                    stringBuilder.Append($"<strong>{MarkupHelper.Encode(item.MarketTemplateName)}</strong>");
                                     stringBuilder.Append($"<br>");
-                                    stringBuilder.Append(string.Join("", item.Payload.Select(x => $"<span>{x}</span><br>").ToList()));
+                                    stringBuilder.Append(string.Join("", item.Payload.Select(x => $"<span>{MarkupHelper.Encode(x)}</span><br>").ToList()));
                                     stringBuilder.Append($"<br>");
                                 }
                                 stringBuilder.Append($"</td>");
@@ -187,8 +187,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             stringBuilder.Append($"<td class=\"px-4\">{_translationState.GetValue("Changed Name")}</td>");
                             var fromPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.From);
                             var toPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.To);
-                            stringBuilder.Append($"<td class=\"px-4\">{fromPaylaod.Name}</td>");
-                            stringBuilder.Append($"<td class=\"px-4\">{toPaylaod?.Name ?? "-"}</td>");
+                            stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(fromPaylaod.Name)}</td>");
+                            stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(toPaylaod?.Name ?? "-")}</td>");
                             break;
                         default:
                             stringBuilder.Append($"<td class=\"px-4\">-</td>");
@@ -198,7 +198,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     }
                 }
             }
-            stringBuilder.Append($"<td class=\"px-4\">{activityLog.UserName}</td>");
+            stringBuilder.Append($"<td class=\"px-4\">{MarkupHelper.Encode(activityLog.UserName)}</td>");
             return stringBuilder.ToString();
         }
         public async Task SelectPage(int page)

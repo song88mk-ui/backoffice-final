@@ -166,7 +166,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 {
                     foreach (var item in collection.ToList())
                     {
-                        value += $"{(MockData.PrematchSettings.FirstOrDefault(c => c.Time == item.T)?.TimeDisplay) ?? "0"} {item.M}</br>";
+                        value += $"{(MockData.PrematchSettings.FirstOrDefault(c => c.Time == item.T)?.TimeDisplay) ?? "0"} {MarkupHelper.Encode(item.M)}</br>";
                     }
                 }
             }

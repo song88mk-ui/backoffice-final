@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -259,13 +260,13 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
             }
             else
             {
-                builder.Append($"<span>{betSelectionDetails.LeagueName}</span>");
-                builder.Append($"<span>{betSelectionDetails.FixtureName}</span>");
+                builder.Append($"<span>{MarkupHelper.Encode(betSelectionDetails.LeagueName)}</span>");
+                builder.Append($"<span>{MarkupHelper.Encode(betSelectionDetails.FixtureName)}</span>");
                 builder.Append($"<span>{betSelectionDetails.FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()}</span>");
-                builder.Append($"<span>{betSelectionDetails.SelectionName}</span>");
-                builder.Append($"<span>{betSelectionDetails.MarketName} @ {betSelectionDetails.Odds.ToString("#.00")} ({oddsFormat})</span>");
-                builder.Append($"<span>(Bet Result: {betSelectionDetails.BetScore}, Final Score: {betSelectionDetails.SettlementScore})</span>");
-                builder.Append($"<span>{betSelectionDetails.BetSelectionStatusName}</span>");
+                builder.Append($"<span>{MarkupHelper.Encode(betSelectionDetails.SelectionName)}</span>");
+                builder.Append($"<span>{MarkupHelper.Encode(betSelectionDetails.MarketName)} @ {betSelectionDetails.Odds.ToString("#.00")} ({MarkupHelper.Encode(oddsFormat)})</span>");
+                builder.Append($"<span>(Bet Result: {MarkupHelper.Encode(betSelectionDetails.BetScore)}, Final Score: {MarkupHelper.Encode(betSelectionDetails.SettlementScore)})</span>");
+                builder.Append($"<span>{MarkupHelper.Encode(betSelectionDetails.BetSelectionStatusName)}</span>");
             }
 
             return builder.ToString();

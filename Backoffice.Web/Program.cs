@@ -53,6 +53,8 @@ app.UseResponseCompression();
 // Configure the HTTP request pipeline.
 app.UseErrorPages();
 
+app.UseSecurityHeaders();
+
 app.UseSession();
 
 app.MapHealthChecks("/healthz");

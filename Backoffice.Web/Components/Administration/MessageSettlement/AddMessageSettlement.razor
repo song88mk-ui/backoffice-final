@@ -47,7 +47,7 @@
             </table>
 
             <div class="@divClass mx-auto form-text p-3" style="@divStyles">
-                <strong>@((MarkupString)message)</strong>
+                <strong>@((MarkupString)MarkupHelper.ToSafeMarkup(message))</strong>
             </div>
             <br />
             @if (AddMessageSettlementModel.BetSelections != null && AddMessageSettlementModel.BetSelections.Any())

@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -117,6 +118,6 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
         #endregion
 
-        private string GetMarkupMessage() => $"You are about to delete {{{$"\"<span class=\"fw - bold\">{UserGroup.UserGroupName}</span>\""}}}.";
+        private string GetMarkupMessage() => $"You are about to delete {{{$"\"<span class=\"fw-bold\">{MarkupHelper.Encode(UserGroup.UserGroupName)}</span>\""}}}.";
     }
 }

@@ -287,6 +287,29 @@ Deliberately mirrors, rather than upgrades, Static Translation's existing "Expor
 
 ---
 
+## Back Office Web Rendered Stored and Hub Text as HTML (BO-134)
+
+**Date noted:** October 30, 2026
+
+**Issue:** `Backoffice.Web` had 36 places that render a string as raw HTML (`MarkupString` x35, `Html.Raw` x1) and no HTML encoding anywhere. Several were fed by text other users type or by the hub, so a user group name such as `<img src=x onerror=...>` ran script in the browser of the next admin who opened the delete confirmation or the group's change log, with that admin's permissions. The live notification pop-up rendered `NotificationsModel.Details` raw, so anyone able to publish to the hub (open before BO-131) could do the same to every connected admin. The login page also wrote `<script>console.log(...)</script>` on every failed login with the serialized `LogInModel`, password included.
+
+**Resolved (BO-134):**
+- `Helpers/MarkupHelper.Encode` is applied to every stored or external value interpolated into a markup string: user group delete confirmation and logs (`CommonService.GetProperties` and the claim lines), market group logs, the price boost, boosted, sport settings, config and template log viewers, the copy client settings and close match confirmations, the manage user success alert, the manual, resend and add-reference settlement event details, and the login user agent. `MarkupString` now only wraps literal tags plus encoded values.
+- The toast renders `MarkupHelper.ToSafeMarkup(message)`: the message is encoded except `<b>`, `<strong>`, `<br>` and `<a href="http(s)://...">text</a>`, which are rebuilt without any other attribute. That keeps the two formats producers send (Utility's excel download link, the API's bold boosted settings notice) and the message settlement result. The Utility link loses its inline `onmouseover` colour change.
+- `Tooltip` renders `Text` as text (no caller passes markup). `CustomModal`'s `ModalIcon` stays raw: only developer literals are passed.
+- The login console script is gone; failed logins are logged server side (`Log.Warning`, username, status and message, no password).
+- Group names containing `<` or `>` are refused in Manage User Groups (Web only).
+- Every response carries `Content-Security-Policy: object-src 'none'; base-uri 'self'; frame-ancestors 'self'` and `X-Content-Type-Options: nosniff` (`WebApplicationExtensions.UseSecurityHeaders`).
+- Tests: `Backoffice.Web.Tests/Common/MarkupEncodingTests.cs` (delete modal, group log, toast, allow-list).
+
+**Still open:**
+- No `script-src` policy, so CSP does not yet block inline handlers. `_Host.cshtml` and `_Layout.cshtml` have inline `<script>` blocks that must move to files (or get nonces) first, and the policy needs checking against Metabase, Tableau and the oddin script in a browser.
+- The `<` `>` rule is Web only; the Auth API that stores group names was not checked. Client and template names have no such rule.
+- Producers still send markup in `NotificationsModel.Details`. A structured link field would let the toast drop the allow-list.
+- Translations (`TranslationState.GetValue`) are treated as trusted literals; they come from the static translation tables that admins edit.
+
+---
+
 ## Critical Issues (Fix Immediately)
 
 ### 1. Developer Exception Page Always Enabled (resolved, BO-132)

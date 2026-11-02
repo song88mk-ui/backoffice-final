@@ -3,6 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Administration.ManageUser;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -130,11 +131,11 @@ namespace Backoffice.Web.Pages.Administration
 
             if (itemCasted.Item2)
             {
-                message = $"<b>{itemCasted.Item1.UserName}</b> has been successfully created";
+                message = $"<b>{MarkupHelper.Encode(itemCasted.Item1.UserName)}</b> has been successfully created";
             }
             else
             {
-                message = $"<b>{itemCasted.Item1.UserName}</b> has been successfully updated";
+                message = $"<b>{MarkupHelper.Encode(itemCasted.Item1.UserName)}</b> has been successfully updated";
             }
 
             Alerts.Clear();

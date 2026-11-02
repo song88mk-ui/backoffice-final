@@ -27,5 +27,22 @@ namespace Backoffice.Web.Extensions
 
             return app;
         }
+
+        // Second layer behind encoding (BO-134). Only directives that cannot break the current pages: no plugins,
+        // no <base> hijack, no framing by other sites. A script-src policy needs the inline scripts in _Host/_Layout
+        // moved to files first (docs/08_TechnicalDebt.md).
+        public const string ContentSecurityPolicy = "object-src 'none'; base-uri 'self'; frame-ancestors 'self'";
+
+        public static WebApplication UseSecurityHeaders(this WebApplication app)
+        {
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers["Content-Security-Policy"] = ContentSecurityPolicy;
+                context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+                await next();
+            });
+
+            return app;
+        }
     }
 }

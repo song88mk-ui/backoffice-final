@@ -125,6 +125,15 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                         Opacity = Opacity
                     });
                 }
+                else if (UserGroup.UserGroupName.IndexOfAny(new[] { '<', '>' }) >= 0)
+                {
+                    Alerts.Add(new()
+                    {
+                        Status = AlertStatus.Error,
+                        Message = "User Group Name must not contain < or >",
+                        Opacity = Opacity
+                    });
+                }
 
                 if (Alerts.Any())
                 {

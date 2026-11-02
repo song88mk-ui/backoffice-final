@@ -223,8 +223,8 @@ namespace Backoffice.Web.Components.Common
                 if (!string.Equals(log.To.SelectionName, log.From.SelectionName, StringComparison.OrdinalIgnoreCase))
                 {
                     remarks.Append($"Selection {log.From.SelectionName} {log.To.SelectionName} ");
-                    fromHtmlDetailBuilder.Append($"<b>Selection</b><br>{log.From.SelectionName} <br><br>");
-                    toHtmlDetailBuilder.Append($"<b>Selection</b><br>{log.To.SelectionName} <br><br>");
+                    fromHtmlDetailBuilder.Append($"<b>Selection</b><br>{MarkupHelper.Encode(log.From.SelectionName)} <br><br>");
+                    toHtmlDetailBuilder.Append($"<b>Selection</b><br>{MarkupHelper.Encode(log.To.SelectionName)} <br><br>");
                 }
 
                 //translation
@@ -237,7 +237,7 @@ namespace Backoffice.Web.Components.Common
                         remarks.Append("Language Code: Language Name: Boosted Selection: ");
                         foreach (var translation in log.From.Translations)
                         {
-                            fromHtmlDetailBuilder.Append($"Language Code: {translation.Language.LanguageCode}<br>Language Name: {translation.Language.LanguageName}<br>Boosted Selection: {translation.BoostedSelectionName}");
+                            fromHtmlDetailBuilder.Append($"Language Code: {MarkupHelper.Encode(translation.Language.LanguageCode)}<br>Language Name: {MarkupHelper.Encode(translation.Language.LanguageName)}<br>Boosted Selection: {MarkupHelper.Encode(translation.BoostedSelectionName)}");
                             remarks.Append($"{translation.Language.LanguageCode} {translation.Language.LanguageName} {translation.BoostedSelectionName} ");
 
                             if (log.From.Translations.IndexOf(translation) != log.From.Translations.Count - 1)
@@ -255,7 +255,7 @@ namespace Backoffice.Web.Components.Common
                         remarks.Append("Language Code: Language Name: Boosted Selection: ");
                         foreach (var translation in log.To.Translations)
                         {
-                            toHtmlDetailBuilder.Append($"Language Code: {translation.Language.LanguageCode}<br>Language Name: {translation.Language.LanguageName}<br>Boosted Selection: {translation.BoostedSelectionName}");
+                            toHtmlDetailBuilder.Append($"Language Code: {MarkupHelper.Encode(translation.Language.LanguageCode)}<br>Language Name: {MarkupHelper.Encode(translation.Language.LanguageName)}<br>Boosted Selection: {MarkupHelper.Encode(translation.BoostedSelectionName)}");
                             remarks.Append($"{translation.Language.LanguageCode} {translation.Language.LanguageName} {translation.BoostedSelectionName} ");
 
                             if (log.To.Translations.IndexOf(translation) != log.To.Translations.Count - 1)
@@ -329,21 +329,21 @@ namespace Backoffice.Web.Components.Common
 
             if (activityLog.Activity == Activity.Create.ToString() || activityLog.Activity == Activity.Update.ToString())
             {
-                stringBuilder.Append($"<strong><b>{activityLog.To.SelectionName}</b></strong><br>");
-                stringBuilder.Append($"{activityLog.To.MarketName}<br>");
-                stringBuilder.Append($"<span>{activityLog.To.SegmentName}</span><br>");
-                stringBuilder.Append($"<span>{activityLog.To.LeagueName}</span><br>");
-                stringBuilder.Append($"{activityLog.To.FixtureName}<br>");
+                stringBuilder.Append($"<strong><b>{MarkupHelper.Encode(activityLog.To.SelectionName)}</b></strong><br>");
+                stringBuilder.Append($"{MarkupHelper.Encode(activityLog.To.MarketName)}<br>");
+                stringBuilder.Append($"<span>{MarkupHelper.Encode(activityLog.To.SegmentName)}</span><br>");
+                stringBuilder.Append($"<span>{MarkupHelper.Encode(activityLog.To.LeagueName)}</span><br>");
+                stringBuilder.Append($"{MarkupHelper.Encode(activityLog.To.FixtureName)}<br>");
                 stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)}</span><br>");
                 stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("HH:mm")}</span>");
             }
             else
             {
-                stringBuilder.Append($"<strong><b>{activityLog.From.SelectionName}</b></strong><br>");
-                stringBuilder.Append($"{activityLog.From.MarketName}<br>");
-                stringBuilder.Append($"<span>{activityLog.From.SegmentName}</span><br>");
-                stringBuilder.Append($"<span>{activityLog.From.LeagueName}</span><br>");
-                stringBuilder.Append($"{activityLog.From.FixtureName}<br>");
+                stringBuilder.Append($"<strong><b>{MarkupHelper.Encode(activityLog.From.SelectionName)}</b></strong><br>");
+                stringBuilder.Append($"{MarkupHelper.Encode(activityLog.From.MarketName)}<br>");
+                stringBuilder.Append($"<span>{MarkupHelper.Encode(activityLog.From.SegmentName)}</span><br>");
+                stringBuilder.Append($"<span>{MarkupHelper.Encode(activityLog.From.LeagueName)}</span><br>");
+                stringBuilder.Append($"{MarkupHelper.Encode(activityLog.From.FixtureName)}<br>");
                 stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)}</span><br>");
                 stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("HH:mm")}</span>");
             }

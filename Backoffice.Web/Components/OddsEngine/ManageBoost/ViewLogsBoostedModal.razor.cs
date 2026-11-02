@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Common;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -96,9 +97,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                         stringBuilder.Append("<b>Translations:</b> </br>");
                         foreach (var translation in fromDeserialized.Translations)
                         {
-                            stringBuilder.Append($"{translation.Language.LanguageName}<br>");
-                            stringBuilder.Append($"{translation.Language.LanguageCode}<br>");
-                            stringBuilder.Append($"{translation.BoostedSelectionName}<br>");
+                            stringBuilder.Append($"{MarkupHelper.Encode(translation.Language.LanguageName)}<br>");
+                            stringBuilder.Append($"{MarkupHelper.Encode(translation.Language.LanguageCode)}<br>");
+                            stringBuilder.Append($"{MarkupHelper.Encode(translation.BoostedSelectionName)}<br>");
                         }
                     }
                 }
@@ -115,9 +116,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                         stringBuilder.Append("<b>Translations:</b> </br>");
                         foreach (var translation in toDeserialized.Translations)
                         {
-                            stringBuilder.Append($"{translation.Language.LanguageName}<br>");
-                            stringBuilder.Append($"{translation.Language.LanguageCode}<br>");
-                            stringBuilder.Append($"{translation.BoostedSelectionName}<br>");
+                            stringBuilder.Append($"{MarkupHelper.Encode(translation.Language.LanguageName)}<br>");
+                            stringBuilder.Append($"{MarkupHelper.Encode(translation.Language.LanguageCode)}<br>");
+                            stringBuilder.Append($"{MarkupHelper.Encode(translation.BoostedSelectionName)}<br>");
                         }
                     }
                 }

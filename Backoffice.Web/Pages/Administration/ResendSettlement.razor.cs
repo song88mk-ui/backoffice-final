@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Components.Administration.ResendSettlement;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -364,12 +365,12 @@ namespace Backoffice.Web.Pages.Administration
             {
                 foreach (var betSelection in bet.Bet.BetSelections)
                 {
-                    builder.Append($"<span class=\"segment-league d-block\">{betSelection.LeagueName}</span>");
-                    builder.Append($"<span class=\"fixture d-block\">{betSelection.FixtureName}</span>");
+                    builder.Append($"<span class=\"segment-league d-block\">{MarkupHelper.Encode(betSelection.LeagueName)}</span>");
+                    builder.Append($"<span class=\"fixture d-block\">{MarkupHelper.Encode(betSelection.FixtureName)}</span>");
                     builder.Append($"<span class=\"segment-league d-block\">{betSelection.FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()}</span>");
-                    builder.Append($"<span class=\"selection-details d-block\">{betSelection.SelectionName}</span>");
-                    builder.Append($"<span class=\"score d-block\">(Bet Result: {betSelection.BetScore}, Final Score: {betSelection.SettlementScore})</span>");
-                    builder.Append($"<span class=\"status\">{betSelection.FixtureStatusName}</span>");
+                    builder.Append($"<span class=\"selection-details d-block\">{MarkupHelper.Encode(betSelection.SelectionName)}</span>");
+                    builder.Append($"<span class=\"score d-block\">(Bet Result: {MarkupHelper.Encode(betSelection.BetScore)}, Final Score: {MarkupHelper.Encode(betSelection.SettlementScore)})</span>");
+                    builder.Append($"<span class=\"status\">{MarkupHelper.Encode(betSelection.FixtureStatusName)}</span>");
                 }
             }
 

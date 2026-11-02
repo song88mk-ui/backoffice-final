@@ -104,7 +104,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             if (payload.Sports != null && payload.Sports.Any())
             {
                 result.Append($"<b>Sports</b></br>");
-                result.Append(string.Join(", ", payload.Sports.Select(s => s.SportName.Trim())));
+                result.Append(string.Join(", ", payload.Sports.Select(s => MarkupHelper.Encode(s.SportName.Trim()))));
                 hasParent = true;
             }
 
@@ -120,8 +120,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                     if (hasParent)
                         result.Append("<br/><br/>");
 
-                    result.Append($"<b>{sports.SportName.Trim()} > Segment</b></br>");
-                    result.Append(string.Join(", ", sports.Segments.Select(s => s.SegmentName.Trim())));
+                    result.Append($"<b>{MarkupHelper.Encode(sports.SportName.Trim())} > Segment</b></br>");
+                    result.Append(string.Join(", ", sports.Segments.Select(s => MarkupHelper.Encode(s.SegmentName.Trim()))));
 
                     hasParent = true;
                 }
@@ -141,8 +141,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                         if (hasParent)
                             result.Append("<br/><br/>");
 
-                        result.Append($"<b>{sport.SportName} > {segment.SegmentName.Trim()} > League</b></br>");
-                        result.Append(string.Join(", ", segment.Leagues.Select(s => s.LeagueName.Trim())));
+                        result.Append($"<b>{MarkupHelper.Encode(sport.SportName)} > {MarkupHelper.Encode(segment.SegmentName.Trim())} > League</b></br>");
+                        result.Append(string.Join(", ", segment.Leagues.Select(s => MarkupHelper.Encode(s.LeagueName.Trim()))));
 
                         hasParent = true;
                     }

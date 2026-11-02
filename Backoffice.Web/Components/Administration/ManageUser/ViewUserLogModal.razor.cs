@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Models;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Pages.Authentication;
 using Backoffice.Web.Services;
@@ -67,9 +68,9 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
             var uaParser = Parser.GetDefault();
             ClientInfo client = uaParser.Parse(content);
-            stringBuilder.Append($"{client.UA.Family.ToString()}<br>");
-            stringBuilder.Append($"{client.UA.Major}.{client.UA.Minor}.{client.UA.Patch}<br>");
-            stringBuilder.Append(client.OS.ToString());
+            stringBuilder.Append($"{MarkupHelper.Encode(client.UA.Family)}<br>");
+            stringBuilder.Append($"{MarkupHelper.Encode($"{client.UA.Major}.{client.UA.Minor}.{client.UA.Patch}")}<br>");
+            stringBuilder.Append(MarkupHelper.Encode(client.OS));
 
             return stringBuilder.ToString();
         }
