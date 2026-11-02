@@ -49,6 +49,7 @@
                     </select>
 
                     <select class="form-select" @onchange="HandleScopeChange">
+                        <option value="-1" selected="@(_selectedScopeId == -1)">@_translationState.GetValue("All Scopes")</option>
                         @if (FilterModel.Scopes.Any())
                         {
                             @foreach (var item in FilterModel.Scopes)

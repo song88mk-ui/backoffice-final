@@ -43,7 +43,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 _languageCode = _translationState.ActiveLanguageCode;
                 _selectedSportId = -1;
-                _selectedScopeId = int.Parse(FilterModel.Scopes.FirstOrDefault()?.Value ?? "-1");
+                // every scope, so a template just saved in either scope is listed (BO-151)
+                _selectedScopeId = -1;
 
                 _alertModel = new AlertModel();
                 _alertModel.Message = QueryMessage;
