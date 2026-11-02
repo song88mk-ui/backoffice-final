@@ -127,7 +127,7 @@ namespace Backoffice.Web.Pages.Authentication
                             }
 
                             TempData["HasError"] = true;
-                            TempData["LogError"] = $"<script>console.log(\"{authenticate.StatusCode.ToString()} - {authenticate.Message} -\n{JsonSerializer.Serialize(LogInModel).Replace("\"", "")}\")</script>";
+                            Log.Warning("Back Office token login failed: {StatusCode} - {Message}", authenticate.StatusCode, authenticate.Message);
 
                             if (!string.IsNullOrEmpty(authenticate.Message) && !authenticate.Message.Contains("Incorrect password"))
                             {
@@ -224,7 +224,8 @@ namespace Backoffice.Web.Pages.Authentication
                 }
 
                 TempData["HasError"] = true;
-                TempData["LogError"] = $"<script>console.log(\"{result.StatusCode.ToString()} - {result.Message} -\n{JsonSerializer.Serialize(LogInModel).Replace("\"", "")}\")</script>";
+                Log.Warning("Back Office login failed for {Username} from {IpAddress} ({Country}): {StatusCode} - {Message}",
+                    LogInModel.Username, LogInModel.IpAddress, LogInModel.Country, result.StatusCode, result.Message);
 
                 if (!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
                 {
