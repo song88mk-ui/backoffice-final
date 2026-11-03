@@ -302,5 +302,46 @@ namespace Backoffice.Web.Tests.OddsEngine
             // Nothing is selected on this tab, so no dialog opens with the leagues of the other one.
             Assert.Empty(_modalService.Opened);
         }
+
+        // After a save the page reloads the list, hides the selection bar (a JS call) and then draws. The page only draws while its
+        // render flag is set, and OnAfterRender clears it. In Blazor Server OnAfterRender runs once the browser has confirmed the
+        // spinner draw, which can land during that JS call, and the final draw was skipped: the spinner stayed up over a loaded list.
+        [Fact]
+        public async Task AfterASave_TheReloadedList_IsDrawn_EvenIfTheRenderFlagIsClearedWhileTheSelectionBarIsHidden()
+        {
+            var cut = RenderPage(ConfigState.Assigned);
+            await Select(cut, 100);
+
+            // The reload after the save finds a league that was not there before.
+            _backofficeService
+                .Setup(s => s.GetConfigClient(It.IsAny<ConfigState>(), It.IsAny<ConfigTemplateLeagueRequest>(), It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new BaseResponse<ConfigTemplateLeagueResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new ConfigTemplateLeagueResponse
+                    {
+                        ClientConfigs = new List<ConfigClientModel>
+                        {
+                            new() { ClientCode = "10BET", ClientName = "10Bet Crypto", SportId = 1, SportName = "Soccer", SegmentId = 10, SegmentName = "England", LeagueId = 100, LeagueName = "Premier League" }
+                        },
+                        MetaData = new MetaData()
+                    }
+                });
+
+            // Hiding the selection bar stays pending until the test lets it finish.
+            var hideBar = JSInterop.SetupVoid(ToggleSelectionBar);
+
+            var save = cut.InvokeAsync(() => cut.Instance.HandleModalSave(new AlertModel { Status = AlertStatus.Success, Message = "The selected leagues were unassigned." }));
+            cut.WaitForAssertion(() => Assert.Equal(2, JSInterop.Invocations[ToggleSelectionBar].Count));
+
+            // The list has loaded and the page is waiting for the browser. The render flag is cleared here, as the late OnAfterRender
+            // does; a parent pass with nothing changed clears it the same way.
+            cut.Render(ps => ps.Add(p => p.State, ConfigState.Assigned));
+            hideBar.SetVoidResult();
+            await save;
+
+            cut.WaitForAssertion(() => Assert.Contains("Premier League", cut.Markup));
+            Assert.DoesNotContain("No Record Found", cut.Markup);
+        }
     }
 }

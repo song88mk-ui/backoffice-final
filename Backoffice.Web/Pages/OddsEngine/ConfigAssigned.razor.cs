@@ -166,6 +166,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _isSelectedLeagueShowing = false;
             }
 
+            // OnAfterRender clears the flag. In Blazor Server it runs once the browser has confirmed the spinner draw, which can land
+            // during the JS call above, and then the draw below is skipped and the spinner stays up over a loaded list (BO-151).
+            // OnAfterRender clears the flag. In Blazor Server it runs once the browser has confirmed the spinner draw, which can land
+            // during the JS call above, and then the draw below is skipped and the spinner stays up over a loaded list (BO-151).
+            _shouldRender = true;
             StateHasChanged();
             await OnStateHasChange.InvokeAsync();
         }
