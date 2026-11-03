@@ -12,13 +12,15 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using System.Text.Json;
 using Xunit;
 
 namespace Backoffice.Web.Tests.OddsEngine
 {
     // BO-142: the margins of a template are not editable until margin per client is enabled, the odds come from the provider by
-    // default. The template editor shows the markets and their key and time nodes, but the market toggles, ACTIVATE ALL and the
-    // nodes (which open the Edit Config popover) are view-only. The template name and Save still work.
+    // default. The template editor shows the markets and their key and time nodes, but only the nodes (which open the Edit Config
+    // popover) are view-only. The market Active toggle, ACTIVATE ALL, the template name and Save still work, and a market saves
+    // with its default margins (the "101 by default is not allowed" check on Save is skipped while the margins are locked).
     public class ConfigEditTemplateReadOnlyTests : BunitTestContext
     {
         private const long TemplateId = 5;
@@ -108,23 +110,64 @@ namespace Backoffice.Web.Tests.OddsEngine
         }
 
         [Fact]
-        public void EveryMarketToggle_IsDisabled_EvenForAUserWhoMayEdit()
+        public void EveryMarketToggle_IsEnabled_ForAUserWhoMayEdit()
         {
             var cut = RenderEditor();
 
             var toggles = cut.FindAll("div.market-toggle input.form-check-input");
 
             Assert.Equal(2, toggles.Count);
-            Assert.All(toggles, toggle => Assert.True(toggle.HasAttribute("disabled")));
+            Assert.All(toggles, toggle => Assert.False(toggle.HasAttribute("disabled")));
         }
 
         [Fact]
-        public void ActivateAll_IsDisabled()
+        public void ActivateAll_IsEnabled()
         {
             var cut = RenderEditor();
 
+            Assert.False(cut.Find("button.btn-activate-all").HasAttribute("disabled"));
+        }
+
+        [Fact]
+        public void InViewMode_TheToggles_AndActivateAll_AreStillDisabled()
+        {
+            var cut = RenderEditor(view: true);
+
+            Assert.All(cut.FindAll("div.market-toggle input.form-check-input"), toggle => Assert.True(toggle.HasAttribute("disabled")));
             Assert.True(cut.Find("button.btn-activate-all").HasAttribute("disabled"));
         }
+
+        [Fact]
+        public void TurningAMarketActive_AndSaving_SavesItWithTheDefaultMargins_WithoutThe101Alert()
+        {
+            MarginRequest? saved = null;
+            _backofficeService
+                .Setup(s => s.AddOrUpdateConfigTemplateMargin(It.IsAny<ConfigTemplateMarginModel>()))
+                .Callback<ConfigTemplateMarginModel>(request => saved = new MarginRequest(request.ConfigTemplateMargins))
+                .ReturnsAsync(Ok(true));
+            _backofficeService
+                .Setup(s => s.AddActivityLog(It.IsAny<ActivityLogModel>()))
+                .ReturnsAsync(Ok(new MessageResponse()));
+            var cut = RenderEditor();
+
+            cut.FindAll("div.market-toggle input.form-check-input")[0].Input(true);
+
+            cut.WaitForAssertion(() => Assert.False(cut.Find("button.btn-save").HasAttribute("disabled")));
+            cut.Find("button.btn-save").Click();
+
+            cut.WaitForAssertion(() => Assert.NotNull(saved));
+            Assert.DoesNotContain("Please update margin", cut.Markup);
+
+            var activated = saved!.Margins.Single(m => m.MarketTemplateId == "9484");
+            Assert.True(activated.IsActive);
+            Assert.False(saved.Margins.Single(m => m.MarketTemplateId == "9485").IsActive);
+
+            // the margins are the defaults: one key of 101 at kick off, nothing else
+            var margin = Assert.Single(JsonSerializer.Deserialize<List<MarketMargin>>(activated.Config)!);
+            Assert.Equal(101, margin.M);
+        }
+
+        private sealed record MarginRequest(List<ConfigTemplateMargin> Margins);
 
         [Fact]
         public void TheKeyAndTimeNodes_AreViewOnly_AndDoNotInviteAClick()

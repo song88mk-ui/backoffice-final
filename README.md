@@ -371,7 +371,7 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 | POST | `api/config/template/{state}` | Get config clients/leagues by state (`?templateId=`). The Unassigned list is the sportsbook Mongo league lookup minus the leagues the client has a saved setting for in `Trading.dbo.ClientLeagueConfig`, restricted or allowed (BO-144); HTTP 400 when either cannot be read |
 | GET | `api/config/template/count` | Template config counts (`?state=`); HTTP 400 when the league lookup, the client list or the saved settings behind a count fails (BO-143, BO-144), never a wrong number. The Unassigned count follows the same rule as the list and counts only the caller's clients |
 | GET | `api/config/template/margin/{id}` | Get config template margin |
-| POST | `api/config/template/margin` | Add or update template margin (Edit). The template editor's margins are view-only until margin per client is enabled (the odds come from the provider by default), so only Copy Template sends this (BO-142) |
+| POST | `api/config/template/margin` | Add or update template margin (Edit). The template editor's key and time nodes are view-only until margin per client is enabled (the odds come from the provider by default), so a save sends only the default margins and the market Active/Inactive state (BO-142) |
 | POST | `api/config/template/copy/client` | Copy a client's config |
 | POST | `api/config/activitylog` | Add an activity log entry |
 | POST | `api/config/set/activitylog/list` | Add a batch of activity log entries |

@@ -22,7 +22,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Parameter] public bool View { get; set; }
 
         // The margins are not editable until margin per client is enabled: the odds come from the provider by default (BO-142).
-        // The market toggles, ACTIVATE ALL and the key and time nodes are view-only, the template name and Save still work.
+        // Only the key and time nodes are view-only. The market Active toggle, ACTIVATE ALL, the template name and Save still work,
+        // and a market saves with its default margins, so the "101 by default is not allowed" check on Save is skipped meanwhile.
         private bool MarginsLocked => true;
 
         private List<BreadcrumbModel> _breadcrumbs;
@@ -263,7 +264,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     foreach (var market in _marketLookupNavigation)
                     {
                         //validate Odds
-                        if (market.NewMarketLookup.IsActive)
+                        if (!MarginsLocked && market.NewMarketLookup.IsActive)
                         {
                             switch ((FixtureStatus)_editConfigTemplateFilterModel.ScopeId)
                             {

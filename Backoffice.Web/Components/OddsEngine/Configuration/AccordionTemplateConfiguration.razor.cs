@@ -10,6 +10,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public List<string> FilterConfigStatus { get; set; }
         [Parameter] public int Scope { get; set; }
         [Parameter] public bool IsReadOnly { get; set; }
+        // the key and time nodes only: the market toggle stays editable (BO-142)
+        [Parameter] public bool IsTimelineReadOnly { get; set; }
 
 
         #region Methods                                        
