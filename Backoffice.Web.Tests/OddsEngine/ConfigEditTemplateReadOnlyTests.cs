@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System.Text.Json;
+using System.Web;
 using Xunit;
 
 namespace Backoffice.Web.Tests.OddsEngine
@@ -201,6 +202,32 @@ namespace Backoffice.Web.Tests.OddsEngine
 
             Assert.Contains("4th Quarter Result", cut.Markup);
             Assert.Contains("Totals", cut.Markup);
+        }
+
+        [Fact]
+        public void AfterASave_TheUserIsSentToMyTemplates_WithTheBannerTextInTheParameterThatPageReads()
+        {
+            _backofficeService
+                .Setup(s => s.AddOrUpdateConfigTemplateMargin(It.IsAny<ConfigTemplateMarginModel>()))
+                .ReturnsAsync(Ok(true));
+            _backofficeService
+                .Setup(s => s.AddActivityLog(It.IsAny<ActivityLogModel>()))
+                .ReturnsAsync(Ok(new MessageResponse()));
+            var cut = RenderEditor();
+
+            cut.FindAll("div.market-toggle input.form-check-input")[0].Input(true);
+
+            cut.WaitForAssertion(() => Assert.False(cut.Find("button.btn-save").HasAttribute("disabled")));
+            cut.Find("button.btn-save").Click();
+
+            var navigation = Services.GetRequiredService<NavigationManager>();
+            cut.WaitForAssertion(() => Assert.Contains("/hk/odds-engine/config-templates?", navigation.Uri));
+
+            // The list page reads only the parameter "M" (Configuration2.QueryMessage). The text used to be sent as "message",
+            // so the page never showed it.
+            var query = HttpUtility.ParseQueryString(new Uri(navigation.Uri).Query);
+            Assert.Equal("Successfully updated", query["M"]);
+            Assert.Null(query["message"]);
         }
     }
 }

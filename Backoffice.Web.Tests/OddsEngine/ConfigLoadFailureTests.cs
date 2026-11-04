@@ -240,5 +240,45 @@ namespace Backoffice.Web.Tests.OddsEngine
             }, TimeSpan.FromSeconds(5));
             Assert.DoesNotContain("Calculating", cut.Markup);
         }
+
+        // ---- The banner after a template Save ----------------------------------------------------------------
+
+        [Fact]
+        public void TheTextInTheMParameter_IsShownOnMyTemplates_AsTheBannerAfterASave()
+        {
+            // The template editor redirects here with ?M=... after a Save, and this page reads only the parameter "M".
+            Services.GetRequiredService<NavigationManager>()
+                .NavigateTo("http://localhost/hk/odds-engine/config-templates?M=Successfully%20updated");
+
+            _backofficeService
+                .Setup(s => s.GetTemplateConfigCount(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new BaseResponse<int> { StatusCode = StatusCode.Success, Result = 0 });
+            // Configuration2.Init() clears its preloader without a render of its own, so delay the first count as above.
+            _backofficeService
+                .Setup(s => s.GetTemplateConfigCount(string.Empty, It.IsAny<CancellationToken>()))
+                .Returns(async () =>
+                {
+                    await Task.Delay(150);
+                    return new BaseResponse<int> { StatusCode = StatusCode.Success, Result = 0 };
+                });
+            _tradingService
+                .Setup(t => t.GetClientList(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new BaseResponse<List<ClientInformationModel>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new List<ClientInformationModel> { new() { ClientCode = "AAA", ClientName = "Client A" } }
+                });
+            _backofficeService
+                .Setup(s => s.GetConfigTemplate(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new BaseResponse<ConfigTemplateResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Result = new ConfigTemplateResponse { ConfigTemplates = new List<ConfigTemplateModel>() }
+                });
+
+            var cut = Render<Configuration2>();
+
+            cut.WaitForAssertion(() => Assert.Contains("Successfully updated", cut.Markup), TimeSpan.FromSeconds(5));
+        }
     }
 }

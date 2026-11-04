@@ -417,8 +417,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                     }
                 }
 
+                // The list page reads the banner text from the query parameter "M" (Configuration2.QueryMessage), no other name.
                 if (isNavigate)
-                    _navigationManager.NavigateTo($"hk/odds-engine/config-templates?message=Successfully updated");
+                    _navigationManager.NavigateTo($"hk/odds-engine/config-templates?M=Successfully updated");
             }
             catch (Exception)
             { }
