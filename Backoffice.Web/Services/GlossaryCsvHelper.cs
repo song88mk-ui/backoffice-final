@@ -1,4 +1,5 @@
 using System.Text;
+using Backoffice.Web.Helpers;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 
@@ -10,7 +11,7 @@ namespace Backoffice.Web.Services
     // template. Kept dependency-free on purpose: no Excel library, mirrors the existing pattern.
     public static class GlossaryCsvHelper
     {
-        // internal: LeagueSortingCsvHelper (BO-122) reuses the escaping and the RFC4180 parser below.
+        // internal: LeagueSortingCsvHelper (BO-122) reuses the BOM and the RFC4180 parser below.
         internal const char Bom = (char)0xFEFF;
 
         public static readonly string[] ExpectedHeaders = { "StringId", "EN", "ZH", "ES", "FR" };
@@ -23,11 +24,11 @@ namespace Backoffice.Web.Services
             foreach (var row in rows)
             {
                 csvBuilder.AppendLine(string.Join(",",
-                    EscapeCsv(row.StringId),
-                    EscapeCsv(row.SourceText),
-                    EscapeCsv(row.TargetTextZh),
-                    EscapeCsv(row.TargetTextEs),
-                    EscapeCsv(row.TargetTextFr)));
+                    CsvField.Escape(row.StringId),
+                    CsvField.Escape(row.SourceText),
+                    CsvField.Escape(row.TargetTextZh),
+                    CsvField.Escape(row.TargetTextEs),
+                    CsvField.Escape(row.TargetTextFr)));
             }
 
             return Bom + csvBuilder.ToString();
@@ -84,23 +85,7 @@ namespace Backoffice.Web.Services
 
         private static string GetCell(List<string> cells, int index) => index < cells.Count ? cells[index] : string.Empty;
 
-        internal static string EscapeCsv(string? value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            var escaped = value.Replace("\"", "\"\"");
-            if (escaped.Contains(',') || escaped.Contains('"') || escaped.Contains('\n') || escaped.Contains('\r'))
-            {
-                escaped = $"\"{escaped}\"";
-            }
-
-            return escaped;
-        }
-
-        // Minimal RFC4180 parser (the inverse of EscapeCsv above): handles quoted fields with
+        // Minimal RFC4180 parser (the inverse of CsvField.Escape): handles quoted fields with
         // embedded commas, doubled-quote escaping ("") and embedded newlines, since translated
         // text can contain any of those.
         internal static List<List<string>> ParseCsvLines(string csvText)
@@ -123,7 +108,7 @@ namespace Backoffice.Web.Services
 
             void EndField()
             {
-                currentRow.Add(field.ToString());
+                currentRow.Add(CsvField.RemoveFormulaMarker(field.ToString()));
                 field.Clear();
             }
 

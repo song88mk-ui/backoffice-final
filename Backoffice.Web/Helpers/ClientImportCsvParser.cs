@@ -55,7 +55,7 @@ namespace Backoffice.Web.Helpers
                 string Get(string column)
                 {
                     var idx = columnIndex[column];
-                    return idx < fields.Count ? fields[idx].Trim() : string.Empty;
+                    return idx < fields.Count ? CsvField.RemoveFormulaMarker(fields[idx].Trim()) : string.Empty;
                 }
 
                 decimal GetDecimal(string column)

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models.OddsEngine.LeagueSorting;
 
 namespace Backoffice.Web.Services
@@ -26,12 +27,12 @@ namespace Backoffice.Web.Services
             foreach (var league in leagues.OrderBy(l => l.SortOrder))
             {
                 csv.AppendLine(string.Join(",",
-                    GlossaryCsvHelper.EscapeCsv(clientCode),
+                    CsvField.Escape(clientCode),
                     sportId.ToString(CultureInfo.InvariantCulture),
                     league.SegmentId.ToString(CultureInfo.InvariantCulture),
-                    GlossaryCsvHelper.EscapeCsv(league.SegmentName),
+                    CsvField.Escape(league.SegmentName),
                     league.LeagueId.ToString(CultureInfo.InvariantCulture),
-                    GlossaryCsvHelper.EscapeCsv(league.LeagueName),
+                    CsvField.Escape(league.LeagueName),
                     league.SortOrder.ToString(CultureInfo.InvariantCulture)));
             }
 

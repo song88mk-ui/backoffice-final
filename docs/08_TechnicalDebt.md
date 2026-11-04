@@ -312,6 +312,24 @@ Deliberately mirrors, rather than upgrades, Static Translation's existing "Expor
 
 ---
 
+## CSV Exports Wrote User Text That Excel Runs as a Formula (BO-137)
+
+**Date noted:** November 2, 2026
+
+**Issue:** The CSV exports (clients, client update error report, static translations, dynamic translations, league sorting) wrote user text unchanged. A cell that starts with `=`, `+`, `-` or `@` is run as a formula when the file is opened in Excel, so a user who can edit a translation or a client name could make the admin who exports the file send its other cells to an outside address or show a misleading link. Three copies of `EscapeCsv` only doubled quotes and quoted the field.
+
+**Resolved (BO-137):**
+- `Helpers/CsvField.Escape` is the one escape for every export (`ClientCsvHelper`, `GlossaryCsvHelper`, `StaticTranslationCsvHelper`, `LeagueSortingCsvHelper`). A cell that starts with `=`, `+`, `-`, `@`, tab or carriage return gets a leading `'`. Text that already starts with `'` before one of those characters gets one more `'`, so the marker can always be told apart.
+- `CsvField.RemoveFormulaMarker` removes exactly that one `'` on import: in `ParseCsvLines` of the glossary and static translation helpers (league sorting uses the glossary parser) and in `Get` of `ClientImportCsvParser` and `ClientUpdateCsvParser`. An unedited export imports back unchanged; `-5`, `+63 ...` and `'5` typed in a file are left alone.
+- Number columns (client fees and limits, ids, sort order) are written as numbers and not marked.
+- Tests: `Backoffice.Web.Tests/Common/CsvFieldTests.cs`.
+
+**Still open:**
+- Not checked in Excel. Excel may show the `'` as part of the text when it opens a CSV, rather than hiding it as it does for typed input. The data is still safe and round-trips; only the display differs.
+- The Excel downloads in `Backoffice.Utility` (EPPlus, `.Value =` with strings) store text, not formulas (assumed, not tested); they are not produced at the moment.
+
+---
+
 ## Critical Issues (Fix Immediately)
 
 ### 1. Developer Exception Page Always Enabled (resolved, BO-132)

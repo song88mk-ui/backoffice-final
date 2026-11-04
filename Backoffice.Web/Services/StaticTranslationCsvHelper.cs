@@ -1,4 +1,5 @@
 using System.Text;
+using Backoffice.Web.Helpers;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 
@@ -24,11 +25,11 @@ namespace Backoffice.Web.Services
             foreach (var row in rows)
             {
                 csvBuilder.AppendLine(string.Join(",",
-                    EscapeCsv(row.Key),
-                    EscapeCsv(row.SourceText),
-                    EscapeCsv(row.TargetTextZh),
-                    EscapeCsv(row.TargetTextJa),
-                    EscapeCsv(row.TargetTextBr)));
+                    CsvField.Escape(row.Key),
+                    CsvField.Escape(row.SourceText),
+                    CsvField.Escape(row.TargetTextZh),
+                    CsvField.Escape(row.TargetTextJa),
+                    CsvField.Escape(row.TargetTextBr)));
             }
 
             return Bom + csvBuilder.ToString();
@@ -85,23 +86,7 @@ namespace Backoffice.Web.Services
 
         private static string GetCell(List<string> cells, int index) => index < cells.Count ? cells[index] : string.Empty;
 
-        private static string EscapeCsv(string? value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            var escaped = value.Replace("\"", "\"\"");
-            if (escaped.Contains(',') || escaped.Contains('"') || escaped.Contains('\n') || escaped.Contains('\r'))
-            {
-                escaped = $"\"{escaped}\"";
-            }
-
-            return escaped;
-        }
-
-        // Minimal RFC4180 parser (the inverse of EscapeCsv above): handles quoted fields with
+        // Minimal RFC4180 parser (the inverse of CsvField.Escape): handles quoted fields with
         // embedded commas, doubled-quote escaping ("") and embedded newlines, since translated
         // text can contain any of those.
         private static List<List<string>> ParseCsvLines(string csvText)
@@ -124,7 +109,7 @@ namespace Backoffice.Web.Services
 
             void EndField()
             {
-                currentRow.Add(field.ToString());
+                currentRow.Add(CsvField.RemoveFormulaMarker(field.ToString()));
                 field.Clear();
             }
 

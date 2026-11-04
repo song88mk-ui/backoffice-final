@@ -32,19 +32,19 @@ namespace Backoffice.Web.Helpers
             foreach (var row in rows)
             {
                 csvBuilder.AppendLine(string.Join(",",
-                    EscapeCsv(row.ClientId),
-                    EscapeCsv(row.ClientCode),
-                    EscapeCsv(row.ClientName),
-                    EscapeCsv(row.Website),
-                    EscapeCsv(row.Region),
-                    EscapeCsv(row.Email),
+                    CsvField.Escape(row.ClientId),
+                    CsvField.Escape(row.ClientCode),
+                    CsvField.Escape(row.ClientName),
+                    CsvField.Escape(row.Website),
+                    CsvField.Escape(row.Region),
+                    CsvField.Escape(row.Email),
                     Num(row.MonthlyFee),
                     Num(row.RevenueShareSportsbook),
                     Num(row.RevenueShareJackpot),
-                    EscapeCsv(row.LimitId),
-                    EscapeCsv(row.Endpoint),
+                    CsvField.Escape(row.LimitId),
+                    CsvField.Escape(row.Endpoint),
                     string.Empty,
-                    EscapeCsv(row.CurrencyCode),
+                    CsvField.Escape(row.CurrencyCode),
                     string.Empty,
                     Num(row.SoccerMinPerTicket),
                     Num(row.SoccerMaxPerTicket),
@@ -68,28 +68,12 @@ namespace Backoffice.Web.Helpers
 
             foreach (var error in errors)
             {
-                csvBuilder.AppendLine(string.Join(",", error.RowNumber.ToString(CultureInfo.InvariantCulture), EscapeCsv(error.ClientCode), EscapeCsv(error.Message)));
+                csvBuilder.AppendLine(string.Join(",", error.RowNumber.ToString(CultureInfo.InvariantCulture), CsvField.Escape(error.ClientCode), CsvField.Escape(error.Message)));
             }
 
             return Bom + csvBuilder.ToString();
         }
 
         private static string Num(decimal value) => value.ToString(CultureInfo.InvariantCulture);
-
-        private static string EscapeCsv(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            var escaped = value.Replace("\"", "\"\"");
-            if (escaped.Contains(',') || escaped.Contains('"') || escaped.Contains('\n') || escaped.Contains('\r'))
-            {
-                escaped = $"\"{escaped}\"";
-            }
-
-            return escaped;
-        }
     }
 }
