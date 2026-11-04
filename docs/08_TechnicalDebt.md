@@ -650,33 +650,29 @@ new StringContent(JsonSerializer.Serialize(request), ...)
 
 ---
 
-### 11. DbContext Created Manually in Config.Service
+### 11. DbContext Created Manually in Config.Service (resolved, BO-138)
 
-**Location:** `Backoffice.Config.Service/Repository/BackofficeRepository.cs` line 29-32
-```csharp
-public BackofficeRepository(IConfiguration configuration, ILogger<BackofficeRepository> logger)
-{
-    var optionsBuilder = new DbContextOptionsBuilder<BackofficeContext>()
-        .UseSqlServer(_configuration["ConnectionStrings:Backoffice"]);
-    _backofficeContext = new BackofficeContext(optionsBuilder.Options);
-}
-```
+**Location:** `Backoffice.Config.Service/Repository/BackofficeRepository.cs`, `Program.cs`
 
-**Severity:** 🟠 HIGH
+**Severity:** 🟠 HIGH (until BO-138)
 
-**Impact:**
-- Bypasses dependency injection
-- Cannot mock/test easily
-- DbContextPool not utilized
-- Manual connection management
+**Impact (before the fix):** the singleton repository built one `BackofficeContext` in its constructor and kept it for
+the life of the process. `DeleteConfigTemplate` wrapped it in `using (var context = _backofficeContext)`, so the first
+template delete disposed it. Every later `r.bo.config.*` message (margin updates and deletes) then failed with
+"Cannot access a disposed context instance". The worker logged the error and returned, so the message broker acked
+the message and it was lost, while the service looked healthy until a restart.
 
-**Better Pattern:**
-```csharp
-public BackofficeRepository(BackofficeContext context) 
-{
-    _backofficeContext = context;
-}
-```
+**Fix (BO-138):** `Program.cs` registers `AddDbContextFactory<BackofficeContext>` and the repository creates a
+short-lived context per call (`using var context = _contextFactory.CreateDbContext()`). Injecting `BackofficeContext`
+into the singleton, as this item used to suggest, would not have fixed it: the singleton would still hold one context
+for its whole life. `UpdateClientMargin` no longer swallows its exceptions. `Worker` rethrows a failure on the first
+delivery, so `MessageBroker.HandleMessage` nacks and requeues it for one retry; when the redelivered message fails
+again it is logged as an error with its payload and acked, so a bad message cannot loop forever. Covered by
+`Backoffice.Config.Service.Tests`.
+
+**Still open:** the service has no health check (it is a worker with no HTTP endpoint), so it cannot report unhealthy
+when the database is unreachable; failures are visible only as errors in the bo-config-service log. The queue has no
+dead-letter exchange, so a message that fails twice is dropped after the error log.
 
 ---
 
@@ -725,25 +721,18 @@ catch (Exception ex)
 
 ---
 
-### 13. Background Service Repository Registered as Singleton
+### 13. Background Service Repository Registered as Singleton (resolved, BO-138)
 
-**Location:** `Backoffice.Config.Service/Program.cs` line 37
+**Location:** `Backoffice.Config.Service/Program.cs`
 ```csharp
 services.AddSingleton<IBackofficeRepository, BackofficeRepository>();
 ```
 
-**Severity:** 🟠 HIGH
+The repository is still a singleton, but since BO-138 it holds only a `IDbContextFactory<BackofficeContext>` and
+creates a new context for each message, so no context or change-tracking state is shared between messages. See #11.
 
-**Impact:**
-- Repository shared across all background task iterations
-- DbContext created once, reused for lifetime
-- No context per request pattern
-- Memory leaks possible (context not disposed between messages)
-
-**Risk:**
-- Memory accumulation
-- Change tracking state pollution
-- Unexpected behavior with second and subsequent messages
+**Still open:** `Backoffice.Utility/Repository/BackofficeRepository.cs` (also a singleton) still keeps one
+`BackofficeContext` field for the life of the process, next to methods that create their own context.
 
 ---
 

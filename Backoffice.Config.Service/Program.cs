@@ -31,6 +31,8 @@ namespace Backoffice.Config.Service
                         ActivitySourceName: Instrumentation.ActivitySourceName,
                         MeterName: Instrumentation.MeterName));
 
+                    // a factory, not one shared context: the singleton repository creates a context per message (BO-138)
+                    services.AddDbContextFactory<BackofficeContext>(options => options.UseSqlServer(hostContext.Configuration["ConnectionStrings:Backoffice"]));
                     services.AddSingleton<IMessageBroker, MessageBroker>();
                     services.AddSingleton<IBackofficeRepository, BackofficeRepository>();
                     services.AddHostedService<Worker>();

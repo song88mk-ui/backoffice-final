@@ -64,9 +64,16 @@ namespace Backoffice.Config.Service
                         break;
                 }
             }
+            // A throw makes the message broker nack and requeue the message, so a failure gets one retry. A message
+            // that fails again is reported with its payload and acked, so it cannot loop forever (BO-138).
+            catch (Exception ex) when (!e.Redelivered)
+            {
+                _logger.LogWarning(ex, "error processing message {messageType}, requeueing it for one retry: {exception}", messageType, ex.Message);
+                throw;
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "error processing message: {exception} {stacktrace}", ex.Message, ex.StackTrace);
+                _logger.LogError(ex, "error processing message {messageType} after a retry, dropping it. payload: {payload}", messageType, payload);
             }
         }
     }

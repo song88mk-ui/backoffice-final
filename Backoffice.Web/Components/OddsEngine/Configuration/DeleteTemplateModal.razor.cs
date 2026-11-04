@@ -41,7 +41,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             if (response.StatusCode == StatusCode.Success)
                 await Modal.OnSaveClickCallback.InvokeAsync($"{_templateName} has successfully been removed.");
             else
-                await Modal.OnSaveClickCallback.InvokeAsync($"{_templateName} Error!");
+                await Modal.OnSaveClickCallback.InvokeAsync(new AlertModel { Status = AlertStatus.Error, Message = $"{_templateName} could not be removed. {response.Message}" });
 
             _isPreloader = false;
             _modalService.Cancel();

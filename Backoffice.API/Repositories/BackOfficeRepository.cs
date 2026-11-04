@@ -1997,23 +1997,24 @@ namespace Backoffice.API.Repositories
 
                 var config = await _backofficeContext.ConfigTemplate.FindAsync(configTemplateId);
 
+                // e.g. a double click: the first request already deleted it (BO-138)
+                if (config == null)
+                    return new BaseResponse<List<ConfigTemplateModel>>() { StatusCode = StatusCode.Error, Message = "The config template was not found. It may already be deleted.", Result = null };
+
                 activity.Payload = $"{config.SportId}.{config.FixtureStatusId}.{config.Name}.T".Replace(" ", "_");
                 activity.From = JsonSerializer.Serialize(config);
 
-                if (config != null)
-                {
-                    _backofficeContext.ConfigTemplate.Remove(config);
-
-                    await _rabbitMqRepository.Publish(new MessageRequest()
-                    {
-                        CorrelationId = Guid.NewGuid().ToString(),
-                        MessageType = "DeleteConfigTemplate",
-                        RoutingKey = $"r.bo.config.deleteconfigtemplate",
-                        Payload = JsonSerializer.Serialize(config)
-                    });
-                }
-
+                _backofficeContext.ConfigTemplate.Remove(config);
                 await _backofficeContext.SaveChangesAsync();
+
+                // published only once the template is really deleted, so the Config service never cleans up assignments of a template that still exists
+                await _rabbitMqRepository.Publish(new MessageRequest()
+                {
+                    CorrelationId = Guid.NewGuid().ToString(),
+                    MessageType = "DeleteConfigTemplate",
+                    RoutingKey = $"r.bo.config.deleteconfigtemplate",
+                    Payload = JsonSerializer.Serialize(config)
+                });
                 await AddActivityLog(activity);
 
                 var configTemplate = await GetConfigTemplates("");

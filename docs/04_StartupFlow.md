@@ -387,6 +387,7 @@ Host.CreateDefaultBuilder(args)
     {
         services.AddSingleton<Instrumentation>();
         services.AddTelemetry(...);
+        services.AddDbContextFactory<BackofficeContext>(options => options.UseSqlServer(...));
         services.AddSingleton<IMessageBroker, MessageBroker>();
         services.AddSingleton<IBackofficeRepository, BackofficeRepository>();
         services.AddHostedService<Worker>();
@@ -398,7 +399,7 @@ Host.CreateDefaultBuilder(args)
 **Initialization Order:**
 1. Telemetry
 2. MessageBroker (singleton)
-3. BackofficeRepository (singleton, creates DbContext manually)
+3. BackofficeRepository (singleton; holds the DbContext factory and creates a context per message, BO-138)
 4. Worker starts consuming messages
 
 ### Worker Startup (ExecuteAsync)
@@ -555,7 +556,7 @@ Would NOT fail on:
 ```
 1. Instrumentation created (singleton)
 2. MessageBroker created (singleton) 
-3. BackofficeRepository created (singleton) with DbContext
+3. BackofficeRepository created (singleton) with the DbContext factory (one context per message)
 4. Worker created (hosted service)
 5. Worker.StartAsync() called
 6. Worker.ExecuteAsync() runs event loop

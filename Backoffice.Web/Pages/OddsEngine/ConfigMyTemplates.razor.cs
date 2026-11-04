@@ -141,6 +141,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     };
                 }
             }
+            else if (e is AlertModel alert)
+                _alertModel = alert; // a failed delete, shown as an error (BO-138)
 
             await LoadConfigTemplates();
         }
