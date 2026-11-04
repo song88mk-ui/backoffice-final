@@ -1,7 +1,9 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 using SportMarketTemplateGroup = Backoffice.Shared.Models.Response.MarketTemplateGroupResponse.SportMarketTemplateGroup;
 
 namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
@@ -16,6 +18,9 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
         public SearchFormModel SearchForm { get; set; }
         public List<MarketGroupNavigationModel> MarketTemplateGroups { get; set; }
+        public AlertModel LoadAlert { get; set; } = new();
+
+        private const string AllMarketsGroupName = "All Markets";
 
         #endregion
 
@@ -26,12 +31,12 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             SearchForm = new SearchFormModel();
             MarketTemplateGroups = new List<MarketGroupNavigationModel>();
 
-            // 99 = all fixture types
-            var marketTemplateGroupResponse = await _backofficeService.GetMarketTemplateGroups(99);
+            // The groups of every sport come from the BO API's Sportsbook data (BO-154), not the Odds Engine Trading API.
+            var marketTemplateGroupResponse = await _backofficeService.GetConfigMarketTemplateGroups();
 
-            if (marketTemplateGroupResponse.StatusCode == StatusCode.Success)
+            if (marketTemplateGroupResponse?.StatusCode == StatusCode.Success)
             {
-                var marketTemplateGroup = marketTemplateGroupResponse.Result.Sports.FirstOrDefault(c => c.SportId == SportId);
+                var marketTemplateGroup = marketTemplateGroupResponse.Result?.Sports.FirstOrDefault(c => c.SportId == SportId);
 
                 var allMarketTemplateGroups = new List<MarketTemplateGroup>();
 
@@ -39,6 +44,17 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
                 {
                     allMarketTemplateGroups.AddRange(marketTemplateGroup.Live);
                     allMarketTemplateGroups.AddRange(marketTemplateGroup.Prematch);
+                }
+
+                // A sport with no market group rows gets one group holding every market of the fixture, as in the Config editor.
+                if (!allMarketTemplateGroups.Any())
+                {
+                    allMarketTemplateGroups.Add(new MarketTemplateGroup
+                    {
+                        MarketTemplateGroupName = AllMarketsGroupName,
+                        SortOrder = 1,
+                        MarketTemplateIds = Fixture.Markets.Select(m => m.MarketTemplateId).Distinct().ToList()
+                    });
                 }
 
                 var marketTemplateGroupNames = allMarketTemplateGroups.Select(s => s.MarketTemplateGroupName).Distinct().ToList();
@@ -72,7 +88,22 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
                     marketTemplateGroupId++;
                 }
 
-                await OnMarketTemplateGroupCallback.InvokeAsync(MarketTemplateGroups.FirstOrDefault(c => c.IsSelected));
+                // The page reads the group it is given, so it must not get null when no group matches the fixture's markets.
+                var selectedGroup = MarketTemplateGroups.FirstOrDefault(c => c.IsSelected);
+
+                if (selectedGroup != null)
+                    await OnMarketTemplateGroupCallback.InvokeAsync(selectedGroup);
+            }
+            else
+            {
+                Log.Warning("The Monitoring market group filter could not load the market groups: {Message}", marketTemplateGroupResponse?.Message);
+
+                LoadAlert = new AlertModel
+                {
+                    Status = AlertStatus.Error,
+                    Message = "The market groups could not be loaded. Please try again, or contact support if it keeps happening.",
+                    IsAlwaysShown = true
+                };
             }
         }
         public async Task OnMarketTemplateGroupClickEvent(MarketGroupNavigationModel model)
