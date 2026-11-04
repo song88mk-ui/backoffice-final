@@ -1872,6 +1872,10 @@ namespace Backoffice.API.Repositories
                 if (write.StatusCode != StatusCode.Success)
                     return write;
 
+                // BO-145: the odds engine reads the saved settings again for these leagues. Unassigned and Active are both
+                // visible, only Restricted is not.
+                await PublishLeagueConfigChanges(rows, !assign || !request.Restricted);
+
                 var logs = new List<ActivityLogModel>();
                 foreach (var row in rows.GroupBy(ConfigRowKey).Select(g => g.Last()))
                 {
@@ -1930,6 +1934,45 @@ namespace Backoffice.API.Repositories
             ((row.ClientCode ?? string.Empty).ToUpperInvariant(), row.SportId, row.SegmentId, row.LeagueId);
 
         private static string ConfigStateName(bool isActive) => isActive ? "Active" : "Restricted";
+
+        // BO-145: tells the odds engine (OE.Adapter.Service) which leagues changed, so it reads the saved settings again and
+        // updates the clients each league is stamped with (ClCo). One message per league, because the adapter only uses the
+        // ids; it carries the client of the first row and the state of this save, which are informational. The settings are
+        // saved already, so a message that cannot be sent is logged and never fails the save: the odds engine also reloads
+        // the settings on a timer.
+        private async Task PublishLeagueConfigChanges(List<ClientLeagueConfig> rows, bool isActive)
+        {
+            foreach (var league in rows.GroupBy(r => (r.SportId, r.SegmentId, r.LeagueId)).Select(g => g.First()))
+            {
+                try
+                {
+                    var response = await _rabbitMqRepository.Publish(new MessageRequest()
+                    {
+                        CorrelationId = Guid.NewGuid().ToString(),
+                        MessageType = "OnLeagueConfig",
+                        RoutingKey = "r.uof.onleagueconfig",
+                        Payload = JsonSerializer.Serialize(new Backoffice.Shared.OutgoingEngineMessages.OnLeagueConfigMessage
+                        {
+                            ClientId = league.ClientId,
+                            ClientCode = league.ClientCode,
+                            SportId = league.SportId,
+                            SegmentId = league.SegmentId,
+                            LeagueId = league.LeagueId,
+                            IsActive = isActive
+                        })
+                    });
+
+                    if (response?.StatusCode != StatusCode.Success)
+                        Log.Error("OnLeagueConfig of league {SportId}.{SegmentId}.{LeagueId} was not accepted by the broker: {Message}",
+                            league.SportId, league.SegmentId, league.LeagueId, response?.Message);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "OnLeagueConfig of league {SportId}.{SegmentId}.{LeagueId} could not be published",
+                        league.SportId, league.SegmentId, league.LeagueId);
+                }
+            }
+        }
 
         // BO-151: the leagues the clients have a saved setting for, with the names of the sportsbook league lookup. A
         // saved league that is no longer in the lookup is still listed, so that it can be unassigned.

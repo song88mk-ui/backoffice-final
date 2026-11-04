@@ -75,7 +75,7 @@ No single format, and not all lowercase. Prefixes seen in live code:
 | `r.oe.web.config.*` | `OnUpdateClientMarketConfig`, `OnUpdateClientLeagueConfig`, `ongetmarginspreadsheet3`, `oncopyclientsettings2` | Config.Service, Utility, Web (via the API's `api/trading/publish`) |
 | `r.bo.config.*` | `updateclientmargin`, `deleteconfigtemplate` | API `BackOfficeRepository.cs:1805-1811,2102-2108` |
 | `r.bo.mapping.onbulkupdate` | message type `OnSportBulkUpdate`, `OnSegmentBulkUpdate`, `OnLeagueBulkUpdate`, `OnFixtureBulkUpdate` (`TradingRepository.cs:2709-2712`) | API via the broker API |
-| `r.uof.*` | `onbetsettlement`, `onpriceboost`, `onleagueconfig`, `onmarketconfig` | API `TradingRepository.cs:1651`, Web |
+| `r.uof.*` | `onbetsettlement`, `onpriceboost`, `onleagueconfig`, `onmarketconfig` | API `TradingRepository.cs:1651`, Web; `onleagueconfig` also from `BackofficeRepository.SetConfigState` (BO-145) |
 
 Casing is inconsistent: Config.Service publishes `r.oe.web.config.OnUpdateClientMarketConfig` and `r.oe.web.config.OnUpdateClientLeagueConfig` with capitals (`BackofficeRepository.cs:90,118`), while `MessageBroker` lowercases keys only when *binding* (`MessageBroker.cs:300-301`). Topic matching is case-sensitive. The string `r.oe.web.config` appears nowhere in the workspace outside backoffice-final; Unverified whether any consumer binds it through a wildcard.
 

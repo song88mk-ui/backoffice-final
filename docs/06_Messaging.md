@@ -85,6 +85,23 @@ nothing deployed consumes those keys, and the Web writes the price boost activit
 `r.uof.onpriceboost` is still published by the Web (through `api/trading/publish`, now the broker API
 of this service) and has no consumer in the deployed Odds Engine v2.
 
+### League Settings Saved (BO-145)
+```
+OnLeagueConfig
+├─ Published by BackofficeRepository.SetConfigState after a Config page save (Assigned as Active or Restricted, or
+│  Unassigned) has been written to Trading.dbo.ClientLeagueConfig
+├─ Route: r.uof.onleagueconfig (through IRabbitMqRepository.Publish, the broker API)
+├─ Payload: OnLeagueConfigMessage (ClientId, ClientCode, SportId, SegmentId, LeagueId, IsActive), one per distinct
+│  league of the save, carrying the client of the league's first row
+└─ Consumer: odds-engine-2 OE.Adapter.Service (binds r.uof.#)
+```
+The adapter only uses the league ids: it reads the saved settings again, works out the clients allowed to see the
+league (every client except the restricted ones) and has the Sportsbook shard stamp them into the `ClCo` of the
+league's stored fixtures and markets. `IsActive` is informational (true for Active and Unassigned, false for
+Restricted). The settings are saved first, so a publish failure is logged and never undoes the save; the adapter also
+reloads the table every 60 seconds, so a lost message delays the change by at most that. The older template modal
+(`ModifyLeagueTemplateModal`) still publishes `OnLeagueConfig` and `OnMarketConfig` from the Web.
+
 ### Configuration Updates
 ```
 OnUpdateClientMarketConfigMessage
