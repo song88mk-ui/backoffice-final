@@ -1,7 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -182,29 +181,14 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
             FilterModel.ToDate = clientDateRange.End.DateTime;
         }
 
+        // BO-136: hands the filters as they are on screen to the page (as Search does), which then loads every
+        // matching row and downloads them.
         public async Task OnExportClickEvent()
         {
             if (FilterModel == null)
                 return;
 
-            var payload = new OnGetMarketSettlementHistoryMessage
-            {
-                SegmentId = FilterModel.SegmentId == 0 ? String.Empty : FilterModel.SegmentId.ToString(),
-                LeagueId = FilterModel.LeagueId == 0 ? String.Empty : FilterModel.LeagueId.ToString(),
-                FixtureId = FilterModel.FixtureId,
-                MarketId = FilterModel.MarketId,
-                SelectionId = FilterModel.SelectionId,
-                SportId = FilterModel.SportId == 0 ? string.Empty : FilterModel.SportId.ToString(),
-                SelectionStatus = FilterModel.ToStatus == 0 ? string.Empty : FilterModel.ToStatus.ToString(),
-                ManualSettledBy = FilterModel.SettledBy,
-                FromDate = FilterModel.FromDate,
-                ToDate = FilterModel.ToDate,
-                UserId = _userState.Model.Id,
-                ConnectionId = _userState.ConnectionId
-            };
-
-            // Task - Migrate to api call
-            //MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMarketSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+            await FilterModelChanged.InvokeAsync(FilterModel);
             await OnExportCallback.InvokeAsync();
         }
 

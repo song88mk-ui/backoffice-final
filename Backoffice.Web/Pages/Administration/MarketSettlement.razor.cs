@@ -5,6 +5,7 @@ using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Newtonsoft.Json;
 
 namespace Backoffice.Web.Pages.Administration
@@ -68,46 +69,35 @@ namespace Backoffice.Web.Pages.Administration
         {
             IsPreLoader = true;
 
-            // The full settlement detail is stored in the activity log's Payload column
-            // (nvarchar(max)); fetch all entries for the page/date range and apply the
-            // fixture/market/selection filters client-side against the deserialized record.
-            var response = (await BackofficeService.GetMarketSettlementActivityLogs(new ActivityLogRequest
-            {
-                Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
-                Payload = "%",
-                MetaData = MetaData,
-                DateFrom = ModalFilterModel.FromDate,
-                DateTo = ModalFilterModel.ToDate
-            })).Result;
+            var (succeeded, _, settlements, metaData) = await LoadSettlements(MetaData);
 
-            List<ManualMarketSettlementAuditModel> result = new List<ManualMarketSettlementAuditModel>();
+            if (succeeded)
+                MetaData = metaData;
 
-            if (response != null)
-            {
-                MetaData = response.MetaData;
-                foreach (var item in response.ActivityLogs)
-                {
-                    result.Add(JsonConvert.DeserializeObject<ManualMarketSettlementAuditModel>(item.Payload));
-                }
-            }
-
-            ManualMarketSettlements = result.Where(x => (ModalFilterModel.SportId == 0 || x.SportId == ModalFilterModel.SportId)
-                                        && (ModalFilterModel.SegmentId == 0 || x.SegmentId == ModalFilterModel.SegmentId)
-                                        && (ModalFilterModel.LeagueId == 0 || x.LeagueId == ModalFilterModel.LeagueId)
-                                        && (string.IsNullOrEmpty(ModalFilterModel.FixtureId) || x.FixtureId.ToString() == ModalFilterModel.FixtureId)
-                                        && (ModalFilterModel.ToStatus == 0 || x.ToStatusId == ModalFilterModel.ToStatus)
-                                        && (string.IsNullOrEmpty(ModalFilterModel.MarketId) || x.MarketId.ToString() == ModalFilterModel.MarketId)
-                                        && (string.IsNullOrEmpty(ModalFilterModel.SelectionId) || x.SelectionId.ToString() == ModalFilterModel.SelectionId)
-                                        && (string.IsNullOrEmpty(ModalFilterModel.SettledBy) || (x.ManualSettledBy ?? string.Empty).ToUpper().Contains(ModalFilterModel.SettledBy.ToUpper()))).ToList();
+            ManualMarketSettlements = settlements;
 
             IsPreLoader = false;
         }
 
+        // BO-136: loads every row for the filters on screen and downloads them as a CSV.
         public async Task OnExportClickedEvent()
         {
-            _toasterService.AddToast(Toast.NewToast
-                    ("Market Settlement",
-                    $"Success! Excel file is being generated system will notify once done."));
+            var (succeeded, message, settlements, _) = await LoadSettlements(new MetaData { CurrentPage = 0, PageSize = 1 });
+
+            if (!succeeded)
+            {
+                _toasterService.AddToast(Toast.NewToast("Market Settlement", $"Export failed: {message}"));
+                return;
+            }
+
+            if (!settlements.Any())
+            {
+                _toasterService.AddToast(Toast.NewToast("Market Settlement", "There are no records to export for these filters."));
+                return;
+            }
+
+            var fileName = HistoryExportCsvHelper.FileName("market-settlement-history", DateTime.UtcNow);
+            await _jsRuntime.InvokeVoidAsync("downloadFileFromText", fileName, HistoryExportCsvHelper.BuildMarketSettlementCsv(settlements), "text/csv");
         }
 
         public async Task SelectPage(int page)
@@ -148,24 +138,40 @@ namespace Backoffice.Web.Pages.Administration
             }
             return className;
         }
-        protected string GetMarketLine(string marketName, string line)
-        {
-            if (!string.IsNullOrEmpty(marketName))
-            {
-                if (string.IsNullOrEmpty(line))
-                {
-                    return string.Empty;
-                }
-                else
-                {
-                    if (marketName.ToUpper().Contains("TOTAL"))
-                        return $"o {decimal.Parse(line)} u";
+        protected string GetMarketLine(string marketName, string line) => HistoryExportCsvHelper.MarketLine(marketName, line);
 
-                    if (marketName.ToUpper().Contains("HANDICAP"))
-                        return $"h {decimal.Parse(line)} a";
-                }
-            }
-            return string.Empty;
+        // The full settlement detail is stored in the activity log's Payload column (nvarchar(max)); fetch all
+        // entries for the page/date range and apply the fixture/market/selection filters to the deserialized
+        // record. The table and the export ask for the same rows; the export passes CurrentPage 0, for which the
+        // API returns every row instead of one page.
+        private async Task<(bool Succeeded, string Message, List<ManualMarketSettlementAuditModel> Settlements, MetaData MetaData)> LoadSettlements(MetaData metaData)
+        {
+            var response = await BackofficeService.GetMarketSettlementActivityLogs(new ActivityLogRequest
+            {
+                Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
+                Payload = "%",
+                MetaData = metaData,
+                DateFrom = ModalFilterModel.FromDate,
+                DateTo = ModalFilterModel.ToDate
+            });
+
+            if (response?.StatusCode != StatusCode.Success || response.Result == null)
+                return (false, response?.Message ?? "No response from the server.", new List<ManualMarketSettlementAuditModel>(), metaData);
+
+            var result = response.Result.ActivityLogs
+                .Select(item => JsonConvert.DeserializeObject<ManualMarketSettlementAuditModel>(item.Payload))
+                .Where(x => x != null);
+
+            var settlements = result.Where(x => (ModalFilterModel.SportId == 0 || x.SportId == ModalFilterModel.SportId)
+                                        && (ModalFilterModel.SegmentId == 0 || x.SegmentId == ModalFilterModel.SegmentId)
+                                        && (ModalFilterModel.LeagueId == 0 || x.LeagueId == ModalFilterModel.LeagueId)
+                                        && (string.IsNullOrEmpty(ModalFilterModel.FixtureId) || x.FixtureId.ToString() == ModalFilterModel.FixtureId)
+                                        && (ModalFilterModel.ToStatus == 0 || x.ToStatusId == ModalFilterModel.ToStatus)
+                                        && (string.IsNullOrEmpty(ModalFilterModel.MarketId) || x.MarketId.ToString() == ModalFilterModel.MarketId)
+                                        && (string.IsNullOrEmpty(ModalFilterModel.SelectionId) || x.SelectionId.ToString() == ModalFilterModel.SelectionId)
+                                        && (string.IsNullOrEmpty(ModalFilterModel.SettledBy) || (x.ManualSettledBy ?? string.Empty).ToUpper().Contains(ModalFilterModel.SettledBy.ToUpper()))).ToList();
+
+            return (true, response.Message, settlements, response.Result.MetaData ?? metaData);
         }
         #endregion
     }

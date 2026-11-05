@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Administration.MessageSettlement;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -74,11 +75,28 @@ namespace Backoffice.Web.Pages.Administration
             await GetContents();
         }
 
+        // BO-136: loads every row for the filters on screen and downloads them as a CSV.
         public async Task OnExportClickedEvent()
         {
-            _toasterService.AddToast(Toast.NewToast
-                    ("Message Settlement",
-                    $"Success! Excel file is being generated system will notify once done."));
+            // CurrentPage 0: the API returns every row instead of one page.
+            var logs = await LoadLogs(new MetaData { CurrentPage = 0, PageSize = 1 });
+
+            if (logs?.StatusCode != StatusCode.Success || logs.Result == null)
+            {
+                _toasterService.AddToast(Toast.NewToast("Message Settlement", $"Export failed: {logs?.Message ?? "No response from the server."}"));
+                return;
+            }
+
+            var settlements = ToModels(logs.Result.ActivityLogs);
+
+            if (!settlements.Any())
+            {
+                _toasterService.AddToast(Toast.NewToast("Message Settlement", "There are no records to export for these filters."));
+                return;
+            }
+
+            var fileName = HistoryExportCsvHelper.FileName("message-settlement-history", DateTime.UtcNow);
+            await JSRuntime.InvokeVoidAsync("downloadFileFromText", fileName, HistoryExportCsvHelper.BuildMessageSettlementCsv(settlements), "text/csv");
         }
 
         public async Task SelectPage(int page)
@@ -101,32 +119,9 @@ namespace Backoffice.Web.Pages.Administration
         {
             IsPreLoader = true;
 
-            var logs = await BackofficeService.GetActivityLogs(new ActivityLogRequest()
-            {
-                Page = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
-                Payload = BuildPayload(),
-                MetaData = MetaData,
-                DateFrom = FilterModel.FromDate,
-                DateTo = FilterModel.ToDate
-            });
+            var logs = await LoadLogs(MetaData);
 
-            var result = new List<MessageSettlementModel>();
-
-            if (logs != null)
-            {
-                result = logs?.Result?.ActivityLogs?.Select(x => new MessageSettlementModel()
-                {
-                    Id = x.Id,
-                    BetDate = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).BetDate,
-                    BetId = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).BetId,
-                    Sports = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).SportName,
-                    MessagesSettled = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).FixtureName,
-                    Product = GetProducts().FirstOrDefault(y => y.Value == JsonSerializer.Deserialize<MessageSettlementTo>(x.To).ProductId).Name,
-                    SettledBy = x.UserName,
-                    DateSettled = x.TimeStamp,
-                    Reason = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).Reason
-                }).ToList();
-            }
+            var result = logs?.Result?.ActivityLogs != null ? ToModels(logs.Result.ActivityLogs) : new List<MessageSettlementModel>();
 
             MetaData = logs?.Result?.MetaData;
             CursorId = result?.LastOrDefault()?.Id ?? 0;
@@ -134,6 +129,41 @@ namespace Backoffice.Web.Pages.Administration
             IsPreLoader = false;
             MessageSettlementModel = result;
             StateHasChanged();
+        }
+
+        // The table and the export ask for the same rows; the export passes CurrentPage 0.
+        private Task<BaseResponse<ActivityLogResponse>> LoadLogs(MetaData metaData)
+        {
+            return BackofficeService.GetActivityLogs(new ActivityLogRequest()
+            {
+                Page = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
+                Payload = BuildPayload(),
+                MetaData = metaData,
+                DateFrom = FilterModel.FromDate,
+                DateTo = FilterModel.ToDate
+            });
+        }
+
+        private List<MessageSettlementModel> ToModels(IEnumerable<ActivityLogModel> logs)
+        {
+            var products = GetProducts();
+
+            return logs.Select(x =>
+            {
+                var to = JsonSerializer.Deserialize<MessageSettlementTo>(x.To);
+                return new MessageSettlementModel()
+                {
+                    Id = x.Id,
+                    BetDate = to.BetDate,
+                    BetId = to.BetId,
+                    Sports = to.SportName,
+                    MessagesSettled = to.FixtureName,
+                    Product = products.FirstOrDefault(y => y.Value == to.ProductId)?.Name,
+                    SettledBy = x.UserName,
+                    DateSettled = x.TimeStamp,
+                    Reason = to.Reason
+                };
+            }).ToList();
         }
 
         private string BuildPayload()

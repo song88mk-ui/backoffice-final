@@ -149,5 +149,25 @@ namespace Backoffice.Web.Tests.OddsEngine
             cut.WaitForAssertion(() => Assert.Contains("Dev Template Test-PreMatch", cut.Markup));
             Assert.DoesNotContain("No Record Found", cut.Markup);
         }
+
+        // BO-136: the template export only forwarded a message to a queue nothing reads, so it produced no file.
+        // The row no longer offers it; the other actions stay.
+        [Fact]
+        public void ATemplateRow_DoesNotOfferExport()
+        {
+            var cut = RenderPage(Templates(new ConfigTemplateModel
+            {
+                Id = 5,
+                Name = "Dev Template Test-PreMatch",
+                SportId = 1,
+                FixtureStatusId = (int)Scope.Prematch,
+                Timestamp = new DateTime(2026, 11, 2, 8, 22, 0)
+            }));
+
+            cut.WaitForAssertion(() => Assert.Contains("Dev Template Test-PreMatch", cut.Markup));
+            Assert.Empty(cut.FindAll("a[title='Export Template']"));
+            Assert.NotEmpty(cut.FindAll("a[title='Edit Template']"));
+            Assert.NotEmpty(cut.FindAll("a[title='Delete Template']"));
+        }
     }
 }

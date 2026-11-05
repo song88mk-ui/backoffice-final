@@ -266,7 +266,10 @@ switch (messageType)
 }
 ```
 
-**Message Volume:** High (activity logging, exports)
+**Message Volume:** Low. Nothing publishes the `Export*` messages any more (BO-136): the Cancel Bet,
+Manual Bet, Market and Message Settlement history pages build their CSV in Back Office Web from the
+same API call as the table, and the Config template export was removed because its
+`r.oe.web.config.ongetmarginspreadsheet3` message has no consumer. See `docs/08_TechnicalDebt.md`.
 
 ### WebSocket.Service Consumer
 

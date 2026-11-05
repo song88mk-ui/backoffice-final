@@ -336,10 +336,10 @@ General-purpose background worker for settlement history exports, configuration 
 
 #### Message Processing (10+ types)
 - LogActivity / LogActivityList
-- ExportMessageSettlementHistory
-- ExportManualBetSettlementHistory
-- ExportMarketSettlementHistory
-- ExportOeConfigTemplate
+- ExportMessageSettlementHistory, ExportManualBetSettlementHistory, ExportMarketSettlementHistory,
+  ExportCancelBetHistory, ExportOeConfigTemplate: still handled, but nothing publishes them any more.
+  The history pages export a CSV in the browser and the template export was removed (BO-136, see
+  `docs/08_TechnicalDebt.md`)
 - BulkUpdateConfig
 - CopyClientSettings
 - ExportDeletedTemplate

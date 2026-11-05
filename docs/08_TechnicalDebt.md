@@ -1145,3 +1145,33 @@ These NuGet audit warnings (NU1902/1903/1904) are surfaced by the .NET 10 SDK du
 
 **Also noted during the upgrade (pre-existing, unrelated):** real Staging SQL credentials are committed in `Backoffice.API/appsettings.json` (`ConnectionStrings` block, including a commented-out Production string) — violates CLAUDE.md rule 6 (Connection String & Secret Safety); needs a credential rotation + move to git-ignored overrides, tracked separately.
 
+## Excel exports moved out of the Utility service (BO-136)
+
+**Date noted:** November 5, 2026
+
+From 2024-11-29 (commit d6f25c1a, "Task - Migrate to api call") until BO-136, five Export buttons
+showed "Success! Excel file is being generated" while the `r.bo.util.export` publish was commented
+out, so no file was ever produced.
+
+**Now:** Cancel Bet History, Manual Bet Settlement, Market Settlement and Message Settlement load
+every row for the filters on screen (the activity log API returns all rows when `MetaData.CurrentPage`
+is 0) and download a CSV at once (`Backoffice.Web/Services/HistoryExportCsvHelper.cs`, same BOM +
+`CsvField.Escape` + `downloadFileFromText` pattern as the other exports). A failed request shows
+"Export failed", not success. The file never leaves the user's session, so it needs no storage
+link and nobody without the page's permission can download it. Cancel Bet History's table now also
+applies its date range, as the export does.
+
+**Removed:** Export on a Config template (My Templates). Utility only forwarded it to
+`r.oe.web.config.ongetmarginspreadsheet3`, and nothing in any repo consumes that message, so there
+was no file builder to switch back on. If the business wants a template export, it needs a new design.
+
+**Remaining dead code (not reachable, left for a clean-up ticket):**
+- `Backoffice.Utility` `Export*` cases (`Worker.cs`, `Repository/BackofficeRepository.cs`): EPPlus,
+  `UploadToAzure` (not awaited, hard-coded production storage account, unsigned guessable links) and
+  `SendAsync("SendMessageToUser")` on a hub without that method. Delete together with the
+  `OnGet*HistoryMessage` / `OnGetOeConfigTemplateMessage` classes and the EPPlus and
+  WindowsAzure.Storage packages.
+- `HeaderConfigTopMenu` / `ImportExportMarginModal` (Import/Export Margins): no page renders them, and
+  both the import and export publishes are commented out.
+- The exports load all rows in one request and pass the CSV text through the Blazor circuit. That is
+  fine for the date ranges used today; a very large range would need a streamed download from the API.

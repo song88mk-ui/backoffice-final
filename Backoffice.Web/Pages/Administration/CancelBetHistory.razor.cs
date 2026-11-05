@@ -1,12 +1,10 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.OutgoingEngineMessages;
-using Backoffice.Shared.Utilities;
-using Backoffice.Web.Extensions;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Text.Json;
 
 namespace Backoffice.Web.Pages.Administration
@@ -64,28 +62,28 @@ namespace Backoffice.Web.Pages.Administration
             CancelBets = await GetActivityLogList(request);
             IsPreload = false;
         }
+        // BO-136: loads every row for the filters on screen and downloads them as a CSV.
         public async Task OnExportEvent(CancelBetHistoryCallbackModel model)
         {
             if (model == null)
                 return;
 
-            var request = new OnGetCancelBetHistoryMessage
+            var (succeeded, message, bets, _) = await LoadCancelBets(model, new MetaData { CurrentPage = 0, PageSize = 1 });
+
+            if (!succeeded)
             {
-                ConnectionId = _userState.ConnectionId,
-                Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
-                Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
-                DateFrom = model.DateFrom,
-                DateTo = model.DateTo,
-                MetaData = MetaData
-            };
+                _toasterService.AddToast(Toast.NewToast("Cancel Bet History", $"Export failed: {message}"));
+                return;
+            }
 
-            // Task - Migrate to api call
-            //MessageBroker.Publish(JsonSerializer.Serialize(request), "ExportCancelBetHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+            if (!bets.Any())
+            {
+                _toasterService.AddToast(Toast.NewToast("Cancel Bet History", "There are no records to export for these filters."));
+                return;
+            }
 
-
-            _toasterService.AddToast(Toast.NewToast
-                    ("Cancel Bet History",
-                    $"Success! Excel file is being generated system will notify once done."));
+            var fileName = HistoryExportCsvHelper.FileName("cancel-bet-history", DateTime.UtcNow);
+            await _jsRuntime.InvokeVoidAsync("downloadFileFromText", fileName, HistoryExportCsvHelper.BuildCancelBetHistoryCsv(bets), "text/csv");
         }
         public async Task SelectPage(int page)
         {
@@ -108,40 +106,50 @@ namespace Backoffice.Web.Pages.Administration
 
         private async Task<CancelBetHistoryModel> GetActivityLogList(CancelBetHistoryCallbackModel model)
         {
-            var cancelBets = new CancelBetHistoryModel();
+            var (succeeded, _, bets, metaData) = await LoadCancelBets(model, MetaData);
+
+            if (succeeded)
+                MetaData = metaData;
+
+            return new CancelBetHistoryModel { CancelBets = bets };
+        }
+
+        // The table and the export ask for the same rows; the export passes CurrentPage 0, for which the API
+        // returns every row instead of one page.
+        private async Task<(bool Succeeded, string Message, List<CancelBetHistoryModel.BetDetails> Bets, MetaData MetaData)> LoadCancelBets(CancelBetHistoryCallbackModel model, MetaData metaData)
+        {
+            var bets = new List<CancelBetHistoryModel.BetDetails>();
 
             var response = await BackofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                 Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
-                MetaData = MetaData
+                DateFrom = model.DateFrom,
+                DateTo = model.DateTo,
+                MetaData = metaData
             });
 
-            if (response.StatusCode == StatusCode.Success)
+            if (response?.StatusCode != StatusCode.Success || response.Result == null)
+                return (false, response?.Message ?? "No response from the server.", bets, metaData);
+
+            foreach (var item in response.Result.ActivityLogs)
             {
-                MetaData = response.Result.MetaData;
-
-                var temp = response.Result.ActivityLogs;
-
-                foreach (var item in temp)
+                var betDetails = JsonSerializer.Deserialize<CancelBetHistoryModel.BetDetails>(item.From);
+                if (betDetails != null)
                 {
-                    var betDetails = JsonSerializer.Deserialize<CancelBetHistoryModel.BetDetails>(item.From);
-                    if (betDetails != null)
-                    {
-                        betDetails.CancelledBy = item.UserName;
+                    betDetails.CancelledBy = item.UserName;
 
-                        var betSelectionDetails = JsonSerializer.Deserialize<CancelBetHistoryModel.BetSelectionDetails>(item.To);
-                        betDetails.Selections = new List<CancelBetHistoryModel.BetSelectionDetails>();
+                    var betSelectionDetails = JsonSerializer.Deserialize<CancelBetHistoryModel.BetSelectionDetails>(item.To);
+                    betDetails.Selections = new List<CancelBetHistoryModel.BetSelectionDetails>();
 
-                        if (betSelectionDetails != null)
-                            betDetails.Selections.Add(betSelectionDetails);
+                    if (betSelectionDetails != null)
+                        betDetails.Selections.Add(betSelectionDetails);
 
-                        cancelBets.CancelBets.Add(betDetails);
-                    }
+                    bets.Add(betDetails);
                 }
             }
 
-            return cancelBets;
+            return (true, response.Message, bets, response.Result.MetaData ?? metaData);
         }
 
         #endregion

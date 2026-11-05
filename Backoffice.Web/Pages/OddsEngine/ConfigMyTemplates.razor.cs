@@ -101,9 +101,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 switch (type)
                 {
-                    case "ExportTemplateModal":
-                        _modalService.Open<ExportTemplateModal>($"Export Templates", parameters, options);
-                        break;
                     case "ViewAssignedModal":
                         _modalService.Open<ViewAssignedModal>($"View Assigned", parameters, options);
                         break;

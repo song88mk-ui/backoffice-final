@@ -2,12 +2,13 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Text;
+using System.Text.Json;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
 
 namespace Backoffice.Web.Pages.Administration
@@ -107,20 +108,39 @@ namespace Backoffice.Web.Pages.Administration
             await GetContents();
         }
 
+        // BO-136: loads every row for the filters on screen and downloads them as a CSV.
         public async Task OnExportExcel()
         {
-            var payload = new OnGetManualBetSettlementHistoryMessage()
+            var response = await BackofficeService.GetManualBetSettlementActivityLogs(new ManualBetSettlementActivityLogRequest()
             {
                 ManualBetSettlementCallbackModel = CallbackModel,
-                ConnectionId = _userState.ConnectionId
-            };
+                // CurrentPage 0: the API returns every row instead of one page.
+                MetaData = new MetaData { CurrentPage = 0, PageSize = 1 }
+            });
 
-            // Task - Migrate to api call
-            //MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportManualBetSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+            if (response?.StatusCode != StatusCode.Success || response.Result == null)
+            {
+                _toasterService.AddToast(Toast.NewToast("Manual Bet Settlement", $"Export failed: {response?.Message ?? "No response from the server."}"));
+                return;
+            }
 
-            _toasterService.AddToast(Toast.NewToast
-                    ("Manual Bet Settlement",
-                    $"Success! Excel file is being generated system will notify once done."));
+            // The same rows the table shows: a log whose details cannot be read is skipped there too.
+            var rows = new List<(ManualBetDetails Bet, string SettledBy)>();
+            foreach (var log in response.Result.ActivityLogs ?? new List<ActivityLogModel>())
+            {
+                var betDetails = ReadBetDetails(log);
+                if (betDetails != null)
+                    rows.Add((betDetails, log.UserName));
+            }
+
+            if (!rows.Any())
+            {
+                _toasterService.AddToast(Toast.NewToast("Manual Bet Settlement", "There are no records to export for these filters."));
+                return;
+            }
+
+            var fileName = HistoryExportCsvHelper.FileName("manual-bet-settlement-history", DateTime.UtcNow);
+            await _jsRuntime.InvokeVoidAsync("downloadFileFromText", fileName, HistoryExportCsvHelper.BuildManualBetSettlementCsv(rows), "text/csv");
         }
 
         public async Task SelectPage(int page)
@@ -184,15 +204,17 @@ namespace Backoffice.Web.Pages.Administration
             return builder.ToString();
         }
 
-        public string GetBetStatusName(ManualBetDetails betDetails)
+        public string GetBetStatusName(ManualBetDetails betDetails) => HistoryExportCsvHelper.ToStatusName(betDetails);
+
+        private static ManualBetDetails? ReadBetDetails(ActivityLogModel log)
         {
-            if (string.IsNullOrEmpty(betDetails.NewBetStatusName))
+            try
             {
-                return ((BetStatus)(int.Parse(betDetails.NewBetStatusId))).ToString();
+                return JsonSerializer.Deserialize<ManualBetDetails>(log.To);
             }
-            else
+            catch (JsonException)
             {
-                return betDetails.NewBetStatusName;
+                return null;
             }
         }
         #endregion

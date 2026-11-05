@@ -15,21 +15,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public void OnEditTemplateClickEvent() => NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{ConfigTemplate.Id}");
         public void OnCopyTemplateClickEvent() => NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/copy/{ConfigTemplate.Id}");
-        public async Task OnExportTemplateClickEventAsync()
-        {
-            var parameters = new ModalParameters();
-
-            parameters.Add("ModalType", "ExportTemplateModal");
-            parameters.Add("ModalClass", "modal-show");
-            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
-            parameters.Add("Region", _region);
-            parameters.Add("ConnectionId", _userState.ConnectionId);
-            parameters.Add("UserId", _userState.Model.Id);
-            parameters.Add("ConfigTemplateId", ConfigTemplate.Id);
-            parameters.Add("ConfigTemplateName", ConfigTemplate.Name);
-
-            await ModalClickedCallback.InvokeAsync(parameters);
-        }
         public async Task OnViewAssignedClickEventAsync()
         {
             var parameters = new ModalParameters();

@@ -1,7 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -185,31 +184,14 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
             await OnInitializeCallback.InvokeAsync();
         }
 
+        // BO-136: hands the filters as they are on screen to the page (as Search does), which then loads every
+        // matching row and downloads them.
         public async Task OnExportClickEvent()
         {
-
             if (FilterModel == null)
                 return;
 
-            var payload = new OnGetMessageSettlementHistoryMessage()
-            {
-                UserId = _userState.Model.Id,
-                ConnectionId = _userState.ConnectionId,
-                SportId = FilterModel.SportId,
-                SegmentId = FilterModel.SegmentId,
-                LeagueId = FilterModel.LeagueId,
-                FixtureId = FilterModel.FixtureId,
-                MarketId = FilterModel.MarketId,
-                SelectionId = FilterModel.SelectionId,
-                Status = FilterModel.ToStatus,
-                FromDate = FilterModel.FromDate,
-                ToDate = FilterModel.ToDate,
-                SettledBy = FilterModel.SettledBy
-            };
-
-            // Task - Migrate to api call
-            //MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMessageSettlementHistory", $"r.bo.util.export", Guid.NewGuid().ToString());
-
+            await FilterModelChanged.InvokeAsync(FilterModel);
             await OnExportCallback.InvokeAsync();
         }
 
