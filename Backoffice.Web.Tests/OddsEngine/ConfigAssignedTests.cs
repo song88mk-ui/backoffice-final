@@ -44,6 +44,7 @@ namespace Backoffice.Web.Tests.OddsEngine
 
         private readonly Mock<IBackofficeService> _backofficeService = new();
         private readonly RecordingModalService _modalService;
+        private readonly BunitAuthorizationContext _authContext;
 
         public ConfigAssignedTests()
         {
@@ -86,9 +87,9 @@ namespace Backoffice.Web.Tests.OddsEngine
                 authenticationService.Object,
                 sp.GetRequiredService<NavigationManager>()));
 
-            var authContext = this.AddAuthorization();
-            authContext.SetAuthorized("test-user");
-            authContext.SetPolicies("sbc-config-canedit");
+            _authContext = this.AddAuthorization();
+            _authContext.SetAuthorized("test-user");
+            _authContext.SetPolicies("sbc-config-canedit");
 
             // No rows: the page shows "No Record Found", which is enough to drive the selection bar and its buttons.
             _backofficeService
@@ -272,6 +273,27 @@ namespace Backoffice.Web.Tests.OddsEngine
             var opened = Assert.Single(_modalService.Opened);
             Assert.Equal("Unassign Leagues", opened.Title);
             Assert.Equal(AssignLeaguesMode.Unassign, opened.Parameters.TryGet<AssignLeaguesMode>("Mode"));
+        }
+
+        // BO-155: the history of the assigns, state changes and unassigns. It is read only, so it is on both tabs and for a
+        // user who cannot edit.
+        [Theory]
+        [InlineData(ConfigState.Assigned, "sbc-config-canedit")]
+        [InlineData(ConfigState.UnAssigned, "sbc-config-canedit")]
+        [InlineData(ConfigState.Assigned, "sbc-config")]
+        [InlineData(ConfigState.UnAssigned, "sbc-config")]
+        public void TheLogsButton_OpensTheLeagueLogs_WithTheClientsAndSportsOfThePage(ConfigState state, string policy)
+        {
+            _authContext.SetPolicies(policy);
+            var cut = RenderPage(state);
+
+            cut.Find("a.btn-logs").Click();
+
+            var opened = Assert.Single(_modalService.Opened);
+            Assert.Equal(typeof(ViewLeagueLogs), opened.Component);
+            Assert.Equal("View Logs", opened.Title);
+            Assert.Same(cut.Instance.FilterModel.Clients, opened.Parameters.TryGet<List<SelectListItemWithCheckboxModel<string>>>("Clients"));
+            Assert.Same(cut.Instance.FilterModel.Sports, opened.Parameters.TryGet<List<SelectListItemModel<string>>>("Sports"));
         }
 
         [Fact]

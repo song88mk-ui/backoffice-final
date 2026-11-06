@@ -1,0 +1,93 @@
+<div class="modal-body">
+    <AlertMessage AlertModel="@_alertModel" />
+
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <div class="d-flex justify-content-between log-filter">
+                <div class="d-flex">
+                    <select id="league-log-client" class="form-select" aria-label="@_translationState.GetValue("Client")" @onchange="OnClientChanged">
+                        @foreach (var item in _clients)
+                        {
+                            <option value="@item.Value" selected="@(item.Value == _selectedClient)">@_translationState.GetValue(item.Name)</option>
+                        }
+                    </select>
+
+                    <select id="league-log-sport" class="form-select" aria-label="@_translationState.GetValue("Sport")" @onchange="OnSportChanged">
+                        @foreach (var item in _sports)
+                        {
+                            <option value="@item.Value" selected="@(item.Value == _selectedSport)">@_translationState.GetValue(item.Name)</option>
+                        }
+                    </select>
+
+                    <BlazorDateRangePicker.DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" StartDate="_dateFrom" EndDate="_dateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDatePickerRangeSelected"></BlazorDateRangePicker.DateRangePicker>
+                </div>
+
+                <EditForm Model="_searchForm" OnValidSubmit="OnSearchSubmitted" Context="FormContext">
+                    <div class="input-group">
+                        <input id="league-log-search" placeholder="@_translationState.GetValue("Search")" class="form-control search-text valid border-end-0" @bind-value="_searchForm.SearchText" />
+                        <button class="input-group-text border-start-0">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered table-striped table-logs">
+                <thead>
+                    <tr>
+                        <th scope="col" class="date">@_translationState.GetValue("Date")</th>
+                        <th scope="col">@_translationState.GetValue("Client")</th>
+                        <th scope="col">@_translationState.GetValue("Sport")</th>
+                        <th scope="col">@_translationState.GetValue("League")</th>
+                        <th scope="col">@_translationState.GetValue("Changes Made")</th>
+                        <th scope="col">@_translationState.GetValue("From")</th>
+                        <th scope="col">@_translationState.GetValue("To")</th>
+                        <th scope="col">@_translationState.GetValue("Updated By")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (_isPreLoader)
+                    {
+                        <tr>
+                            <td colspan="8">
+                                <Preloader />
+                            </td>
+                        </tr>
+                    }
+                    else if (_rows.Any())
+                    {
+                        @foreach (var row in _rows)
+                        {
+                            <tr>
+                                <td>@row.Date</td>
+                                <td>@row.Client</td>
+                                <td>@row.Sport</td>
+                                <td>@row.League</td>
+                                <td>@row.Change</td>
+                                <td>@row.From</td>
+                                <td>@row.To</td>
+                                <td>@row.UpdatedBy</td>
+                            </tr>
+                        }
+                    }
+                    else if (!_loadFailed)
+                    {
+                        <tr>
+                            <td colspan="8">
+                                <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <Pagination MetaData="_metaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="8" />
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseClicked">@_translationState.GetValue("Close")</button>
+</div>

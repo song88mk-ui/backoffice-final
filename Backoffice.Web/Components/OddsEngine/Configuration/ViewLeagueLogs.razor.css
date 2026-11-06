@@ -1,0 +1,32 @@
+.modal-btn {
+    background: transparent linear-gradient(180deg, #EA6442 0%, #E43F2C 59%, #E12E22 100%) 0% 0% no-repeat padding-box;
+    border-radius: 2px;
+    opacity: 1;
+    color: white;
+}
+
+.table-logs thead tr > th.date {
+    min-width: 12rem !important;
+}
+
+.log-filter {
+    gap: 1rem;
+}
+
+    .log-filter > div:first-child {
+        gap: 1rem;
+        flex-basis: 60%;
+    }
+
+.input-group {
+    flex-basis: 20%;
+}
+
+table thead {
+    background-color: #354156;
+    color: white;
+}
+
+.table-logs thead tr > th {
+    padding-left: 1.5rem !important;
+}

@@ -5,19 +5,7 @@
                 <i class="fa fa-exchange"></i>
                 Import/Export Margins
             </a>
-
-            <a href="javascript:void(0)" class="p-2" @onclick="OnLogsClickEvent">
-                <i class="fa fa-list-alt"></i>
-                @_translationState.GetValue("Logs")
-            </a>
-
         </Authorized>
-        <NotAuthorized Context="ActivateAll">            
-            <a href="javascript:void(0)" class="p-2" @onclick="OnLogsClickEvent">
-                <i class="fa fa-list-alt"></i>
-                @_translationState.GetValue("Logs")
-            </a>            
-        </NotAuthorized>
     </AuthorizeView>
 
 </div>

@@ -120,7 +120,8 @@ namespace Backoffice.API.Tests.Config
                 Assert.Equal("Active", l.To);
                 Assert.Equal("u-1", l.UserId);
                 Assert.Equal("trader", l.UserName);
-                Assert.Equal("Config", l.Page);
+                // BO-155: the page the caller sent ("Config" here) is not used, the rows always go to the leagues page
+                Assert.Equal("SBC.OE.Config.Leagues", l.Page);
             });
             Assert.Equal("S88.1.10.1", logs[0].Payload);
         }

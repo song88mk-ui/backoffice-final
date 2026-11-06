@@ -250,6 +250,23 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void HandleUnassignClick() => OpenAssignLeaguesModal(AssignLeaguesMode.Unassign);
 
+        // BO-155: the same dialog for both tabs. It offers the client and sport lists of the Config page.
+        public void HandleLogsClick()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("Clients", FilterModel.Clients);
+            parameters.Add("Sports", FilterModel.Sports);
+            parameters.Add("ModalClass", "modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
+            parameters.Add("DialogStyle", "max-width:1500px");
+
+            _modalService.Open<ViewLeagueLogs>("View Logs", parameters, new ModalOptions());
+
+            // this page only draws when asked to, and the modal is drawn by the CustomModal at the bottom of it
+            _shouldRender = true;
+        }
+
         private void OpenAssignLeaguesModal(AssignLeaguesMode mode)
         {
             var leagues = _selectedConfigClients?.Where(x => x.IsChecked).ToList() ?? new List<ConfigClientViewModel>();

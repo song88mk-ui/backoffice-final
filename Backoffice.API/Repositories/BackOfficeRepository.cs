@@ -1819,6 +1819,12 @@ namespace Backoffice.API.Repositories
         // BO-151: assign leagues to clients as Active or Restricted, or unassign them. A league is assigned to a client
         // when the client has a row for it in Trading.dbo.ClientLeagueConfig, and IsActive = 0 means Restricted (hidden for
         // that client). Every change is written to the activity log with the user, the league and the old and new state.
+        // BO-155: the rows go to a page of their own, never to the page the caller sent. The caller's page is whatever
+        // the web service last set (it stays set for the whole session), so a league row could land among the template
+        // rows of SBC.OE.Config, which the My Templates logs dialog cannot read. The Assigned and Unassigned logs
+        // dialog (ViewLeagueLogs) reads this page. The same name is in that dialog.
+        public const string ConfigLeagueActivityLogPage = "SBC.OE.Config.Leagues";
+
         public async Task<BaseResponse<bool>> SetConfigState(ConfigState configState, ConfigSetLeagueStateRequest request, List<string> userClientCodes, RequesterInfo requesterInfo)
         {
             try
@@ -1888,7 +1894,7 @@ namespace Backoffice.API.Repositories
 
                     logs.Add(new ActivityLogModel
                     {
-                        Page = requesterInfo?.Page ?? "Config",
+                        Page = ConfigLeagueActivityLogPage,
                         Payload = $"{row.ClientCode}.{row.SportId}.{row.SegmentId}.{row.LeagueId}",
                         Activity = (!hadRow ? Shared.Enums.Activity.Create : assign ? Shared.Enums.Activity.Update : Shared.Enums.Activity.Delete).ToString(),
                         From = from,

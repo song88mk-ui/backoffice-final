@@ -16,10 +16,10 @@ using Xunit;
 
 namespace Backoffice.Web.Tests.OddsEngine
 {
-    // BO-142: the template editor (and the My Templates Logs dialog) took their market groups and market list from the old
-    // Odds Engine Trading API, which does not resolve on DEV or STG, so the editor showed "No Markets Available" and the Logs
-    // filter threw. They now come from the BO API's Sportsbook data (GetConfigMarketTemplateGroups and GetConfigMarketLookup),
-    // and a failed call is shown as an error instead of looking like an empty list.
+    // BO-142: the template editor took its market groups and market list from the old Odds Engine Trading API, which does
+    // not resolve on DEV or STG, so the editor showed "No Markets Available". They now come from the BO API's Sportsbook data
+    // (GetConfigMarketTemplateGroups and GetConfigMarketLookup), and a failed call is shown as an error instead of looking
+    // like an empty list. (The Config View Logs filter that used the same calls was removed in BO-155.)
     public class ConfigMarketListLoadingTests : BunitTestContext
     {
         private const string MarketsAlert = "The markets could not be loaded";
@@ -213,47 +213,5 @@ namespace Backoffice.Web.Tests.OddsEngine
             Assert.DoesNotContain(MarketsAlert, cut.Markup);
         }
 
-        // ---- The My Templates Logs filter ---------------------------------------------------------------------
-
-        private async Task<IRenderedComponent<ViewLogsFilter>> ChooseSport(int sportId)
-        {
-            _backofficeService
-                .Setup(s => s.GetSegmentLookup(It.IsAny<int>(), It.IsAny<LanguageCode>()))
-                .ReturnsAsync(Ok(new SegmentLookupResponse()));
-            _backofficeService
-                .Setup(s => s.GetLeagueLookup(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<LanguageCode>()))
-                .ReturnsAsync(Ok(new LeagueLookupResponse()));
-
-            var cut = Render<ViewLogsFilter>();
-            cut.WaitForAssertion(() => Assert.NotNull(cut.Instance.ConfigLogsFilterModel?.Sports));
-
-            await cut.InvokeAsync(() => cut.Instance.OnSportsChangedEvent(new ChangeEventArgs { Value = sportId.ToString() }));
-
-            return cut;
-        }
-
-        [Fact]
-        public async Task TheLogsFilter_ListsTheGroupsAndMarketsFromTheConfigCalls()
-        {
-            ServeConfigMarkets(Ok(GroupsOfBasketball()), Ok(Markets(("115", "Moneyline"), ("147", "Spread"), ("8471", "Team Total"))));
-
-            var cut = await ChooseSport(4);
-
-            Assert.Equal(new[] { "Main Market", "Team Props" }, cut.Instance.ConfigLogsFilterModel.MarketTemplateGroups.Select(g => g.Name).ToArray());
-            Assert.Equal(new[] { "115", "147", "8471" }, cut.Instance.ConfigLogsFilterModel.Markets.Select(m => m.Value).ToArray());
-            _tradingService.Verify(t => t.GetMarketTemplateGroups(It.IsAny<int>()), Times.Never);
-            _tradingService.Verify(t => t.GetMarketLookup(It.IsAny<MarketLookupRequest>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task TheLogsFilter_WhenTheMarketCallsFail_ChoosingASportDoesNotThrow_AndTheListsAreEmpty()
-        {
-            ServeConfigMarkets(Failed<MarketTemplateGroupResponse>(), Failed<MarketLookupResponse>());
-
-            var cut = await ChooseSport(4);
-
-            Assert.Empty(cut.Instance.ConfigLogsFilterModel.MarketTemplateGroups);
-            Assert.Empty(cut.Instance.ConfigLogsFilterModel.Markets);
-        }
     }
 }
