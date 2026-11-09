@@ -3024,21 +3024,21 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<bool>> CopyClientMarketSortOrder(CopyClientMarketSortOrderRequest request)
+        public async Task<BaseResponse<CopyClientMarketSortOrderResponse>> CopyClientMarketSortOrder(CopyClientMarketSortOrderRequest request)
         {
             try
             {
                 var response = await _httpClient.PostAsync($"sportsbook/client/markettemplate/copy", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                    return JsonSerializer.Deserialize<BaseResponse<CopyClientMarketSortOrderResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                        return JsonSerializer.Deserialize<BaseResponse<CopyClientMarketSortOrderResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
-                        return new BaseResponse<bool>
+                        return new BaseResponse<CopyClientMarketSortOrderResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -3052,7 +3052,7 @@ namespace Backoffice.Web.Services
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
 
-                return new BaseResponse<bool>
+                return new BaseResponse<CopyClientMarketSortOrderResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

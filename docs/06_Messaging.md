@@ -158,8 +158,9 @@ OnMarketSortOrderChange  (payload: OnDeleteCacheMessage { CacheType = MarketSort
 ├─ Route: r.oe.cachesync.onmarketsortorderchange
 ├─ Published by SportsbookRepository after:
 │   · AddOrUpdateClientMarketTemplatesOrder / CopyClientMarketTemplatesOrder (market sort order)
-│   · Delete / CopyClientMarketTemplateGroup (market groups; BO-158: Copy sends one message per
-│     target client that was copied, none for a target that failed)
+│     (BO-159: the copy publishes one message per target client, after that target's transaction
+│     commits, with the target's ClientCode; it used to send an empty code, which CacheSync
+│     turned into a routing key no engine client matches)
 │   · AddOrUpdateClientSelectorMarketTemplates / CopyClientSelectorMarketTemplates
 │     (BO-87: ClientSelectorMarketTemplate2 writes from the Selector Market Templates page)
 └─ Platform.CacheSync.Service ──POST v1/cachepreload──▶ Platform.Sportsbook.API

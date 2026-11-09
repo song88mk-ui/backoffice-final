@@ -1,76 +1,95 @@
-﻿<div class="modal-body">
-    <div class="row mb-2">
-        <div class="col-2 text-center">
-            <span>Client</span>
-        </div>
-        <div class="col">
-            <select class="form-select" @onchange="OnClientChangedEvent">
-                <option value="" selected>@_translationState.GetValue("Select Client")</option>
-                @foreach (var item in Clients)
-                {
-                    if (item.Value == SelectedClientCode)
-                    {
-                        <option value="@item.Value" selected>@item.Name</option>
-                    }
-                    else
-                    {
-                        <option value="@item.Value">@item.Name</option>
-                    }
-                }
-             </select>
-        </div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-2 text-center">
-            <span>Sport</span>
-        </div>
-        <div class="col">
-            <select class="form-select" @onchange="OnSportChangedEvent">
-                <option value="0" selected>@_translationState.GetValue("Select Sport")</option>
-                @foreach (var sport in Sports)
-                {
-                    if (sport.SportId == SelectedSportId)
-                    {
-                        <option value="@sport.SportId" selected>@sport.SportName</option>
-                    }
-                    else
-                    {
-                        <option value="@sport.SportId">@sport.SportName</option>
-                    }
-                }
-             </select>
-        </div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-2 text-center">
-            <span>Scope</span>
-        </div>
-        <div class="col">
-            <select class="form-select" @onchange="OnScopeChangedEvent">
-                <option value="-1" selected>@_translationState.GetValue("Select Scope")</option>
-                @foreach (var scope in Scopes)
-                {
-                    if (scope.Value == SelectedScopeId)
-                    {
-                        <option value="@scope.Value" selected>@scope.Name</option>
-                    }
-                    else
-                    {
-                        <option value="@scope.Value">@scope.Name</option>
-                    }
-                }
-             </select>
-        </div>
-    </div>
-</div>
-<div class="modal-footer mx-4">
-    <button type="button" class="btn btn-cancel" @onclick="OnCancelClickEvent">@_translationState.GetValue("Cancel")</button>
-    @if (!string.IsNullOrEmpty(SelectedClientCode) && SelectedSportId > 0 && SelectedScopeId >= 0)
+<div class="modal-body">
+    @if (!_confirming)
     {
-        <button type="button" class="btn btn-copy" @onclick="OnCopyClickEvent">@_translationState.GetValue("Copy")</button>
+        <section class="mso-copy-section mb-3">
+            <div class="d-flex gap-3">
+                <div class="mso-copy-select">
+                    <label class="form-label">@_translationState.GetValue("Clients")</label>
+                    <div class="dropdown">
+                        <button class="btn btn-client dropdown-toggle" type="button" id="market-sort-order-copy-client-dropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">
+                            @if (_clients.Count > 1)
+                            {
+                                <span>@(_selected.Count == 1 ? _selected[0].Name : $"{_translationState.GetValue("Clients")} ({_selected.Count})")</span>
+                            }
+                            else
+                            {
+                                <span>@_translationState.GetValue("No Clients Available")</span>
+                            }
+                        </button>
+                        @if (_clients.Count > 1)
+                        {
+                            <SelectWithCheckbox Items="_clients" AriaLabel="market-sort-order-copy-client-dropdown" OnCheckboxCallback="OnClientCheckboxEvent" />
+                        }
+                    </div>
+                </div>
+                <div class="mso-copy-selected flex-grow-1 d-flex flex-wrap align-content-start border rounded p-2">
+                    @foreach (var client in _selected)
+                    {
+                        <div class="mso-chip mx-1 mb-1 py-1 px-2" @key="client.Code">
+                            @client.Name
+                            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close" @onclick="() => OnRemoveClientEvent(client.Code)"></button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="mso-copy-section">
+            <div class="row mb-2">
+                <div class="col-2 text-center">
+                    <span>@_translationState.GetValue("Sport")</span>
+                </div>
+                <div class="col">
+                    <select class="form-select" id="market-sort-order-copy-sport" @onchange="OnSportChangedEvent">
+                        <option value="0" selected="@(_selectedSportId <= 0)">@_translationState.GetValue("Select Sport")</option>
+                        @foreach (var sport in _sports)
+                        {
+                            <option value="@sport.SportId" selected="@(sport.SportId == _selectedSportId)">@sport.SportName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-2 text-center">
+                    <span>@_translationState.GetValue("Scope")</span>
+                </div>
+                <div class="col">
+                    <select class="form-select" id="market-sort-order-copy-scope" @onchange="OnScopeChangedEvent">
+                        <option value="-1" selected="@(_selectedScopeId < 0)">@_translationState.GetValue("Select Scope")</option>
+                        @foreach (var scope in _scopes)
+                        {
+                            <option value="@scope.Value" selected="@(scope.Value == _selectedScopeId)">@scope.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </section>
     }
     else
     {
-        <button type="button" class="btn btn-copy" disabled>@_translationState.GetValue("Copy")</button>
+        <div class="alert alert-warning mb-0" role="alert">
+            Copying will replace the Market Sort Order of @SelectedSportName (every scope) and the Market Groups of @SelectedSportName &gt; @SelectedScopeName of
+            <strong>@(_selected.Count == 1 ? _selected[0].Name : $"{_selected.Count} clients")</strong>
+            with those of <strong>@_fromClientName</strong> (@_fromSportName &gt; @_fromFixtureStatusName). Do you want to continue?
+        </div>
+    }
+
+    @if (_alert != null && !string.IsNullOrEmpty(_alert.Message))
+    {
+        <div class="mt-3">
+            <AlertMessage AlertModel="@_alert" />
+        </div>
+    }
+</div>
+<div class="modal-footer mx-4 p-0 py-3 border-0">
+    @if (!_confirming)
+    {
+        <button type="button" class="btn btn-cancel waves-effect" @onclick="OnCancelClickEvent">@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="btn btn-copy waves-effect" disabled="@(!CanCopy)" @onclick="OnCopyClickEvent">@_translationState.GetValue("Copy")</button>
+    }
+    else
+    {
+        <button type="button" class="btn btn-cancel waves-effect" disabled="@_isSaving" @onclick="OnBackClickEvent">@_translationState.GetValue("Back")</button>
+        <button type="button" class="btn btn-copy waves-effect" disabled="@_isSaving" @onclick="OnConfirmClickEvent">@_translationState.GetValue("Confirm")</button>
     }
 </div>

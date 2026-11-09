@@ -1631,111 +1631,249 @@ namespace Backoffice.API.Repositories
         }
 
 
-        public async Task<BaseResponse<bool>> CopyClientMarketTemplatesOrder(CopyClientMarketSortOrderRequest request)
+        // ActivityLog2.Page of a Market Sort Order copy entry (BO-159).
+        private static readonly string MarketSortOrderLogPage = Page.OE_Administration_MarketSortOrder.ToString().Replace('_', '.');
+
+        // BO-159: copies the source client's market sort order (per sport) and market groups (per sport and scope)
+        // to every target client. Each target is replaced in its own transaction, so one failed client does not
+        // undo the others; OnMarketSortOrderChange is published per target once its transaction has committed.
+        public async Task<BaseResponse<CopyClientMarketSortOrderResponse>> CopyClientMarketTemplatesOrder(CopyClientMarketSortOrderRequest request)
         {
+            var targetIds = (request.CopyToClientIds ?? new List<Guid>())
+                .Where(id => id != Guid.Empty)
+                .Distinct()
+                .ToList();
+
+            // Requests from a bo-web built before BO-159 send a single target.
+            if (!targetIds.Any() && request.CopyToClientId != Guid.Empty)
+                targetIds.Add(request.CopyToClientId);
+
+            if (request.CopyFromClientId == Guid.Empty)
+                return InvalidMarketSortOrderCopy("Invalid source client");
+
+            if (request.CopyFromSportId <= 0 || request.CopyToSportId <= 0)
+                return InvalidMarketSortOrderCopy("Invalid sport");
+
+            if (request.CopyFromFixtureStatusId < 0 || request.CopyToFixtureStatusId < 0)
+                return InvalidMarketSortOrderCopy("Invalid scope");
+
+            if (!targetIds.Any())
+                return InvalidMarketSortOrderCopy("No target client selected");
+
+            if (targetIds.Contains(request.CopyFromClientId)
+                && request.CopyFromSportId == request.CopyToSportId
+                && request.CopyFromFixtureStatusId == request.CopyToFixtureStatusId)
+                return InvalidMarketSortOrderCopy("You're copying to the same client, sport, and scope. Change at least one before copying.");
+
+            PlatformClientResponse source;
+            List<PlatformClientResponse> targets;
+            List<ClientMarketTemplateOrder> sourceOrder;
+            List<ClientMarketTemplateGroup> sourceGroups;
+
             try
             {
-                var existingClientMarketTemplateOrder = new List<ClientMarketTemplateOrder>();
-                var newClientMarketTemplateOrder = new List<ClientMarketTemplateOrder>();
+                var clientList = (await _platformRepository.GetClients("HK")).Result ?? new List<PlatformClientResponse>();
+                source = clientList.FirstOrDefault(c => c.ClientId == request.CopyFromClientId);
+                targets = targetIds
+                    .Select(id => clientList.FirstOrDefault(c => c.ClientId == id))
+                    .Where(c => c != null)
+                    .ToList();
 
-                var existingClientMarketTemplateGroup = new List<ClientMarketTemplateGroup>();
+                if (source == null || targets.Count != targetIds.Count)
+                    return InvalidMarketSortOrderCopy("No client found");
 
-                using (var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    existingClientMarketTemplateOrder = await _sportsbookContext.ClientMarketTemplateOrder.Where(x => x.ClientId == request.CopyToClientId && x.SportId == request.CopyToSportId).ToListAsync();
-                    if (existingClientMarketTemplateOrder.Any())
-                    {
-                        _sportsbookContext.ClientMarketTemplateOrder.RemoveRange(existingClientMarketTemplateOrder);
-                    }
+                sourceOrder = await _sportsbookContext.ClientMarketTemplateOrder.AsNoTracking()
+                    .Where(x => x.ClientId == request.CopyFromClientId && x.SportId == request.CopyFromSportId)
+                    .ToListAsync();
 
-                    existingClientMarketTemplateGroup = await _sportsbookContext.ClientMarketTemplateGroup.Where(x => x.ClientId == request.CopyToClientId && x.SportId == request.CopyToSportId && x.FixtureStatusId == request.CopyToFixtureStatusId).ToListAsync();
-                    if (existingClientMarketTemplateGroup.Any())
-                    {
-                        _sportsbookContext.ClientMarketTemplateGroup.RemoveRange(existingClientMarketTemplateGroup);
-                    }
-
-                    await _sportsbookContext.SaveChangesAsync();
-
-                    var sourceClientMarketTemplateOrder = await _sportsbookContext.ClientMarketTemplateOrder.AsNoTracking().Where(x => x.ClientId == request.CopyFromClientId && x.SportId == request.CopyFromSportId).ToListAsync();
-                    if (sourceClientMarketTemplateOrder.Any())
-                    {
-                        newClientMarketTemplateOrder = sourceClientMarketTemplateOrder.Select(x => new ClientMarketTemplateOrder()
-                        {
-                            ClientId = request.CopyToClientId,
-                            SportId = request.CopyToSportId,
-                            MarketTemplateId = x.MarketTemplateId,
-                            SortOrder = x.SortOrder
-                        }).ToList();
-                    }
-                    await _sportsbookContext.AddRangeAsync(newClientMarketTemplateOrder);
-                    await _sportsbookContext.SaveChangesAsync();
-
-                    var sourceClientMarketTemplateGroup = await _sportsbookContext.ClientMarketTemplateGroup.AsNoTracking().Where(x => x.ClientId == request.CopyFromClientId && x.SportId == request.CopyFromSportId && x.FixtureStatusId == request.CopyFromFixtureStatusId).ToListAsync();
-
-                    foreach (var group in sourceClientMarketTemplateGroup)
-                    {
-                        await _sportsbookContext.Database.ExecuteSqlRawAsync(
-                            @"INSERT INTO ClientMarketTemplateGroup (ClientId, SportId, FixtureStatusId, Name, SortOrder, IsActive, MarketTemplates)
-                              VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6})",
-                            request.CopyToClientId, request.CopyToSportId, request.CopyToFixtureStatusId,
-                            group.Name, group.SortOrder, group.IsActive, (object)group.MarketTemplates ?? DBNull.Value);
-                    }
-
-                    scope.Complete();
-                }
-
-                //await _sportsbookContext.ActivityLog.AddAsync(new OE.Shared.Data.Trading.Entities.ActivityLog()
-                //{
-                //    Page = Page.OE_Administration_MarketSortOrder.ToString().Replace("_", "."),
-                //    Payload = JsonSerializer.Serialize(request),
-                //    Activity = Activity.Update.ToString(),
-                //    From = JsonSerializer.Serialize(existingClientMarketTemplateOrder),
-                //    To = JsonSerializer.Serialize(newClientMarketTemplateOrder),
-                //    UserId = request.UserId,
-                //    TimeStamp = DateTime.UtcNow,
-                //});
-
-                //await _sportsbookContext.ActivityLog.AddAsync(new OE.Shared.Data.Trading.Entities.ActivityLog()
-                //{
-                //    Page = Page.OE_Administration_MarketSortOrder.ToString().Replace("_", "."),
-                //    Payload = JsonSerializer.Serialize(request),
-                //    Activity = Activity.Update.ToString(),
-                //    From = JsonSerializer.Serialize(existingClientMarketTemplateGroup),
-                //    To = JsonSerializer.Serialize(newClientMarketTemplateGroup),
-                //    UserId = request.UserId,
-                //    TimeStamp = DateTime.UtcNow,
-                //});
-
-                await _rabbitMqRepository.Publish(new MessageRequest
-                {
-                    Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
-                    {
-                        CacheType = CacheType.MarketSortOrder,
-                        ClientId = request.CopyToClientId,
-                        ClientCode = string.Empty,
-                        CacheKey = string.Empty
-                    }),
-                    CorrelationId = Guid.NewGuid().ToString().ToUpper(),
-                    MessageType = "OnMarketSortOrderChange",
-                    RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
-                });
-
-                return new BaseResponse<bool>
-                {
-                    StatusCode = StatusCode.Success,
-                    Result = true,
-                    Message = "Copy market sort order successful"
-                };
+                sourceGroups = await _sportsbookContext.ClientMarketTemplateGroup.AsNoTracking()
+                    .Where(x => x.ClientId == request.CopyFromClientId && x.SportId == request.CopyFromSportId && x.FixtureStatusId == request.CopyFromFixtureStatusId)
+                    .ToListAsync();
             }
             catch (Exception ex)
             {
-                return new BaseResponse<bool>
-                {
-                    StatusCode = StatusCode.Error,
-                    Result = false,
-                    Message = ex.Message
-                };
+                Serilog.Log.Error(ex, "Market Sort Order copy could not read the source client {ClientId}", request.CopyFromClientId);
+                return InvalidMarketSortOrderCopy($"Error: {ex.Message}");
             }
+
+            if (!sourceOrder.Any() && !sourceGroups.Any())
+                return InvalidMarketSortOrderCopy("Source client has no market sort order to copy");
+
+            var results = new List<CopyClientMarketSortOrderTargetResult>();
+            var logs = new List<OnActivityLogMessage>();
+
+            foreach (var target in targets)
+            {
+                var result = new CopyClientMarketSortOrderTargetResult { ClientId = target.ClientId, ClientCode = target.ClientCode };
+                results.Add(result);
+
+                List<ClientMarketTemplateOrder> previousOrder;
+                List<ClientMarketTemplateGroup> previousGroups;
+
+                try
+                {
+                    (previousOrder, previousGroups) = await ReplaceClientMarketSortOrder(target.ClientId, request.CopyToSportId, request.CopyToFixtureStatusId, sourceOrder, sourceGroups);
+                }
+                catch (Exception ex)
+                {
+                    Serilog.Log.Error(ex, "Market Sort Order copy to {ClientCode} failed", target.ClientCode);
+                    result.StatusCode = StatusCode.Error;
+                    result.Message = ex.Message;
+                    continue;
+                }
+                finally
+                {
+                    // A failed target's pending deletes must not be saved with the next target.
+                    _sportsbookContext.ChangeTracker.Clear();
+                }
+
+                result.StatusCode = StatusCode.Success;
+                result.Message = "Copied";
+
+                logs.Add(new OnActivityLogMessage
+                {
+                    Page = MarketSortOrderLogPage,
+                    Payload = target.ClientCode,
+                    Activity = "Copy",
+                    From = JsonSerializer.Serialize(ToMarketSortOrderAudit(request.CopyToSportId, request.CopyToFixtureStatusId, previousOrder, previousGroups, null)),
+                    To = JsonSerializer.Serialize(ToMarketSortOrderAudit(request.CopyToSportId, request.CopyToFixtureStatusId, sourceOrder, sourceGroups, source.ClientCode)),
+                    UserId = request.UserId,
+                    UserName = request.UserName,
+                    TimeStamp = DateTime.UtcNow
+                });
+
+                try
+                {
+                    await _rabbitMqRepository.Publish(new MessageRequest
+                    {
+                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                        {
+                            CacheType = CacheType.MarketSortOrder,
+                            ClientId = target.ClientId,
+                            // CacheSync builds the engine routing key from the code, so it must not be empty.
+                            ClientCode = target.ClientCode,
+                            CacheKey = string.Empty
+                        }),
+                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                        MessageType = "OnMarketSortOrderChange",
+                        RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Serilog.Log.Error(ex, "Market Sort Order copy to {ClientCode} saved, but OnMarketSortOrderChange could not be published", target.ClientCode);
+                    result.Message = "Copied, but the sportsbook cache was not refreshed. Save its Market Sort Order once to refresh it.";
+                }
+            }
+
+            await TryWriteMarketSortOrderLogs(logs);
+
+            var copied = results.Count(r => r.StatusCode == StatusCode.Success);
+            var allCopied = copied == results.Count;
+
+            return new BaseResponse<CopyClientMarketSortOrderResponse>
+            {
+                StatusCode = allCopied ? StatusCode.Success : StatusCode.Error,
+                Message = allCopied
+                    ? "Copy market sort order successful"
+                    : $"Market sort order copied to {copied} of {results.Count} clients",
+                Result = new CopyClientMarketSortOrderResponse { Targets = results }
+            };
+        }
+
+        // Deletes the target's order for the sport (the order has no scope) and its groups for the sport and scope,
+        // then inserts the source's rows, in one transaction. Returns what was there before.
+        private async Task<(List<ClientMarketTemplateOrder> PreviousOrder, List<ClientMarketTemplateGroup> PreviousGroups)> ReplaceClientMarketSortOrder(
+            Guid clientId, int sportId, int fixtureStatusId,
+            List<ClientMarketTemplateOrder> sourceOrder, List<ClientMarketTemplateGroup> sourceGroups)
+        {
+            using var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled);
+
+            var previousOrder = await _sportsbookContext.ClientMarketTemplateOrder
+                .Where(x => x.ClientId == clientId && x.SportId == sportId)
+                .ToListAsync();
+            _sportsbookContext.ClientMarketTemplateOrder.RemoveRange(previousOrder);
+
+            var previousGroups = await _sportsbookContext.ClientMarketTemplateGroup
+                .Where(x => x.ClientId == clientId && x.SportId == sportId && x.FixtureStatusId == fixtureStatusId)
+                .ToListAsync();
+            _sportsbookContext.ClientMarketTemplateGroup.RemoveRange(previousGroups);
+
+            await _sportsbookContext.SaveChangesAsync();
+
+            await _sportsbookContext.ClientMarketTemplateOrder.AddRangeAsync(sourceOrder.Select(x => new ClientMarketTemplateOrder
+            {
+                ClientId = clientId,
+                SportId = sportId,
+                MarketTemplateId = x.MarketTemplateId,
+                SortOrder = x.SortOrder
+            }));
+            await _sportsbookContext.SaveChangesAsync();
+
+            await InsertClientMarketTemplateGroups(clientId, sportId, fixtureStatusId, sourceGroups);
+
+            scope.Complete();
+
+            return (previousOrder, previousGroups);
+        }
+
+        // ClientMarketTemplateGroup.Id is an IDENTITY column the EF model does not know about, so the rows go in
+        // with raw SQL. Virtual so the tests (EF InMemory, no raw SQL) can replace it.
+        protected virtual async Task InsertClientMarketTemplateGroups(Guid clientId, int sportId, int fixtureStatusId, List<ClientMarketTemplateGroup> groups)
+        {
+            foreach (var group in groups)
+            {
+                await _sportsbookContext.Database.ExecuteSqlRawAsync(
+                    @"INSERT INTO ClientMarketTemplateGroup (ClientId, SportId, FixtureStatusId, Name, SortOrder, IsActive, MarketTemplates)
+                      VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6})",
+                    clientId, sportId, fixtureStatusId,
+                    group.Name, group.SortOrder, group.IsActive, (object)group.MarketTemplates ?? DBNull.Value);
+            }
+        }
+
+        private static object ToMarketSortOrderAudit(int sportId, int fixtureStatusId,
+            List<ClientMarketTemplateOrder> order, List<ClientMarketTemplateGroup> groups, string sourceClientCode)
+        {
+            return new
+            {
+                SportId = sportId,
+                FixtureStatusId = fixtureStatusId,
+                SourceClientCode = sourceClientCode,
+                MarketTemplates = order
+                    .OrderBy(o => o.SortOrder)
+                    .Select(o => new { o.MarketTemplateId, o.SortOrder })
+                    .ToList(),
+                MarketGroups = groups
+                    .OrderBy(g => g.SortOrder)
+                    .Select(g => new { g.Name, g.SortOrder, g.IsActive, g.MarketTemplates })
+                    .ToList()
+            };
+        }
+
+        // Best effort, like the League Sorting logs: a failed audit write does not fail a copy that has committed.
+        private async Task TryWriteMarketSortOrderLogs(List<OnActivityLogMessage> logs)
+        {
+            if (!logs.Any())
+                return;
+
+            try
+            {
+                await _activityLogRepository.ProcessActivityLog(new OnActivityLogListMessage { OnActivityLogMessages = logs });
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Market Sort Order copy audit log could not be written for {ClientCodes}", string.Join(",", logs.Select(l => l.Payload)));
+            }
+        }
+
+        private static BaseResponse<CopyClientMarketSortOrderResponse> InvalidMarketSortOrderCopy(string message)
+        {
+            return new BaseResponse<CopyClientMarketSortOrderResponse>
+            {
+                StatusCode = StatusCode.Error,
+                Message = message,
+                Result = new CopyClientMarketSortOrderResponse()
+            };
         }
 
         #endregion

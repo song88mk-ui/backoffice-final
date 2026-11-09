@@ -507,7 +507,7 @@ Most of these routes forward to the OddsEngine Trading API (`API:TradingAPI:{HK|
 | POST | `sportsbook/client/tier/leagueorder/list` | Tier league order list |
 | GET | `sportsbook/client/markettemplate/{clientCode}/{sportId}/{fixtureStatusId}` | Client market templates |
 | POST | `sportsbook/client/markettemplate` | Add or update market template order |
-| POST | `sportsbook/client/markettemplate/copy` | Copy market template order |
+| POST | `sportsbook/client/markettemplate/copy` | Copy a client's market sort order and market groups to one or more clients (BO-159) |
 | GET | `sportsbook/client/selectormarkettemplate/{clientId:guid}` | Client selector market templates |
 | GET | `sportsbook/client/selectormarkettemplate/lookup` | Selector market template lookup |
 | POST | `sportsbook/client/selectormarkettemplate` | Add or update selector market templates |

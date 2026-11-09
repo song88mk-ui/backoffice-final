@@ -170,7 +170,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-md");
+            parameters.Add("ModalDialogClass", "modal-lg");
 
             parameters.Add("FromClientCode", _filterModel.SelectedClientCode);
 

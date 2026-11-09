@@ -107,7 +107,7 @@ namespace Backoffice.Web.Services
 
         #region Market Sort Order
         Task<BaseResponse<ClientMarketTemplateResponse>> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId, LanguageCode langCode);
-        Task<BaseResponse<bool>> CopyClientMarketSortOrder(CopyClientMarketSortOrderRequest request);
+        Task<BaseResponse<CopyClientMarketSortOrderResponse>> CopyClientMarketSortOrder(CopyClientMarketSortOrderRequest request);
         Task<BaseResponse<ClientMarketTemplateResponse>> AddOrUpdateClientMarketTemplatesOrder(ClientMarketTemplateRequest request);
 
         #endregion

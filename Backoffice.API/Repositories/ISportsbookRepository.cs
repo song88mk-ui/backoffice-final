@@ -25,7 +25,7 @@ namespace Backoffice.API.Repositories
         #region Client Market Sort Order
         Task<BaseResponse<ClientMarketTemplateResponse>> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId, string langCode);
         Task<BaseResponse<ClientMarketTemplateResponse>> AddOrUpdateClientMarketTemplatesOrder(ClientMarketTemplateRequest request);
-        Task<BaseResponse<bool>> CopyClientMarketTemplatesOrder(CopyClientMarketSortOrderRequest request);
+        Task<BaseResponse<CopyClientMarketSortOrderResponse>> CopyClientMarketTemplatesOrder(CopyClientMarketSortOrderRequest request);
         #endregion
 
         #region Client Selector Market Templates
