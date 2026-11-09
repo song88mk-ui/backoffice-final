@@ -11,6 +11,7 @@ namespace Backoffice.Web.Models
         public string ClientCode { get; set; }
         public Guid ClientId { get; set; }
         public int SportId { get; set; }
+        public string SportName { get; set; }
         public int FixtureStatusId { get; set; }
         public bool IsUpdate { get; set; }
         public List<ClientMarketTemplateGroupDTO> MarketTemplateGroups { get; set; }

@@ -219,6 +219,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 {
                     MarketGroupModel.ClientCode = SelectedClientCode;
                     MarketGroupModel.SportId = marketTemplateResponse.SportId;
+                    MarketGroupModel.SportName = Sports.FirstOrDefault(s => s.Value == marketTemplateResponse.SportId)?.Name;
                     MarketGroupModel.ClientId = marketTemplateResponse.ClientId;
                     MarketGroupModel.FixtureStatusId = marketTemplateResponse.FixtureStatusId;
                     await MarketGroupModelChanged.InvokeAsync(MarketGroupModel);

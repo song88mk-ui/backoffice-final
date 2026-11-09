@@ -169,10 +169,17 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnCopyClickedEvent()
         {
+            // BO-158: the client, sport and scope on screen are the source; the dialog picks the target clients.
+            // The saved groups are what gets copied, so unsaved edits on the page are not part of the copy.
             var parameters = new ModalParameters();
+            parameters.Add("ClientId", MarketGroupModel.ClientId);
             parameters.Add("ClientCode", MarketGroupModel.ClientCode);
+            parameters.Add("SportId", MarketGroupModel.SportId);
+            parameters.Add("SportName", MarketGroupModel.SportName);
+            parameters.Add("FixtureStatusId", MarketGroupModel.FixtureStatusId);
+            parameters.Add("Groups", MarketGroupModel.OldMarketTemplateGroups ?? new List<ClientMarketTemplateGroupDTO>());
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-md");
+            parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
             parameters.Add("Region", Region);
 

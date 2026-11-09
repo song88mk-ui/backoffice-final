@@ -336,29 +336,172 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<ClientMarketTemplateGroupResponse>> CopyClientMarketTemplateGroup(ClientCopyMarketTemplateGroupRequest request, string region)
+        // BO-158: copies the source client's market groups (one sport and scope) to every target client. The
+        // Trading API takes one target per call, so each target gets its own call and its own cache message. A
+        // target that fails does not stop the others; each target's outcome is returned so the caller can say
+        // which clients were copied and write one activity log per copied client.
+        public async Task<BaseResponse<ClientCopyMarketTemplateGroupResponse>> CopyClientMarketTemplateGroup(ClientCopyMarketTemplateGroupRequest request, string region)
+        {
+            var targetIds = (request.CopyToClientIds ?? new List<Guid>())
+                .Where(id => id != Guid.Empty)
+                .Distinct()
+                .ToList();
+
+            // Callers from before BO-158 send a single CopyToClientId.
+            if (!targetIds.Any() && request.CopyToClientId != Guid.Empty)
+                targetIds.Add(request.CopyToClientId);
+
+            if (request.ClientId == Guid.Empty)
+                return InvalidMarketTemplateGroupCopy(request, "Invalid Source Client");
+
+            if (request.SportId <= 0 || request.CopyToSportId <= 0)
+                return InvalidMarketTemplateGroupCopy(request, "Invalid Sport");
+
+            if (!IsMarketGroupScope(request.FixtureStatusId) || !IsMarketGroupScope(request.CopyToFixtureStatusId))
+                return InvalidMarketTemplateGroupCopy(request, "Invalid Scope");
+
+            if (!targetIds.Any())
+                return InvalidMarketTemplateGroupCopy(request, "No target client selected");
+
+            if (targetIds.Contains(request.ClientId))
+                return InvalidMarketTemplateGroupCopy(request, "Source client cannot be a copy target");
+
+            try
+            {
+                // The copy deletes the target's groups before inserting the source's, so an empty source would wipe them.
+                var sourceHasGroups = await _sportsbookContext.ClientMarketTemplateGroup.AsNoTracking()
+                    .AnyAsync(g => g.ClientId == request.ClientId && g.SportId == request.SportId && g.FixtureStatusId == request.FixtureStatusId);
+
+                if (!sourceHasGroups)
+                    return InvalidMarketTemplateGroupCopy(request, "Source client has no market groups to copy");
+            }
+            catch (Exception ex)
+            {
+                return InvalidMarketTemplateGroupCopy(request, $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})");
+            }
+
+            var result = new ClientCopyMarketTemplateGroupResponse
+            {
+                ClientId = request.ClientId,
+                SportId = request.SportId,
+                FixtureStatusId = request.FixtureStatusId
+            };
+
+            foreach (var targetId in targetIds)
+                result.Targets.Add(await CopyClientMarketTemplateGroupToTarget(request, targetId, region));
+
+            var copied = result.Targets.Count(t => t.StatusCode == StatusCode.Success);
+
+            return new BaseResponse<ClientCopyMarketTemplateGroupResponse>
+            {
+                StatusCode = copied == result.Targets.Count ? StatusCode.Success : StatusCode.Error,
+                Message = copied == result.Targets.Count
+                    ? StatusCode.Success.ToString()
+                    : copied == 0 ? "Market groups were not copied." : "Market groups were copied to some clients only.",
+                Result = result
+            };
+        }
+
+        private async Task<ClientCopyMarketTemplateGroupTargetResult> CopyClientMarketTemplateGroupToTarget(ClientCopyMarketTemplateGroupRequest request, Guid targetId, string region)
+        {
+            var target = new ClientCopyMarketTemplateGroupTargetResult { ClientId = targetId };
+
+            try
+            {
+                target.PreviousGroups = (await _sportsbookContext.ClientMarketTemplateGroup.AsNoTracking()
+                        .Where(g => g.ClientId == targetId && g.SportId == request.CopyToSportId && g.FixtureStatusId == request.CopyToFixtureStatusId)
+                        .ToListAsync())
+                    .OrderBy(g => g.SortOrder)
+                    .Select(g => new ClientMarketTemplateGroupDTO
+                    {
+                        MarketTemplateGroupId = g.Id,
+                        Name = g.Name,
+                        SortOrder = g.SortOrder,
+                        MarketTemplateIds = g.MarketTemplates ?? string.Empty,
+                        IsActive = g.IsActive,
+                        FixtureStatusId = g.FixtureStatusId
+                    })
+                    .ToList();
+
+                var copy = await PostCopyClientMarketTemplateGroup(new ClientCopyMarketTemplateGroupRequest
+                {
+                    ClientId = request.ClientId,
+                    SportId = request.SportId,
+                    FixtureStatusId = request.FixtureStatusId,
+                    CopyToClientId = targetId,
+                    CopyToSportId = request.CopyToSportId,
+                    CopyToFixtureStatusId = request.CopyToFixtureStatusId
+                }, region);
+
+                if (copy == null || copy.StatusCode != StatusCode.Success)
+                {
+                    target.StatusCode = copy == null || copy.StatusCode == StatusCode.Success ? StatusCode.Error : copy.StatusCode;
+                    target.Message = string.IsNullOrEmpty(copy?.Message) ? StatusCode.Error.ToString() : copy.Message;
+                    return target;
+                }
+
+                target.StatusCode = StatusCode.Success;
+                target.Message = StatusCode.Success.ToString();
+                target.CopiedGroups = copy.Result?.ClientMarketTemplateGroups ?? new List<ClientMarketTemplateGroupDTO>();
+            }
+            catch (Exception ex)
+            {
+                target.StatusCode = StatusCode.Error;
+                target.Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})";
+                return target;
+            }
+
+            // The groups are already copied here, so a failed cache message is reported but does not undo the copy.
+            try
+            {
+                await _rabbitMqRepository.Publish(new MessageRequest
+                {
+                    Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                    {
+                        CacheType = CacheType.MarketSortOrder,
+                        ClientId = targetId,
+                        ClientCode = string.Empty,
+                        CacheKey = string.Empty
+                    }),
+                    CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                    MessageType = "OnMarketSortOrderChange",
+                    RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
+                }, region);
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Market group cache message could not be published for client {ClientId}", targetId);
+                target.Message = "Copied, but the market group cache could not be refreshed.";
+            }
+
+            return target;
+        }
+
+        private static bool IsMarketGroupScope(int fixtureStatusId) =>
+            fixtureStatusId == (int)FixtureStatus.Prematch || fixtureStatusId == (int)FixtureStatus.Live;
+
+        private static BaseResponse<ClientCopyMarketTemplateGroupResponse> InvalidMarketTemplateGroupCopy(ClientCopyMarketTemplateGroupRequest request, string message) =>
+            new BaseResponse<ClientCopyMarketTemplateGroupResponse>
+            {
+                StatusCode = StatusCode.Error,
+                Message = message,
+                Result = new ClientCopyMarketTemplateGroupResponse
+                {
+                    ClientId = request.ClientId,
+                    SportId = request.SportId,
+                    FixtureStatusId = request.FixtureStatusId
+                }
+            };
+
+        // One copy on the Trading API (one target). Virtual so the tests can stand in for the HTTP call.
+        protected virtual async Task<BaseResponse<ClientMarketTemplateGroupResponse>> PostCopyClientMarketTemplateGroup(ClientCopyMarketTemplateGroupRequest request, string region)
         {
             try
             {
                 var response = await GetHttpClient(region).PostAsync($"client/markettemplategroup/copy", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                {
-                    await _rabbitMqRepository.Publish(new MessageRequest
-                    {
-                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
-                        {
-                            CacheType = CacheType.MarketSortOrder,
-                            ClientId = request.CopyToClientId,
-                            ClientCode = string.Empty,
-                            CacheKey = string.Empty
-                        }),
-                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
-                        MessageType = "OnMarketSortOrderChange",
-                        RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
-                    }, region);
                     return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
-                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)

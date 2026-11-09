@@ -2962,21 +2962,21 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<ClientMarketTemplateGroupResponse>> CopyClientMarketTemplateGroup(ClientCopyMarketTemplateGroupRequest request)
+        public async Task<BaseResponse<ClientCopyMarketTemplateGroupResponse>> CopyClientMarketTemplateGroup(ClientCopyMarketTemplateGroupRequest request)
         {
             try
             {
                 var response = await _httpClient.PostAsync($"sportsbook/client/markettemplategroup/copy", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                    return JsonSerializer.Deserialize<BaseResponse<ClientCopyMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+                        return JsonSerializer.Deserialize<BaseResponse<ClientCopyMarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
                     else
                     {
-                        return new BaseResponse<ClientMarketTemplateGroupResponse>
+                        return new BaseResponse<ClientCopyMarketTemplateGroupResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -2990,7 +2990,7 @@ namespace Backoffice.Web.Services
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
 
-                return new BaseResponse<ClientMarketTemplateGroupResponse>
+                return new BaseResponse<ClientCopyMarketTemplateGroupResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

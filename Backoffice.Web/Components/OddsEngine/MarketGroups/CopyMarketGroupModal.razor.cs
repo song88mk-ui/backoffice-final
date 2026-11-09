@@ -1,191 +1,239 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Serilog;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 {
-    public partial class CopyMarketGroupModal : IDisposable
+    // BO-158: copies the market groups of the client, sport and scope on screen to the clients ticked here,
+    // with a confirmation step before the targets' groups are replaced (the same flow as League Sorting Copy).
+    public partial class CopyMarketGroupModal
     {
-        #region Properties
+        [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+        [CascadingParameter] public CustomModal Modal { get; set; }
 
-        [CascadingParameter] public ModalParameters ModalParameters { get; set; }
+        private Guid _fromClientId;
+        private string _fromClientCode;
+        private string _fromClientName;
+        private int _sportId;
+        private string _sportName;
+        private int _fixtureStatusId;
+        private string _scopeName;
 
-        public List<PlatformClientResponse> ClientInformations { get; set; }
+        private List<ClientMarketTemplateGroupDTO> _groups = new List<ClientMarketTemplateGroupDTO>();
+        // Index 0 is the "all clients" entry that SelectWithCheckbox expects.
+        private List<SelectListItemWithCheckboxModel<string>> _clients = new List<SelectListItemWithCheckboxModel<string>>();
+        private Dictionary<string, PlatformClientResponse> _clientsByCode = new Dictionary<string, PlatformClientResponse>();
+        private List<(Guid Id, string Code, string Name)> _selected = new List<(Guid Id, string Code, string Name)>();
 
-        public List<SelectListItemModel<string>> Clients { get; set; }
-        public string SelectedClientCode { get; set; }
-        public List<SelectListItemModel<int>> Sports { get; set; }
-        public int SelectedSportId { get; set; }
-        public List<SelectListItemModel<int>> FixtureStatuses { get; set; }
-        public int SelectedFixtureStatusId { get; set; }
-
-        public Guid CopyToClientId { get; set; }
-        public string CopyToClientCode { get; set; }
-        public string CopyToClientName { get; set; }
-        public AlertModel AlertModel { get; set; }
-        public bool IsPreLoader { get; set; }
-
-        #endregion
+        private string _clientError;
+        private bool _confirming;
+        private bool _isSaving;
+        private AlertModel _alert;
 
         #region Methods
-        protected override async Task OnInitializedAsync()
+
+        protected override void OnInitialized()
         {
-            IsPreLoader = true;
-            _tradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
-            AlertModel = new AlertModel();
-            Clients = new List<SelectListItemModel<string>>();
-            Sports = new List<SelectListItemModel<int>>();
-            FixtureStatuses = new List<SelectListItemModel<int>>();
+            _fromClientId = ModalParameters.TryGet<Guid>("ClientId");
+            _fromClientCode = ModalParameters.TryGet<string>("ClientCode");
+            _sportId = ModalParameters.TryGet<int>("SportId");
+            _fixtureStatusId = ModalParameters.TryGet<int>("FixtureStatusId");
+            _scopeName = ((FixtureStatus)_fixtureStatusId).ToString();
+
+            _groups = (ModalParameters.TryGet<List<ClientMarketTemplateGroupDTO>>("Groups") ?? new List<ClientMarketTemplateGroupDTO>())
+                .OrderBy(g => g.SortOrder)
+                .ToList();
+
+            var tradingClients = _userState.Model.TradingClients ?? new List<PlatformClientResponse>();
+
+            _fromClientName = tradingClients.FirstOrDefault(c => string.Equals(c.ClientCode, _fromClientCode, StringComparison.OrdinalIgnoreCase))?.ClientName ?? _fromClientCode;
+
+            var sportName = ModalParameters.TryGet<string>("SportName");
+            _sportName = string.IsNullOrEmpty(sportName) ? $"Sport {_sportId}" : _translationState.GetValue(sportName);
+
+            var targetClients = tradingClients
+                .Where(c => !string.Equals(c.ClientCode, _fromClientCode, StringComparison.OrdinalIgnoreCase) && c.ClientId != _fromClientId)
+                .GroupBy(c => c.ClientCode)
+                .Select(g => g.First())
+                .OrderBy(c => c.ClientName)
+                .ToList();
+
+            _clientsByCode = targetClients.ToDictionary(c => c.ClientCode);
+
+            var targets = targetClients
+                .Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName })
+                .ToList();
+
+            if (targets.Any())
+                targets.Insert(0, new SelectListItemWithCheckboxModel<string> { Value = "all", Name = "All Clients" });
+
+            _clients = targets;
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        // SelectWithCheckbox has already updated the checked state on the shared items when this runs.
+        public void OnClientCheckboxEvent(Dictionary<string, string> items)
         {
-            if (firstRender)
-            {
-                try
-                {
-                    CopyToClientCode = ModalParameters.TryGet<string>("ClientCode");
-                    if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
-                    {
-                        ClientInformations = _userState.Model.TradingClients;
-                        Clients = ClientInformations.Where(x => x.ClientCode != CopyToClientCode).Select(s => new SelectListItemModel<string>
-                        {
-                            Value = s.ClientCode,
-                            Name = s.ClientName
-                        }).ToList();
-                    }
-                    else
-                    {
-                        Clients.Add(new SelectListItemModel<string>
-                        {
-                            Value = "",
-                            Name = _translationState.GetValue("No Clients Available")
-                        });
-                    }
-
-                    var client = ClientInformations.Where(x => x.ClientCode == CopyToClientCode).FirstOrDefault();
-                    CopyToClientId = client.ClientId;
-                    CopyToClientName = client.ClientName;
-                    SelectedClientCode = Clients.FirstOrDefault().Value;
-
-                    var sports = (await _backofficeService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
-
-                    if (sports != null)
-                    {
-                        Sports = sports.SportLookup.Select(s => new SelectListItemModel<int>
-                        {
-                            Value = s.SportId,
-                            Name = s.SportName
-                        }).ToList();
-                    }
-                    else
-                    {
-                        Sports.Add(new SelectListItemModel<int>
-                        {
-                            Value = 0,
-                            Name = "No Sports Available"
-                        });
-                    }
-
-                    SelectedSportId = Sports.Any() ? Sports.FirstOrDefault().Value : 0;
-
-                    FixtureStatuses.Add(new SelectListItemModel<int>
-                    {
-                        Value = (int)FixtureStatus.Prematch,
-                        Name = FixtureStatus.Prematch.ToString()
-                    });
-                    FixtureStatuses.Add(new SelectListItemModel<int>
-                    {
-                        Value = (int)FixtureStatus.Live,
-                        Name = FixtureStatus.Live.ToString()
-                    });
-
-                    SelectedFixtureStatusId = FixtureStatuses.FirstOrDefault().Value;
-                    IsPreLoader = false;
-                    StateHasChanged();
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, ex.Message);
-                    if (ex.StackTrace != null)
-                        Log.Error(ex.StackTrace.ToString());
-                }
-            }
+            SyncSelected();
+            _clientError = null;
         }
 
-        public async Task OnClientChangedEvent(ChangeEventArgs e)
+        public void OnRemoveClientEvent(string clientCode)
         {
-            SelectedClientCode = e.Value.ToString();
+            var item = _clients.FirstOrDefault(c => c.Value == clientCode);
+
+            if (item != null)
+                item.IsChecked = false;
+
+            if (_clients.Any())
+                _clients[0].IsChecked = false;
+
+            SyncSelected();
         }
 
-        public async void OnSportChangedEvent(ChangeEventArgs e)
-        {
-            SelectedSportId = int.Parse(e.Value.ToString());
-        }
-
-        public async void OnFixtureStatusChangedEvent(ChangeEventArgs e)
-        {
-            SelectedFixtureStatusId = int.Parse(e.Value.ToString());
-        }
-
-        public async Task OnModalCancelEvent()
+        public void OnCancelClickEvent()
         {
             _modalService.Cancel();
         }
 
-        public async void OnModalCopyEvent()
+        public void OnSaveClickEvent()
         {
-            IsPreLoader = true;
-            StateHasChanged();
+            if (!_groups.Any())
+                return;
 
-            if (string.IsNullOrEmpty(SelectedClientCode) || SelectedSportId <= 0 || SelectedFixtureStatusId <= -1)
+            if (!_selected.Any())
             {
-                AlertModel.Message = "Please select all options in order to copy Market Group.";
-                AlertModel.Status = AlertStatus.Error;
-                AlertModel.Opacity = 1.0m;
-                IsPreLoader = false;
+                _clientError = "Select client to proceed";
                 return;
             }
 
-            var clientId = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode == SelectedClientCode).ClientId;
-
-            var marketTemplateGroupResponse = (await _backofficeService.GetClientMarketTemplateGroups(clientId, SelectedSportId, SelectedFixtureStatusId)).Result;
-
-            var copyFromMarketGroupModel = new MarketGroupModel()
-            {
-                ClientId = marketTemplateGroupResponse.ClientId,
-                SportId = marketTemplateGroupResponse.SportId,
-                FixtureStatusId = marketTemplateGroupResponse.FixtureStatusId,
-                MarketTemplateGroups = marketTemplateGroupResponse.ClientMarketTemplateGroups,
-                OldMarketTemplateGroups = new List<ClientMarketTemplateGroupDTO>()
-            };
-
-            var parameters = new ModalParameters();
-
-            parameters.Add("MarketGroupModel", copyFromMarketGroupModel);
-            parameters.Add("CopyToClientId", CopyToClientId);
-            parameters.Add("CopyToClientCode", CopyToClientCode);
-            parameters.Add("CopyToClientName", CopyToClientName);
-            parameters.Add("CopyToSportId", SelectedSportId);
-            parameters.Add("CopyToSportName", Sports.Where(x => x.Value == SelectedSportId).FirstOrDefault().Name);
-            parameters.Add("CopyToFixtureStatusId", SelectedFixtureStatusId);
-            parameters.Add("CopyToFixtureStatusName", FixtureStatuses.Where(x => x.Value == SelectedFixtureStatusId).FirstOrDefault().Name);
-
-            parameters.Add("DialogStyle", "max-width: 600px;");
-
-            IsPreLoader = false;
-            var options = new ModalOptions();
-            _modalService.Open<CopyConfirmationMarketGroupModalBody>("Copy Market Group", parameters, options);
+            _clientError = null;
+            _alert = new AlertModel();
+            _confirming = true;
         }
 
-        public void Dispose()
+        public void OnBackClickEvent()
         {
-
+            _confirming = false;
         }
+
+        public async Task OnConfirmClickEvent()
+        {
+            _alert = new AlertModel();
+            _isSaving = true;
+
+            var targets = _selected.ToList();
+
+            var response = await _backofficeService.CopyClientMarketTemplateGroup(new ClientCopyMarketTemplateGroupRequest
+            {
+                ClientId = _fromClientId,
+                SportId = _sportId,
+                FixtureStatusId = _fixtureStatusId,
+                CopyToClientIds = targets.Select(t => t.Id).ToList(),
+                CopyToSportId = _sportId,
+                CopyToFixtureStatusId = _fixtureStatusId
+            });
+
+            var results = response?.Result?.Targets ?? new List<ClientCopyMarketTemplateGroupTargetResult>();
+            var copied = new List<(Guid Id, string Code, string Name)>();
+            var notCopied = new List<string>();
+
+            foreach (var target in targets)
+            {
+                var result = results.FirstOrDefault(r => r.ClientId == target.Id);
+
+                if (result != null && result.StatusCode == StatusCode.Success)
+                {
+                    copied.Add(target);
+                    await WriteActivityLog(target.Code, result);
+                }
+                else
+                {
+                    var reason = result?.Message ?? response?.Message;
+                    notCopied.Add(string.IsNullOrEmpty(reason) ? target.Name : $"{target.Name} ({reason})");
+                }
+            }
+
+            if (!notCopied.Any())
+            {
+                _alert = new AlertModel { Status = AlertStatus.Success, Message = $"Market Groups copied to {string.Join(", ", copied.Select(c => c.Name))}!" };
+                await InvokeAsync(StateHasChanged);
+
+                await Modal.OnSaveClickCallback.InvokeAsync(true);
+                await Task.Delay(1200);
+
+                _isSaving = false;
+                _modalService.Cancel();
+                return;
+            }
+
+            // Leave only the clients that were not copied ticked, so Save tries just those again.
+            foreach (var client in copied)
+            {
+                var item = _clients.FirstOrDefault(c => c.Value == client.Code);
+
+                if (item != null)
+                    item.IsChecked = false;
+            }
+
+            if (copied.Any() && _clients.Any())
+                _clients[0].IsChecked = false;
+
+            SyncSelected();
+
+            _isSaving = false;
+            _confirming = false;
+            _alert = new AlertModel
+            {
+                Status = AlertStatus.Error,
+                Message = copied.Any()
+                    ? $"Copied to: {string.Join(", ", copied.Select(c => c.Name))}. Not copied: {string.Join(", ", notCopied)}."
+                    : $"Not copied: {string.Join(", ", notCopied)}."
+            };
+        }
+
+        #endregion
+
+        #region Utilities
+
+        private void SyncSelected()
+        {
+            _selected = _clients
+                .Where(c => c.Value != "all" && c.IsChecked && _clientsByCode.ContainsKey(c.Value))
+                .Select(c => (_clientsByCode[c.Value].ClientId, c.Value, c.Name))
+                .ToList();
+        }
+
+        // One Copy entry per copied client, in that client's own log (the payload starts with its code).
+        private async Task WriteActivityLog(string clientCode, ClientCopyMarketTemplateGroupTargetResult result)
+        {
+            await _backofficeService.AddActivityLog(new ActivityLogModel
+            {
+                Page = SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", "."),
+                Payload = $"{clientCode}.{_sportId}.{_fixtureStatusId}.0",
+                Activity = Activity.Copy.ToString(),
+                From = JsonSerializer.Serialize(ToActivityModels(result.PreviousGroups)),
+                To = JsonSerializer.Serialize(ToActivityModels(result.CopiedGroups)),
+                UserId = _userState.Model.Id,
+                UserName = _userState.Model.Name
+            });
+        }
+
+        private static List<MarketGroupActivtyModel> ToActivityModels(List<ClientMarketTemplateGroupDTO> groups) =>
+            (groups ?? new List<ClientMarketTemplateGroupDTO>())
+                .Select(g => new MarketGroupActivtyModel
+                {
+                    MarketTemplateGroupId = g.MarketTemplateGroupId,
+                    Name = g.Name,
+                    SortOrder = g.SortOrder,
+                    MarketTemplateIds = g.MarketTemplateIds,
+                    IsActive = g.IsActive
+                })
+                .ToList();
 
         #endregion
     }

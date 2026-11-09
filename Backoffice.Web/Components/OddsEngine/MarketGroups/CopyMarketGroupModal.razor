@@ -1,77 +1,88 @@
 ﻿<div class="modal-body">
-    @if (IsPreLoader)
+    @if (!_confirming)
     {
-        <Preloader />
-    }
-    else
-    {
-        <div class="row mb-2">
-            <div class="col-2 text-center">
-                <span>@_translationState.GetValue("From")</span>
+        <section class="mg-copy-section mb-3">
+            <div class="mg-copy-from mb-2">
+                @_translationState.GetValue("From"): <strong>@_fromClientName</strong> &gt; @_sportName &gt; @_scopeName
             </div>
-            <div class="col-10">
-                <select class="form-select" placeholder="Select Client" @onchange="OnClientChangedEvent">
-                    @if (Clients != null)
-                    {
-                        <option value="" selected>@_translationState.GetValue("Select Client")</option>
-
-                        foreach (var client in Clients)
-                        {
-                            if (client.Value == SelectedClientCode)
+            <div class="d-flex gap-3">
+                <div class="mg-copy-select">
+                    <label class="form-label">@_translationState.GetValue("Clients")</label>
+                    <div class="dropdown">
+                        <button class="btn btn-client dropdown-toggle" type="button" id="market-group-copy-client-dropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">
+                            @if (_clients.Count > 1)
                             {
-                                <option value="@client.Value" selected>@client.Name</option>
+                                <span>@(_selected.Count == 1 ? _selected[0].Name : $"{_translationState.GetValue("Clients")} ({_selected.Count})")</span>
                             }
                             else
                             {
-                                <option value="@client.Value">@client.Name</option>
+                                <span>@_translationState.GetValue("No Clients Available")</span>
                             }
-                        }
-                    }
-                </select>
-            </div>
-        </div>
-        <div class="row mb-2">
-            <div class="col-2"></div>
-            <div class="col-10">
-                <select class="form-select" placeholder="@_translationState.GetValue("Select Sport")" @onchange="OnSportChangedEvent">
-                    @if (Sports != null)
-                    {
-                        <option value="0" selected>@_translationState.GetValue("Select Sport")</option>
-
-                        foreach (var sport in Sports)
+                        </button>
+                        @if (_clients.Count > 1)
                         {
-                            <option value="@sport.Value" selected="@(sport.Value == SelectedSportId)">@_translationState.GetValue(sport.Name)</option>
+                            <SelectWithCheckbox Items="_clients" AriaLabel="market-group-copy-client-dropdown" OnCheckboxCallback="OnClientCheckboxEvent" />
                         }
-                    }
-                </select>
-            </div>
-        </div>
-        <div class="row mb-2">
-            <div class="col-2"></div>
-            <div class="col-10">
-                <select class="form-select" placeholder="Select Scope" @onchange="OnFixtureStatusChangedEvent">
-                    @if (FixtureStatuses != null)
+                    </div>
+                </div>
+                <div class="mg-copy-selected flex-grow-1 d-flex flex-wrap align-content-start border rounded p-2">
+                    @foreach (var client in _selected)
                     {
-                        <option value="-1" selected>@_translationState.GetValue("Select Scope")</option>
-
-                        foreach (var fixtureStatus in FixtureStatuses)
-                        {
-                            <option value="@fixtureStatus.Value" selected="@(fixtureStatus.Value == SelectedFixtureStatusId)">@_translationState.GetValue(fixtureStatus.Name)</option>
-                        }
+                        <div class="mg-chip mg-client-chip mx-1 mb-1 py-1 px-2" @key="client.Code">
+                            @client.Name
+                            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close" @onclick="() => OnRemoveClientEvent(client.Code)"></button>
+                        </div>
                     }
-                </select>
+                </div>
             </div>
-        </div>
-    }
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnModalCancelEvent">@_translationState.GetValue("Cancel")</button>
-    @if (string.IsNullOrEmpty(SelectedClientCode) || SelectedSportId <= 0 || SelectedFixtureStatusId <= -1)
-    {
-        <button type="button" class="btn modal-btn modal-save" disabled>@_translationState.GetValue("Copy")</button>
+            @if (!string.IsNullOrEmpty(_clientError))
+            {
+                <div class="alert alert-danger mt-3 mb-0" role="alert">@_clientError</div>
+            }
+        </section>
+
+        <section class="mg-copy-section">
+            <label class="form-label">@_translationState.GetValue("Market Groups")</label>
+            <div class="mg-group-container d-flex flex-wrap p-3">
+                @if (_groups.Any())
+                {
+                    @foreach (var group in _groups)
+                    {
+                        <div class="mg-chip mg-group-chip mx-1 mb-2 py-1 px-2" @key="group.MarketTemplateGroupId">@group.Name</div>
+                    }
+                }
+                else
+                {
+                    <span class="mg-no-groups">@_fromClientName has no saved market groups for @_sportName &gt; @_scopeName to copy.</span>
+                }
+            </div>
+        </section>
     }
     else
     {
-        <button type="button" class="btn modal-btn modal-save" @onclick="OnModalCopyEvent" disabled="@IsPreLoader">@_translationState.GetValue("Copy")</button>
+        <div class="alert alert-warning mb-0" role="alert">
+            Copying will replace the existing Market Groups (@_sportName &gt; @_scopeName) of
+            <strong>@_selected.Count client@(_selected.Count == 1 ? "" : "s")</strong> (@string.Join(", ", _selected.Select(c => c.Name)))
+            with the @_groups.Count market group@(_groups.Count == 1 ? "" : "s") of <strong>@_fromClientName</strong>. Do you want to continue?
+        </div>
+    }
+
+    @if (_alert != null && !string.IsNullOrEmpty(_alert.Message))
+    {
+        <div class="mt-3">
+            <AlertMessage AlertModel="@_alert" />
+        </div>
+    }
+</div>
+<div class="modal-footer mx-4 p-0 py-3 border-0">
+    @if (!_confirming)
+    {
+        <button type="button" class="btn btn-cancel waves-effect" @onclick="OnCancelClickEvent">@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="btn btn-save waves-effect" disabled="@(!_groups.Any())" @onclick="OnSaveClickEvent">@_translationState.GetValue("Save")</button>
+    }
+    else
+    {
+        <button type="button" class="btn btn-cancel waves-effect" disabled="@_isSaving" @onclick="OnBackClickEvent">@_translationState.GetValue("Back")</button>
+        <button type="button" class="btn btn-save waves-effect" disabled="@_isSaving" @onclick="OnConfirmClickEvent">@_translationState.GetValue("Confirm")</button>
     }
 </div>
