@@ -130,6 +130,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ActivityLogResponse>> GetOddstableLeagueSortingLogs(OddstableLeagueSortingLogRequest request);
         Task<BaseResponse<List<TierLeagueOrderModel>>> GetTierLeagueOrder();
         Task<BaseResponse<ClientSportSettingResponse>> AddOrUpdateClientSportSettings(ClientSportSettingRequest request);
+        Task<BaseResponse<CopyClientSportSettingsResponse>> CopyClientSportSettings(CopyClientSportSettingsRequest request);
         Task<BaseResponse<List<ClientSportOrderAuditResponse>>> GetClientSportOrderAuditList(ClientSportOrderAuditRequest request);
 
         #endregion

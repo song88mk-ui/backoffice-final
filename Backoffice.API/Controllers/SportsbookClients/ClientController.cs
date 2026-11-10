@@ -199,6 +199,22 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
 
+        // BO-160: copy one client's Sport Settings to one or more clients. A partial copy is a 400 whose
+        // Result lists which clients were copied and which were not.
+        [HttpPost("sportsettings/copy")]
+        public async Task<IActionResult> CopyClientSportSettings([FromBody] CopyClientSportSettingsRequest request)
+        {
+            var result = await _sportsbookRepository.CopyClientSportSettings(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpPost("sportorder/list")]
         public async Task<IActionResult> GetClientSportOrderList([FromBody] ClientSportOrderListRequest request)
         {

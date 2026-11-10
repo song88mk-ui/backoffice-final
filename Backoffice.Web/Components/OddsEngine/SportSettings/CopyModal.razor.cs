@@ -1,94 +1,212 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Drawing;
 
 namespace Backoffice.Web.Components.OddsEngine.SportSettings
 {
-    public partial class CopyModal : IDisposable
+    // BO-160: copies the Sport Settings shown on screen for one client to one or more other clients.
+    // Same pattern as the League Sorting and Market Sort Order copy dialogs.
+    public partial class CopyModal
     {
-        #region Properties
-
-        [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IModalService ModalService { get; set; }
-
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
-        public List<PlatformClientResponse> ClientInformations { get; set; }
-        public List<SelectListItemModel<string>> Clients { get; set; }
-        public string SelectedClientCode { get; set; }
+        private string _fromClientCode;
+        private string _fromClientName;
+        private List<SportsSortOrder> _sports = new List<SportsSortOrder>();
 
-        public string FromClientCode { get; set; }
-        private string Region { get; set; }
+        // Index 0 is the "all clients" entry that SelectWithCheckbox expects. The source client is not listed.
+        private List<SelectListItemWithCheckboxModel<string>> _clients = new List<SelectListItemWithCheckboxModel<string>>();
+        private List<(string Code, string Name)> _selected = new List<(string Code, string Name)>();
+        private Dictionary<string, PlatformClientResponse> _clientsByCode = new Dictionary<string, PlatformClientResponse>(StringComparer.OrdinalIgnoreCase);
 
-        #endregion
+        private bool _confirming;
+        private bool _isSaving;
+        private AlertModel _alert;
+
+        private bool CanCopy => _selected.Any() && _sports.Any();
 
         #region Methods
 
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
-            Clients = new List<SelectListItemModel<string>>();
-            Region = ModalParameters.TryGet<string>("Region").ToUpper();
-            TradingService.Region = Region;
+            _fromClientCode = ModalParameters.TryGet<string>("FromClientCode");
+            _sports = ModalParameters.TryGet<List<SportsSortOrder>>("Sports") ?? new List<SportsSortOrder>();
 
-            FromClientCode = ModalParameters.TryGet<string>("FromClientCode");
+            var tradingClients = _userState.Model.TradingClients ?? new List<PlatformClientResponse>();
 
-            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
-            {
-                ClientInformations = _userState.Model.TradingClients;
+            _clientsByCode = tradingClients
+                .Where(c => !string.IsNullOrEmpty(c.ClientCode))
+                .GroupBy(c => c.ClientCode, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
 
-                Clients = _userState.Model.TradingClients.Select(s => new SelectListItemModel<string>
+            _fromClientName = _clientsByCode.TryGetValue(_fromClientCode ?? string.Empty, out var fromClient)
+                ? fromClient.ClientName
+                : _fromClientCode;
+
+            var targets = _clientsByCode.Values
+                .Where(c => !string.Equals(c.ClientCode, _fromClientCode, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(c => c.ClientName)
+                .Select(c => new SelectListItemWithCheckboxModel<string>
                 {
-                    Value = s.ClientCode,
-                    Name = s.ClientName
-                }).ToList();
-            }
-            else
+                    Value = c.ClientCode,
+                    Name = c.ClientName
+                })
+                .ToList();
+
+            if (targets.Any())
             {
-                Clients.Add(new SelectListItemModel<string>
+                targets.Insert(0, new SelectListItemWithCheckboxModel<string>
                 {
-                    Value = "",
-                    Name = _translationState.GetValue("No Clients Available")
+                    Value = "all",
+                    Name = "All Clients"
                 });
             }
+
+            _clients = targets;
+
+            // Copying an empty list would wipe every target's sports.
+            if (!_sports.Any())
+                _alert = Error($"{_fromClientName} has no sports to copy.");
         }
 
-        public async Task OnClientChangedEvent(ChangeEventArgs e)
+        // SelectWithCheckbox has already updated the checked state on the shared items when this runs.
+        public void OnClientCheckboxEvent(Dictionary<string, string> items)
         {
-            SelectedClientCode = e.Value.ToString();
+            SyncSelected();
+
+            if (_sports.Any())
+                _alert = null;
         }
 
-        protected async Task OnCopyClickEvent()
+        public void OnRemoveClientEvent(string clientCode)
         {
-            if (string.IsNullOrEmpty(SelectedClientCode))
+            var item = _clients.FirstOrDefault(c => c.Value == clientCode);
+
+            if (item != null)
+                item.IsChecked = false;
+
+            if (_clients.Any())
+                _clients[0].IsChecked = false;
+
+            SyncSelected();
+        }
+
+        public void OnCancelClickEvent()
+        {
+            _modalService.Cancel();
+        }
+
+        public void OnCopyClickEvent()
+        {
+            if (!CanCopy)
+            {
+                _alert = Error(_sports.Any()
+                    ? "Please select the clients you want to copy to."
+                    : $"{_fromClientName} has no sports to copy.");
                 return;
+            }
 
-            var parameters = new ModalParameters();
-
-            var toClient = ClientInformations.FirstOrDefault(c => c.ClientCode == SelectedClientCode);
-
-            parameters.Add("ToClientCode", toClient.ClientCode);
-            parameters.Add("ToClientName", toClient.ClientName);
-            parameters.Add("Sports", ModalParameters.TryGet<List<SportsSortOrder>>("Sports"));
-            parameters.Add("Region", Region);
-
-            parameters.Add("DialogStyle", "max-width: 600px;");
-
-            var options = new ModalOptions();
-            ModalService.Open<CopyConfirmationModal>("Copy Setting", parameters, options);
+            _alert = null;
+            _confirming = true;
         }
 
-        public async Task OnCancelClickEvent()
+        public void OnBackClickEvent()
         {
-            ModalService.Cancel();
+            _confirming = false;
         }
 
-        public void Dispose()
+        public async Task OnConfirmClickEvent()
         {
+            _alert = null;
+            _isSaving = true;
+
+            var response = await _backofficeService.CopyClientSportSettings(new CopyClientSportSettingsRequest
+            {
+                FromClientCode = _fromClientCode,
+                ToClientCodes = _selected.Select(c => c.Code).ToList(),
+                SportsSortOrder = _sports,
+                UserId = _userState.Model.Id,
+                UserName = _userState.Model.Name
+            });
+
+            _isSaving = false;
+
+            var targets = response?.Result?.Targets ?? new List<CopyClientSportSettingsTargetResult>();
+            var copied = targets.Where(t => t.StatusCode == StatusCode.Success).ToList();
+            var failed = targets.Where(t => t.StatusCode != StatusCode.Success).ToList();
+
+            if (response?.StatusCode == StatusCode.Success)
+            {
+                var warnings = Warnings(copied);
+
+                _alert = new AlertModel
+                {
+                    Status = AlertStatus.Success,
+                    Message = $"Sport Settings copied to {Describe(copied.Count)}!" + warnings,
+                    IsAlwaysShown = warnings.Length > 0
+                };
+
+                // Keep the dialog open when a cache refresh or log failed, so the warning is read.
+                if (warnings.Length > 0)
+                {
+                    _confirming = false;
+                    return;
+                }
+
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(1200);
+
+                _modalService.Cancel();
+                return;
+            }
+
+            _confirming = false;
+
+            if (copied.Any())
+            {
+                // Some clients were copied: say which, and which were not.
+                _alert = Error($"Copied to {NamesOf(copied)}.{Warnings(copied)} Not copied to {string.Join(", ", failed.Select(t => $"{NameOf(t)} ({t.Message})"))}.");
+                return;
+            }
+
+            _alert = Error(failed.Any()
+                ? $"Not copied to {string.Join(", ", failed.Select(t => $"{NameOf(t)} ({t.Message})"))}."
+                : response?.Message ?? "Copy failed. Please try again.");
+        }
+
+        #endregion
+
+        #region Utilities
+
+        private void SyncSelected()
+        {
+            _selected = _clients
+                .Where(c => c.Value != "all" && c.IsChecked)
+                .Select(c => (c.Value, c.Name))
+                .ToList();
+        }
+
+        private static AlertModel Error(string message) => new AlertModel
+        {
+            Status = AlertStatus.Error,
+            Message = message,
+            IsAlwaysShown = true
+        };
+
+        private string Describe(int count) => count == 1 && _selected.Count == 1 ? _selected[0].Name : $"{count} clients";
+
+        private string NameOf(CopyClientSportSettingsTargetResult target) =>
+            _clientsByCode.TryGetValue(target.ClientCode ?? string.Empty, out var client) ? client.ClientName : target.ClientCode;
+
+        private string NamesOf(IEnumerable<CopyClientSportSettingsTargetResult> targets) => string.Join(", ", targets.Select(NameOf));
+
+        // A copied client whose cache refresh or activity log failed carries a warning instead of "Copied".
+        private string Warnings(IEnumerable<CopyClientSportSettingsTargetResult> copied)
+        {
+            var warned = copied.Where(t => t.Message != "Copied").ToList();
+            return warned.Any() ? $" {NamesOf(warned)}: {warned[0].Message}" : string.Empty;
         }
 
         #endregion

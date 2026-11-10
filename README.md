@@ -495,6 +495,7 @@ Most of these routes forward to the OddsEngine Trading API (`API:TradingAPI:{HK|
 | POST | `sportsbook/client/markettemplategroup/delete` | Delete a market template group |
 | POST | `sportsbook/client/markettemplategroup/copy` | Copy market template groups |
 | POST | `sportsbook/client/sportsettings` | Add or update client sport settings |
+| POST | `sportsbook/client/sportsettings/copy` | Copy the on-screen sport settings of one client to one or more clients (BO-160) |
 | POST | `sportsbook/client/sportorder/list` | Client sport order list |
 | POST | `sportsbook/client/sportorder/audit/list` | Sport order audit list |
 | POST | `sportsbook/client/segmentorder/list` | Client segment order list |

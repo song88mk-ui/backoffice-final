@@ -3060,6 +3060,34 @@ namespace Backoffice.Web.Services
             }
         }
 
+        public async Task<BaseResponse<CopyClientSportSettingsResponse>> CopyClientSportSettings(CopyClientSportSettingsRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"sportsbook/client/sportsettings/copy", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                // A partial copy comes back as 400 with the per-client results.
+                if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
+                    return JsonSerializer.Deserialize<BaseResponse<CopyClientSportSettingsResponse>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptionsProvider.CaseInsensitive);
+
+                return new BaseResponse<CopyClientSportSettingsResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                };
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, ex.Message);
+
+                return new BaseResponse<CopyClientSportSettingsResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<List<ClientSelectorMarketTemplateModel>>> GetClientSelectorMarketTemplates(Guid clientId)
         {
             try

@@ -761,6 +761,401 @@ namespace Backoffice.API.Repositories
             };
         }
 
+        // ActivityLog2.Page of every Sport Settings entry, the same value the Web logs dialog filters on.
+        private static readonly string SportSettingsLogPage = SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace('_', '.');
+        private const string SportSettingsCopied = "Copied";
+
+        // BO-160: replaces the Sport Settings (sport order, segment order, league order) of every target client
+        // with the list shown on screen for the source client. Each target is replaced in its own transaction,
+        // so one failed client does not undo the others. One activity log is written per copied target.
+        public async Task<BaseResponse<CopyClientSportSettingsResponse>> CopyClientSportSettings(CopyClientSportSettingsRequest request)
+        {
+            var sports = request.SportsSortOrder ?? new List<SportsSortOrder>();
+            var targetCodes = (request.ToClientCodes ?? new List<string>())
+                .Where(code => !string.IsNullOrWhiteSpace(code))
+                .Select(code => code.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (string.IsNullOrWhiteSpace(request.FromClientCode))
+                return InvalidSportSettingsCopy("Invalid source client");
+
+            if (!targetCodes.Any())
+                return InvalidSportSettingsCopy("No target client selected");
+
+            if (targetCodes.Contains(request.FromClientCode.Trim(), StringComparer.OrdinalIgnoreCase))
+                return InvalidSportSettingsCopy("A client cannot be copied to itself. Remove it from the target clients.");
+
+            // An empty list would wipe every target's sports.
+            if (!sports.Any())
+                return InvalidSportSettingsCopy("The source client has no sport settings to copy");
+
+            var invalidMessage = ValidateSportSettingsCopy(sports);
+            if (invalidMessage != null)
+                return InvalidSportSettingsCopy(invalidMessage);
+
+            var targets = new List<PlatformClientResponse>();
+
+            try
+            {
+                var clientList = (await _platformRepository.GetClients("HK")).Result ?? new List<PlatformClientResponse>();
+                var missing = new List<string>();
+
+                foreach (var code in targetCodes)
+                {
+                    var client = clientList.FirstOrDefault(c => string.Equals(c.ClientCode, code, StringComparison.OrdinalIgnoreCase));
+
+                    if (client == null)
+                        missing.Add(code);
+                    else
+                        targets.Add(client);
+                }
+
+                if (missing.Any())
+                    return InvalidSportSettingsCopy($"No client found: {string.Join(", ", missing)}");
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Sport Settings copy could not read the client list");
+                return InvalidSportSettingsCopy($"Error: {ex.Message}");
+            }
+
+            var results = new List<CopyClientSportSettingsTargetResult>();
+            var logs = new List<OnActivityLogMessage>();
+
+            foreach (var target in targets)
+            {
+                var result = new CopyClientSportSettingsTargetResult
+                {
+                    ClientId = target.ClientId,
+                    ClientCode = target.ClientCode
+                };
+                results.Add(result);
+
+                SportSettingsRows previous;
+
+                try
+                {
+                    previous = await ReplaceClientSportSettings(target.ClientId, sports);
+                }
+                catch (Exception ex)
+                {
+                    Serilog.Log.Error(ex, "Sport Settings copy to {ClientCode} failed", target.ClientCode);
+                    result.StatusCode = StatusCode.Error;
+                    result.Message = ex.Message;
+                    continue;
+                }
+                finally
+                {
+                    // A failed target's pending changes must not be saved with the next target.
+                    _sportsbookContext.ChangeTracker.Clear();
+                }
+
+                result.StatusCode = StatusCode.Success;
+                result.Message = SportSettingsCopied;
+
+                logs.Add(BuildSportSettingsCopyLog(request, target.ClientCode, previous, sports));
+            }
+
+            var copied = results.Where(r => r.StatusCode == StatusCode.Success).ToList();
+
+            if (copied.Any())
+            {
+                // Sportsbook.API purges the sport, segment and league order of every client on this message,
+                // so one message covers all the targets.
+                var cacheRefreshed = await TryPublishSportSortOrderChange();
+                var logged = await TryWriteSportSettingsLogs(logs);
+
+                foreach (var result in copied)
+                {
+                    if (!cacheRefreshed)
+                        result.Message = "Copied, but the sportsbook cache was not refreshed. Save its Sport Settings once to refresh it.";
+                    else if (!logged)
+                        result.Message = "Copied, but its activity log could not be written.";
+                }
+            }
+
+            var allCopied = copied.Count == results.Count;
+
+            return new BaseResponse<CopyClientSportSettingsResponse>
+            {
+                StatusCode = allCopied ? StatusCode.Success : StatusCode.Error,
+                Message = allCopied
+                    ? "Copy sport settings successful"
+                    : $"Sport settings copied to {copied.Count} of {results.Count} clients",
+                Result = new CopyClientSportSettingsResponse { Targets = results }
+            };
+        }
+
+        // The rows one client's Sport Settings are stored in.
+        protected sealed class SportSettingsRows
+        {
+            public List<ClientSportOrder> Sports { get; set; } = new List<ClientSportOrder>();
+            public List<ClientSegmentOrder> Segments { get; set; } = new List<ClientSegmentOrder>();
+            public List<ClientLeagueOrder> Leagues { get; set; } = new List<ClientLeagueOrder>();
+        }
+
+        // Deletes the client's sport, segment and league order and inserts the copied ones, in one transaction
+        // (the Save path deletes outside its transaction, so a failed insert there leaves the client empty).
+        // Returns what was there before. Virtual so the tests can make one client fail.
+        protected virtual async Task<SportSettingsRows> ReplaceClientSportSettings(Guid clientId, List<SportsSortOrder> sports)
+        {
+            using var scope = new TransactionScope(TransactionScopeOption.Required, new System.Transactions.TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled);
+
+            var previous = new SportSettingsRows
+            {
+                Sports = await _sportsbookContext.ClientSportOrder.Where(x => x.ClientId == clientId).ToListAsync(),
+                Segments = await _sportsbookContext.ClientSegmentOrder.Where(x => x.ClientId == clientId).ToListAsync(),
+                Leagues = await _sportsbookContext.ClientLeagueOrder.Where(x => x.ClientId == clientId).ToListAsync()
+            };
+
+            _sportsbookContext.ClientLeagueOrder.RemoveRange(previous.Leagues);
+            _sportsbookContext.ClientSegmentOrder.RemoveRange(previous.Segments);
+            _sportsbookContext.ClientSportOrder.RemoveRange(previous.Sports);
+            await _sportsbookContext.SaveChangesAsync();
+
+            // Same rows as AddOrUpdateClientSportSettings writes.
+            foreach (var sport in sports)
+            {
+                _sportsbookContext.ClientSportOrder.Add(new ClientSportOrder
+                {
+                    ClientId = clientId,
+                    SportId = sport.SportId,
+                    SportName = sport.SportName,
+                    SortOrder = sport.SortOrder,
+                    IsActive = sport.IsActive
+                });
+
+                foreach (var segment in sport.SegmentsSortOrder ?? new List<SportsSegmentSortOrder>())
+                {
+                    _sportsbookContext.ClientSegmentOrder.Add(new ClientSegmentOrder
+                    {
+                        ClientId = clientId,
+                        SportId = segment.SportId,
+                        SportName = segment.SportName,
+                        SegmentId = segment.SegmentId,
+                        SegmentName = segment.SegmentName,
+                        SortOrder = segment.SortOrder
+                    });
+
+                    foreach (var league in segment.LeagueSortOrder ?? new List<SportSegmentLeagueSortOrder>())
+                    {
+                        _sportsbookContext.ClientLeagueOrder.Add(new ClientLeagueOrder
+                        {
+                            ClientId = clientId,
+                            SportId = league.SportId,
+                            SportName = league.SportName,
+                            SegmentId = league.SegmentId,
+                            SegmentName = league.SegmentName,
+                            LeagueId = league.LeagueId,
+                            LeagueName = league.LeagueName,
+                            SortOrder = league.SortOrder
+                        });
+                    }
+                }
+            }
+
+            await _sportsbookContext.SaveChangesAsync();
+            scope.Complete();
+
+            return previous;
+        }
+
+        // The checks AddOrUpdateClientSportSettings makes, plus the duplicate segments and leagues that would
+        // break the copy's primary keys. Returns null when the list is valid.
+        private static string ValidateSportSettingsCopy(List<SportsSortOrder> sports)
+        {
+            if (sports.GroupBy(s => s.SportId).Any(g => g.Count() > 1))
+                return "Duplicate client sport found";
+
+            if (sports.Any(s => s.SportId == 0 || s.SortOrder == 0))
+                return "Error! All fields cannot be empty. Please fill in accordingly or remove the empty row";
+
+            var segments = sports.SelectMany(s => s.SegmentsSortOrder ?? new List<SportsSegmentSortOrder>()).ToList();
+
+            if (segments.GroupBy(s => new { s.SportId, s.SegmentId }).Any(g => g.Count() > 1))
+                return "Duplicate client segment found";
+
+            var leagues = segments.SelectMany(s => s.LeagueSortOrder ?? new List<SportSegmentLeagueSortOrder>()).ToList();
+
+            if (leagues.GroupBy(l => new { l.SportId, l.SegmentId, l.LeagueId }).Any(g => g.Count() > 1))
+                return "Duplicate client league found";
+
+            return null;
+        }
+
+        private async Task<bool> TryPublishSportSortOrderChange()
+        {
+            try
+            {
+                var response = await _rabbitMqRepository.Publish(new MessageRequest
+                {
+                    Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                    {
+                        CacheType = CacheType.SportSortOrder,
+                        // No single client: the purge covers every client.
+                        ClientId = Guid.Empty,
+                        ClientCode = string.Empty,
+                        CacheKey = string.Empty
+                    }),
+                    CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                    MessageType = "OnSportSortOrderChange",
+                    RoutingKey = "r.oe.cachesync.onsportsortorderchange"
+                });
+
+                if (response?.StatusCode == StatusCode.Success)
+                    return true;
+
+                Serilog.Log.Error("Sport Settings copy saved, but OnSportSortOrderChange could not be published: {Message}", response?.Message);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Sport Settings copy saved, but OnSportSortOrderChange could not be published");
+                return false;
+            }
+        }
+
+        private async Task<bool> TryWriteSportSettingsLogs(List<OnActivityLogMessage> logs)
+        {
+            if (!logs.Any())
+                return true;
+
+            try
+            {
+                await _activityLogRepository.ProcessActivityLog(new OnActivityLogListMessage { OnActivityLogMessages = logs });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Sport Settings copy audit log could not be written for {ClientCodes}", string.Join(",", logs.Select(l => l.Payload)));
+                return false;
+            }
+        }
+
+        // From and To use the shape the Sport Settings logs dialog reads (SportSettingSortOrderAudit in
+        // Backoffice.Web): the sports always, and the segments and leagues only where their order changed,
+        // like a normal save. Leagues are listed per segment, so listing every one would bury the change.
+        private static OnActivityLogMessage BuildSportSettingsCopyLog(CopyClientSportSettingsRequest request, string targetCode, SportSettingsRows previous, List<SportsSortOrder> copied)
+        {
+            var fromSports = previous.Sports
+                .Where(s => s.IsActive)
+                .OrderBy(s => s.SortOrder)
+                .Select(s => new SportAuditEntry(s.SportId, s.SportName, s.SortOrder))
+                .ToList();
+
+            var toSports = copied
+                .OrderBy(s => s.SortOrder)
+                .Select(s => new SportAuditEntry(s.SportId, s.SportName, s.SortOrder))
+                .ToList();
+
+            var fromSegments = previous.Segments
+                .Select(s => new SegmentAuditEntry(s.SportId, s.SportName, s.SegmentId, s.SegmentName, s.SortOrder))
+                .ToList();
+
+            var toSegments = copied
+                .SelectMany(s => s.SegmentsSortOrder ?? new List<SportsSegmentSortOrder>())
+                .Select(s => new SegmentAuditEntry(s.SportId, s.SportName, s.SegmentId, s.SegmentName, s.SortOrder))
+                .ToList();
+
+            var fromLeagues = previous.Leagues
+                .Select(l => new LeagueAuditEntry(l.SportId, l.SportName, l.SegmentId, l.SegmentName, l.LeagueId, l.LeagueName, l.SortOrder))
+                .ToList();
+
+            var toLeagues = copied
+                .SelectMany(s => s.SegmentsSortOrder ?? new List<SportsSegmentSortOrder>())
+                .SelectMany(s => s.LeagueSortOrder ?? new List<SportSegmentLeagueSortOrder>())
+                .Select(l => new LeagueAuditEntry(l.SportId, l.SportName, l.SegmentId, l.SegmentName, l.LeagueId, l.LeagueName, l.SortOrder))
+                .ToList();
+
+            var changedSegmentSports = fromSegments.Select(s => s.SportId)
+                .Union(toSegments.Select(s => s.SportId))
+                .Where(sportId => !OrderedIds(fromSegments.Where(s => s.SportId == sportId), s => s.SegmentId, s => s.SortOrder)
+                    .SequenceEqual(OrderedIds(toSegments.Where(s => s.SportId == sportId), s => s.SegmentId, s => s.SortOrder)))
+                .ToHashSet();
+
+            var changedLeagueSegments = fromLeagues.Select(l => (l.SportId, l.SegmentId))
+                .Union(toLeagues.Select(l => (l.SportId, l.SegmentId)))
+                .Where(key => !OrderedIds(fromLeagues.Where(l => (l.SportId, l.SegmentId) == key), l => l.LeagueId, l => l.SortOrder)
+                    .SequenceEqual(OrderedIds(toLeagues.Where(l => (l.SportId, l.SegmentId) == key), l => l.LeagueId, l => l.SortOrder)))
+                .ToHashSet();
+
+            return new OnActivityLogMessage
+            {
+                Page = SportSettingsLogPage,
+                Payload = targetCode,
+                Activity = "Copy",
+                From = JsonSerializer.Serialize(ToSportSettingsAudit(fromSports, fromSegments, fromLeagues, changedSegmentSports, changedLeagueSegments, null)),
+                To = JsonSerializer.Serialize(ToSportSettingsAudit(toSports, toSegments, toLeagues, changedSegmentSports, changedLeagueSegments, request.FromClientCode)),
+                UserId = request.UserId,
+                UserName = request.UserName,
+                TimeStamp = DateTime.UtcNow
+            };
+        }
+
+        private static List<long> OrderedIds<T>(IEnumerable<T> rows, Func<T, long> id, Func<T, int> sortOrder) =>
+            rows.OrderBy(sortOrder).Select(id).ToList();
+
+        private static object ToSportSettingsAudit(List<SportAuditEntry> sports, List<SegmentAuditEntry> segments, List<LeagueAuditEntry> leagues,
+            HashSet<int> changedSegmentSports, HashSet<(int SportId, int SegmentId)> changedLeagueSegments, string copiedFromClientCode)
+        {
+            return new
+            {
+                CopiedFromClientCode = copiedFromClientCode,
+                Sports = sports
+                    .Select(s => new { s.SportId, SportName = s.SportName ?? string.Empty, s.SortOrder })
+                    .ToList(),
+                Segments = segments
+                    .Where(s => changedSegmentSports.Contains(s.SportId))
+                    .GroupBy(s => s.SportId)
+                    .OrderBy(g => g.Key)
+                    .Select(g => new
+                    {
+                        SportId = g.Key,
+                        SportName = g.First().SportName ?? string.Empty,
+                        Segments = g.OrderBy(s => s.SortOrder)
+                            .Select(s => new { s.SegmentId, SegmentName = s.SegmentName ?? string.Empty, s.SortOrder })
+                            .ToList()
+                    })
+                    .ToList(),
+                Leagues = leagues
+                    .Where(l => changedLeagueSegments.Contains((l.SportId, l.SegmentId)))
+                    .GroupBy(l => l.SportId)
+                    .OrderBy(g => g.Key)
+                    .Select(sport => new
+                    {
+                        SportId = sport.Key,
+                        SportName = sport.First().SportName ?? string.Empty,
+                        Segments = sport.GroupBy(l => l.SegmentId)
+                            .OrderBy(g => g.Key)
+                            .Select(segment => new
+                            {
+                                SegmentId = segment.Key,
+                                SegmentName = segment.First().SegmentName ?? string.Empty,
+                                Leagues = segment.OrderBy(l => l.SortOrder)
+                                    .Select(l => new { LeagueId = (long)l.LeagueId, LeagueName = l.LeagueName ?? string.Empty, l.SortOrder })
+                                    .ToList()
+                            })
+                            .ToList()
+                    })
+                    .ToList()
+            };
+        }
+
+        private sealed record SportAuditEntry(int SportId, string SportName, int SortOrder);
+        private sealed record SegmentAuditEntry(int SportId, string SportName, int SegmentId, string SegmentName, int SortOrder);
+        private sealed record LeagueAuditEntry(int SportId, string SportName, int SegmentId, string SegmentName, int LeagueId, string LeagueName, int SortOrder);
+
+        private static BaseResponse<CopyClientSportSettingsResponse> InvalidSportSettingsCopy(string message)
+        {
+            return new BaseResponse<CopyClientSportSettingsResponse>
+            {
+                StatusCode = StatusCode.Error,
+                Message = message,
+                Result = new CopyClientSportSettingsResponse()
+            };
+        }
+
         public async Task<BaseResponse<List<ClientSportOrderListResponse>>> GetClientSportOrderList(ClientSportOrderListRequest request)
         {
             var clientList = (await _platformRepository.GetClients("HK")).Result;

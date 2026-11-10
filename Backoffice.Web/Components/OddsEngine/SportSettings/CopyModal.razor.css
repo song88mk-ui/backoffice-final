@@ -1,10 +1,54 @@
-﻿.btn-cancel, .btn-copy {
+﻿.ss-copy-section {
+    padding: 0.75rem 1rem;
+    border: 1px solid #DEE2E6;
+    border-radius: 4px;
+    background-color: #FAFAFA;
+}
+
+.ss-copy-select {
+    width: 15rem;
+    flex-shrink: 0;
+}
+
+.btn-client {
+    width: 100%;
+    border: 1px solid #C7C1C1;
+    border-radius: 3px;
+    background-color: #FFF;
+    text-align: left;
+}
+
+.btn-client.dropdown-toggle::after {
+    float: right;
+    position: relative;
+    top: 10px;
+}
+
+.ss-copy-selected {
+    min-height: 40px;
+    background-color: #FFF;
+}
+
+.ss-chip {
+    background: #404E67;
+    border-radius: 3px;
     color: white;
-    border-radius: 2px;
+}
+
+.btn-close {
+    font-size: 0.6rem;
+    font-weight: bold;
+}
+
+.btn-cancel, .btn-copy {
+    width: 112px;
+    height: 40px;
+    border-radius: 5px;
+    color: white;
 }
 
 .btn-cancel {
-    background: #9AA0AB 0% 0% no-repeat padding-box;
+    background-color: #9AA0AB;
 }
 
 .btn-copy {

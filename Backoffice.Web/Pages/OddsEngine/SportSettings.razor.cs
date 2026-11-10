@@ -280,8 +280,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }).ToList();
 
             parameters.Add("Sports", sports);
-            parameters.Add("DialogStyle", "max-width: 600px;");
-            parameters.Add("Region", Region);
+            parameters.Add("DialogStyle", "max-width: 700px;");
 
             var options = new ModalOptions();
 
