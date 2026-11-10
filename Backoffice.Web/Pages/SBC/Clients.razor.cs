@@ -159,11 +159,18 @@ namespace Backoffice.Web.Pages.SBC
         {
             Alerts.Clear();
 
-            var response = await BackofficeService.ExportClients();
+            // Same search and sort as the list on screen, so the file holds exactly the clients being shown.
+            var response = await BackofficeService.ExportClients(ClientListCallbackModel?.SearchText, ClientListCallbackModel?.SortBy ?? 0);
 
             if (response.StatusCode != Backoffice.Shared.Enums.StatusCode.Success || response.Result == null)
             {
                 Alerts.Add(new AlertModel { Status = AlertStatus.Error, Message = response.Message ?? "Export failed." });
+                return;
+            }
+
+            if (response.Result.Count == 0)
+            {
+                Alerts.Add(new AlertModel { Status = AlertStatus.Error, Message = "No clients match the current search, so there is nothing to export." });
                 return;
             }
 

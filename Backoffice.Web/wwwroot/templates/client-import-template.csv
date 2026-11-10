@@ -1,2 +1,2 @@
 ClientId,ClientCode,ClientName,Website,Region,Email,MonthlyFee,RevenueShareSportsbook,RevenueShareJackpot,LimitId,Endpoint,ReferenceClientCode,CurrencyCode,CurrencyAction,SoccerMinPerTicket,SoccerMaxPerTicket,SoccerMaxPerGame,AllSportsMinPerTicket,AllSportsMaxPerTicket,AllSportsMaxPerGame,ParlayMinPerTicket,ParlayMaxPerTicket,ParlayMaxPayoutPerTicket,ParlayMaxWinningsBonus
-,ABC,Example Sports,https://examplesports.com,HK,ops@examplesports.com,500,0.1,0.08,2535,https://preprod-operatorapi.song88.com,QTE,USD,,1,5000,10000,1,5000,10000,1,2000,50000,0.02
+,ABC,Example Sports,https://examplesports.com,HK,ops@examplesports.com,0,0.07,0,10939,https://product.qtplatform.com/s88,KEH,PHP,,10,5000,10000,10,5000,10000,10,2000,50000,0.02

@@ -710,9 +710,27 @@ namespace Backoffice.API.Repositories
 
         #region Export
 
-        public async Task<BaseResponse<List<ClientExportRow>>> ExportClients()
+        // Exports what the Manage Clients list shows for the same search and sort: the same clients
+        // (not deleted, SBC/SB only, the caller's brands) in the same order. brands == null means every brand.
+        public async Task<BaseResponse<List<ClientExportRow>>> ExportClients(string search, ClientSorting sortBy, List<string> brands)
         {
-            var clients = await _backofficeContext.ClientInformation.AsNoTracking().Where(c => !c.IsDeleted).ToListAsync();
+            var clients = await _backofficeContext.ClientInformation.AsNoTracking()
+                .Where(c => !c.IsDeleted && (c.ApplicationId == (int)Application2.SBC || c.ApplicationId == (int)Application2.SB))
+                .ToListAsync();
+
+            if (brands != null)
+                clients = clients.Where(c => brands.Contains(c.Brand)).ToList();
+
+            if (!string.IsNullOrWhiteSpace(search))
+                clients = clients.Where(c => (c.Name ?? string.Empty).Contains(search.Trim(), StringComparison.InvariantCultureIgnoreCase)).ToList();
+
+            clients = sortBy switch
+            {
+                ClientSorting.SortByBusinessNameDesc => clients.OrderByDescending(c => c.Name).ToList(),
+                ClientSorting.SortByCreatedDateAsc => clients.OrderBy(c => c.CreatedDate).ToList(),
+                ClientSorting.SortByCreatedDateDesc => clients.OrderByDescending(c => c.CreatedDate).ToList(),
+                _ => clients.OrderBy(c => c.Name).ToList()
+            };
             var platformClients = (await _backofficeRepository.GetPlatformClients()).Result ?? new List<PlatformClientResponse>();
 
             // An export without currencies looks like "this client has none" — fail loudly instead.

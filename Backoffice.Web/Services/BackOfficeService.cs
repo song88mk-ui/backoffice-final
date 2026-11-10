@@ -724,11 +724,11 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ClientExportRow>>> ExportClients()
+        public async Task<BaseResponse<List<ClientExportRow>>> ExportClients(string search, int sortBy)
         {
             try
             {
-                return await GetAsync<List<ClientExportRow>>($"sportsbook/clientimport/export") ?? new BaseResponse<List<ClientExportRow>>();
+                return await GetAsync<List<ClientExportRow>>($"sportsbook/clientimport/export?search={Uri.EscapeDataString(search ?? string.Empty)}&sortBy={sortBy}") ?? new BaseResponse<List<ClientExportRow>>();
             }
             catch (Exception ex)
             {

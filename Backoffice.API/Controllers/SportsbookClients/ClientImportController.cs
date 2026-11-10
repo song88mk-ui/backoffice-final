@@ -1,9 +1,13 @@
 using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Utilities;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Backoffice.API.Controllers.SportsbookClients
@@ -93,10 +97,11 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
 
+        // search and sortBy are the Manage Clients list's own filter, so the file holds what the list shows.
         [HttpGet("export")]
-        public async Task<IActionResult> Export()
+        public async Task<IActionResult> Export([FromQuery] string search, [FromQuery] ClientSorting sortBy = ClientSorting.SortByBusinessNameAsc)
         {
-            var result = await _clientImportRepository.ExportClients();
+            var result = await _clientImportRepository.ExportClients(search, sortBy, GetCallerBrands());
 
             switch (result.StatusCode)
             {
@@ -164,6 +169,19 @@ namespace Backoffice.API.Controllers.SportsbookClients
                 default:
                     return BadRequest(result);
             }
+        }
+
+        // Same rule as the client list (ClientController.GetClientList): a CLIENTCODES claim of "ALL" sees every
+        // brand, anything else only the listed ones. A missing claim sees nothing rather than everything.
+        private List<string> GetCallerBrands()
+        {
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var clientCodes = JwtParser.ParseClaimsFromJwt(token).FirstOrDefault(x => x.Type.ToUpper() == "CLIENTCODES")?.Value ?? string.Empty;
+
+            if (string.Equals(clientCodes.Trim(), "ALL", StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            return clientCodes.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
         }
     }
 }

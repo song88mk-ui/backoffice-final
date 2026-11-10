@@ -1,3 +1,4 @@
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -16,7 +17,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<ClientImportProgressResponse>> GetProgress(Guid batchId);
         BaseResponse<string> GetEnvironment();
 
-        Task<BaseResponse<List<ClientExportRow>>> ExportClients();
+        Task<BaseResponse<List<ClientExportRow>>> ExportClients(string search, ClientSorting sortBy, List<string> brands);
         Task<BaseResponse<ValidateClientUpdateResponse>> ValidateUpdateBatch(ValidateClientUpdateRequest request);
         Task<BaseResponse<CommitClientUpdateResponse>> CommitUpdateBatch(CommitClientUpdateRequest request, string userId, string userName);
         Task<BaseResponse<List<ClientFieldChangeResponse>>> GetFieldChanges(Guid batchId);

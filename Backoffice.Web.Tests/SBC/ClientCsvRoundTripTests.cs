@@ -135,6 +135,41 @@ namespace Backoffice.Web.Tests.SBC
             Assert.All(result.Errors, e => Assert.Contains("Client ID is required", e));
         }
 
+        // BO-163: the standard values every client gets in every environment. Only the client's own
+        // details (code, name, website, email, currency, and limits when the client asks) are meant to change.
+        [Fact]
+        public void ShippedTemplate_CarriesTheStandardValues()
+        {
+            var row = Assert.Single(ClientImportCsvParser.Parse(ReadShippedTemplate()).Rows);
+
+            Assert.Equal(0m, row.MonthlyFee);
+            Assert.Equal(0.07m, row.RevenueShareSportsbook);
+            Assert.Equal(0m, row.RevenueShareJackpot);
+            Assert.Equal("10939", row.LimitId);
+            Assert.Equal("https://product.qtplatform.com/s88", row.Endpoint);
+            Assert.Equal("KEH", row.ReferenceClientCode);
+            Assert.Equal("PHP", row.CurrencyCode);
+            Assert.Equal((10m, 5000m, 10000m), (row.SoccerMinPerTicket, row.SoccerMaxPerTicket, row.SoccerMaxPerGame));
+            Assert.Equal((10m, 5000m, 10000m), (row.AllSportsMinPerTicket, row.AllSportsMaxPerTicket, row.AllSportsMaxPerGame));
+            Assert.Equal((10m, 2000m, 50000m, 0.02m), (row.ParlayMinPerTicket, row.ParlayMaxPerTicket, row.ParlayMaxPayoutPerTicket, row.ParlayMaxWinningsBonus));
+        }
+
+        [Fact]
+        public void CreateParser_RejectsBlankLimits_InsteadOfSavingZero()
+        {
+            var lines = ReadShippedTemplate().Split('\n').Select(l => l.TrimEnd('\r')).Where(l => l.Length > 0).ToList();
+            var headers = lines[0].Split(',').ToList();
+            var cells = lines[1].Split(',');
+            cells[headers.IndexOf("SoccerMaxPerTicket")] = string.Empty;
+            cells[headers.IndexOf("ParlayMaxWinningsBonus")] = " ";
+
+            var result = ClientImportCsvParser.Parse(lines[0] + "\n" + string.Join(",", cells));
+
+            var error = Assert.Single(result.Errors);
+            Assert.Contains("Row 2", error);
+            Assert.Contains("SoccerMaxPerTicket, ParlayMaxWinningsBonus", error);
+        }
+
         [Fact]
         public void Export_UsesExactlyTheTemplateColumns()
         {

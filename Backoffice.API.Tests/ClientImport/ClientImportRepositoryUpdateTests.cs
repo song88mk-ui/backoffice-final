@@ -93,6 +93,7 @@ namespace Backoffice.API.Tests.ClientImport
             SportsbookShare = 0.1m,
             JackpotShare = 0.08m,
             StatusId = (int)ClientStatus.Normal,
+            ApplicationId = (int)Application2.SBC,
             IsDeleted = false
         };
 
@@ -445,10 +446,86 @@ namespace Backoffice.API.Tests.ClientImport
             h.BackofficeRepo.Setup(r => r.GetBetSettingsBulk(It.IsAny<List<int>>()))
                 .ReturnsAsync(new BaseResponse<Dictionary<int, List<ClientListResponse.BetSetting>>> { StatusCode = StatusCode.Error, Message = "bad JSON", Result = null });
 
-            var response = await h.Sut.ExportClients();
+            var response = await h.Sut.ExportClients(null, ClientSorting.SortByBusinessNameAsc, null);
 
             Assert.Equal(StatusCode.Error, response.StatusCode);
             Assert.Null(response.Result);
+        }
+
+        // BO-163: Export CSV holds what the Manage Clients list shows for the same search and sort.
+        private static Harness BuildExportHarness(string dbName)
+        {
+            var h = BuildHarness(dbName, MakeClient(1, "NWS"));
+            var eaz = MakeClient(2, "EAZ");
+            eaz.Name = "QTE-Eazywin999";
+            eaz.CreatedDate = new DateTime(2026, 1, 1);
+            var eaz2 = MakeClient(3, "EZ2");
+            eaz2.Name = "Eazy Two";
+            eaz2.CreatedDate = new DateTime(2026, 3, 1);
+            var deleted = MakeClient(4, "EZD");
+            deleted.Name = "Eazy Deleted";
+            deleted.IsDeleted = true;
+            var otherApp = MakeClient(5, "EZA");
+            otherApp.Name = "Eazy Agent";
+            otherApp.ApplicationId = (int)Application2.AMS;
+            h.Context.ClientInformation.AddRange(eaz, eaz2, deleted, otherApp);
+            h.Context.SaveChanges();
+            return h;
+        }
+
+        [Fact]
+        public async Task Export_OnlyHasTheClientsMatchingTheSearch()
+        {
+            var h = BuildExportHarness(nameof(Export_OnlyHasTheClientsMatchingTheSearch));
+
+            var response = await h.Sut.ExportClients(" eaz ", ClientSorting.SortByBusinessNameAsc, null);
+
+            Assert.Equal(StatusCode.Success, response.StatusCode);
+            // Case-insensitive, trimmed; deleted and non-Sportsbook clients are left out like in the list.
+            Assert.Equal(new[] { "EZ2", "EAZ" }, response.Result.Select(r => r.ClientCode));
+        }
+
+        [Fact]
+        public async Task Export_FollowsTheListSortOrder()
+        {
+            var h = BuildExportHarness(nameof(Export_FollowsTheListSortOrder));
+
+            var byCreatedDesc = await h.Sut.ExportClients("eaz", ClientSorting.SortByCreatedDateDesc, null);
+            var byNameDesc = await h.Sut.ExportClients(null, ClientSorting.SortByBusinessNameDesc, null);
+
+            Assert.Equal(new[] { "EZ2", "EAZ" }, byCreatedDesc.Result.Select(r => r.ClientCode));
+            Assert.Equal(new[] { "EAZ", "NWS", "EZ2" }, byNameDesc.Result.Select(r => r.ClientCode));
+        }
+
+        [Fact]
+        public async Task Export_OnlyHasTheCallersBrands()
+        {
+            var h = BuildExportHarness(nameof(Export_OnlyHasTheCallersBrands));
+
+            var some = await h.Sut.ExportClients(null, ClientSorting.SortByBusinessNameAsc, new List<string> { "NWS" });
+            var none = await h.Sut.ExportClients(null, ClientSorting.SortByBusinessNameAsc, new List<string>());
+
+            Assert.Equal(new[] { "NWS" }, some.Result.Select(r => r.ClientCode));
+            Assert.Empty(none.Result);
+        }
+
+        [Fact]
+        public async Task Export_WritesOneRowPerCurrencyOfEachMatchingClient()
+        {
+            var betSettings = new Dictionary<int, List<ClientListResponse.BetSetting>>
+            {
+                [1] = new List<ClientListResponse.BetSetting>
+                {
+                    new ClientListResponse.BetSetting { CurrencyCode = "PHP" },
+                    new ClientListResponse.BetSetting { CurrencyCode = "USD" }
+                }
+            };
+            var h = BuildHarness(nameof(Export_WritesOneRowPerCurrencyOfEachMatchingClient), MakeClient(1, "NWS"), betSettings);
+
+            var response = await h.Sut.ExportClients("nws", ClientSorting.SortByBusinessNameAsc, null);
+
+            Assert.Equal(new[] { "PHP", "USD" }, response.Result.Select(r => r.CurrencyCode));
+            Assert.All(response.Result, r => Assert.Equal("NWS", r.ClientCode));
         }
 
         [Fact]

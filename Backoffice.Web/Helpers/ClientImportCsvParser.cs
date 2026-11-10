@@ -14,6 +14,15 @@ namespace Backoffice.Web.Helpers
             "ParlayMinPerTicket", "ParlayMaxPerTicket", "ParlayMaxPayoutPerTicket", "ParlayMaxWinningsBonus"
         };
 
+        // A blank limit would be saved as 0, not as the standard limits, so a new client must have every one.
+        // The template (Download CSV) carries the standard limits to keep unless the client asked for others.
+        private static readonly string[] LimitColumns = new[]
+        {
+            "SoccerMinPerTicket", "SoccerMaxPerTicket", "SoccerMaxPerGame",
+            "AllSportsMinPerTicket", "AllSportsMaxPerTicket", "AllSportsMaxPerGame",
+            "ParlayMinPerTicket", "ParlayMaxPerTicket", "ParlayMaxPayoutPerTicket", "ParlayMaxWinningsBonus"
+        };
+
         public class ParseResult
         {
             public List<ClientImportRowRequest> Rows { get; set; } = new();
@@ -87,6 +96,12 @@ namespace Backoffice.Web.Helpers
                 else if (!Enum.TryParse<Backoffice.Shared.Enums.Currency>(currencyRaw, true, out _))
                 {
                     result.Errors.Add($"Row {rowNumber}: \"{currencyRaw}\" is not a recognized currency code.");
+                }
+
+                var blankLimits = LimitColumns.Where(c => string.IsNullOrWhiteSpace(Get(c))).ToList();
+                if (blankLimits.Count > 0)
+                {
+                    result.Errors.Add($"Row {rowNumber}: every limit column is required. Blank: {string.Join(", ", blankLimits)}. Use the standard limits from Download CSV unless the client asked for different ones.");
                 }
 
                 result.Rows.Add(new ClientImportRowRequest
