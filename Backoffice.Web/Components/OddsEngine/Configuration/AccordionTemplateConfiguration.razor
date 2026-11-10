@@ -6,9 +6,10 @@
             </button>
 
             <div class="d-flex justify-content-around market-toggle">
-                <span class="market-is-active-text">@(Market.MarketLookup.IsActive ? "Market Active" : "Market Inactive")&nbsp;</span>
                 <AuthorizeView Policy="sbc-config-canedit">
                     <Authorized Context="ActivateAll">
+                        @* BO-156: the text reads the same value as the switch next to it, the edited state *@
+                        <span class="market-is-active-text">@(Market.NewMarketLookup.IsActive ? "Market Active" : "Market Inactive")&nbsp;</span>
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox"
                                    id="@($"Market-{Market.NewMarketLookup.MarketTemplateId}Toggle")" role="switch"
@@ -17,6 +18,7 @@
                         </div>
                     </Authorized>
                     <NotAuthorized Context="ActivateAll">
+                        <span class="market-is-active-text">@(Market.MarketLookup.IsActive ? "Market Active" : "Market Inactive")&nbsp;</span>
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox"
                                    id="@($"Market-{Market.MarketLookup.MarketTemplateId}Toggle")" role="switch"

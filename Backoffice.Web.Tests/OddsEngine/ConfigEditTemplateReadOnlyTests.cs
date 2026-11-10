@@ -27,6 +27,7 @@ namespace Backoffice.Web.Tests.OddsEngine
         private const long TemplateId = 5;
 
         private readonly Mock<IBackofficeService> _backofficeService = new();
+        private readonly BunitAuthorizationContext _authContext;
 
         public ConfigEditTemplateReadOnlyTests()
         {
@@ -67,9 +68,9 @@ namespace Backoffice.Web.Tests.OddsEngine
                 sp.GetRequiredService<NavigationManager>()));
 
             // a user who may edit: the toggles must be locked by the page, not just hidden by the permission
-            var authContext = this.AddAuthorization();
-            authContext.SetAuthorized("test-user");
-            authContext.SetPolicies("sbc-config", "sbc-config-canedit");
+            _authContext = this.AddAuthorization();
+            _authContext.SetAuthorized("test-user");
+            _authContext.SetPolicies("sbc-config", "sbc-config-canedit");
 
             _backofficeService
                 .Setup(s => s.GetSportLookup(It.IsAny<string>()))
@@ -136,6 +137,71 @@ namespace Backoffice.Web.Tests.OddsEngine
 
             Assert.All(cut.FindAll("div.market-toggle input.form-check-input"), toggle => Assert.True(toggle.HasAttribute("disabled")));
             Assert.True(cut.Find("button.btn-activate-all").HasAttribute("disabled"));
+        }
+
+        // BO-156: the "Market Active" / "Market Inactive" text next to a switch showed the saved state, so while a user was
+        // editing it disagreed with the switch until the template was saved and reopened.
+
+        // The template as saved: these markets are Active, every other market of the template is Inactive.
+        private void ServeSavedActiveMarkets(params string[] activeMarketTemplateIds) =>
+            _backofficeService
+                .Setup(s => s.GetConfigTemplateMargin(TemplateId))
+                .ReturnsAsync(Ok(new ConfigTemplateMarginModel
+                {
+                    ConfigTemplateMargins = activeMarketTemplateIds
+                        .Select(id => new ConfigTemplateMargin
+                        {
+                            ConfigTemplateId = TemplateId,
+                            SportId = 17,
+                            MarketTemplateId = id,
+                            FixtureTypeId = (int)FixtureType.Match,
+                            FixtureStatusId = (int)Scope.Prematch,
+                            IsActive = true,
+                            Config = JsonSerializer.Serialize(new List<MarketMargin> { new() { T = 0, M = 101 } })
+                        })
+                        .ToList()
+                }));
+
+        // the text of each market, in the order the markets are listed (4th Quarter Result, then Totals)
+        private static List<string> MarketTexts(IRenderedComponent<ConfigEditTemplate> cut) =>
+            cut.FindAll("div.market-toggle span.market-is-active-text").Select(span => span.TextContent.Trim()).ToList();
+
+        [Fact]
+        public void TheMarketText_FollowsTheSwitch_WhileEditing()
+        {
+            ServeSavedActiveMarkets("9484");
+            var cut = RenderEditor();
+            Assert.Equal(new[] { "Market Active", "Market Inactive" }, MarketTexts(cut));
+
+            cut.FindAll("div.market-toggle input.form-check-input")[0].Input(false);
+            cut.FindAll("div.market-toggle input.form-check-input")[1].Input(true);
+
+            cut.WaitForAssertion(() => Assert.Equal(new[] { "Market Inactive", "Market Active" }, MarketTexts(cut)));
+
+            // and back: switching a market back to its saved state shows the saved text again
+            cut.FindAll("div.market-toggle input.form-check-input")[0].Input(true);
+
+            cut.WaitForAssertion(() => Assert.Equal(new[] { "Market Active", "Market Active" }, MarketTexts(cut)));
+        }
+
+        [Fact]
+        public void TheMarketText_IsTheSavedState_ForAUserWhoCannotEdit()
+        {
+            ServeSavedActiveMarkets("9484");
+            _authContext.SetPolicies("sbc-config"); // no sbc-config-canedit: the switches are shown but locked
+            var cut = RenderEditor();
+
+            Assert.Equal(new[] { "Market Active", "Market Inactive" }, MarketTexts(cut));
+            Assert.All(cut.FindAll("div.market-toggle input.form-check-input"), toggle => Assert.True(toggle.HasAttribute("disabled")));
+        }
+
+        [Fact]
+        public void TheMarketText_IsTheSavedState_InViewMode()
+        {
+            ServeSavedActiveMarkets("9485");
+            var cut = RenderEditor(view: true);
+
+            Assert.Equal(new[] { "Market Inactive", "Market Active" }, MarketTexts(cut));
         }
 
         [Fact]
