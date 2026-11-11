@@ -117,9 +117,13 @@ OnBulkUpdateConfigMessage
 ├─ Multiple configurations
 └─ Used for: Batch operations
 
-OnCopyClientSettingsMessage
-├─ Settings replication
-└─ Used for: Client cloning
+OnCopyClientSettingsMessage  (MessageType OnCopyClientSettings2)
+├─ Route: r.oe.web.config.oncopyclientsettings2
+├─ Published by BackofficeRepository.CopyClientConfig (Config > Copy Client Settings), one message per
+│   copied target client after its template assignments are saved (BO-162; before, the Web published it)
+├─ Payload: UserId, FromClientCode, ToClientCode, ToRemoveConfig (the target's leagues the source has no
+│   assignment for)
+└─ No consumer in the deployed Odds Engine v2 (checked 2026-11-10); a failed publish is only logged
 ```
 
 ### Manual Market Settlement

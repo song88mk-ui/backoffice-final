@@ -372,7 +372,7 @@ Authentication model (see `Backoffice.API/ActionFilter/`):
 | GET | `api/config/template/count` | Template config counts (`?state=`); HTTP 400 when the league lookup, the client list or the saved settings behind a count fails (BO-143, BO-144), never a wrong number. The Unassigned count follows the same rule as the list and counts only the caller's clients |
 | GET | `api/config/template/margin/{id}` | Get config template margin |
 | POST | `api/config/template/margin` | Add or update template margin (Edit). The template editor's key and time nodes are view-only until margin per client is enabled (the odds come from the provider by default), so a save sends only the default margins and the market Active/Inactive state (BO-142) |
-| POST | `api/config/template/copy/client` | Copy a client's config |
+| POST | `api/config/template/copy/client` | Copy the league template assignments of one client to one or more clients (`ToClients`; the single `ToClient*` fields are still read when `ToClients` is empty). One transaction per target, a result per target, refused when the source has no assignments (Edit, BO-162) |
 | POST | `api/config/activitylog` | Add an activity log entry |
 | POST | `api/config/set/activitylog/list` | Add a batch of activity log entries |
 | POST | `api/config/activitylog/list` | Query activity logs |

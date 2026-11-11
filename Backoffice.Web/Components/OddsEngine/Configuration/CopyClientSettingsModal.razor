@@ -1,34 +1,76 @@
 ﻿<div class="modal-body">
-    <div class="row mb-3">
-        <div class="col">
-            <label for="fromClient" class="form-label">@_translationState.GetValue("From")</label>
-            <select class="form-select" id="fromClient" @onchange="@(e => OnFromClientChangedEvent(e))">
-                @foreach (var item in Clients)
-                {
-                    if (SelectedToClient.Key != item.ClientCode)
+    @if (!_confirming)
+    {
+        <div class="row mb-3">
+            <div class="col">
+                <label for="fromClient" class="form-label">@_translationState.GetValue("From")</label>
+                <select class="form-select" id="fromClient" disabled="@(!_fromClients.Any())" @onchange="OnFromClientChangedEvent">
+                    @foreach (var client in _fromClients)
                     {
-                        <option @key="item" value="@item.ClientCode" selected="@(item.ClientCode == SelectedFromClient.Key)">@item.ClientName</option>
+                        <option @key="client.ClientCode" value="@client.ClientCode" selected="@(client.ClientCode == _fromClientCode)">@client.ClientName</option>
                     }
-                }
-            </select>
+                </select>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <label for="toClient" class="form-label">@_translationState.GetValue("To")</label>
-            <select class="form-select" id="toClient" @onchange="OnToClientChangedEvent">
-                @foreach (var item in Clients)
-                {
-                    if (SelectedFromClient.Key != item.ClientCode)
+        <section class="ccs-copy-section">
+            <div class="d-flex gap-3">
+                <div class="ccs-copy-select">
+                    <label class="form-label">@_translationState.GetValue("To")</label>
+                    <div class="dropdown">
+                        <button class="btn btn-client dropdown-toggle" type="button" id="copy-client-settings-dropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">
+                            @if (_clients.Count > 1)
+                            {
+                                <span>@(_selected.Count == 1 ? _selected[0].Name : $"{_translationState.GetValue("Clients")} ({_selected.Count})")</span>
+                            }
+                            else
+                            {
+                                <span>@_translationState.GetValue("No Clients Available")</span>
+                            }
+                        </button>
+                        @if (_clients.Count > 1)
+                        {
+                            <SelectWithCheckbox Items="_clients" AriaLabel="copy-client-settings-dropdown" OnCheckboxCallback="OnClientCheckboxEvent" />
+                        }
+                    </div>
+                </div>
+                <div class="ccs-copy-selected flex-grow-1 d-flex flex-wrap align-content-start border rounded p-2">
+                    @foreach (var client in _selected)
                     {
-                        <option @key="item" value="@item.ClientCode" selected="@(item.ClientCode == SelectedToClient.Key)">@item.ClientName</option>
+                        <div class="ccs-chip mx-1 mb-1 py-1 px-2" @key="client.Code">
+                            @client.Name
+                            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close" @onclick="() => OnRemoveClientEvent(client.Code)"></button>
+                        </div>
                     }
-                }
-            </select>
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <div class="alert alert-warning mb-0" role="alert">
+            Copying will replace the league template assignments (prematch and live) of
+            <strong>@(_selected.Count == 1 ? _selected[0].Name : $"{_selected.Count} clients")</strong>
+            with those of <strong>@_fromClientName</strong>. Leagues that @_fromClientName has no template for are cleared.
+            You can't undo this action. Do you want to continue?
         </div>
-    </div>
+    }
+
+    @if (_alert != null && !string.IsNullOrEmpty(_alert.Message))
+    {
+        <div class="mt-3">
+            <AlertMessage AlertModel="@_alert" />
+        </div>
+    }
 </div>
-<div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" data-bs-dismiss="modal" @onclick="OnCancelModalClickEvent">@_translationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn btn-apply" @onclick="OnApplyModalClickEvent">@_translationState.GetValue("Apply")</button>
+<div class="modal-footer mx-4 p-0 py-3 border-0">
+    @if (!_confirming)
+    {
+        <button type="button" class="btn btn-cancel waves-effect" @onclick="OnCancelClickEvent">@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="btn btn-copy waves-effect" disabled="@(!CanCopy)" @onclick="OnCopyClickEvent">@_translationState.GetValue("Copy")</button>
+    }
+    else
+    {
+        <button type="button" class="btn btn-cancel waves-effect" disabled="@_isSaving" @onclick="OnBackClickEvent">@_translationState.GetValue("Back")</button>
+        <button type="button" class="btn btn-copy waves-effect" disabled="@_isSaving" @onclick="OnConfirmClickEvent">@_translationState.GetValue("Confirm")</button>
+    }
 </div>

@@ -1,90 +1,215 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
-    public partial class CopyClientSettingsModal : IDisposable
+    // Copy Client Settings: the league template assignments of one client replace those of the ticked clients.
+    // BO-162: several target clients at once (same pattern as the League Sorting and Sport Settings copy dialogs), with
+    // the confirmation step inside the dialog.
+    public partial class CopyClientSettingsModal
     {
-        #region Properties
-
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
         private EventCallback<AlertModel> OnCopyClientSettingsCallback { get; set; }
 
-        private List<PlatformClientResponse> Clients { get; set; }
+        private List<PlatformClientResponse> _fromClients = new List<PlatformClientResponse>();
+        private string _fromClientCode;
+        private string _fromClientName;
 
-        private KeyValuePair<string, string> SelectedFromClient { get; set; }
-        private KeyValuePair<string, string> SelectedToClient { get; set; }
-        #endregion
+        // Index 0 is the "all clients" entry that SelectWithCheckbox expects. The From client is not listed.
+        private List<SelectListItemWithCheckboxModel<string>> _clients = new List<SelectListItemWithCheckboxModel<string>>();
+        private List<(string Code, string Name)> _selected = new List<(string Code, string Name)>();
+
+        private bool _confirming;
+        private bool _isSaving;
+        private AlertModel _alert;
+
+        private bool CanCopy => !string.IsNullOrEmpty(_fromClientCode) && _selected.Any();
+
         #region Methods
-        protected override async Task OnInitializedAsync()
+
+        protected override void OnInitialized()
         {
-            Clients = new List<PlatformClientResponse>();
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback<AlertModel>>("OnCopyClientSettingsCallback");
-            await Initialize();
+
+            _fromClients = (_userState.Model.TradingClients ?? new List<PlatformClientResponse>())
+                .Where(c => !string.IsNullOrEmpty(c.ClientCode))
+                .GroupBy(c => c.ClientCode, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First())
+                .OrderBy(c => c.ClientName)
+                .ToList();
+
+            SetFromClient(_fromClients.FirstOrDefault()?.ClientCode);
         }
 
-        public async Task Initialize()
+        public void OnFromClientChangedEvent(ChangeEventArgs e)
         {
-            Clients = _userState.Model.TradingClients;
-
-            var selectedFrom = ModalParameters.TryGet<string>("FromClientCode");
-            var selectedTo = ModalParameters.TryGet<string>("ToClientCode");
-
-            if (!string.IsNullOrEmpty(selectedFrom) && !string.IsNullOrEmpty(selectedTo))
-            {
-                var clientFrom = Clients.FirstOrDefault(c => c.ClientCode.ToUpper() == selectedFrom.ToUpper());
-                var clientTo = Clients.FirstOrDefault(c => c.ClientCode.ToUpper() == selectedTo.ToUpper());
-
-                SelectedFromClient = new KeyValuePair<string, string>(clientFrom?.ClientCode ?? string.Empty, clientFrom?.ClientName ?? string.Empty);
-                SelectedToClient = new KeyValuePair<string, string>(clientTo?.ClientCode ?? string.Empty, clientTo?.ClientName ?? string.Empty);
-            }
-            else
-            {
-                SelectedFromClient = new KeyValuePair<string, string>(Clients[0].ClientCode, Clients[0].ClientName);
-                SelectedToClient = new KeyValuePair<string, string>(Clients[1].ClientCode, Clients[1].ClientName);
-            }
+            SetFromClient(e.Value?.ToString());
+            _alert = null;
         }
 
-        public async Task OnFromClientChangedEvent(ChangeEventArgs e)
+        // SelectWithCheckbox has already updated the checked state on the shared items when this runs.
+        public void OnClientCheckboxEvent(Dictionary<string, string> items)
         {
-            var clientCode = e.Value?.ToString()?.ToUpper() ?? string.Empty;
-            var client = Clients.FirstOrDefault(c => c.ClientCode == clientCode);
-
-            SelectedFromClient = new KeyValuePair<string, string>(clientCode, client?.ClientName ?? string.Empty);
+            SyncSelected();
+            _alert = null;
         }
 
-        public async Task OnToClientChangedEvent(ChangeEventArgs e)
+        public void OnRemoveClientEvent(string clientCode)
         {
-            var clientCode = e.Value?.ToString()?.ToUpper() ?? string.Empty;
-            var client = Clients.FirstOrDefault(c => c.ClientCode == clientCode);
+            var item = _clients.FirstOrDefault(c => c.Value == clientCode);
 
-            SelectedToClient = new KeyValuePair<string, string>(clientCode, client?.ClientName ?? string.Empty);
+            if (item != null)
+                item.IsChecked = false;
+
+            if (_clients.Any())
+                _clients[0].IsChecked = false;
+
+            SyncSelected();
         }
 
-        public async Task OnCancelModalClickEvent()
+        public void OnCancelClickEvent()
         {
             _modalService.Cancel();
         }
 
-        public async Task OnApplyModalClickEvent()
+        public void OnCopyClickEvent()
         {
-            var parameters = new ModalParameters();
-            parameters.Add("ModalClass", "modal-center");
-            parameters.Add("ModalDialogClass", "modal-md");
-            parameters.Add("ToClient", Clients.FirstOrDefault(c => c.ClientCode == SelectedToClient.Key));
-            parameters.Add("SelectedFromClient", SelectedFromClient);
-            parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);
+            if (!CanCopy)
+            {
+                _alert = Error("Please select the clients you want to copy to.");
+                return;
+            }
 
-            _modalService.Open<ConfirmCopyClientSettingsModal>($"Copy Client Settings", parameters);
+            _alert = null;
+            _confirming = true;
         }
-        public void Dispose()
+
+        public void OnBackClickEvent()
         {
-
+            _confirming = false;
         }
+
+        public async Task OnConfirmClickEvent()
+        {
+            _alert = null;
+            _isSaving = true;
+
+            var response = await _backofficeService.CopyClientConfig(new CopyClientConfigRequest
+            {
+                FromClientCode = _fromClientCode,
+                ToClients = _selected
+                    .Select(s => _fromClients.First(c => c.ClientCode == s.Code))
+                    .Select(c => new CopyClientConfigTarget
+                    {
+                        ClientId = c.ClientId,
+                        ClientCode = c.ClientCode,
+                        ClientName = c.ClientName
+                    })
+                    .ToList(),
+                UserId = _userState.Model.Id
+            });
+
+            _isSaving = false;
+
+            var targets = response?.Result?.Targets ?? new List<CopyClientConfigTargetResult>();
+            var copied = targets.Where(t => t.StatusCode == StatusCode.Success).ToList();
+            var failed = targets.Where(t => t.StatusCode != StatusCode.Success).ToList();
+
+            if (response?.StatusCode == StatusCode.Success)
+            {
+                _modalService.Cancel();
+                await OnCopyClientSettingsCallback.InvokeAsync(new AlertModel
+                {
+                    Status = AlertStatus.Success,
+                    Message = $"Client Settings copied to {Describe(copied)}.",
+                    Opacity = 1.0m
+                });
+                return;
+            }
+
+            _confirming = false;
+
+            if (copied.Any())
+            {
+                // Some clients were copied: say which, and which were not.
+                _alert = Error($"Copied to {NamesOf(copied)}. Not copied to {Failures(failed)}.");
+                return;
+            }
+
+            _alert = Error(failed.Any()
+                ? $"Not copied to {Failures(failed)}."
+                : response?.Message ?? "Copy Client Settings failed. Please try again.");
+        }
+
         #endregion
 
+        #region Utilities
+
+        // The From client is never offered as a target. Ticks on the other clients are kept when From changes.
+        private void SetFromClient(string clientCode)
+        {
+            var from = _fromClients.FirstOrDefault(c => string.Equals(c.ClientCode, clientCode, StringComparison.OrdinalIgnoreCase));
+
+            _fromClientCode = from?.ClientCode;
+            _fromClientName = from?.ClientName;
+
+            var ticked = _clients.Where(c => c.Value != "all" && c.IsChecked).Select(c => c.Value).ToHashSet();
+
+            var targets = _fromClients
+                .Where(c => c.ClientCode != _fromClientCode)
+                .Select(c => new SelectListItemWithCheckboxModel<string>
+                {
+                    Value = c.ClientCode,
+                    Name = c.ClientName,
+                    IsChecked = ticked.Contains(c.ClientCode)
+                })
+                .ToList();
+
+            if (targets.Any())
+            {
+                targets.Insert(0, new SelectListItemWithCheckboxModel<string>
+                {
+                    Value = "all",
+                    Name = "All Clients",
+                    IsChecked = targets.All(t => t.IsChecked)
+                });
+            }
+
+            _clients = targets;
+
+            SyncSelected();
+        }
+
+        private void SyncSelected()
+        {
+            _selected = _clients
+                .Where(c => c.Value != "all" && c.IsChecked)
+                .Select(c => (c.Value, c.Name))
+                .ToList();
+        }
+
+        private static AlertModel Error(string message) => new AlertModel
+        {
+            Status = AlertStatus.Error,
+            Message = message,
+            IsAlwaysShown = true
+        };
+
+        private string Describe(List<CopyClientConfigTargetResult> copied) =>
+            copied.Count == 1 ? NameOf(copied[0]) : $"{copied.Count} clients";
+
+        private string NameOf(CopyClientConfigTargetResult target) =>
+            _fromClients.FirstOrDefault(c => c.ClientCode == target.ClientCode)?.ClientName ?? target.ClientName ?? target.ClientCode;
+
+        private string NamesOf(IEnumerable<CopyClientConfigTargetResult> targets) => string.Join(", ", targets.Select(NameOf));
+
+        private string Failures(IEnumerable<CopyClientConfigTargetResult> failed) =>
+            string.Join(", ", failed.Select(t => $"{NameOf(t)} ({t.Message})"));
+
+        #endregion
     }
 }

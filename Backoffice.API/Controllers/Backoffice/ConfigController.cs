@@ -241,7 +241,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpPost("template/copy/client")]
-        [Authorize("SBC.OE.Config", ((int)Access.View))]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> CopyClientConfig([FromBody] CopyClientConfigRequest request)
         {
             var result = await _backofficeRepository.CopyClientConfig(request);

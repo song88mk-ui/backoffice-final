@@ -2430,83 +2430,198 @@ namespace Backoffice.API.Repositories
             }
         }
 
+        // Copy Client Settings: the league template assignments (prematch and live) of the source client replace those
+        // of each target. BO-162: several targets per request, one transaction per target, so one failing target leaves
+        // the others copied. The injected context is used directly: it is scoped and pooled, so it must not be disposed
+        // here (the old `using` broke every later use of it in the same request).
         public async Task<BaseResponse<CopyClientConfigResponse>> CopyClientConfig(CopyClientConfigRequest request)
         {
             try
             {
-                if (string.IsNullOrEmpty(request.FromClientCode) || string.IsNullOrEmpty(request.ToClientCode))
-                    return new BaseResponse<CopyClientConfigResponse>()
-                    {
-                        StatusCode = StatusCode.Error,
-                        Message = StatusCode.Error.ToString(),
-                        Result = new CopyClientConfigResponse
-                        {
-                            Result = false,
-                        }
-                    };
+                if (request == null || string.IsNullOrEmpty(request.FromClientCode))
+                    return CopyClientConfigError("Choose the client to copy from.");
 
-                var toBeRemovedConfigTemplate = new List<ConfigTemplateAssigned>();
+                var targets = CopyClientConfigTargets(request);
 
-                using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                if (!targets.Any())
+                    return CopyClientConfigError("Choose at least one client to copy to.");
+
+                var fromAssigned = _backofficeContext.ConfigTemplateAssigned
+                    .AsNoTracking()
+                    .Where(c => c.ClientCode == request.FromClientCode)
+                    .ToList();
+
+                // Copying nothing would clear every assignment of every target.
+                if (!fromAssigned.Any())
+                    return CopyClientConfigError($"{request.FromClientCode} has no template assignments to copy.");
+
+                var response = new CopyClientConfigResponse();
+
+                foreach (var target in targets)
                 {
-                    using (var context = _backofficeContext)
+                    var result = new CopyClientConfigTargetResult
                     {
-                        //check if there are existing config template assigned to ToClientCode that needs to be removed in OE.Adapter cache
-                        var fromClientConfigTemplateAssigned = context.ConfigTemplateAssigned.Where(c => c.ClientCode == request.FromClientCode).ToList();
-                        var toClientConfigTemplateAssigned = context.ConfigTemplateAssigned.Where(c => c.ClientCode == request.ToClientCode).ToList();
+                        ClientCode = target.ClientCode,
+                        ClientName = target.ClientName
+                    };
+                    response.Targets.Add(result);
 
-                        if (toClientConfigTemplateAssigned.Any())
-                        {
-                            foreach (var config in toClientConfigTemplateAssigned)
-                            {
-                                var fromConfig = fromClientConfigTemplateAssigned.FirstOrDefault(c => c.SportId == config.SportId && c.SegmentId == config.SegmentId && c.LeagueId == config.LeagueId);
-                                if (fromConfig == null)
-                                    toBeRemovedConfigTemplate.Add(config);
-                            }
-
-                            context.ConfigTemplateAssigned.RemoveRange(toClientConfigTemplateAssigned);
-                        }
-
-                        //assign all config templates assigned from FromClientCode into ToClientCode
-                        foreach (var config in fromClientConfigTemplateAssigned)
-                        {
-                            context.ConfigTemplateAssigned.Add(new ConfigTemplateAssigned()
-                            {
-                                ClientId = request.ToClientId,
-                                ClientCode = request.ToClientCode,
-                                ClientName = request.ToClientName,
-                                SportId = config.SportId,
-                                SportName = config.SportName,
-                                SegmentId = config.SegmentId,
-                                SegmentName = config.SegmentName,
-                                LeagueId = config.LeagueId,
-                                LeagueName = config.LeagueName,
-                                PrematchConfigTemplateId = config.PrematchConfigTemplateId,
-                                LiveConfigTemplateId = config.LiveConfigTemplateId
-                            });
-                        }
-                        context.SaveChanges();
-
-                        scope.Complete();
+                    if (string.Equals(target.ClientCode, request.FromClientCode, StringComparison.OrdinalIgnoreCase))
+                    {
+                        result.StatusCode = StatusCode.Error;
+                        result.Message = "It is the client copied from.";
+                        continue;
                     }
+
+                    List<ConfigTemplateAssigned> removed;
+
+                    try
+                    {
+                        removed = ReplaceClientConfigTemplateAssigned(fromAssigned, target);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Pending changes of the failed target must not be saved with the next one.
+                        _backofficeContext.ChangeTracker.Clear();
+
+                        Log.Error(ex, "Copy Client Settings from {FromClientCode} to {ToClientCode} failed", request.FromClientCode, target.ClientCode);
+
+                        result.StatusCode = StatusCode.Error;
+                        result.Message = ex.GetBaseException().Message;
+                        continue;
+                    }
+
+                    result.StatusCode = StatusCode.Success;
+                    result.Message = "Copied";
+                    response.ToBeRemoved.AddRange(removed);
+
+                    await PublishCopyClientSettings(request, target, removed);
                 }
+
+                response.Result = response.Targets.All(t => t.StatusCode == StatusCode.Success);
 
                 return new BaseResponse<CopyClientConfigResponse>()
                 {
-                    StatusCode = StatusCode.Success,
-                    Message = StatusCode.Success.ToString(),
-                    Result = new CopyClientConfigResponse
-                    {
-                        Result = true,
-                        ToBeRemoved = toBeRemovedConfigTemplate
-                    }
+                    StatusCode = response.Result ? StatusCode.Success : StatusCode.Error,
+                    Message = response.Result
+                        ? StatusCode.Success.ToString()
+                        : response.Targets.Any(t => t.StatusCode == StatusCode.Success) ? "Copied to some clients only." : "Not copied.",
+                    Result = response
                 };
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Copy Client Settings from {FromClientCode} failed", request?.FromClientCode);
                 return new BaseResponse<CopyClientConfigResponse>() { StatusCode = StatusCode.Error, Message = ex.Message };
             }
         }
+
+        // Replaces the assignments of one target in its own transaction. Returns the removed assignments of the leagues
+        // the source has none for.
+        protected virtual List<ConfigTemplateAssigned> ReplaceClientConfigTemplateAssigned(List<ConfigTemplateAssigned> fromAssigned, CopyClientConfigTarget target)
+        {
+            using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled);
+
+            var toAssigned = _backofficeContext.ConfigTemplateAssigned.Where(c => c.ClientCode == target.ClientCode).ToList();
+
+            var removed = toAssigned
+                .Where(t => !fromAssigned.Any(f => f.SportId == t.SportId && f.SegmentId == t.SegmentId && f.LeagueId == t.LeagueId))
+                .ToList();
+
+            _backofficeContext.ConfigTemplateAssigned.RemoveRange(toAssigned);
+
+            foreach (var config in fromAssigned)
+            {
+                _backofficeContext.ConfigTemplateAssigned.Add(new ConfigTemplateAssigned()
+                {
+                    ClientId = target.ClientId,
+                    ClientCode = target.ClientCode,
+                    ClientName = target.ClientName,
+                    SportId = config.SportId,
+                    SportName = config.SportName,
+                    SegmentId = config.SegmentId,
+                    SegmentName = config.SegmentName,
+                    LeagueId = config.LeagueId,
+                    LeagueName = config.LeagueName,
+                    PrematchConfigTemplateId = config.PrematchConfigTemplateId,
+                    LiveConfigTemplateId = config.LiveConfigTemplateId
+                });
+            }
+
+            _backofficeContext.SaveChanges();
+            scope.Complete();
+
+            // The saved rows would otherwise stay tracked into the next target.
+            _backofficeContext.ChangeTracker.Clear();
+
+            return removed;
+        }
+
+        // One OnCopyClientSettings2 per copied target, after its save. Nothing in the deployed Odds Engine v2 consumes
+        // r.oe.web.config.* (checked 2026-11-10), so a failed publish is only logged and never undoes the copy.
+        private async Task PublishCopyClientSettings(CopyClientConfigRequest request, CopyClientConfigTarget target, List<ConfigTemplateAssigned> removed)
+        {
+            var message = new OnCopyClientSettingsMessage
+            {
+                UserId = request.UserId,
+                FromClientCode = request.FromClientCode,
+                ToClientCode = target.ClientCode,
+                ToRemoveConfig = removed.Select(s => new ClientLeagueConfig
+                {
+                    ClientCode = s.ClientCode,
+                    ClientId = s.ClientId,
+                    SportId = s.SportId,
+                    SegmentId = s.SegmentId,
+                    LeagueId = s.LeagueId,
+                }).ToList()
+            };
+
+            var published = await _rabbitMqRepository.Publish(new MessageRequest
+            {
+                CorrelationId = Guid.NewGuid().ToString(),
+                MessageType = "OnCopyClientSettings2",
+                RoutingKey = "r.oe.web.config.oncopyclientsettings2",
+                Payload = JsonSerializer.Serialize(message)
+            });
+
+            if (published?.StatusCode != StatusCode.Success)
+                Log.Warning("OnCopyClientSettings2 for {ToClientCode} was not published: {Message}", target.ClientCode, published?.Message);
+        }
+
+        // Every distinct target of the request. An older Web sends only the single ToClient* fields.
+        private static List<CopyClientConfigTarget> CopyClientConfigTargets(CopyClientConfigRequest request)
+        {
+            var targets = request.ToClients ?? new List<CopyClientConfigTarget>();
+
+            if (!targets.Any() && !string.IsNullOrEmpty(request.ToClientCode))
+            {
+                targets = new List<CopyClientConfigTarget>
+                {
+                    new CopyClientConfigTarget
+                    {
+                        ClientId = request.ToClientId,
+                        ClientCode = request.ToClientCode,
+                        ClientName = request.ToClientName
+                    }
+                };
+            }
+
+            return targets
+                .Where(t => t != null && !string.IsNullOrEmpty(t.ClientCode))
+                .GroupBy(t => t.ClientCode, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First())
+                .ToList();
+        }
+
+        private static BaseResponse<CopyClientConfigResponse> CopyClientConfigError(string message) => new BaseResponse<CopyClientConfigResponse>()
+        {
+            StatusCode = StatusCode.Error,
+            Message = message,
+            Result = new CopyClientConfigResponse
+            {
+                Result = false
+            }
+        };
 
 
         #endregion
